@@ -1,0 +1,63 @@
+from django.db import models
+
+GENDER_CHOICES = (
+    ('M', 'Male'),
+    ('F', 'Female'),
+)
+
+class Competition(models.Model):
+    date = models.DateField()
+    end_date = models.DateField(blank=True, null=True)
+
+    created = models.DateTimeField(auto_now_add=True)
+    modified = models.DateTimeField(auto_now=True)
+
+    def clean(self, *args, **kwargs):
+        if self.end_date is None:
+            self.end_date = self.date
+        return super(Competition, self).clean(*args, **kwargs)
+
+    def __unicode__(self):
+        return 'OUIT: {0}'.format(self.date.year)
+
+class Bowstyle(models.Model):
+    name = models.CharField(max_length=50)
+
+    def __unicode__(self):
+        return self.name
+
+class Club(models.Model):
+    name = models.CharField(max_length=500)
+    short_name = models.CharField(max_length=50)
+
+    def __unicode__(self):
+        return self.short_name
+
+class Archer(models.Model):
+    name = models.CharField(max_length=200)
+    gender = models.CharField(max_length=1, choices=GENDER_CHOICES)
+    club = models.ForeignKey(Club)
+    bowstyle = models.ForeignKey(Bowstyle)
+
+    def __unicode__(self):
+        return self.name
+
+class Shoot(models.Model):
+    score = models.IntegerField()
+    hits = models.IntegerField()
+    golds = models.IntegerField()
+
+    competition = models.ForeignKey(Competition)
+    archer = models.ForeignKey(Archer)
+    club = models.ForeignKey(Club, blank=True, null=True)
+    bowstyle = models.ForeignKey(Bowstyle, blank=True, null=True)
+
+    def clean(self, *args, **kwargs):
+        if self.club is None:
+            self.club = self.archer.club
+        if self.bowstyle is None:
+            self.bowstyle = self.archer.bowstyle
+        return super(Shoot, self).clean(*args, **kwargs)
+
+    def __unicode__(self):
+        return '{0} at {1}'.format(self.archer, self.competition)
