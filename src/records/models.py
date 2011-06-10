@@ -1,5 +1,7 @@
 from django.db import models
 
+from itertools import groupby
+
 GENDER_CHOICES = (
     ('M', 'Male'),
     ('F', 'Female'),
@@ -16,6 +18,17 @@ class Competition(models.Model):
         if self.end_date is None:
             self.end_date = self.date
         return super(Competition, self).clean(*args, **kwargs)
+
+    def full_results(self):
+        ordering = ['bowstyle', 'archer__gender', '-score', '-hits', '-golds']
+        all_scores = self.shoot_set.select_related().order_by(*ordering)
+        results = []
+        for key, group in groupby(all_scores, lambda s: s.get_classification()):
+            results.append({
+                'class': key,
+                'scores': list(group)
+            })
+        return results
 
     def __unicode__(self):
         return 'OUIT: {0}'.format(self.date.year)
@@ -58,6 +71,9 @@ class Shoot(models.Model):
         if self.bowstyle is None:
             self.bowstyle = self.archer.bowstyle
         return super(Shoot, self).clean(*args, **kwargs)
+
+    def get_classification(self):
+        return '{0} {1}'.format(self.bowstyle, self.archer.get_gender_display())
 
     def __unicode__(self):
         return '{0} at {1}'.format(self.archer, self.competition)

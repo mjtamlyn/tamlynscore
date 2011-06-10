@@ -1,0 +1,17 @@
+<html>
+    <head>
+        {% block head %}
+        {% endblock head %}
+    </head>
+    <body>
+        <div class="wrapper">
+            {% block nav %}
+            <div class="navigation">
+                <a href="/">Home</a>
+            </div>
+            {% endblock nav %}
+            {% block content %}
+            {% endblock %}
+        </div>
+    </body>
+</html>

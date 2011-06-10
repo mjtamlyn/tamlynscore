@@ -1,0 +1,22 @@
+{% extends 'base.html' %}
+
+{% block content %}
+<h1>{{ competition }}</h1>
+
+{% for result in results %}
+<h2>{{ result.class }}</h2>
+<table>
+    {% for score in result.scores %}
+    <tr>
+        <td>{{ forloop.counter }}</td>
+        <td>{{ score.archer }}</td>
+        <td>{{ score.club }}</td>
+        <td>{{ score.score }}</td>
+        <td>{{ score.hits }}</td>
+        <td>{{ score.golds }}</td>
+    </tr>
+    {% endfor %}
+</table>
+{% endfor %}
+
+{% endblock %}

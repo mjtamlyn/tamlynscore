@@ -5,4 +5,5 @@ admin.autodiscover()
 
 urlpatterns = patterns('records.views',
     (r'^$', 'index'),
+    (r'^competition/(?P<competition_id>\d+)/$', 'competition_index'),
 )

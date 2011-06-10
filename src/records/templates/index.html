@@ -1,5 +1,11 @@
-<html>
-    <body>
-        <h1>Hello world (OUIT)</h1>
-    </body>
-</html>
+{% extends 'base.html' %}
+
+{% block content %}
+<h1>Competitions</h1>
+
+<ul>
+{% for competition in competitions %}
+<li><a href="/competition/{{ competition.pk }}">{{ competition }}</a></li>
+{% endfor %}
+</ul>
+{% endblock content %}
