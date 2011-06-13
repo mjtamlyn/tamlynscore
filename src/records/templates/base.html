@@ -1,17 +1,28 @@
 <html>
     <head>
         {% block head %}
+            {% block styles %}
+                <link rel="stylesheet" href="{{ STATIC_URL }}css/style.css" />
+                {% block extrastyles %}
+                {% endblock extrastyles %}
+            {% endblock styles %}
         {% endblock head %}
     </head>
     <body>
         <div class="wrapper">
             {% block nav %}
             <div class="navigation">
-                <a href="/">Home</a>
+                <a href="/"><div class="nav-link">Home</div></a>
+                <a href="/"><div class="nav-link">Other Home</div></a>
             </div>
             {% endblock nav %}
             {% block content %}
             {% endblock %}
+            {% block footer %}
+            <div class="footer">
+                <p>Designed, built and maintained by <a href="http://twitter.com/mjtamlyn">Marc Tamlyn</a></p>
+            </div>
+            {% endblock footer %}
         </div>
     </body>
 </html>
