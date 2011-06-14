@@ -1,13 +1,15 @@
 body {
-    background-color: #113;
+    background-color: #002147;
     font-family: Georgia;
 }
 h1, h2, h3, h4, h5, h6 {
+    background-color: #fff;
+    margin: 0px;
+    padding: 5px;
     text-align: center;
 }
 a {
-    
-    color: #000;
+    color: #111d2b;
     text-decoration: none;
 }
 a:hover {
@@ -19,34 +21,63 @@ ul {
 li {
     display: block;
 }
+.text-right {
+    text-align: right;
+}
 
 .wrapper {
-    background-color: #eee;
+    background-color: #c5efe2;
     border-radius: 10px;
-    box-shadow: 2px 2px #ddd;
-    color: #111;
+    box-shadow: 2px 2px #111d2b;
+    color: #000f1f;
     margin: 20px auto;
     width: 1000px;
 }
 .navigation {
-    background-color: #ccf;
-    border-radius: 10 10 0 0px;
     font-weight: bold;
     text-align: center;
     width: 100%;
 }
 .navigation .nav-link {
-    background-color: #559;
-    color: #eee;
+    background-color: #002147;
+    border-radius: 0 0 5 5px;
+    color: #fff;
     display: inline-block;
-    padding: 3px 8px;
+    padding: 8 8 3 8px;
+    position: relative;
+        top: -5px;
 }
 .navigation a:hover .nav-link {
-    background-color: #77a;
     text-decoration: underline;
+    position: relative;
+        top: 0px;
 }
 .footer {
     font-size: 10px;
     margin: 2px 0px;
     text-align: center;
+}
+
+.results {
+    margin-top: 10px;
+}
+.results-table {
+    background-color: #fff;
+    border-collapse: collapse;
+    color: inherit;
+    margin: 0 auto;
+    width: 60%;
+}
+.results-table .header {
+    background-color: #c5efe2;
+}
+.results-table .header th {
+    padding: 0px;
+}
+.results-table .header h2 {
+    border-radius: 10 10 0 0px;
+    margin-top: 10px;
+}
+.results-table td {
+    padding: 2px;
 }

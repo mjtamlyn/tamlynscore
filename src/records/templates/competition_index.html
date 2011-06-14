@@ -3,21 +3,25 @@
 {% block content %}
 <h1>{{ competition }}</h1>
 
-{% for result in results %}
-<h2>{{ result.class }}</h2>
-<table>
-    {% for score in result.scores %}
-    <tr>
-        <td>{{ forloop.counter }}</td>
-        <td>{{ score.archer }}</td>
-        <td>{{ score.club }}</td>
-        <td>{{ score.score }}</td>
-        <td>{{ score.hits }}</td>
-        <td>{{ score.golds }}</td>
-    </tr>
+<div class="results">
+    <table class="results-table">
+    {% for result in results %}
+        <tr class="header">
+            <th colspan="10"><h2>{{ result.class }}</h2></th>
+        </tr>
+        {% for score in result.scores %}
+        <tr>
+            <td>{{ forloop.counter }}</td>
+            <td>{{ score.archer }}</td>
+            <td>{{ score.club }}</td>
+            <td class="text-right">{{ score.score }}</td>
+            <td class="text-right">{{ score.hits }}</td>
+            <td class="text-right">{{ score.golds }}</td>
+        </tr>
+        {% endfor %}
     {% endfor %}
-</table>
-{% endfor %}
+    </table>
+</div>
 
 <div class="actions">
     <a href="add-scores/">Add more scores</a>
