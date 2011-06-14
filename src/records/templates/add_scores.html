@@ -1,11 +1,33 @@
 {% extends 'base.html' %}
 
+{% block title %}Add scores{% endblock %}
+
+{% block scripts %}
+<script src="{{ STATIC_URL }}js/mootools-core-1.3.js"></script>
+<script src="{{ STATIC_URL }}js/add_scores.js"></script>
+<script type="text/javascript">
+    window.addEvent('domready', function () {
+        var smartInput = new SmartInput();
+        smartInput.setUp();
+    });
+</script>
+{% endblock scripts %}
+
 {% block content %}
-<form action="" method="post">
+<form action="" method="post" autocomplete="off">
     <ul>
-    {% csrf_token %}
-    {{ form.as_ul }}
+        <li class="smart-input">
+            <label for="archer_input">{{ form.archer.label }}:</label>
+            <input type="text" id="archer_input" />
+            {{ form.archer }}
+        </li>
+        <li class="hidden">{{ form.bowstyle }}</li>
+        <li class="hidden">{{ form.club }}</li>
+        <li>{{ form.score.label }}: {{ form.score }}</li>
+        <li>{{ form.golds.label }}: {{ form.golds }}</li>
+        <li>{{ form.hits.label }}: {{ form.hits }}</li>
     </ul>
     <input type="submit" />
+    {% csrf_token %}
 </form>
 {% endblock content %}

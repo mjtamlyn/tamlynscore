@@ -1,11 +1,16 @@
 <html>
     <head>
         {% block head %}
+            {% block meta %}
+            <title>{% block title %}Archery Results{% endblock %}</title>
+            {% endblock meta %}
             {% block styles %}
                 <link rel="stylesheet" href="{{ STATIC_URL }}css/style.css" />
                 {% block extrastyles %}
                 {% endblock extrastyles %}
             {% endblock styles %}
+            {% block scripts %}
+            {% endblock scripts %}
         {% endblock head %}
     </head>
     <body>
