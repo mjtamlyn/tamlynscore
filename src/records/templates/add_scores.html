@@ -19,7 +19,8 @@
         <li class="smart-input">
             <label for="archer_input">{{ form.archer.label }}:</label>
             <input type="text" id="archer_input" />
-            {{ form.archer }}
+            <p id="archer-options"></p>
+            <div class="hidden">{{ form.archer }}</div>
         </li>
         <li class="hidden">{{ form.bowstyle }}</li>
         <li class="hidden">{{ form.club }}</li>

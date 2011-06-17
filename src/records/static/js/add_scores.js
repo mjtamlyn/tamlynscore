@@ -23,11 +23,14 @@ var SmartInput = new Class({
                     resultsLookup[value] = name;
                 }
             });
-            console.log(resultsLookup);
             input.addEvent('keyup', function (e) {
                 if (e.key == 'enter' || e.key == 'up' || e.key == 'down') {
                     console.log('hello');
                     e.stop();
+                    return;
+                }
+                if (!this.value) {
+                    $('archer-options').set('html', '');
                     return;
                 }
                 var params = this.value.split(' ');
@@ -49,12 +52,12 @@ var SmartInput = new Class({
                     });
                 });
                 var results = [];
-                Object.keys(hits).each(function (item, index) {
+                Object.keys(hits).each(function (item) {
                     if (hits[item] === params.length) {
-                        results.push(index);
+                        results.push(resultsLookup[item]);
                     }
                 });
-                console.log(results);
+                $('archer-options').set('html', results.join('<br />'));
             });
         });
     },

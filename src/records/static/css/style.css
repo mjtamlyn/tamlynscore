@@ -21,6 +21,9 @@ ul {
 li {
     display: block;
 }
+.hidden {
+    display: none;
+}
 .text-right {
     text-align: right;
 }
