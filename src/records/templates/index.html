@@ -1,13 +1,11 @@
 {% extends 'base.html' %}
 
 {% block content %}
-<h1>OUIT</h1>
-<h3>The Oxford University Company of Archers Indoor Tournament</h3>
-<h2>Results Archive</h2>
+<h1>Archery Results</h1>
 
 <ul>
 {% for competition in competitions %}
-<li><a href="/competition/{{ competition.pk }}">{{ competition.date.year }}</a></li>
+<li><a href="/competition/{{ competition.pk }}">{{ competition }}</a></li>
 {% endfor %}
 </ul>
 {% endblock content %}

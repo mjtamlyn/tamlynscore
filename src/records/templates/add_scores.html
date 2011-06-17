@@ -14,16 +14,19 @@
 {% endblock scripts %}
 
 {% block content %}
+<h1>Add Entries</h1>
 <form action="" method="post" autocomplete="off">
     <ul>
         <li class="smart-input">
             <label for="archer_input">{{ form.archer.label }}:</label>
             <input type="text" id="archer_input" />
-            <p id="archer-options"></p>
+            <div id="archer-options"></div>
             <div class="hidden">{{ form.archer }}</div>
         </li>
-        <li class="hidden">{{ form.bowstyle }}</li>
-        <li class="hidden">{{ form.club }}</li>
+        <li class="hidden archer-options new-archer-options">{{ form.bowstyle.label }}: {{ form.bowstyle }}</li>
+        <li class="hidden archer-options new-archer-options">{{ form.club.label }}: {{ form.club }}</li>
+        <li class="hidden new-archer-options">{{ form.gender.label }}: {{ form.gender }}</li>
+        <li class="hidden new-archer-options">{{ form.new_archer }}</li>
         <li>{{ form.score.label }}: {{ form.score }}</li>
         <li>{{ form.golds.label }}: {{ form.golds }}</li>
         <li>{{ form.hits.label }}: {{ form.hits }}</li>

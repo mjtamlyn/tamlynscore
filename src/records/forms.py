@@ -9,6 +9,8 @@ class ArcherField(forms.ModelChoiceField):
 class ScoreEntryForm(forms.ModelForm):
 
     archer = ArcherField(queryset=Archer.objects)
+    new_archer = forms.BooleanField()
+    gender = forms.ChoiceField(required=False, choices=GENDER_CHOICES)
 
     class Meta:
         model = Entry

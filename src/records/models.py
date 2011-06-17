@@ -8,9 +8,39 @@ GENDER_CHOICES = (
     ('F', 'Female'),
 )
 
+DISTANCE_UNITS = (
+    ('m', 'metres'),
+    ('y', 'yards'),
+)
+
+class Tournament(models.Model):
+    full_name = models.CharField(max_length=300)
+    short_name = models.CharField(max_length=20)
+
+    def __unicode__(self):
+        return self.short_name
+
+class Subround(models.Model):
+    arrows = models.PositiveIntegerField()
+    distance = models.PositiveIntegerField()
+    unit = models.CharField(max_length=1, choices=DISTANCE_UNITS)
+    
+    def __unicode__(self):
+        return '{0} arrows at {1} {2}'.format(self.arrows, self.distance, self.get_unit_display())
+
+class Round(models.Model):
+    name = models.CharField(max_length=100)
+    subrounds = models.ManyToManyField(Subround)
+
+    def __unicode__(self):
+        return self.name
+
 class Competition(models.Model):
     date = models.DateField()
     end_date = models.DateField(blank=True, null=True)
+
+    rounds = models.ManyToManyField(Round)
+    tournament = models.ForeignKey(Tournament)
 
     created = models.DateTimeField(auto_now_add=True)
     modified = models.DateTimeField(auto_now=True)
@@ -32,7 +62,7 @@ class Competition(models.Model):
         return results
 
     def __unicode__(self):
-        return 'OUIT: {0}'.format(self.date.year)
+        return '{0}: {1}'.format(self.tournament, self.date.year)
 
 class Bowstyle(models.Model):
     name = models.CharField(max_length=50)
@@ -74,16 +104,20 @@ class Entry(models.Model):
     hits = models.IntegerField(blank=True, null=True)
     golds = models.IntegerField(blank=True, null=True)
 
-    def clean(self, *args, **kwargs):
-        if self.club is None:
-            self.club = self.archer.club
-        if self.bowstyle is None:
-            self.bowstyle = self.archer.bowstyle
-        return super(Entry, self).clean(*args, **kwargs)
-
     def get_classification(self):
         return '{0} {1}'.format(self.bowstyle, self.archer.get_gender_display())
 
     def __unicode__(self):
         return '{0} at {1}'.format(self.archer, self.competition)
 
+    class Meta:
+        verbose_name_plural = 'entries'
+
+class Arrow(models.Model):
+    subround = models.ForeignKey(Subround)
+    entry = models.ForeignKey(Entry)
+    score = models.PositiveIntegerField()
+    arrow_of_round = models.PositiveIntegerField()
+
+    def __unicode__(self):
+        return unicode(self.score)
