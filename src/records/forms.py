@@ -9,10 +9,10 @@ class ArcherField(forms.ModelChoiceField):
 class ScoreEntryForm(forms.ModelForm):
 
     archer = ArcherField(queryset=Archer.objects)
-    new_archer = forms.BooleanField()
+    new_archer = forms.BooleanField(required=False)
     gender = forms.ChoiceField(required=False, choices=GENDER_CHOICES)
 
     class Meta:
         model = Entry
-        exclude = ['competition']
+        exclude = ['shot_round']
 

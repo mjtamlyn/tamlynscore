@@ -8,5 +8,5 @@ from records.views import *
 urlpatterns = patterns('records.views',
     (r'^$', 'index'),
     (r'^competition/(?P<competition_id>\d+)/$', 'competition_index'),
-    (r'^competition/(?P<competition_id>\d+)/add-scores/$', AddScoresView.as_view()),
+    (r'^add-scores/(?P<round_id>\d+)/$', AddScoresView.as_view()),
 )

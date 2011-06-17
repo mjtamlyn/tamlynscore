@@ -35,11 +35,15 @@ class Round(models.Model):
     def __unicode__(self):
         return self.name
 
+class BoundRound(models.Model):
+    round_type = models.ForeignKey(Round)
+    competition = models.ForeignKey('Competition')
+
 class Competition(models.Model):
     date = models.DateField()
     end_date = models.DateField(blank=True, null=True)
 
-    rounds = models.ManyToManyField(Round)
+    rounds = models.ManyToManyField(Round, through=BoundRound)
     tournament = models.ForeignKey(Tournament)
 
     created = models.DateTimeField(auto_now_add=True)
@@ -51,15 +55,17 @@ class Competition(models.Model):
         return super(Competition, self).clean(*args, **kwargs)
 
     def full_results(self):
-        ordering = ['bowstyle', 'archer__gender', '-score', '-hits', '-golds']
-        all_scores = self.entry_set.select_related().order_by(*ordering)
-        results = []
-        for key, group in groupby(all_scores, lambda s: s.get_classification()):
-            results.append({
-                'class': key,
-                'scores': list(group)
-            })
-        return results
+        return []
+        #TODO: fix this when we've got the db better laid out!
+        #ordering = ['bowstyle', 'archer__gender', '-score', '-hits', '-golds']
+        #all_scores = self.entry_set.select_related().order_by(*ordering)
+        #results = []
+        #for key, group in groupby(all_scores, lambda s: s.get_classification()):
+        #    results.append({
+        #        'class': key,
+        #        'scores': list(group)
+        #    })
+        #return results
 
     def __unicode__(self):
         return '{0}: {1}'.format(self.tournament, self.date.year)
@@ -95,7 +101,8 @@ class Archer(models.Model):
         })
 
 class Entry(models.Model):
-    competition = models.ForeignKey(Competition)
+    shot_round = models.ForeignKey(BoundRound)
+    
     archer = models.ForeignKey(Archer)
     club = models.ForeignKey(Club)
     bowstyle = models.ForeignKey(Bowstyle)
@@ -108,7 +115,7 @@ class Entry(models.Model):
         return '{0} {1}'.format(self.bowstyle, self.archer.get_gender_display())
 
     def __unicode__(self):
-        return '{0} at {1}'.format(self.archer, self.competition)
+        return '{0} at {1}'.format(self.archer, self.shot_round.competition)
 
     class Meta:
         verbose_name_plural = 'entries'

@@ -24,7 +24,9 @@
 </div>
 
 <div class="actions">
-    <a href="add-scores/">Add more scores</a>
+    {% for round in competition.boundround_set.all %}
+    <p><a href="/add-scores/{{ round.pk }}/">Add scores for the {{ round.round_type }} round</a></p>
+    {% endfor %}
 </div>
 
 {% endblock %}

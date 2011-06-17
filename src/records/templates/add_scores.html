@@ -16,6 +16,7 @@
 {% block content %}
 <h1>Add Entries</h1>
 <form action="" method="post" autocomplete="off">
+    {{ form.errors }}
     <ul>
         <li class="smart-input">
             <label for="archer_input">{{ form.archer.label }}:</label>
@@ -28,9 +29,10 @@
         <li class="hidden new-archer-options">{{ form.gender.label }}: {{ form.gender }}</li>
         <li class="hidden new-archer-options">{{ form.new_archer }}</li>
         <li>{{ form.score.label }}: {{ form.score }}</li>
-        <li>{{ form.golds.label }}: {{ form.golds }}</li>
         <li>{{ form.hits.label }}: {{ form.hits }}</li>
+        <li>{{ form.golds.label }}: {{ form.golds }}</li>
     </ul>
     {% csrf_token %}
+    <input type="submit" />
 </form>
 {% endblock content %}

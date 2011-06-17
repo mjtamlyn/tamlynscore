@@ -15,12 +15,18 @@ def competition_index(request, competition_id):
     return render_to_response('competition_index.html', locals(), context_instance=RequestContext(request))
 
 class AddScoresView(View):
-    def get(self, request, competition_id):
-        form = ScoreEntryForm(initial={'competition': competition_id})
+    def get(self, request, round_id):
+        the_round = get_object_or_404(BoundRound, id=round_id)
+        form = ScoreEntryForm()
         return render_to_response('add_scores.html', locals(), context_instance=RequestContext(request))
 
-    def post(self, request, competition_id):
-        form = ScoreEntryForm(request.POST, initial={'competition': competition_id})
-        print form.is_valid()
+    def post(self, request, round_id):
+        the_round = get_object_or_404(BoundRound, id=round_id)
+        form = ScoreEntryForm(request.POST)
+        if form.is_valid():
+            score = form.save(commit=False)
+            score.shot_round = the_round
+            score.save()
+            form = ScoreEntryForm()
         return render_to_response('add_scores.html', locals(), context_instance=RequestContext(request))
 

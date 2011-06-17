@@ -42,7 +42,8 @@ var SmartInput = new Class({
                         smartInput.moveDown();
                     }
                     if (e.key == 'enter' && this.value) {
-                        smartInput.selectArcher(this);
+                        this.blur()
+                        smartInput.selectArcher();
                     }
                     e.stop();
                 }
@@ -110,23 +111,29 @@ var SmartInput = new Class({
         }
     },
 
-    selectArcher: function (input) {
-        input.blur();
-        $$('.new-archer-options').addClass('hidden');
-        var current = $$('.archer-select.selected')[0];
-        var rel = current.get('rel');
+    selectArcher: function (preSelected) {
+        if (preSelected) {
+            console.log('be clever');
+        } else {
+            $$('.new-archer-options').addClass('hidden');
+            var current = $$('.archer-select.selected')[0];
+            var rel = current.get('rel');
+        }
         if (rel == 'new') {
             $$('.new-archer-options').removeClass('hidden');
             $('id_new_archer').set('checked', 'checked');
             $('id_bowstyle').getElement('option').set('selected', 'selected');
             $('id_club').getElement('option').set('selected', 'selected');
+            $('id_bowstyle').focus();
         } else {
             $$('.archer-options').removeClass('hidden');
             var archer = this.resultsLookup[rel];
+            $$('#id_archer option[value=' + rel + ']').set('selected', 'selected');
             $$('#id_bowstyle option[value=' + archer.bowstyle + ']').set('selected', 'selected');
             $$('#id_club option[value=' + archer.club + ']').set('selected', 'selected');
             $('id_new_archer').set('checked', '');
             $('archer_input').set('value', archer.name);
+            $('id_score').focus();
         }
         $('archer-options').empty();
     },
