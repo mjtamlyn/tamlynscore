@@ -1,6 +1,7 @@
 from django.db import models
 
 from itertools import groupby
+import json
 
 GENDER_CHOICES = (
     ('M', 'Male'),
@@ -21,7 +22,7 @@ class Competition(models.Model):
 
     def full_results(self):
         ordering = ['bowstyle', 'archer__gender', '-score', '-hits', '-golds']
-        all_scores = self.shoot_set.select_related().order_by(*ordering)
+        all_scores = self.entry_set.select_related().order_by(*ordering)
         results = []
         for key, group in groupby(all_scores, lambda s: s.get_classification()):
             results.append({
@@ -55,25 +56,34 @@ class Archer(models.Model):
     def __unicode__(self):
         return self.name
 
-class Shoot(models.Model):
-    score = models.IntegerField()
-    hits = models.IntegerField()
-    golds = models.IntegerField()
+    def json(self):
+        return json.dumps({
+            'name': self.name,
+            'gender': self.get_gender_display(),
+            'club': self.club.pk,
+            'bowstyle': self.bowstyle.pk,
+        })
 
+class Entry(models.Model):
     competition = models.ForeignKey(Competition)
     archer = models.ForeignKey(Archer)
-    club = models.ForeignKey(Club, blank=True, null=True)
-    bowstyle = models.ForeignKey(Bowstyle, blank=True, null=True)
+    club = models.ForeignKey(Club)
+    bowstyle = models.ForeignKey(Bowstyle)
+
+    score = models.IntegerField(blank=True, null=True)
+    hits = models.IntegerField(blank=True, null=True)
+    golds = models.IntegerField(blank=True, null=True)
 
     def clean(self, *args, **kwargs):
         if self.club is None:
             self.club = self.archer.club
         if self.bowstyle is None:
             self.bowstyle = self.archer.bowstyle
-        return super(Shoot, self).clean(*args, **kwargs)
+        return super(Entry, self).clean(*args, **kwargs)
 
     def get_classification(self):
         return '{0} {1}'.format(self.bowstyle, self.archer.get_gender_display())
 
     def __unicode__(self):
         return '{0} at {1}'.format(self.archer, self.competition)
+

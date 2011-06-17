@@ -84,3 +84,10 @@ li {
 .results-table td {
     padding: 2px;
 }
+
+.archer-select {
+    margin: 0 20px;
+}
+.archer-select.selected {
+    color: red;
+}

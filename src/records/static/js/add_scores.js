@@ -8,19 +8,19 @@ var SmartInput = new Class({
             hits = {};
             resultsLookup = {};
             select.getElements('option').each(function (option) {
-                var name, value;
+                var archer, value;
                 value = option.get('value');
                 if (value) {
                     hits[value] = 0;
-                    name = option.get('html'); 
-                    name.split(' ').each(function (part) {
+                    archer = JSON.decode(option.get('html'));
+                    archer.name.split(' ').each(function (part) {
                         if (search[part]) {
                             search[part].push(value);
                         } else {
                             search[part] = [value];
                         }
                     });
-                    resultsLookup[value] = name;
+                    resultsLookup[value] = archer;
                 }
             });
             input.addEvent('keyup', function (e) {
@@ -29,8 +29,8 @@ var SmartInput = new Class({
                     e.stop();
                     return;
                 }
+                $('archer-options').empty();
                 if (!this.value) {
-                    $('archer-options').set('html', '');
                     return;
                 }
                 var params = this.value.split(' ');
@@ -52,12 +52,18 @@ var SmartInput = new Class({
                     });
                 });
                 var results = [];
+                var displayResults = [];
                 Object.keys(hits).each(function (item) {
                     if (hits[item] === params.length) {
                         results.push(resultsLookup[item]);
+                        displayResults.push(new Element('p', {
+                            html: resultsLookup[item].name,
+                            'class': 'archer-select',
+                        }));
                     }
                 });
-                $('archer-options').set('html', results.join('<br />'));
+                $('archer-options').adopt(displayResults);
+                $('archer-options').firstChild.addClass('selected');
             });
         });
     },
