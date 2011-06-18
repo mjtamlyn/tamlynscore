@@ -1,4 +1,5 @@
 from django.db import models
+from django.forms import ValidationError
 
 from itertools import groupby
 import json
@@ -14,7 +15,7 @@ DISTANCE_UNITS = (
 )
 
 class Tournament(models.Model):
-    full_name = models.CharField(max_length=300)
+    full_name = models.CharField(max_length=300, unique=True)
     short_name = models.CharField(max_length=20)
 
     def __unicode__(self):
@@ -24,7 +25,7 @@ class Subround(models.Model):
     arrows = models.PositiveIntegerField()
     distance = models.PositiveIntegerField()
     unit = models.CharField(max_length=1, choices=DISTANCE_UNITS)
-    
+
     def __unicode__(self):
         return u'{0} arrows at {1} {2}'.format(self.arrows, self.distance, self.get_unit_display())
 
@@ -73,14 +74,17 @@ class Competition(models.Model):
     def __unicode__(self):
         return u'{0}: {1}'.format(self.tournament, self.date.year)
 
+    class Meta:
+        unique_together = ('date', 'tournament')
+
 class Bowstyle(models.Model):
-    name = models.CharField(max_length=50)
+    name = models.CharField(max_length=50, unique=True)
 
     def __unicode__(self):
         return self.name
 
 class Club(models.Model):
-    name = models.CharField(max_length=500)
+    name = models.CharField(max_length=500, unique=True)
     short_name = models.CharField(max_length=50)
 
     def __unicode__(self):
@@ -97,15 +101,19 @@ class Archer(models.Model):
 
     def json(self):
         return json.dumps({
+            'id': self.pk,
             'name': self.name,
             'gender': self.get_gender_display(),
             'club': self.club.pk,
             'bowstyle': self.bowstyle.pk,
         })
 
+    class Meta:
+        unique_together = ('name', 'club')
+
 class Entry(models.Model):
     shot_round = models.ForeignKey(BoundRound)
-    
+
     archer = models.ForeignKey(Archer)
     club = models.ForeignKey(Club)
     bowstyle = models.ForeignKey(Bowstyle)
@@ -122,6 +130,7 @@ class Entry(models.Model):
 
     class Meta:
         verbose_name_plural = 'entries'
+        unique_together = ('archer', 'shot_round')
 
 class Arrow(models.Model):
     subround = models.ForeignKey(Subround)
@@ -131,3 +140,10 @@ class Arrow(models.Model):
 
     def __unicode__(self):
         return unicode(self.score)
+
+    def clean(self):
+        if self.arrow_of_round > self.subround.arrows:
+            raise ValidationError('You can\'t have arrow {0} in a subround of {1} arrows.'.format(self.arrow_of_round, self.subround.arrows))
+
+    class Meta:
+        unique_together = ('subround', 'arrow_of_round', 'entry')
