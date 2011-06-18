@@ -59,17 +59,17 @@ class Competition(models.Model):
         return super(Competition, self).clean(*args, **kwargs)
 
     def full_results(self):
-        return []
-        #TODO: fix this when we've got the db better laid out!
-        #ordering = ['bowstyle', 'archer__gender', '-score', '-hits', '-golds']
-        #all_scores = self.entry_set.select_related().order_by(*ordering)
-        #results = []
-        #for key, group in groupby(all_scores, lambda s: s.get_classification()):
-        #    results.append({
-        #        'class': key,
-        #        'scores': list(group)
-        #    })
-        #return results
+        ordering = ['bowstyle', 'archer__gender', '-score', '-hits', '-golds']
+        results = {}
+        for the_round in self.boundround_set.all():
+            all_scores = the_round.entry_set.select_related().order_by(*ordering)
+            results[the_round] = []
+            for key, group in groupby(all_scores, lambda s: s.get_classification()):
+                results[the_round].append({
+                    'class': key,
+                    'scores': list(group)
+                })
+        return results
 
     def __unicode__(self):
         return u'{0}: {1}'.format(self.tournament, self.date.year)

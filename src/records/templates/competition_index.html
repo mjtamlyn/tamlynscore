@@ -5,19 +5,21 @@
 
 <div class="results">
     <table class="results-table">
-    {% for result in results %}
-        <tr class="header">
-            <th colspan="10"><h2>{{ result.class }}</h2></th>
-        </tr>
-        {% for score in result.scores %}
-        <tr>
-            <td>{{ forloop.counter }}</td>
-            <td>{{ score.archer }}</td>
-            <td>{{ score.club }}</td>
-            <td class="text-right">{{ score.score }}</td>
-            <td class="text-right">{{ score.hits }}</td>
-            <td class="text-right">{{ score.golds }}</td>
-        </tr>
+    {% for result_round in results.values %}
+        {% for result in result_round %}
+            <tr class="header">
+                <th colspan="10"><h2>{{ result.class }}</h2></th>
+            </tr>
+            {% for score in result.scores %}
+            <tr>
+                <td>{{ forloop.counter }}</td>
+                <td>{{ score.archer }}</td>
+                <td>{{ score.club }}</td>
+                <td class="text-right">{{ score.score }}</td>
+                <td class="text-right">{{ score.hits }}</td>
+                <td class="text-right">{{ score.golds }}</td>
+            </tr>
+            {% endfor %}
         {% endfor %}
     {% endfor %}
     </table>
