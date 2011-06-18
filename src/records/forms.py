@@ -37,3 +37,23 @@ class ScoreEntryForm(forms.ModelForm):
 class ClubForm(forms.ModelForm):
     class Meta:
         model = Club
+
+class ArrowForm(forms.ModelForm):
+    class Meta:
+        model = Arrow
+        exclude = ['subround', 'entry', 'arrow_of_round']
+
+def get_arrow_formset(the_round, target_no, doz_no):
+    archers = Entry.objects.filter(shot_round=the_round, target__startswith=target_no).order_by('target')
+    forms_list = []
+    for archer in archers:
+        target = {
+                'forms': [],
+                'archer': archer.archer,
+                'target': archer.target,
+        }
+        for arrow in range(1, 13):
+            prefix = archer.target[-1] + str(arrow)
+            target['forms'].append(ArrowForm(prefix=prefix))
+        forms_list.append(target)
+    return forms_list

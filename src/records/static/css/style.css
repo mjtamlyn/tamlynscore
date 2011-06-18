@@ -91,3 +91,7 @@ li {
 .archer-select.selected {
     color: red;
 }
+
+.arrow-values input {
+    width: 30px;
+}

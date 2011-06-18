@@ -28,9 +28,13 @@
         <li class="hidden archer-options new-archer-options">{{ form.club.label }}: {{ form.club }}</li>
         <li class="hidden new-archer-options">{{ form.gender.label }}: {{ form.gender }}</li>
         <li class="hidden new-archer-options">{{ form.new_archer }}</li>
+        {% if not the_round.use_individual_arrows %}
         <li>{{ form.score.label }}: {{ form.score }}</li>
         <li>{{ form.hits.label }}: {{ form.hits }}</li>
         <li>{{ form.golds.label }}: {{ form.golds }}</li>
+        {% else %}
+        <li>{{ form.target.label }}: {{ form.target }}</li>
+        {% endif %}
     </ul>
     {% csrf_token %}
     <input type="submit" />

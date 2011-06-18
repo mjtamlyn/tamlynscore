@@ -9,5 +9,7 @@ urlpatterns = patterns('records.views',
     (r'^$', 'index'),
     (r'^competition/(?P<competition_id>\d+)/$', 'competition_index'),
     (r'^add-scores/(?P<round_id>\d+)/$', AddScoresView.as_view()),
+    (r'^add-arrow-values/(?P<round_id>\d+)/$', 'add_arrow_values_index'),
+    (r'^add-arrow-values/(?P<round_id>\d+)/target/(?P<target_no>\d+)/doz/(?P<doz_no>\d+)/$', AddArrowValuesView.as_view()),
     (r'^new-club/$', NewClubView.as_view()),
 )
