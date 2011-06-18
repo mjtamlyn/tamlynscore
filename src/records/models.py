@@ -36,12 +36,21 @@ class Round(models.Model):
     def __unicode__(self):
         return self.name
 
+    @property
+    def arrows(self):
+        return self.subrounds.aggregate(models.Sum('arrows'))['arrows__sum']
+
 class BoundRound(models.Model):
     round_type = models.ForeignKey(Round)
     competition = models.ForeignKey('Competition')
+    use_individual_arrows = models.BooleanField(default=False)
 
     def __unicode__(self):
         return u'{0} at {1}'.format(self.round_type, self.competition)
+
+    @property
+    def arrows(self):
+        return self.round_type.arrows
 
 class Competition(models.Model):
     date = models.DateField()
@@ -121,6 +130,8 @@ class Entry(models.Model):
     score = models.IntegerField(blank=True, null=True)
     hits = models.IntegerField(blank=True, null=True)
     golds = models.IntegerField(blank=True, null=True)
+
+    target = models.CharField(max_length=10, blank=True, null=True)
 
     def get_classification(self):
         return u'{0} {1}'.format(self.bowstyle, self.archer.get_gender_display())

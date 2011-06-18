@@ -1,0 +1,13 @@
+{% extends 'base.html' %}
+
+{% block content %}
+<h1>Choose scores to update</h1>
+
+{% for target in targets %}
+    <h3>Target {{ target.target }}</h3>
+    Dozens:
+    {% for dozen in dozens %}
+    <a href="target/{{ target.target }}/doz/{{dozen}}/">{{ dozen }}</a>
+    {% endfor %}
+{% endfor %}
+{% endblock %}

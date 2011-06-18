@@ -1,0 +1,15 @@
+{% extends 'base.html' %}
+
+{% block content %}
+<h1>Add arrow scores for target {{ target_no }}, dozen {{ doz_no }}</h1>
+<form class="arrow-values">
+{% for target in forms %}
+    <div class="target">
+        <p>{{ target.archer }} - {{ target.target }}</p>
+        {% for form in target.forms %}
+        {{ form.score }}
+        {% endfor %}
+    </div>
+{% endfor %}
+</form>
+{% endblock %}
