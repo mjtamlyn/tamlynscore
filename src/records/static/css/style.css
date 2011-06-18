@@ -92,6 +92,6 @@ li {
     color: red;
 }
 
-.arrow-values input {
+.arrow-values input[type=text] {
     width: 30px;
 }
