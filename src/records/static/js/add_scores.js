@@ -132,7 +132,7 @@ var SmartInput = new Class({
             $$('#id_bowstyle option[value=' + archer.bowstyle + ']').set('selected', 'selected');
             $$('#id_club option[value=' + archer.club + ']').set('selected', 'selected');
             $('id_new_archer').set('checked', '');
-            $('archer_input').set('value', archer.name);
+            $('id_archer_name').set('value', archer.name);
             $('id_score').focus();
         }
         $('archer-options').empty();

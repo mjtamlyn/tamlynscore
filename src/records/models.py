@@ -26,7 +26,7 @@ class Subround(models.Model):
     unit = models.CharField(max_length=1, choices=DISTANCE_UNITS)
     
     def __unicode__(self):
-        return '{0} arrows at {1} {2}'.format(self.arrows, self.distance, self.get_unit_display())
+        return u'{0} arrows at {1} {2}'.format(self.arrows, self.distance, self.get_unit_display())
 
 class Round(models.Model):
     name = models.CharField(max_length=100)
@@ -38,6 +38,9 @@ class Round(models.Model):
 class BoundRound(models.Model):
     round_type = models.ForeignKey(Round)
     competition = models.ForeignKey('Competition')
+
+    def __unicode__(self):
+        return u'{0} at {1}'.format(self.round_type, self.competition)
 
 class Competition(models.Model):
     date = models.DateField()
@@ -68,7 +71,7 @@ class Competition(models.Model):
         #return results
 
     def __unicode__(self):
-        return '{0}: {1}'.format(self.tournament, self.date.year)
+        return u'{0}: {1}'.format(self.tournament, self.date.year)
 
 class Bowstyle(models.Model):
     name = models.CharField(max_length=50)
@@ -112,10 +115,10 @@ class Entry(models.Model):
     golds = models.IntegerField(blank=True, null=True)
 
     def get_classification(self):
-        return '{0} {1}'.format(self.bowstyle, self.archer.get_gender_display())
+        return u'{0} {1}'.format(self.bowstyle, self.archer.get_gender_display())
 
     def __unicode__(self):
-        return '{0} at {1}'.format(self.archer, self.shot_round.competition)
+        return u'{0} at {1}'.format(self.archer, self.shot_round.competition)
 
     class Meta:
         verbose_name_plural = 'entries'
