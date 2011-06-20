@@ -39,11 +39,25 @@ class ClubForm(forms.ModelForm):
         model = Club
 
 class ArrowForm(forms.ModelForm):
+
+    score = forms.CharField(required=False)
+
+    def clean(self):
+        score = self.cleaned_data.get('score', 'M')
+        if score == 'X':
+            self.cleaned_data['score'] = 10
+            self.cleaned_data['is_x'] = True
+        else:
+            self.cleaned_data['is_x'] = False
+        if score == 'M' or score == '':
+            self.cleaned_data['score'] = 0
+        return self.cleaned_data
+
     class Meta:
         model = Arrow
         exclude = ['subround', 'entry', 'arrow_of_round']
 
-def get_arrow_formset(the_round, target_no, doz_no):
+def get_arrow_formset(the_round, target_no, doz_no, data=None):
     archers = Entry.objects.filter(shot_round=the_round, target__startswith=target_no).order_by('target')
     forms_list = []
     for archer in archers:
@@ -54,6 +68,10 @@ def get_arrow_formset(the_round, target_no, doz_no):
         }
         for arrow in range(1, 13):
             prefix = archer.target[-1] + str(arrow)
-            target['forms'].append(ArrowForm(prefix=prefix))
+            try:
+                instance = Arrow.objects.get(entry=archer, arrow_of_round=int(doz_no)*12 + arrow, subround=the_round.round_type.get_subround(doz_no))
+            except Arrow.DoesNotExist:
+                instance = Arrow(entry=archer, arrow_of_round=int(doz_no)*12 + arrow, subround=the_round.round_type.get_subround(doz_no))
+            target['forms'].append(ArrowForm(data, instance=instance, prefix=prefix))
         forms_list.append(target)
     return forms_list

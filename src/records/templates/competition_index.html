@@ -4,8 +4,8 @@
 <h1>{{ competition }}</h1>
 
 <div class="results">
-    <table class="results-table">
     {% for result_round in results.values %}
+    <table class="results-table">
         {% for result in result_round %}
             <tr class="header">
                 <th colspan="10"><h2>{{ result.class }}</h2></th>
@@ -15,14 +15,17 @@
                 <td>{{ forloop.counter }}</td>
                 <td>{{ score.archer }}</td>
                 <td>{{ score.club }}</td>
-                <td class="text-right">{{ score.score }}</td>
-                <td class="text-right">{{ score.hits }}</td>
-                <td class="text-right">{{ score.golds }}</td>
+                <td class="text-right">{% if score.score %}{{ score.score }}{% else %}-{% endif %}</td>
+                <td class="text-right">{% if score.hits %}{{ score.hits }}{% else %}-{% endif %}</td>
+                <td class="text-right">{% if score.golds %}{{ score.golds }}{% else %}-{% endif %}</td>
+                {% if result.round.has_xs %}
+                <td class="text-right">{% if score.xs %}{{ score.xs }}{% else %}-{% endif %}</td>
+                {% endif %}
             </tr>
             {% endfor %}
         {% endfor %}
-    {% endfor %}
     </table>
+    {% endfor %}
 </div>
 
 <div class="actions">

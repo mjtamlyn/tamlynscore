@@ -32,6 +32,7 @@ class Subround(models.Model):
 class Round(models.Model):
     name = models.CharField(max_length=100)
     subrounds = models.ManyToManyField(Subround)
+    has_xs = models.BooleanField(default=False)
 
     def __unicode__(self):
         return self.name
@@ -39,6 +40,15 @@ class Round(models.Model):
     @property
     def arrows(self):
         return self.subrounds.aggregate(models.Sum('arrows'))['arrows__sum']
+
+    def get_subround(self, doz_no):
+        arrows = int(doz_no) * 12
+        subrounds = self.subrounds.order_by('-distance')
+        counter = 0
+        for subround in subrounds:
+            if subround.arrows >= arrows:
+                return subround
+        raise Exception('There aren\'t that many dozens in that round!')
 
 class BoundRound(models.Model):
     round_type = models.ForeignKey(Round)
@@ -75,6 +85,7 @@ class Competition(models.Model):
             results[the_round] = []
             for key, group in groupby(all_scores, lambda s: s.get_classification()):
                 results[the_round].append({
+                    'round': the_round.round_type,
                     'class': key,
                     'scores': list(group)
                 })
@@ -130,11 +141,19 @@ class Entry(models.Model):
     score = models.IntegerField(blank=True, null=True)
     hits = models.IntegerField(blank=True, null=True)
     golds = models.IntegerField(blank=True, null=True)
+    xs = models.IntegerField(blank=True, null=True)
 
     target = models.CharField(max_length=10, blank=True, null=True)
 
     def get_classification(self):
         return u'{0} {1}'.format(self.bowstyle, self.archer.get_gender_display())
+
+    def update_totals(self):
+        self.score = self.arrow_set.aggregate(models.Sum('score'))['score__sum']
+        self.golds = self.arrow_set.filter(score=10).count()
+        self.hits = self.arrow_set.exclude(score=0).count()
+        self.xs = self.arrow_set.filter(is_x=True).count()
+        self.save()
 
     def __unicode__(self):
         return u'{0} at {1}'.format(self.archer, self.shot_round.competition)
@@ -148,8 +167,13 @@ class Arrow(models.Model):
     entry = models.ForeignKey(Entry)
     score = models.PositiveIntegerField()
     arrow_of_round = models.PositiveIntegerField()
+    is_x = models.BooleanField(default=False)
 
     def __unicode__(self):
+        if self.is_x:
+            return u'X'
+        if self.score == 0:
+            return u'M'
         return unicode(self.score)
 
     def clean(self):

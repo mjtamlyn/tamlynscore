@@ -1,13 +1,24 @@
 {% extends 'base.html' %}
 
+{% block scripts %}
+<script src="{{ STATIC_URL }}js/mootools-core-1.3.js"></script>
+<script src="{{ STATIC_URL }}js/add_arrow_values_index.js"></script>
+<script type="text/javascript">
+    window.addEvent('domready', function () {
+        var valuesIndexPage = new ValuesIndexPage();
+        valuesIndexPage.setUp();
+    });
+</script>
+{% endblock scripts %}
+
 {% block content %}
 <h1>Choose scores to update</h1>
 
-{% for target in targets %}
-    <h3>Target {{ target.target }}</h3>
-    Dozens:
-    {% for dozen in dozens %}
-    <a href="target/{{ target.target }}/doz/{{dozen}}/">{{ dozen }}</a>
+{% for dozen in dozens %}
+    <h3>Dozen {{ dozen }}</h3>
+    Targets:
+    {% for target in targets %}
+    <a href="target/{{ target.target }}/doz/{{dozen}}/" {% if target.target == highlighted.target and dozen == highlighted.dozen %}class="focus"{% endif %}>{{ target.target }}</a>
     {% endfor %}
 {% endfor %}
 {% endblock %}

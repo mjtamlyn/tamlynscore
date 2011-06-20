@@ -1,3 +1,4 @@
+from django.http import HttpResponse, HttpResponseRedirect
 from django.shortcuts import render_to_response, get_object_or_404
 from django.template import RequestContext
 from django.views.generic import View
@@ -40,9 +41,14 @@ def add_arrow_values_index(request, round_id):
     targets = []
     for key, group in groupby(entries, lambda e: e.target[:-1]):
         targets.append({
-            'target': key,
+            'target': int(key),
             'archers': list(group)
         })
+    if request.GET.get('fd', ''):
+        highlighted = {
+            'dozen': int(request.GET['fd']),
+            'target': int(request.GET['ft']) + 1,
+        }
     return render_to_response('add_arrow_values_index.html', locals(), context_instance=RequestContext(request))
 
 class AddArrowValuesView(View):
@@ -51,12 +57,23 @@ class AddArrowValuesView(View):
         forms = get_arrow_formset(the_round, target_no, doz_no)
         return render_to_response('add_arrow_values.html', locals(), context_instance=RequestContext(request))
 
-    def post(self, request, round_id):
-        form = ClubForm(request.POST)
-        if form.is_valid():
-            form.save()
-            return self.get(request)
-        return render_to_response('new_club.html', locals(), context_instance=RequestContext(request))
+    def post(self, request, round_id, target_no, doz_no):
+        the_round = get_object_or_404(BoundRound, pk=round_id, use_individual_arrows=True)
+        forms = get_arrow_formset(the_round, target_no, doz_no, data=request.POST)
+        arrows = []
+        failed = False
+        for archer in forms:
+            for form in archer['forms']:
+                if form.is_valid():
+                    arrows.append(form.save(commit=False))
+                else:
+                    failed = True
+        if not failed:
+            for arrow in arrows:
+                arrow.save()
+                arrow.entry.update_totals()
+            return HttpResponseRedirect('../../../../?fd={0}&ft={1}'.format(doz_no, target_no))
+        return render_to_response('add_arrow_values.html', locals(), context_instance=RequestContext(request))
 
 class NewClubView(View):
     def get(self, request):
