@@ -15,7 +15,7 @@
 
 {% block content %}
 <h1>Add arrow scores for target {{ target_no }}, dozen {{ doz_no }}</h1>
-<form class="arrow-values" action="" method="post">
+<form class="arrow-values" action="" method="post" autocomplete="off">
     <table class="target">
         <tr>
             <th colspan="2">Archer</th>
@@ -33,7 +33,7 @@
             <td>{{ target.target }}</td>
             <td>{{ target.archer }}</td>
             {% for form in target.forms %}
-            <td>{{ form.score }}</td>
+            <td>{{ form.score }}<span class="hidden">{{ form.is_x.value }}</span></td>
             {% if forloop.counter == 6 %}
             <th class="end-total">0</th>
             {% endif %}
