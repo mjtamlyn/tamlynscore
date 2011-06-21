@@ -5,7 +5,7 @@
 
 <ul>
 {% for competition in competitions %}
-<li><a href="/competition/{{ competition.pk }}">{{ competition }}</a></li>
+<li><a href="{% url records.views.competition_index slug=competition.slug %}">{{ competition }}</a></li>
 {% endfor %}
 </ul>
 {% endblock content %}

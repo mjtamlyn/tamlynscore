@@ -17,8 +17,8 @@
         <div class="wrapper">
             {% block nav %}
             <div class="navigation">
-                <a href="/"><div class="nav-link">Home</div></a>
-                <a href="/new-club/"><div class="nav-link">New club</div></a>
+                <a href="{% url records.views.index %}"><div class="nav-link">Home</div></a>
+                <a href="{% url records.views.new_club %}"><div class="nav-link">Clubs</div></a>
             </div>
             {% endblock nav %}
             {% block content %}

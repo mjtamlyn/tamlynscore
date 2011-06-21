@@ -1,5 +1,6 @@
 from django.db import models
 from django.forms import ValidationError
+from django.template.defaultfilters import slugify
 
 from itertools import groupby
 import json
@@ -66,6 +67,8 @@ class Competition(models.Model):
     date = models.DateField()
     end_date = models.DateField(blank=True, null=True)
 
+    slug = models.SlugField(editable=False, unique=True)
+
     rounds = models.ManyToManyField(Round, through=BoundRound)
     tournament = models.ForeignKey(Tournament)
 
@@ -75,6 +78,7 @@ class Competition(models.Model):
     def clean(self, *args, **kwargs):
         if self.end_date is None:
             self.end_date = self.date
+        self.slug = slugify('{0} {1}'.format(self.tournament, self.date.year))
         return super(Competition, self).clean(*args, **kwargs)
 
     def full_results(self):
@@ -143,6 +147,7 @@ class Entry(models.Model):
     golds = models.IntegerField(blank=True, null=True)
     xs = models.IntegerField(blank=True, null=True)
 
+    retired = models.BooleanField(default=False)
     target = models.CharField(max_length=10, blank=True, null=True)
 
     def get_classification(self):
@@ -152,7 +157,8 @@ class Entry(models.Model):
         self.score = self.arrow_set.aggregate(models.Sum('score'))['score__sum']
         self.golds = self.arrow_set.filter(score=10).count()
         self.hits = self.arrow_set.exclude(score=0).count()
-        self.xs = self.arrow_set.filter(is_x=True).count()
+        if self.shot_round.round_type.has_xs:
+            self.xs = self.arrow_set.filter(is_x=True).count()
         self.save()
 
     def __unicode__(self):
