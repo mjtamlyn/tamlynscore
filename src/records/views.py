@@ -13,25 +13,28 @@ def index(request):
     competitions = Competition.objects.all()
     return render_to_response('index.html', locals(), context_instance=RequestContext(request))
 
-def competition_index(request, competition_id):
-    competition = get_object_or_404(Competition, id=competition_id)
+def competition_index(request, slug):
+    competition = get_object_or_404(Competition, slug=slug)
     results = competition.full_results()
     return render_to_response('competition_index.html', locals(), context_instance=RequestContext(request))
 
 class AddScoresView(View):
     def get(self, request, round_id):
         the_round = get_object_or_404(BoundRound, pk=round_id)
+        competition = the_round.competition
         form = ScoreEntryForm(initial={'hits': the_round.arrows})
         return render_to_response('add_scores.html', locals(), context_instance=RequestContext(request))
 
     def post(self, request, round_id):
         the_round = get_object_or_404(BoundRound, pk=round_id)
+        competition = the_round.competition
         entry = Entry(shot_round=the_round)
         form = ScoreEntryForm(request.POST, instance=entry)
         if form.is_valid():
             score = form.save()
             return self.get(request, round_id)
         return render_to_response('add_scores.html', locals(), context_instance=RequestContext(request))
+add_scores = AddScoresView.as_view()
 
 def add_arrow_values_index(request, round_id):
     the_round = get_object_or_404(BoundRound, pk=round_id, use_individual_arrows=True)
@@ -72,8 +75,9 @@ class AddArrowValuesView(View):
             for arrow in arrows:
                 arrow.save()
                 arrow.entry.update_totals()
-            return HttpResponseRedirect('../../../../?fd={0}&ft={1}'.format(doz_no, target_no))
+            return HttpResponseRedirect('../../../../?fd={0}&ft={1}#dozen-{0}'.format(doz_no, target_no))
         return render_to_response('add_arrow_values.html', locals(), context_instance=RequestContext(request))
+add_arrow_values = AddArrowValuesView.as_view()
 
 class NewClubView(View):
     def get(self, request):
@@ -86,4 +90,5 @@ class NewClubView(View):
             form.save()
             return self.get(request)
         return render_to_response('new_club.html', locals(), context_instance=RequestContext(request))
+new_club = NewClubView.as_view()
 

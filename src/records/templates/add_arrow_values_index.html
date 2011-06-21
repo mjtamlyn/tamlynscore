@@ -12,10 +12,13 @@
 {% endblock scripts %}
 
 {% block content %}
+<div class="actions">
+    <a href="{% url records.views.competition_index slug=the_round.competition.slug %}">Back</a>
+</div>
 <h1>Choose scores to update</h1>
 
 {% for dozen in dozens %}
-    <h3>Dozen {{ dozen }}</h3>
+    <h3 id="dozen-{{dozen}}">Dozen {{ dozen }}</h3>
     Targets:
     {% for target in targets %}
     <a href="target/{{ target.target }}/doz/{{dozen}}/" {% if target.target == highlighted.target and dozen == highlighted.dozen %}class="focus"{% endif %}>{{ target.target }}</a>
