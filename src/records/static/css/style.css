@@ -3,9 +3,9 @@ body {
     font-family: Georgia;
 }
 h1, h2, h3, h4, h5, h6 {
-    background-color: #fff;
+    background-image: -webkit-linear-gradient(#fff, #fff, #fff, #c5efe2);
     margin: 0px;
-    padding: 5px;
+    padding: 2px 5px 10px 5px;
     text-align: center;
 }
 a {
@@ -31,16 +31,18 @@ li {
 .wrapper {
     background-color: #c5efe2;
     border-radius: 10px;
-    box-shadow: 2px 2px #111d2b;
+    box-shadow: -2px 2px #796ef0;
     color: #000f1f;
     margin: 20px auto;
     width: 1000px;
 }
 .navigation {
+    background-image: -webkit-linear-gradient(#C9C5F0, #C5EFE2);
+    border-radius: 10px 10px 0px 0px;
     font-weight: bold;
     text-align: center;
     width: 100%;
-    margin-bottom: 5px;
+    margin-bottom: 10px;
 }
 .navigation .nav-link {
     background-color: #002147;
@@ -58,8 +60,12 @@ li {
 }
 .footer {
     font-size: 10px;
-    margin: 2px 0px;
+    padding: 5px 0px;
+    margin-top: 5px;
     text-align: center;
+}
+.footer p {
+    margin: 0;
 }
 
 .results {
