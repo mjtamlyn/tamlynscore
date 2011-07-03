@@ -1,4 +1,5 @@
 from django.db import models
+from django.template.defaultfilters import slugify
 
 class Tournament(models.Model):
     full_name = models.CharField(max_length=300, unique=True)

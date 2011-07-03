@@ -1,6 +1,5 @@
 from django.db import models
 from django.forms import ValidationError
-from django.template.defaultfilters import slugify
 
 from itertools import groupby
 

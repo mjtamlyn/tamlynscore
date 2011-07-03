@@ -1,4 +1,5 @@
 from django.db import models
+from django.template.defaultfilters import slugify
 
 import json
 
@@ -62,9 +63,13 @@ class Bowstyle(models.Model):
 
 class Club(models.Model):
     name = models.CharField(max_length=500, unique=True)
-    short_name = models.CharField(max_length=50)
+    short_name = models.CharField(max_length=50, unique=True)
 
-    slug = models.SlugField(editable=False)
+    slug = models.SlugField(editable=False, unique=True)
+
+    def clean(self, *args, **kwargs):
+        self.slug = slugify(self.short_name)
+        return super(Club, self).clean(*args, **kwargs)
 
     def __unicode__(self):
         return self.short_name

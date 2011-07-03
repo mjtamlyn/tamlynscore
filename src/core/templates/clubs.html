@@ -1,0 +1,13 @@
+{% extends 'base.html' %}
+
+{% block content %}
+<h1>Clubs</h1>
+
+<ul>
+{% for club in clubs %}
+<li><a href="{% url core.views.club_index club=club.slug %}">{{ club }}</a></li>
+{% endfor %}
+</ul>
+
+{% endblock %}
+
