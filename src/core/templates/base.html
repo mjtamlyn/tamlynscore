@@ -2,10 +2,10 @@
     <head>
         {% block head %}
             {% block meta %}
-            <title>{% block title %}Archery Results{% endblock %}</title>
+            <title>{% block title %}Archery Tournaments{% endblock %}</title>
             {% endblock meta %}
             {% block styles %}
-                <link rel="stylesheet" href="{{ STATIC_URL }}css/style.css" />
+                <link rel="stylesheet" href="{{ STATIC_URL }}css/base.css" />
                 {% block extrastyles %}
                 {% endblock extrastyles %}
             {% endblock styles %}
@@ -17,8 +17,8 @@
         <div class="wrapper">
             {% block nav %}
             <div class="navigation">
-                <a href="{% url records.views.index %}"><div class="nav-link">Home</div></a>
-                <a href="{% url records.views.new_club %}"><div class="nav-link">Clubs</div></a>
+                <a href="{% url core.views.index %}"><div class="nav-link">Home</div></a>
+                <a href="{% url core.views.clubs %}"><div class="nav-link">Clubs</div></a>
             </div>
             {% endblock nav %}
             {% block content %}
