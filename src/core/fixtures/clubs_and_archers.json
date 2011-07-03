@@ -1,0 +1,1 @@
+[{"pk": 1, "model": "core.club", "fields": {"name": "Oxford Archers", "short_name": "Oxford", "slug": ""}}, {"pk": 2, "model": "core.club", "fields": {"name": "Oxford University Company of Archers", "short_name": "OUCofA", "slug": ""}}, {"pk": 1, "model": "core.archer", "fields": {"name": "Marc Tamlyn", "club": 1, "gender": "M", "age": "S", "novice": false, "bowstyle": 1}}]
