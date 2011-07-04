@@ -1,0 +1,15 @@
+{% extends 'base.html' %}
+
+{% block content %}
+<h1>Tournaments</h1>
+
+<ul>
+{% for tournament in tournaments %}
+{% for competition in tournament.competition_set.all %}
+<li><a href="{% url entries.views.competition_index slug=competition.slug %}">{{ competition }}</a></li>
+{% endfor %}
+{% endfor %}
+</ul>
+
+{% endblock %}
+
