@@ -69,12 +69,18 @@ class CompetitionEntry(models.Model):
     def __unicode__(self):
         return u'{0} at {1}'.format(self.archer, self.competition)
 
+    class Meta:
+        verbose_name_plural = 'competition entries'
+
 class SessionEntry(models.Model):
     competition_entry = models.ForeignKey(CompetitionEntry)
     session_round = models.ForeignKey(SessionRound)
 
     def __unicode__(self):
         return u'{0} - {1}'.format(self.competition_entry, self.session_round.shot_round)
+
+    class Meta:
+        verbose_name_plural = 'session entries'
 
 class TargetAllocation(models.Model):
     session_entry = models.ForeignKey(SessionEntry)
