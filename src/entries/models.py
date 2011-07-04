@@ -1,21 +1,30 @@
 from django.db import models
 from django.template.defaultfilters import slugify
 
+from core.models import Archer, Bowstyle, Club, Round, AGE_CHOICES
+
+SCORING_SYSTEMS = (
+    ('F', 'Full running slips'),
+    ('D', 'Dozen running slips'),
+    ('T', 'Totals only'),
+)
+
 class Tournament(models.Model):
     full_name = models.CharField(max_length=300, unique=True)
     short_name = models.CharField(max_length=20)
+
+    host_club = models.ForeignKey(Club)
 
     def __unicode__(self):
         return self.short_name
 
 class Competition(models.Model):
+    tournament = models.ForeignKey(Tournament)
+
     date = models.DateField()
     end_date = models.DateField(blank=True, null=True)
 
     slug = models.SlugField(editable=False, unique=True)
-
-    rounds = models.ManyToManyField(Round, through=BoundRound)
-    tournament = models.ForeignKey(Tournament)
 
     created = models.DateTimeField(auto_now_add=True)
     modified = models.DateTimeField(auto_now=True)
@@ -26,68 +35,51 @@ class Competition(models.Model):
         self.slug = slugify('{0} {1}'.format(self.tournament, self.date.year))
         return super(Competition, self).clean(*args, **kwargs)
 
-    def full_results(self):
-        ordering = ['bowstyle', 'archer__gender', '-score', '-hits', '-golds']
-        results = {}
-        for the_round in self.boundround_set.all():
-            all_scores = the_round.entry_set.select_related().order_by(*ordering)
-            results[the_round] = []
-            for key, group in groupby(all_scores, lambda s: s.get_classification()):
-                results[the_round].append({
-                    'round': the_round.round_type,
-                    'class': key,
-                    'scores': list(group)
-                })
-        return results
-
     def __unicode__(self):
         return u'{0}: {1}'.format(self.tournament, self.date.year)
 
     class Meta:
         unique_together = ('date', 'tournament')
 
-class BoundRound(models.Model):
-    round_type = models.ForeignKey(Round)
-    competition = models.ForeignKey('Competition')
-    use_individual_arrows = models.BooleanField(default=False)
+class Session(models.Model):
+    competition = models.ForeignKey(Competition)
+    start = models.DateTimeField()
+
+    scoring_system = models.CharField(max_length=1, choices=SCORING_SYSTEMS)
 
     def __unicode__(self):
-        return u'{0} at {1}'.format(self.round_type, self.competition)
+        return u'{0} - {1}'.format(self.competition, self.start)
 
-    @property
-    def arrows(self):
-        return self.round_type.arrows
+class SessionRound(models.Model):
+    session = models.ForeignKey(Session)
+    shot_round = models.ForeignKey(Round)
 
-class Entry(models.Model):
-    shot_round = models.ForeignKey(BoundRound)
+    def __unicode__(self):
+        return u'{0}, {1}'.format(self.session, self.shot_round)
+
+class CompetitionEntry(models.Model):
+    competition = models.ForeignKey(Competition)
 
     archer = models.ForeignKey(Archer)
     club = models.ForeignKey(Club)
     bowstyle = models.ForeignKey(Bowstyle)
-
-    score = models.IntegerField(blank=True, null=True)
-    hits = models.IntegerField(blank=True, null=True)
-    golds = models.IntegerField(blank=True, null=True)
-    xs = models.IntegerField(blank=True, null=True)
-
-    retired = models.BooleanField(default=False)
-    target = models.CharField(max_length=10, blank=True, null=True)
-
-    def get_classification(self):
-        return u'{0} {1}'.format(self.bowstyle, self.archer.get_gender_display())
-
-    def update_totals(self):
-        self.score = self.arrow_set.aggregate(models.Sum('score'))['score__sum']
-        self.golds = self.arrow_set.filter(score=10).count()
-        self.hits = self.arrow_set.exclude(score=0).count()
-        if self.shot_round.round_type.has_xs:
-            self.xs = self.arrow_set.filter(is_x=True).count()
-        self.save()
+    age = models.CharField(max_length=1, choices=AGE_CHOICES)
+    novice = models.BooleanField(default=False)
 
     def __unicode__(self):
-        return u'{0} at {1}'.format(self.archer, self.shot_round.competition)
+        return u'{0} at {1}'.format(self.archer, self.competition)
 
-    class Meta:
-        verbose_name_plural = 'entries'
-        unique_together = ('archer', 'shot_round')
+class SessionEntry(models.Model):
+    competition_entry = models.ForeignKey(CompetitionEntry)
+    session_round = models.ForeignKey(SessionRound)
 
+    def __unicode__(self):
+        return u'{0} - {1}'.format(self.competition_entry, self.session_round.shot_round)
+
+class TargetAllocation(models.Model):
+    session_entry = models.ForeignKey(SessionEntry)
+    boss = models.PositiveIntegerField()
+    target = models.CharField(max_length=1)
+
+    def __unicode__(self):
+        return u'{0}{1} - {2}'.format(self.boss, self.target, self.session_entry)
