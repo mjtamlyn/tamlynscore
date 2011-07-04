@@ -119,7 +119,7 @@ INSTALLED_APPS = (
     'south',
     'core',
     'entries',
-    #'scores',
+    'scores',
 )
 
 # A sample logging configuration. The only tangible logging
