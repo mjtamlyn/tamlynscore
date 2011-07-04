@@ -118,7 +118,7 @@ INSTALLED_APPS = (
     'django.contrib.admin',
     'south',
     'core',
-    #'entries',
+    'entries',
     #'scores',
 )
 
