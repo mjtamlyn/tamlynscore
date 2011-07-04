@@ -6,8 +6,8 @@ admin.autodiscover()
 
 urlpatterns = patterns('',
     (r'', include('core.urls')),
-    (r'^entries/', include('entries.urls')),
-    (r'^scoring/', include('scores.urls')),
+    (r'^tournaments/', include('entries.urls')),
+    (r'^tournaments/scoring/', include('scores.urls')),
     (r'^admin/', include(admin.site.urls)),
 )
 
