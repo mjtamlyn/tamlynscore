@@ -1,19 +1,57 @@
 {% extends 'base.html' %}
 
+{% block extrastyles %}
+<link rel="stylesheet" href="{{ STATIC_URL }}css/competition.css">
+{% endblock %}
+
 {% block content %}
 <h1>{{ competition }}</h1>
 
-<p><strong>Required sections:</strong></p>
-<p>Add Entries</p>
-<p>Do target allocations</p>
-<p>Registration</p>
+{% block competition_nav %}
+<div class="competition-nav">
+    <h2>Before the shoot</h2>
+    <ul>
+        <li>Manage Entries</li>
+        <li>Target lists</li>
+        <li>Score sheets</li>
+    </ul>
+    <h2>On the day</h2>
+    <ul>
+        <li>Registration</li>
+        <li>Input scores</li>
+        <li>Leaderboard</li>
+        <li>Head to heads panel</li>
+    </ul>
+    <h2>After the shoot</h2>
+    <ul>
+        <li>Full Results</li>
+    </ul>
+</div>
+{% endblock %}
 
-<p><strong>Printouts:</strong></p>
-<p>Target list</p>
+<div class="competition-content">
+    {% block competition_content %}
+    <p><strong>Required sections:</strong></p>
+    <p>Add Entries</p>
+    <p>Do target allocations</p>
+    <p>Registration</p>
 
-<p><strong>Long term sections:</strong></p>
-<p>My Tournaments</p>
-<p>Tournament admin</p>
+    <p><strong>Printouts:</strong></p>
+    <p>Target list</p>
+    <p>Score sheets</p>
+
+    <p><strong>Long term sections:</strong></p>
+    <p>My Tournaments</p>
+    <p>Tournament admin</p>
+
+    <p><strong>Scoring sections:</strong><p>
+    <p>Add scores</p>
+    <p>Results/Leaderboard</p>
+    <p>Head to Heads</p>
+    {% endblock %}
+</div>
+
+<div class="clear"></div>
 
 {% endblock %}
 

@@ -21,6 +21,9 @@ ul {
 li {
     display: block;
 }
+.clear {
+    clear: both;
+}
 .hidden {
     display: none;
 }
