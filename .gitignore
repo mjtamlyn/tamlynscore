@@ -2,4 +2,4 @@
 *.db
 .*.swp
 .*.swo
-
+.sass-cache
