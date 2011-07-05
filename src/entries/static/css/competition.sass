@@ -1,0 +1,25 @@
+@import ../../../core/static/css/colors.sass
+
+$navborder: 1px solid $bluegrey
+.competition-nav
+  border-bottom: $navborder
+  border-right: $navborder
+  background-color: $vlightblue
+  float: left
+  width: 200px
+  height: 100%
+  h2
+    font-size: 18px
+    margin: 0
+    padding: 5px
+  ul
+    margin: 0
+    padding: 0
+  li
+    &:not(:last-child)
+      border-bottom: $navborder
+    padding: 2px 5px
+
+.competition-content
+  float: left
+  margin: 10px

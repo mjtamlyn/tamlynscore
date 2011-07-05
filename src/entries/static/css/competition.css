@@ -1,7 +1,22 @@
 .competition-nav {
-    float: left;
-    width: 200px;
-}
+  border-bottom: 1px solid #353345;
+  border-right: 1px solid #353345;
+  background-color: #dddafa;
+  float: left;
+  width: 200px;
+  height: 100%; }
+  .competition-nav h2 {
+    font-size: 18px;
+    margin: 0;
+    padding: 5px; }
+  .competition-nav ul {
+    margin: 0;
+    padding: 0; }
+  .competition-nav li {
+    padding: 2px 5px; }
+    .competition-nav li:not(:last-child) {
+      border-bottom: 1px solid #353345; }
+
 .competition-content {
-    float: left;
-}
+  float: left;
+  margin: 10px; }

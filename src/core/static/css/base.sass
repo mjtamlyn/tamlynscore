@@ -1,0 +1,81 @@
+@import colors.sass
+
+body
+  background-color: $oxford
+  font-family: Georgia
+
+h1, h2, h3, h4, h5, h6
+  background-image: -webkit-linear-gradient($bluegrey, $darkbluegrey, $darkbluegrey, $bluegrey)
+  color: white
+  margin: 2px 0px
+  padding: 2px 5px
+  text-align: center
+
+a
+  color: $dark
+  text-decoration: none
+  &:hover
+    text-decoration: underline
+
+ul
+  list-style-type: none
+
+li
+  display: block
+
+.clear
+  clear: both
+
+.hidden
+  display: none
+
+.text-right
+  text-align: right
+
+.wrapper
+  background-color: $bg
+  border-radius: 10px
+  box-shadow: -2px 2px 2px $hlblue
+  color: $dark
+  margin: 20px auto
+  width: 1000px
+
+.navigation
+  background-image: -webkit-linear-gradient($lightblue, $bg)
+  border-radius: 10px 10px 0px 0px
+  font-weight: bold
+  overflow: hidden
+  padding-bottom: 10px
+  text-align: center
+  width: 100%
+  .nav-link
+    background-color: $oxford
+    border-radius: 0 0 5px 5px
+    box-shadow: 0px 1px 2px $dark
+    color: white
+    display: inline-block
+    padding: 8px 8px 3px 8px
+    position: relative
+    top: -5px
+    -webkit-transition: all 0.15s ease-in-out
+    &:hover
+      box-shadow: 0px 1px 3px $dark
+      background-color: $hlblue
+      position: relative
+      top: 0px
+
+.footer
+  font-size: 10px
+  padding: 5px 0
+  margin-top: 5px
+  text-align: center
+  p
+    margin: 0
+
+.archer-select
+  margin: 0 20px
+  &.selected
+    color: red
+
+.arrow-values input[type=text]
+  width: 30px
