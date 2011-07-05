@@ -5,13 +5,13 @@
 {% endblock %}
 
 {% block content %}
-<h1>{{ competition }}</h1>
+<a href="{% url entries.views.competition_index slug=competition.slug %}"><h1>{{ competition }}</h1></a>
 
 {% block competition_nav %}
 <div class="competition-nav">
     <h2>Before the shoot</h2>
     <ul>
-        <li>Manage Entries</li>
+        <a href="{% url entries.views.entries slug=competition.slug %}"><li>Manage Entries</li></a>
         <li>Target lists</li>
         <li>Score sheets</li>
     </ul>
