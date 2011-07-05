@@ -1,21 +1,21 @@
 @import colors.sass
 
+$borderradius: 15px
+
 body
   background-color: $oxford
   font-family: Georgia
 
 h1, h2, h3, h4, h5, h6
-  background-image: -webkit-linear-gradient($bluegrey, $darkbluegrey, $darkbluegrey, $bluegrey)
+  background-image: -webkit-linear-gradient(lighten($darkbluegrey, 10%), $darkbluegrey, $darkbluegrey, lighten($darkbluegrey, 10%))
   color: white
-  margin: 2px 0px
-  padding: 2px 5px
+  margin: 5px 0px
+  padding: 5px
   text-align: center
 
 a
   color: $dark
   text-decoration: none
-  &:hover
-    text-decoration: underline
 
 ul
   list-style-type: none
@@ -34,15 +34,15 @@ li
 
 .wrapper
   background-color: $bg
-  border-radius: 10px
-  box-shadow: -2px 2px 2px $hlblue
+  border-radius: $borderradius
+  //box-shadow: -2px 2px 2px $vlightblue, 2px 2px 2px $vlightblue
   color: $dark
   margin: 20px auto
   width: 1000px
 
 .navigation
-  background-image: -webkit-linear-gradient($lightblue, $bg)
-  border-radius: 10px 10px 0px 0px
+  background-image: -webkit-linear-gradient($vlightblue, $bg)
+  border-radius: $borderradius $borderradius 0 0
   font-weight: bold
   overflow: hidden
   padding-bottom: 10px

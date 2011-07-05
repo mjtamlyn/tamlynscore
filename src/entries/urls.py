@@ -6,4 +6,5 @@ admin.autodiscover()
 urlpatterns = patterns('entries.views',
     (r'^$', 'tournaments'),
     (r'^(?P<slug>[\w-]+)/$', 'competition_index'),
+    (r'^(?P<slug>[\w-]+)/entries/$', 'entries'),
 )

@@ -1,10 +1,12 @@
 .competition-nav {
-  border-bottom: 1px solid #353345;
-  border-right: 1px solid #353345;
+  border: 1px solid #353345;
+    border-top: none;
   background-color: #dddafa;
   float: left;
-  width: 200px;
-  height: 100%; }
+  height: 100%;
+  margin-top: 1px;
+  margin-left: 3px;
+  width: 200px; }
   .competition-nav h2 {
     font-size: 18px;
     margin: 0;
@@ -12,11 +14,36 @@
   .competition-nav ul {
     margin: 0;
     padding: 0; }
-  .competition-nav li {
-    padding: 2px 5px; }
-    .competition-nav li:not(:last-child) {
-      border-bottom: 1px solid #353345; }
+    .competition-nav ul li {
+      border-bottom: 1px solid #353345;
+      padding: 2px 5px; }
+    .competition-nav ul a:hover {
+      text-decoration: none; }
+      .competition-nav ul a:hover li {
+        background-color: #070052;
+        color: white; }
 
 .competition-content {
   float: left;
-  margin: 10px; }
+  margin: 10px;
+  width: 700px; }
+  .competition-content .competition-entries .top .new-entry input {
+    border: 1px solid #dddafa;
+      border-radius: 5px 5px 0 0;
+    font-family: Verdana;
+    font-size: 18px;
+    margin: 0;
+    outline: none;
+    padding: 5px;
+    width: 300px; }
+    .competition-content .competition-entries .top .new-entry input::webkit-input-placeholder {
+      font-style: italic; }
+  .competition-content .competition-entries .top .new-entry .options {
+    border: 1px solid #dddafa;
+      border-top: none;
+    width: 298px; }
+    .competition-content .competition-entries .top .new-entry .options .option {
+      background-color: white;
+      border-bottom: 1px solid #dddafa;
+      font-family: Verdana;
+      padding: 2px 5px; }

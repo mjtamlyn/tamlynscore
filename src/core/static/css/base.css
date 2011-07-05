@@ -3,17 +3,15 @@ body {
   font-family: Georgia; }
 
 h1, h2, h3, h4, h5, h6 {
-  background-image: -webkit-linear-gradient(#353345, #111d2a, #111d2a, #353345);
+  background-image: -webkit-linear-gradient(#20364e, #111d2a, #111d2a, #20364e);
   color: white;
-  margin: 2px 0px;
-  padding: 2px 5px;
+  margin: 5px 0px;
+  padding: 5px;
   text-align: center; }
 
 a {
   color: #000f1f;
   text-decoration: none; }
-  a:hover {
-    text-decoration: underline; }
 
 ul {
   list-style-type: none; }
@@ -31,16 +29,15 @@ li {
   text-align: right; }
 
 .wrapper {
-  background-color: #fbf4db;
-  border-radius: 10px;
-  box-shadow: -2px 2px 2px #8579fa;
+  background-color: #fbeedb;
+  border-radius: 15px;
   color: #000f1f;
   margin: 20px auto;
   width: 1000px; }
 
 .navigation {
-  background-image: -webkit-linear-gradient(#6fb3ff, #fbf4db);
-  border-radius: 10px 10px 0px 0px;
+  background-image: -webkit-linear-gradient(#dddafa, #fbeedb);
+  border-radius: 15px 15px 0 0;
   font-weight: bold;
   overflow: hidden;
   padding-bottom: 10px;
