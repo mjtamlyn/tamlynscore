@@ -39,11 +39,13 @@ $navborder: 1px solid $bluegrey
     .top
 
       .new-entry
+        float: left
+
         $input-width: 300px
 
-        input
-          border: 1px solid $vlightblue
-            radius: 5px 5px 0 0
+        #id_archer_name
+          border: 2px solid $vlightblue
+            radius: 4px
           font:
             family: Verdana
             size: 18px
@@ -51,18 +53,42 @@ $navborder: 1px solid $bluegrey
           outline: none
           padding: 5px
           width: $input-width
+          &:focus
+            border-color: $lightblue
           &::webkit-input-placeholder
             font-style: italic
 
+        $sidespacing: 0px
         .options
-          border: 1px solid $vlightblue
+          border: 2px solid $vlightblue
             top: none
-          width: $input-width - 2
+          margin: 0 $sidespacing
+          width: $input-width - 2 * $sidespacing - 4
 
           .option
             background-color: white
-            border-bottom: 1px solid $vlightblue
             font:
               family: Verdana
-            padding: 2px 5px
+            padding: 3px 5px
+            &:not(:last-child)
+              border-bottom: 1px solid $vlightblue
+            &.selected
+              background-color: $bluegrey
+              color: white
 
+      .stats
+        background-color: white
+        float: right
+
+        h4
+          margin-top: 0
+
+        ul
+          margin: 0 10px 10px 10px
+
+    .entries-table
+      margin-top: 10px
+      width: 100%
+
+      table
+        width: 100%

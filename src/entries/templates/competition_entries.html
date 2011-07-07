@@ -14,15 +14,26 @@ Should you be able to add multiple entrants in one go? Should we do AJAX saving?
 <div class="competition-entries">
     <div class="top">
         <div class="new-entry">
-            <input placeholder="Add a new entry..."/>
-            <div class="options">
+            {{ form.archer_name }}
+            <div class="hidden">
+                {{ form.archer }}
+            </div>
+            <div class="options hidden">
+                <div class="option selected">Emma Tamlyn</div>
                 <div class="option">Emma Tamlyn</div>
                 <div class="option">Emma Tamlyn</div>
-                <div class="option">Emma Tamlyn</div>
-                <div class="option">Emma Tamlyn</div>
+                <div class="option">New Archer</div>
+            </div>
+            <div class="archer-details">
+                {{ form.club }}
+                {{ form.bowstyle }}
+                {{ form.age }}
+                {{ form.novice }}
+                {{ form.gender }}
             </div>
         </div>
         <div class="stats">
+            <h4>Entries Summary</h4>
             <ul>
                 <li>Current total entries: 24</li>
                 <li>Current total entries: 24</li>
@@ -32,10 +43,11 @@ Should you be able to add multiple entrants in one go? Should we do AJAX saving?
                 <li>Current total entries: 24</li>
             </ul>
         </div>
+        <div class="clear"></div>
     </div>
     <div class="entries-table">
         <table>
-            <caption>Existing entries</caption>
+            <caption><h4>Existing entries</h4></caption>
             <thead>
                 <th>Name</th>
                 <th>Club</th>
