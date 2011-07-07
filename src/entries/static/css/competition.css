@@ -27,23 +27,44 @@
   float: left;
   margin: 10px;
   width: 700px; }
-  .competition-content .competition-entries .top .new-entry input {
-    border: 1px solid #dddafa;
-      border-radius: 5px 5px 0 0;
-    font-family: Verdana;
-    font-size: 18px;
-    margin: 0;
-    outline: none;
-    padding: 5px;
-    width: 300px; }
-    .competition-content .competition-entries .top .new-entry input::webkit-input-placeholder {
-      font-style: italic; }
-  .competition-content .competition-entries .top .new-entry .options {
-    border: 1px solid #dddafa;
-      border-top: none;
-    width: 298px; }
-    .competition-content .competition-entries .top .new-entry .options .option {
-      background-color: white;
-      border-bottom: 1px solid #dddafa;
+  .competition-content .competition-entries .top .new-entry {
+    float: left; }
+    .competition-content .competition-entries .top .new-entry #id_archer_name {
+      border: 2px solid #dddafa;
+        border-radius: 4px;
       font-family: Verdana;
-      padding: 2px 5px; }
+      font-size: 18px;
+      margin: 0;
+      outline: none;
+      padding: 5px;
+      width: 300px; }
+      .competition-content .competition-entries .top .new-entry #id_archer_name:focus {
+        border-color: #6fb3ff; }
+      .competition-content .competition-entries .top .new-entry #id_archer_name::webkit-input-placeholder {
+        font-style: italic; }
+    .competition-content .competition-entries .top .new-entry .options {
+      border: 2px solid #dddafa;
+        border-top: none;
+      margin: 0 0px;
+      width: 296px; }
+      .competition-content .competition-entries .top .new-entry .options .option {
+        background-color: white;
+        font-family: Verdana;
+        padding: 3px 5px; }
+        .competition-content .competition-entries .top .new-entry .options .option:not(:last-child) {
+          border-bottom: 1px solid #dddafa; }
+        .competition-content .competition-entries .top .new-entry .options .option.selected {
+          background-color: #353345;
+          color: white; }
+  .competition-content .competition-entries .top .stats {
+    background-color: white;
+    float: right; }
+    .competition-content .competition-entries .top .stats h4 {
+      margin-top: 0; }
+    .competition-content .competition-entries .top .stats ul {
+      margin: 0 10px 10px 10px; }
+  .competition-content .competition-entries .entries-table {
+    margin-top: 10px;
+    width: 100%; }
+    .competition-content .competition-entries .entries-table table {
+      width: 100%; }

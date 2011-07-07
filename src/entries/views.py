@@ -1,5 +1,6 @@
 from django.shortcuts import render, get_object_or_404
 
+from entries.forms import NewEntryForm
 from entries.models import Tournament, Competition
 
 def tournaments(request):
@@ -13,4 +14,5 @@ def competition_index(request, slug):
 def entries(request, slug):
     competition = get_object_or_404(Competition, slug=slug)
     entries = competition.competitionentry_set.all()
+    form = NewEntryForm()
     return render(request, 'competition_entries.html', locals())
