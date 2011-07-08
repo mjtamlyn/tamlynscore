@@ -9,8 +9,9 @@ class ArcherField(forms.ModelChoiceField):
 
 class NewEntryForm(forms.ModelForm):
 
-    archer_name = forms.CharField()
+    archer_name = forms.CharField(widget=forms.widgets.TextInput(attrs={'placeholder': 'Add an archer...'}))
     archer = ArcherField(queryset=Archer.objects, required=False)
+    club_name = forms.CharField(widget=forms.widgets.TextInput(attrs={'placeholder': 'Club'}))
     new_archer = forms.BooleanField(required=False)
     gender = forms.ChoiceField(required=False, choices=GENDER_CHOICES)
 
