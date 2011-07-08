@@ -68,3 +68,6 @@
     width: 100%; }
     .competition-content .competition-entries .entries-table table {
       width: 100%; }
+
+.select-widget .select, .select-widget .options {
+  display: none; }
