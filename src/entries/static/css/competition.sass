@@ -37,56 +37,120 @@ $navborder: 1px solid $bluegrey
     .competition-entries
 
       .top
+        h4
+          margin-top: 0
 
         .new-entry
+          background-color: white
           float: left
 
           $input-width: 300px
 
-          #id_archer_name,
-          #id_club_name
-            border: 2px solid $vlightblue
-              radius: 4px
-            font:
-              family: Verdana
-              size: 18px
-            margin: 0
-            outline: none
+          .new-entry-form
             padding: 5px
-            width: $input-width
-            &:focus
-              border-color: $lightblue
-            &::webkit-input-placeholder
-              font-style: italic
 
-          .options-wrapper
+            input
+              border: 2px solid $vlightblue
+                radius: 4px
+              font:
+                family: Verdana
+                size: 18px
+              margin: 0
+              outline: none
+              padding: 5px
+              width: $input-width
+              &:focus
+                border-color: $lightblue
+              &::webkit-input-placeholder
+                font-style: italic
 
-            $sidespacing: 0px
-            .options
-              margin: 0 $sidespacing
-              width: $input-width - 2 * $sidespacing
+            .options-wrapper
 
-              .option
-                background-color: white
-                border:
-                  left: 2px solid $vlightblue
-                  right: 2px solid $vlightblue
-                  bottom: 1px solid $vlightblue
-                font:
-                  family: Verdana
-                padding: 3px 5px
-                &:last-child
-                  border-bottom-width: 2px
+              $sidespacing: 0px
+              .options
+                margin: 0 $sidespacing
+                width: $input-width - 2 * $sidespacing
+
+                .option
+                  background-color: white
+                  border:
+                    left: 2px solid $vlightblue
+                    right: 2px solid $vlightblue
+                    bottom: 1px solid $vlightblue
+                  font:
+                    family: Verdana
+                  padding: 3px 5px
+                  &:last-child
+                    border-bottom-width: 2px
+                  &.selected
+                    background-color: $bluegrey
+                    color: white
+
+            #archer-widget
+              margin: 0 auto 10px
+              width: $input-width
+
+            .archer-details
+              visibility: hidden
+              opacity: 0
+              width: 450px
+              -webkit-transition: all 0.2s ease-in-out
+              &.shown
+                visibility: visible
+                opacity: 1
+
+              .button
+                border: 2px solid $lightblue
+                  radius: 10px
+                background-image: -webkit-linear-gradient(darken($vlightblue, 10%), $vlightblue, darken($vlightblue, 10%))
+                cursor: pointer
+                padding: 5px
+                text-align: center
                 &.selected
-                  background-color: $bluegrey
+                  background-image: -webkit-linear-gradient($darkbluegrey, $bluegrey, $darkbluegrey)
+                  border-color: $darkbluegrey
                   color: white
+
+              #club-widget
+                margin: 0 auto
+                width: $input-width
+
+              #bowstyle-widget
+                padding: 10px 4px
+                .button
+                  display: inline-block
+                  margin: 0 1px
+
+              #save
+                background-image: -webkit-linear-gradient($darkbluegrey, $bluegrey, $darkbluegrey)
+                border-color: $darkbluegrey
+                color: white
+                float: right
+
+              .show-more-details
+                float: left
+                cursor: pointer
+                .pointer
+                  display: inline-block
+                  font-size: 20px
+                  line-height: 12px
+                  -webkit-transition: -webkit-transform 0.2s ease-in-out
+                &.selected
+                  .pointer
+                    -webkit-transform: rotate(90deg)
+
+              .more-details
+                display: none
+                padding: 10px 0
+                &.shown
+                  display: block
+
+                #gender-widget
+
 
         .stats
           background-color: white
           float: right
-
-          h4
-            margin-top: 0
 
           ul
             margin: 0 10px 10px 10px
@@ -107,3 +171,7 @@ $navborder: 1px solid $bluegrey
     .options
       position: absolute
       display: none
+
+.buttons-widget
+  .select
+    display: none

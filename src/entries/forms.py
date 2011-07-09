@@ -3,6 +3,8 @@ from django import forms
 from core.models import Club, Archer, GENDER_CHOICES
 from entries.models import CompetitionEntry
 
+GENDER_CHOICES = (('', '--------'),) + GENDER_CHOICES
+
 class JsonChoiceField(forms.ModelChoiceField):
     def label_from_instance(self, obj):
         return obj.json()
@@ -17,7 +19,7 @@ class NewEntryForm(forms.ModelForm):
     club = JsonChoiceField(queryset=Club.objects, required=False)
     new_club = forms.BooleanField(required=False)
 
-    gender = forms.ChoiceField(required=False, choices=GENDER_CHOICES)
+    gender = forms.ChoiceField(choices=GENDER_CHOICES)
 
     class Meta:
         model = CompetitionEntry

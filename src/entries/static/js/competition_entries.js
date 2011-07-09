@@ -106,7 +106,6 @@ var SelectWidget = new Class({
                 }
                 if (e.key == 'enter' && this.value) {
                     this.blur()
-                    widget.select();
                 }
                 e.stop();
             }
@@ -137,22 +136,48 @@ var SelectWidget = new Class({
     },
 
     select: function () {
-        this.input.blur();
         this.options.setStyle('display', 'none');
         var current = this.options.getElement('.selected');
         var rel = current.get('rel');
         this.selectedObject;
-        if (rel === 'new') {
+        this.is_new = (rel === 'new');
+        if (this.is_new) {
             this.selectedObject = {id: ''}
         } else {
             this.selectedObject = this.resultsLookup[rel];
         }
         var option = this.selectElement.getElement('option[value=' + this.selectedObject.id + ']')
         option.set('selected', 'selected');
-        if (rel !== 'new') {
+        if (!this.is_new) {
             this.input.set('value', this.selectedObject.name);
         }
         this.callback(this);
+    },
+
+    setValue: function (value) {
+        this.selectedObject = this.resultsLookup[value];
+        this.input.set('value', this.selectedObject.name);
+        var option = this.selectElement.getElement('option[value=' + this.selectedObject.id + ']')
+        option.set('selected', 'selected');
+    }
+
+});
+
+var ButtonWidget = new Class({
+
+    initialize: function (widget) {
+        this.widget = widget
+        widget.getElements('.button').addEvent('click', function () {
+            if (!this.hasClass('selected')) {
+                widget.getElements('.button').removeClass('selected');
+            };
+            this.toggleClass('selected');
+            var value = this.get('rel');
+            if (!this.hasClass('selected')) {
+                value = '';
+            }
+            widget.getElement('option[value=' + value + ']').set('selected', 'selected');
+        });
     }
 
 });
