@@ -96,7 +96,7 @@ class Archer(models.Model):
         return json.dumps({
             'id': self.pk,
             'name': self.name,
-            'gender': self.get_gender_display(),
+            'gender': self.gender,
             'club': self.club.pk,
             'bowstyle': self.bowstyle.pk,
         })
