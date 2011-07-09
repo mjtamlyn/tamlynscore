@@ -5,11 +5,14 @@
 <script src="{{ STATIC_URL }}js/competition_entries.js"></script>
 <script>
     window.addEvent('domready', function () {
-        var archer, club, bowstyle, gender;
+        var archer, club, bowstyle, gender, age, novice, gnas_no;
         var reset = function () {
             club.reset();
             bowstyle.reset();
             gender.reset();
+            age.reset();
+            novice.reset();
+            gnas_no.set('value', '');
             $$('.show-more-details').removeClass('selected');
             $$('.more-details').removeClass('shown');
         }
@@ -23,8 +26,11 @@
                     $$('.show-more-details').fireEvent('click');
                 } else {
                     club.setValue(widget.selectedObject.club);
-                    bowstyle.widget.getElement('[rel=' + widget.selectedObject.bowstyle + ']').fireEvent('click');
-                    gender.widget.getElement('[rel=' + widget.selectedObject.gender + ']').fireEvent('click');
+                    bowstyle.setValue(widget.selectedObject.bowstyle);
+                    gender.setValue(widget.selectedObject.gender);
+                    age.setValue(widget.selectedObject.age);
+                    novice.setValue(widget.selectedObject.novice);
+                    gnas_no.set('value', widget.selectedObject.gnas_no);
                 }
             }
         });
@@ -34,6 +40,9 @@
         });
         bowstyle = new ButtonWidget($('bowstyle-widget'));
         gender = new ButtonWidget($('gender-widget'));
+        age = new ButtonWidget($('age-widget'));
+        novice = new ButtonWidget($('novice-widget'));
+        gnas_no = $('id_gnas_no');
         $$('.show-more-details').addEvent('click', function () {
             $$('.more-details').toggleClass('shown');
             this.toggleClass('selected');
@@ -100,6 +109,30 @@ Should you be able to add multiple entrants in one go? Should we do AJAX saving?
                     </div>
                     <div class="clear"></div>
                     <div class="more-details">
+                        <div class="buttons-widget" id="novice-widget">
+                            <div class="select">
+                                {{ form.novice }}
+                            </div>
+                            {% for choice in form.fields.novice.choices %}
+                            {% if choice.0 %}
+                            <div class="button" rel="{{ choice.0 }}">
+                                {{ choice.1 }}
+                            </div>
+                            {% endif %}
+                            {% endfor %}
+                        </div>
+                        <div class="buttons-widget" id="age-widget">
+                            <div class="select">
+                                {{ form.age }}
+                            </div>
+                            {% for choice in form.fields.age.choices %}
+                            {% if choice.0 %}
+                            <div class="button" rel="{{ choice.0 }}">
+                                {{ choice.1 }}
+                            </div>
+                            {% endif %}
+                            {% endfor %}
+                        </div>
                         <div class="buttons-widget" id="gender-widget">
                             <div class="select">
                                 {{ form.gender }}
@@ -112,6 +145,7 @@ Should you be able to add multiple entrants in one go? Should we do AJAX saving?
                             {% endif %}
                             {% endfor %}
                         </div>
+                        {{ form.gnas_no }}
                     </div>
                 </div>
             </div>
@@ -151,6 +185,7 @@ Should you be able to add multiple entrants in one go? Should we do AJAX saving?
                 <td>Gents FITA</td>
                 <td>Edit</td>
             </tr>
+            {{ form }}
         </table>
     </div>
 </div>

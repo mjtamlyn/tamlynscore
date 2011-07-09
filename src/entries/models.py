@@ -1,7 +1,7 @@
 from django.db import models
 from django.template.defaultfilters import slugify
 
-from core.models import Archer, Bowstyle, Club, Round, AGE_CHOICES
+from core.models import Archer, Bowstyle, Club, Round, AGE_CHOICES, NOVICE_CHOICES
 
 SCORING_SYSTEMS = (
     ('F', 'Full running slips'),
@@ -64,7 +64,7 @@ class CompetitionEntry(models.Model):
     club = models.ForeignKey(Club)
     bowstyle = models.ForeignKey(Bowstyle)
     age = models.CharField(max_length=1, choices=AGE_CHOICES)
-    novice = models.BooleanField(default=False)
+    novice = models.CharField(max_length=1, choices=NOVICE_CHOICES)
 
     def __unicode__(self):
         return u'{0} at {1}'.format(self.archer, self.competition)
