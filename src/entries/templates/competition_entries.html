@@ -4,12 +4,20 @@
 <script src="{{ STATIC_URL }}js/mootools-core-1.3.js"></script>
 <script src="{{ STATIC_URL }}js/competition_entries.js"></script>
 <script>
-    window.addEvent('domready', function () { 
+    window.addEvent('domready', function () {
         var archer, club, bowstyle, gender;
+        var reset = function () {
+            club.reset();
+            bowstyle.reset();
+            gender.reset();
+            $$('.show-more-details').removeClass('selected');
+            $$('.more-details').removeClass('shown');
+        }
         archer = new SelectWidget({
             widget: $('archer-widget'),
             blank: 'New Archer',
             callback: function (widget) {
+                reset();
                 $$('.archer-details').addClass('shown');
                 if (widget.is_new) {
                     $$('.show-more-details').fireEvent('click');
