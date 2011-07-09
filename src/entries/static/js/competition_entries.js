@@ -188,6 +188,10 @@ var ButtonWidget = new Class({
     reset: function () {
         this.widget.getElements('.button').removeClass('selected');
         this.widget.getElement('option[value=]').set('selected', 'selected');
+    },
+
+    setValue: function (value) {
+        this.widget.getElement('[rel=' + value + ']').fireEvent('click');
     }
 
 });

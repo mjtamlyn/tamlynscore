@@ -20,6 +20,11 @@ GENDER_CHOICES = (
     ('F', 'Female'),
 )
 
+NOVICE_CHOICES = (
+    ('N', 'Novice'),
+    ('E', 'Experienced'),
+)
+
 AGE_CHOICES = (
     ('J', 'Junior'),
     ('S', 'Senior'),
@@ -87,7 +92,8 @@ class Archer(models.Model):
     club = models.ForeignKey(Club)
     bowstyle = models.ForeignKey(Bowstyle)
     age = models.CharField(max_length=1, choices=AGE_CHOICES)
-    novice = models.BooleanField(default=False)
+    novice = models.CharField(max_length=1, choices=NOVICE_CHOICES)
+    gnas_no = models.BigIntegerField()
 
     def __unicode__(self):
         return self.name
@@ -96,8 +102,11 @@ class Archer(models.Model):
         return json.dumps({
             'id': self.pk,
             'name': self.name,
+            'age': self.age,
             'gender': self.gender,
             'club': self.club.pk,
             'bowstyle': self.bowstyle.pk,
+            'novice': self.novice,
+            'gnas_no': self.gnas_no,
         })
 
