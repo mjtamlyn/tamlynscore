@@ -159,6 +159,11 @@ var SelectWidget = new Class({
         this.input.set('value', this.selectedObject.name);
         var option = this.selectElement.getElement('option[value=' + this.selectedObject.id + ']')
         option.set('selected', 'selected');
+    },
+
+    reset: function () {
+        this.input.set('value', '');
+        this.selectElement.getElement('option[value=]').set('selected', 'selected');
     }
 
 });
@@ -178,6 +183,11 @@ var ButtonWidget = new Class({
             }
             widget.getElement('option[value=' + value + ']').set('selected', 'selected');
         });
+    },
+
+    reset: function () {
+        this.widget.getElements('.button').removeClass('selected');
+        this.widget.getElement('option[value=]').set('selected', 'selected');
     }
 
 });
