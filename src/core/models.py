@@ -74,6 +74,13 @@ class Club(models.Model):
     def __unicode__(self):
         return self.short_name
 
+    def json(self):
+        return json.dumps({
+            'id': self.pk,
+            'name': self.name,
+            'short_name': self.short_name,
+        })
+
 class Archer(models.Model):
     name = models.CharField(max_length=200)
     gender = models.CharField(max_length=1, choices=GENDER_CHOICES)

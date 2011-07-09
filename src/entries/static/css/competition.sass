@@ -2,98 +2,108 @@
 
 $navborder: 1px solid $bluegrey
 
-.competition-nav
-  border: $navborder
-    top: none
-  background-color: $vlightblue
-  float: left
-  height: 100%
-  margin:
-    top: 1px
-    left: 3px
-  width: 200px
-  h2
-    font-size: 18px
-    margin: 0
-    padding: 5px
-  ul
-    margin: 0
-    padding: 0
-    li
-      border-bottom: $navborder
-      padding: 2px 5px
-    a
-      &:hover
-        text-decoration: none
-        li
-          background-color: $darkblue
-          color: white
+.competition-section
+  margin: 15px 10px
 
-.competition-content
-  float: left
-  margin: 10px
-  width: 700px
-  
-  .competition-entries
+  .competition-nav
+    border: $navborder
+      top: none
+    background-color: $vlightblue
+    float: left
+    height: 100%
+    width: 200px
+    h2
+      font-size: 18px
+      margin: 0
+      padding: 5px
+    ul
+      margin: 0
+      padding: 0
+      li
+        border-bottom: $navborder
+        padding: 7px 10px
+      a
+        &:hover
+          text-decoration: none
+          li
+            background-color: $darkblue
+            color: white
 
-    .top
+  .competition-content
+    float: left
+    margin: 0 10px
+    width: 700px
+    
+    .competition-entries
 
-      .new-entry
-        float: left
+      .top
 
-        $input-width: 300px
+        .new-entry
+          float: left
 
-        #id_archer_name
-          border: 2px solid $vlightblue
-            radius: 4px
-          font:
-            family: Verdana
-            size: 18px
-          margin: 0
-          outline: none
-          padding: 5px
-          width: $input-width
-          &:focus
-            border-color: $lightblue
-          &::webkit-input-placeholder
-            font-style: italic
+          $input-width: 300px
 
-        $sidespacing: 0px
-        .options
-          border: 2px solid $vlightblue
-            top: none
-          margin: 0 $sidespacing
-          width: $input-width - 2 * $sidespacing - 4
-
-          .option
-            background-color: white
+          #id_archer_name,
+          #id_club_name
+            border: 2px solid $vlightblue
+              radius: 4px
             font:
               family: Verdana
-            padding: 3px 5px
-            &:not(:last-child)
-              border-bottom: 1px solid $vlightblue
-            &.selected
-              background-color: $bluegrey
-              color: white
+              size: 18px
+            margin: 0
+            outline: none
+            padding: 5px
+            width: $input-width
+            &:focus
+              border-color: $lightblue
+            &::webkit-input-placeholder
+              font-style: italic
 
-      .stats
-        background-color: white
-        float: right
+          .options-wrapper
 
-        h4
-          margin-top: 0
+            $sidespacing: 0px
+            .options
+              margin: 0 $sidespacing
+              width: $input-width - 2 * $sidespacing
 
-        ul
-          margin: 0 10px 10px 10px
+              .option
+                background-color: white
+                border:
+                  left: 2px solid $vlightblue
+                  right: 2px solid $vlightblue
+                  bottom: 1px solid $vlightblue
+                font:
+                  family: Verdana
+                padding: 3px 5px
+                &:last-child
+                  border-bottom-width: 2px
+                &.selected
+                  background-color: $bluegrey
+                  color: white
 
-    .entries-table
-      margin-top: 10px
-      width: 100%
+        .stats
+          background-color: white
+          float: right
 
-      table
+          h4
+            margin-top: 0
+
+          ul
+            margin: 0 10px 10px 10px
+
+      .entries-table
+        margin-top: 10px
         width: 100%
+
+        table
+          width: 100%
 
 
 .select-widget
-  .select, .options
+  .select
     display: none
+  .options-wrapper
+    position: relative
+    .options
+      position: absolute
+      display: none
