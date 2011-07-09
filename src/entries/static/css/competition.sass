@@ -106,6 +106,7 @@ $navborder: 1px solid $bluegrey
                 cursor: pointer
                 padding: 5px
                 text-align: center
+                -webkit-user-select: none
                 &.selected
                   background-image: -webkit-linear-gradient($darkbluegrey, $bluegrey, $darkbluegrey)
                   border-color: $darkbluegrey
@@ -114,12 +115,6 @@ $navborder: 1px solid $bluegrey
               #club-widget
                 margin: 0 auto
                 width: $input-width
-
-              #bowstyle-widget
-                padding: 10px 4px
-                .button
-                  display: inline-block
-                  margin: 0 1px
 
               #save
                 background-image: -webkit-linear-gradient($darkbluegrey, $bluegrey, $darkbluegrey)
@@ -142,10 +137,9 @@ $navborder: 1px solid $bluegrey
               .more-details
                 display: none
                 padding: 10px 0
+                text-align: center
                 &.shown
                   display: block
-
-                #gender-widget
 
 
         .stats
@@ -173,5 +167,10 @@ $navborder: 1px solid $bluegrey
       display: none
 
 .buttons-widget
+  padding: 5px
+  text-align: center
   .select
     display: none
+  .button
+    display: inline-block
+    margin: 0 2px

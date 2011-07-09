@@ -78,7 +78,8 @@
             background-image: -webkit-linear-gradient(#b4adf4, #dddafa, #b4adf4);
             cursor: pointer;
             padding: 5px;
-            text-align: center; }
+            text-align: center;
+            -webkit-user-select: none; }
             .competition-section .competition-content .competition-entries .top .new-entry .new-entry-form .archer-details .button.selected {
               background-image: -webkit-linear-gradient(#111d2a, #353345, #111d2a);
               border-color: #111d2a;
@@ -86,11 +87,6 @@
           .competition-section .competition-content .competition-entries .top .new-entry .new-entry-form .archer-details #club-widget {
             margin: 0 auto;
             width: 300px; }
-          .competition-section .competition-content .competition-entries .top .new-entry .new-entry-form .archer-details #bowstyle-widget {
-            padding: 10px 4px; }
-            .competition-section .competition-content .competition-entries .top .new-entry .new-entry-form .archer-details #bowstyle-widget .button {
-              display: inline-block;
-              margin: 0 1px; }
           .competition-section .competition-content .competition-entries .top .new-entry .new-entry-form .archer-details #save {
             background-image: -webkit-linear-gradient(#111d2a, #353345, #111d2a);
             border-color: #111d2a;
@@ -108,7 +104,8 @@
               -webkit-transform: rotate(90deg); }
           .competition-section .competition-content .competition-entries .top .new-entry .new-entry-form .archer-details .more-details {
             display: none;
-            padding: 10px 0; }
+            padding: 10px 0;
+            text-align: center; }
             .competition-section .competition-content .competition-entries .top .new-entry .new-entry-form .archer-details .more-details.shown {
               display: block; }
     .competition-section .competition-content .competition-entries .top .stats {
@@ -130,5 +127,11 @@
     position: absolute;
     display: none; }
 
-.buttons-widget .select {
-  display: none; }
+.buttons-widget {
+  padding: 5px;
+  text-align: center; }
+  .buttons-widget .select {
+    display: none; }
+  .buttons-widget .button {
+    display: inline-block;
+    margin: 0 2px; }
