@@ -12,14 +12,23 @@ var Option = new Class({
 
 var SelectWidget = new Class({
 
-    initialize: function (widget) {
-        this.widget = widget;
-        this.parseOptions(widget.getElement('select'));
-        this.input = widget.getElement('input');
-        this.options = new Element('ul', {'class': 'options'});
-        this.widget.adopt(this.options);
+    Implements: Options,
+
+    options: {
+        callback: function () {},
+        blank: 'New...'
+    },
+
+    initialize: function (options) {
+        this.setOptions(options);
+        this.initOptions = this.options;
+        this.widget = this.initOptions.widget;
+        this.selectElement = this.widget.getElement('select');
+        this.parseOptions(this.selectElement);
+        this.input = this.widget.getElement('input');
+        this.options = this.widget.getElement('.options');
         this.addInputEvents();
-        //this.options.adopt(new Option('New Archer', 'new'));
+        this.callback = this.initOptions.callback;
     },
 
     parseOptions: function (select) {
@@ -45,8 +54,8 @@ var SelectWidget = new Class({
     },
 
     addInputEvents: function () {
-        widget = this;
-        widget.input.addEvent('keyup', function (e) {
+        var widget = this;
+        var showOptions = function (e) {
             if (e.key == 'enter' || e.key == 'up' || e.key == 'down') {
                 e.stop();
                 return;
@@ -77,16 +86,73 @@ var SelectWidget = new Class({
             widget.results = [];
             widget.displayResults = [];
             Object.keys(widget.hits).each(function (item) {
-                if (widget.hits[item] === params.length) {
+                if (widget.hits[item] >= params.length) {
                     widget.results.push(widget.resultsLookup[item]);
                     widget.displayResults.push(new Option(widget.resultsLookup[item].name, item));
                 }
             });
-            widget.options.adopt(widget.displayResults, new Option('New Archer', 'new'));
+            widget.options.adopt(widget.displayResults, new Option(widget.initOptions.blank, 'new'));
             widget.options.setStyle('display', 'block');
             widget.options.getChildren().removeClass('selected');
             widget.options.firstChild.addClass('selected');
+        };
+        widget.input.addEvent('keydown', function (e) {
+            if (e.key == 'enter' || e.key == 'up' || e.key == 'down') {
+                if (e.key == 'up' && this.value) {
+                    widget.moveUp();
+                }
+                if (e.key == 'down' && this.value) {
+                    widget.moveDown();
+                }
+                if (e.key == 'enter' && this.value) {
+                    this.blur()
+                    widget.select();
+                }
+                e.stop();
+            }
         });
+        widget.input.addEvent('keyup', showOptions);
+        widget.input.addEvent('focus', showOptions);
+        widget.input.addEvent('blur', function () {
+            if (widget.input.get('value')) {
+                widget.select();
+            }
+        });
+    },
+
+    moveUp: function () {
+        var current = this.options.getElement('.selected');
+        if (current.previousSibling) {
+            current.removeClass('selected');
+            current.previousSibling.addClass('selected');
+        }
+    },
+
+    moveDown: function () {
+        var current = this.options.getElement('.selected');
+        if (current.nextSibling) {
+            current.removeClass('selected');
+            current.nextSibling.addClass('selected');
+        }
+    },
+
+    select: function () {
+        this.input.blur();
+        this.options.setStyle('display', 'none');
+        var current = this.options.getElement('.selected');
+        var rel = current.get('rel');
+        this.selectedObject;
+        if (rel === 'new') {
+            this.selectedObject = {id: ''}
+        } else {
+            this.selectedObject = this.resultsLookup[rel];
+        }
+        var option = this.selectElement.getElement('option[value=' + this.selectedObject.id + ']')
+        option.set('selected', 'selected');
+        if (rel !== 'new') {
+            this.input.set('value', this.selectedObject.name);
+        }
+        this.callback(this);
     }
 
 });

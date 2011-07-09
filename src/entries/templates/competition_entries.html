@@ -5,7 +5,14 @@
 <script src="{{ STATIC_URL }}js/competition_entries.js"></script>
 <script>
     window.addEvent('domready', function () { 
-        var archer = new SelectWidget($('archer-widget'));
+        var archer = new SelectWidget({
+            widget: $('archer-widget'),
+            blank: 'New Archer'
+        });
+        var club = new SelectWidget({
+            widget: $('club-widget'),
+            blank: 'New Club'
+        });
     });
 </script>
 {% endblock %}
@@ -34,13 +41,19 @@ Should you be able to add multiple entrants in one go? Should we do AJAX saving?
                     {{ form.archer }}
                 </div>
                 {{ form.archer_name }}
+                <div class="options-wrapper">
+                    <ul class="options"></ul>
+                </div>
             </div>
             <div class="archer-details">
-                <div class="club">
-                    <div class="hidden">
+                <div class="select-widget" id="club-widget">
+                    <div class="select">
                         {{ form.club }}
                     </div>
                     {{ form.club_name }}
+                    <div class="options-wrapper">
+                        <ul class="options"></ul>
+                    </div>
                 </div>
                 <div class="bowstyle">
                     <div class="hidden">
