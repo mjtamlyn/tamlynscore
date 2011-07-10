@@ -114,10 +114,23 @@
       .competition-section .competition-content .competition-entries .top .stats ul {
         margin: 0 10px 10px 10px; }
     .competition-section .competition-content .competition-entries .entries-table {
-      margin-top: 10px;
-      width: 100%; }
+      background-color: white;
+      border: 1px solid #111d2a;
+      margin-top: 10px; }
+      .competition-section .competition-content .competition-entries .entries-table h4 {
+        margin-top: 0; }
       .competition-section .competition-content .competition-entries .entries-table table {
+        border-collapse: collapse;
         width: 100%; }
+        .competition-section .competition-content .competition-entries .entries-table table td {
+          padding: 3px; }
+        .competition-section .competition-content .competition-entries .entries-table table .top td {
+          border-top: 1px solid #111d2a; }
+        .competition-section .competition-content .competition-entries .entries-table table .bottom td {
+          font-size: 14px; }
+        .competition-section .competition-content .competition-entries .entries-table table .tall {
+          border-left: 1px solid #111d2a;
+          text-align: center; }
 
 .select-widget .select {
   display: none; }

@@ -35,6 +35,11 @@ class Competition(models.Model):
         self.slug = slugify('{0} {1}'.format(self.tournament, self.date.year))
         return super(Competition, self).clean(*args, **kwargs)
 
+    def sessions_with_rounds(self):
+        sessions = self.session_set.annotate(count=models.Count('sessionround')).filter(
+                count__gt=0).order_by('start')
+        return sessions
+
     def __unicode__(self):
         return u'{0}: {1}'.format(self.tournament, self.date.year)
 
@@ -71,6 +76,16 @@ class CompetitionEntry(models.Model):
 
     class Meta:
         verbose_name_plural = 'competition entries'
+
+    def rounds_entered(self):
+        rounds = []
+        for session in self.competition.sessions_with_rounds():
+            entries = self.sessionentry_set.filter(session_round__session=session)
+            if entries:
+                rounds.append(entries[0].session_round.shot_round)
+            else:
+                rounds.append(u'-')
+        return rounds
 
 class SessionEntry(models.Model):
     competition_entry = models.ForeignKey(CompetitionEntry)

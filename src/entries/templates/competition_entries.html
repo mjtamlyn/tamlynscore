@@ -4,6 +4,24 @@
 <script src="{{ STATIC_URL }}js/mootools-core-1.3.js"></script>
 <script src="{{ STATIC_URL }}js/competition_entries.js"></script>
 <script>
+Elements.from = function(text, excludeScripts){
+	if (excludeScripts || excludeScripts == null) text = text.stripScripts();
+
+	var container, match = text.match(/^\s*<(t[dhr]|tbody|tfoot|thead)/i);
+
+	if (match){
+		container = new Element('table');
+		var tag = match[1].toLowerCase();
+		if (['td', 'th', 'tr'].contains(tag)){
+			container = new Element('tbody').inject(container);
+			if (tag != 'tr') container = new Element('tr').inject(container);
+		}
+	}
+
+	return (container || new Element('div')).set('html', text).getChildren();
+};
+</script>
+<script>
     window.addEvent('domready', function () {
         var archer, club, bowstyle, gender, age, novice, gnas_no, session0, session1;
         var reset = function () {
@@ -69,6 +87,16 @@
                 data: data,
                 onSuccess: function (response) {
                     fullReset();
+                    var row = Elements.from(response);
+                    var table = $$('.entries-table tbody');
+                    var rows = [];
+                    table.getElements('tr').each(function (tr) {
+                        rows.push(tr.dispose());
+                    });
+                    table.adopt(row);
+                    rows.each(function (row) {
+                        table.adopt(row);
+                    });
                 },
                 onFailure: function (response) {
                     console.log(JSON.decode(response.response));
@@ -132,27 +160,17 @@
     </div>
 
     <div class="entries-table">
+        <h4>Existing entries</h4>
         <table>
-            <caption><h4>Existing entries</h4></caption>
             <thead>
-                <th>Name</th>
-                <th>Club</th>
-                <th>Bowstyle</th>
-                <th>Gender</th>
-                <th>Age</th>
-                <th>06/08/11</th>
-                <th>07/08/11</th>
+                <th colspan="4">Archer</th>
+                {% for session in competition.sessions_with_rounds %}
+                <th>{{ session.start }}</th>
+                {% endfor %}
             </thead>
-            <tr>
-                <td>Marc Tamlyn</td>
-                <td></td>
-                <td>Recurve</td>
-                <td>Male</td>
-                <td>Senior</td>
-                <td>FITA 70m</td>
-                <td>Gents FITA</td>
-                <td>Edit</td>
-            </tr>
+            {% for entry in entries %}
+            {% include 'includes/entry_row.html' %}
+            {% endfor %}
         </table>
     </div>
 </div>

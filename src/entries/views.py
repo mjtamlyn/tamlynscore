@@ -34,7 +34,7 @@ class EntriesView(View):
 
     def get(self, request, slug):
         competition = self.get_object(slug)
-        entries = competition.competitionentry_set.all()
+        entries = competition.competitionentry_set.all().order_by('-pk')
         form = self.get_form_class(competition)()
         return self.render(locals())
 
@@ -43,8 +43,8 @@ class EntriesView(View):
         instance = self.model(competition=competition)
         form = self.get_form_class(competition)(request.POST, instance=instance)
         if form.is_valid():
-            inst = form.save()
-            return HttpResponse('ok')
+            entry = form.save()
+            return render(request, 'includes/entry_row.html', locals())
         else:
             errors = json.dumps(form.errors)
         return HttpResponseBadRequest(errors)
