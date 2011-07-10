@@ -87,7 +87,7 @@
           .competition-section .competition-content .competition-entries .top .new-entry .new-entry-form .archer-details #club-widget {
             margin: 0 auto;
             width: 300px; }
-          .competition-section .competition-content .competition-entries .top .new-entry .new-entry-form .archer-details #save {
+          .competition-section .competition-content .competition-entries .top .new-entry .new-entry-form .archer-details .save {
             background-image: -webkit-linear-gradient(#111d2a, #353345, #111d2a);
             border-color: #111d2a;
             color: white;
