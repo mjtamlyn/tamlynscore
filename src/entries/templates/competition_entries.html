@@ -51,20 +51,28 @@
             $$('.more-details').toggleClass('shown');
             this.toggleClass('selected');
         });
+
+        $$('.save').addEvent('click', function () {
+            data = {}
+            $$('.new-entry-form input').each(function (item) {
+                data[item.name] = item.value;
+            });
+            $$('.new-entry-form select').each(function (item) {
+                data[item.name] = item.value;
+            });
+            var request = new Request({
+                data: data,
+                onSuccess: function (response) {
+                    console.log(response);
+                }
+            });
+            request.send();
+        });
     });
 </script>
 {% endblock %}
 
 {% block competition_content %}
-<!--p>
-What should this page look like? We need to be able to do the following: Add new entries, modify existing entries (including make a note of payments), see all of the sessions and which round the archer has entered in which session, filter and/or search the entries, see stats on how many entries you have.
-</p>
-<p>
-Adding new entries will probably be the biggest use case for the page, so this should appear at the top. There should be a single large input box, which acts as a select box as before. Once you have selected an archer, the options should appear and be easily changeable.
-</p>
-<p>
-Should you be able to add multiple entrants in one go? Should we do AJAX saving?
-</p-->
 
 <div class="competition-entries">
     <div class="top">
@@ -72,6 +80,7 @@ Should you be able to add multiple entrants in one go? Should we do AJAX saving?
         <div class="new-entry">
             <h4>New Entry</h4>
             <div class="new-entry-form">
+                {% csrf_token %}
                 {{ form.archer }}
                 <div class="archer-details">
                     {{ form.sessions }}

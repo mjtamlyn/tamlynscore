@@ -80,6 +80,11 @@ class JsonChoiceField(forms.ModelChoiceField):
     def label_from_instance(self, obj):
         return obj.json()
 
+    def to_python(self, value):
+        pk, name = value
+        if pk:
+            return super(JsonChoiceField, self).to_python(pk)
+
 class SessionChoiceField(forms.ModelChoiceField):
     widget = ButtonWidget
 
@@ -101,6 +106,7 @@ def new_entry_form_for_competition(competition):
 
         class Meta:
             model = CompetitionEntry
+            exclude = ['competition']
             widgets = {
                 'bowstyle': ButtonWidget,
                 'novice': ButtonWidget,
