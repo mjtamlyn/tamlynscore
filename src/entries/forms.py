@@ -84,6 +84,8 @@ class JsonChoiceField(forms.ModelChoiceField):
         pk, name = value
         if pk:
             return super(JsonChoiceField, self).to_python(pk)
+        elif name:
+            return self.queryset.model(name=name)
 
 class SessionChoiceField(forms.ModelChoiceField):
     widget = ButtonWidget
@@ -98,15 +100,15 @@ class SessionChoiceField(forms.ModelChoiceField):
 def new_entry_form_for_competition(competition):
     class NewEntryForm(forms.ModelForm):
 
-        archer = JsonChoiceField(queryset=Archer.objects, required=False, widget=SelectWidget(attrs={'placeholder': 'Add an archer...'}))
-        club = JsonChoiceField(queryset=Club.objects, required=False, widget=SelectWidget(attrs={'placeholder': 'Club'}))
+        archer = JsonChoiceField(queryset=Archer.objects, widget=SelectWidget(attrs={'placeholder': 'Add an archer...'}))
+        club = JsonChoiceField(queryset=Club.objects, widget=SelectWidget(attrs={'placeholder': 'Club'}))
 
         gender = forms.ChoiceField(choices=GENDER_CHOICES, widget=ButtonWidget)
         gnas_no = forms.CharField(widget=forms.widgets.TextInput(attrs={'placeholder': 'GNAS number'}))
 
         class Meta:
             model = CompetitionEntry
-            exclude = ['competition']
+            exclude = ['competition', 'archer', 'club']
             widgets = {
                 'bowstyle': ButtonWidget,
                 'novice': ButtonWidget,
@@ -116,24 +118,50 @@ def new_entry_form_for_competition(competition):
         def __init__(self, *args, **kwargs):
             super(NewEntryForm, self).__init__(*args, **kwargs)
             sessions = competition.session_set.annotate(count=Count('sessionround')).filter(count__gt=0).order_by('start')
+            self.session_fields = {}
             for i in range(len(sessions)):
                 session = sessions[i]
-                self.fields['session-{0}'.format(i)] = SessionChoiceField(sessions[i])
+                field = SessionChoiceField(sessions[i], required=False)
+                self.fields['session-{0}'.format(i)] = field
+                self.session_fields['session-{0}'.format(i)] = field
 
         def save(self, *args, **kwargs):
-            entry = super(NewEntryForm, self).save(*args, **kwargs)
-            for field in self.fields:
-                if 'session' in field:
+            #TODO: deal with commit=False
+            club = self.cleaned_data['club']
+            if not club.pk:
+                club.short_name = club.name[:50]
+                club.clean()
+                club.save()
+            archer = self.cleaned_data['archer']
+            if not archer.pk:
+                archer.club = club
+                archer.bowstyle = self.cleaned_data['bowstyle']
+                archer.novice = self.cleaned_data['novice']
+                archer.gnas_no = self.cleaned_data['gnas_no']
+                archer.age = self.cleaned_data['age']
+                archer.gender = self.cleaned_data['gender']
+                archer.save()
+            entry = super(NewEntryForm, self).save(commit=False, *args, **kwargs)
+            entry.archer = archer
+            entry.club = club
+            entry.save()
+            for field in self.session_fields:
+                if self.cleaned_data[field]:
                     session_round = self.cleaned_data[field]
                     session_entry = SessionEntry(competition_entry=entry, session_round=session_round)
                     session_entry.save()
             return entry
 
+        def clean(self):
+            sessions = filter(None, [self.cleaned_data[field] for field in self.session_fields])
+            if not sessions:
+                raise forms.ValidationError('You should enter at least one session')
+            return self.cleaned_data
+
         def sessions(self):
             response = u''
-            for field in self.fields:
-                if 'session' in field:
-                    response += unicode(self[field])
+            for field in self.session_fields:
+                response += unicode(self[field])
             return mark_safe(response)
 
 

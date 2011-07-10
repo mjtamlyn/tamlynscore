@@ -121,6 +121,8 @@ INSTALLED_APPS = (
     'entries',
     'scores',
     'accounts',
+
+    #'django_extensions',
 )
 
 LOGIN_REDIRECT_URL = '/'

@@ -1,10 +1,12 @@
 from django.contrib.auth.decorators import login_required
-from django.http import HttpResponse
+from django.http import HttpResponse, HttpResponseBadRequest
 from django.views.generic import View
 from django.shortcuts import render, get_object_or_404
 
 from entries.forms import new_entry_form_for_competition
 from entries.models import Tournament, Competition, CompetitionEntry
+
+import json
 
 @login_required
 def tournaments(request):
@@ -42,8 +44,9 @@ class EntriesView(View):
         form = self.get_form_class(competition)(request.POST, instance=instance)
         if form.is_valid():
             inst = form.save()
+            return HttpResponse('ok')
         else:
-            print form.errors
-        return HttpResponse('ok')
+            errors = json.dumps(form.errors)
+        return HttpResponseBadRequest(errors)
 
 entries = login_required(EntriesView.as_view())

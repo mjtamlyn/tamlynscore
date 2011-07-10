@@ -17,7 +17,12 @@
             gnas_no.set('value', '');
             $$('.show-more-details').removeClass('selected');
             $$('.more-details').removeClass('shown');
-        }
+        };
+        var fullReset = function () {
+            reset();
+            $$('.archer-details').removeClass('shown');
+            archer.reset();
+        };
         archer = new SelectWidget({
             widget: $('archer-widget'),
             blank: 'New Archer',
@@ -63,7 +68,10 @@
             var request = new Request({
                 data: data,
                 onSuccess: function (response) {
-                    console.log(response);
+                    fullReset();
+                },
+                onFailure: function (response) {
+                    console.log(JSON.decode(response.response));
                 }
             });
             request.send();
