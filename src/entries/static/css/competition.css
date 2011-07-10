@@ -122,6 +122,11 @@
       .competition-section .competition-content .competition-entries .entries-table table {
         border-collapse: collapse;
         width: 100%; }
+        .competition-section .competition-content .competition-entries .entries-table table td:last-child.delete {
+          cursor: pointer; }
+        .competition-section .competition-content .competition-entries .entries-table table tr:hover td:last-child.delete {
+          background-color: #070052;
+          color: white; }
         .competition-section .competition-content .competition-entries .entries-table table td {
           padding: 3px; }
         .competition-section .competition-content .competition-entries .entries-table table .top td {
