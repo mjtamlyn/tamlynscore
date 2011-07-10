@@ -1,16 +1,20 @@
+from django.contrib.auth.decorators import login_required
 from django.shortcuts import render, get_object_or_404
 
 from entries.forms import new_entry_form_for_competition
 from entries.models import Tournament, Competition
 
+@login_required
 def tournaments(request):
     tournaments = Tournament.objects.all()
     return render(request, 'tournaments.html', locals())
 
+@login_required
 def competition_index(request, slug):
     competition = get_object_or_404(Competition, slug=slug)
     return render(request, 'competition_index.html', locals())
 
+@login_required
 def entries(request, slug):
     competition = get_object_or_404(Competition, slug=slug)
     entries = competition.competitionentry_set.all()
