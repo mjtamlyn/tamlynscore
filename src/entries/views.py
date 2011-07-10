@@ -42,7 +42,6 @@ class EntriesView(View):
         form = self.get_form_class(competition)(request.POST, instance=instance)
         if form.is_valid():
             inst = form.save()
-            print inst.novice
         else:
             print form.errors
         return HttpResponse('ok')

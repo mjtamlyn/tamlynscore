@@ -3,7 +3,7 @@ from django.db.models import Count
 from django.utils.safestring import mark_safe
 
 from core.models import Club, Archer, GENDER_CHOICES
-from entries.models import CompetitionEntry
+from entries.models import CompetitionEntry, SessionEntry
 
 GENDER_CHOICES = (('', ''),) + GENDER_CHOICES
 
@@ -119,6 +119,15 @@ def new_entry_form_for_competition(competition):
             for i in range(len(sessions)):
                 session = sessions[i]
                 self.fields['session-{0}'.format(i)] = SessionChoiceField(sessions[i])
+
+        def save(self, *args, **kwargs):
+            entry = super(NewEntryForm, self).save(*args, **kwargs)
+            for field in self.fields:
+                if 'session' in field:
+                    session_round = self.cleaned_data[field]
+                    session_entry = SessionEntry(competition_entry=entry, session_round=session_round)
+                    session_entry.save()
+            return entry
 
         def sessions(self):
             response = u''
