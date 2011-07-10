@@ -72,15 +72,7 @@ Should you be able to add multiple entrants in one go? Should we do AJAX saving?
         <div class="new-entry">
             <h4>New Entry</h4>
             <div class="new-entry-form">
-                <div class="select-widget" id="archer-widget">
-                    <div class="select">
-                        {{ form.archer }}
-                    </div>
-                    {{ form.archer_name }}
-                    <div class="options-wrapper">
-                        <ul class="options"></ul>
-                    </div>
-                </div>
+                {{ form.archer }}
                 <div class="archer-details">
                     {{ form.sessions }}
                     {{ form.bowstyle }}
@@ -88,25 +80,21 @@ Should you be able to add multiple entrants in one go? Should we do AJAX saving?
                     <div class="show-more-details button">
                         More options <div class="pointer">&raquo;</div>
                     </div>
-                    <div class="button" id="save">
+                    <div class="button save">
                         Save
                     </div>
                     <div class="clear"></div>
 
                     <div class="more-details">
-                        <div class="select-widget" id="club-widget">
-                            <div class="select">
-                                {{ form.club }}
-                            </div>
-                            {{ form.club_name }}
-                            <div class="options-wrapper">
-                                <ul class="options"></ul>
-                            </div>
-                        </div>
+                        {{ form.club }}
                         {{ form.gnas_no }}
                         {{ form.novice }}
                         {{ form.age }}
                         {{ form.gender }}
+                        <div class="button save">
+                            Save
+                        </div>
+                        <div class="clear"></div>
                     </div>
                 </div>
             </div>
