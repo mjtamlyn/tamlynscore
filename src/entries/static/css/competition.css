@@ -25,11 +25,13 @@
   .competition-section .competition-content {
     float: left;
     margin: 0 10px;
-    width: 700px; }
-    .competition-section .competition-content .competition-entries .top h4 {
-      margin-top: 0; }
-    .competition-section .competition-content .competition-entries .top .new-entry {
+    width: 758px; }
+    .competition-section .competition-content .module {
       background-color: white;
+      border: 1px solid #111d2a; }
+      .competition-section .competition-content .module h4 {
+        margin-top: 0; }
+    .competition-section .competition-content .competition-entries .top .new-entry {
       float: left; }
       .competition-section .competition-content .competition-entries .top .new-entry .new-entry-form {
         padding: 5px; }
@@ -109,16 +111,11 @@
             .competition-section .competition-content .competition-entries .top .new-entry .new-entry-form .archer-details .more-details.shown {
               display: block; }
     .competition-section .competition-content .competition-entries .top .stats {
-      background-color: white;
       float: right; }
       .competition-section .competition-content .competition-entries .top .stats ul {
         margin: 0 10px 10px 10px; }
     .competition-section .competition-content .competition-entries .entries-table {
-      background-color: white;
-      border: 1px solid #111d2a;
       margin-top: 10px; }
-      .competition-section .competition-content .competition-entries .entries-table h4 {
-        margin-top: 0; }
       .competition-section .competition-content .competition-entries .entries-table table {
         border-collapse: collapse;
         width: 100%; }

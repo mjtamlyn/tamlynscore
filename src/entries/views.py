@@ -32,9 +32,28 @@ class EntriesView(View):
     def get_form_class(self, competition):
         return new_entry_form_for_competition(competition)
 
+    def get_stats(self, competition):
+        stats = []
+        stats.append(
+            ('Total Entries', competition.competitionentry_set.count()),
+        )
+        for session in competition.sessions_with_rounds():
+            stats.append((
+                'Entries for {0}'.format(session.start.strftime('%A')),
+                competition.competitionentry_set.filter(sessionentry__session_round__session=session).count(),
+            ))
+        for session in competition.sessions_with_rounds():
+            for session_round in session.sessionround_set.all():
+                stats.append((
+                    'Entries for {0}'.format(session_round.shot_round),
+                    competition.competitionentry_set.filter(sessionentry__session_round=session_round).count(),
+                ))
+        return stats
+
     def get(self, request, slug):
         competition = self.get_object(slug)
         entries = competition.competitionentry_set.all().order_by('-pk')
+        stats = self.get_stats(competition)
         form = self.get_form_class(competition)()
         return self.render(locals())
 

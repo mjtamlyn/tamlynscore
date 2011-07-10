@@ -133,7 +133,7 @@ Elements.from = function(text, excludeScripts){
 <div class="competition-entries">
     <div class="top">
 
-        <div class="new-entry">
+        <div class="new-entry module">
             <h4>New Entry</h4>
             <div class="new-entry-form">
                 {% csrf_token %}
@@ -165,27 +165,24 @@ Elements.from = function(text, excludeScripts){
             </div>
         </div>
 
-        <div class="stats">
+        <div class="stats module">
             <h4>Entries Summary</h4>
             <ul>
-                <li>Current total entries: 24</li>
-                <li>Current total entries: 24</li>
-                <li>Current total entries: 24</li>
-                <li>Current total entries: 24</li>
-                <li>Current total entries: 24</li>
-                <li>Current total entries: 24</li>
+                {% for stat, value in stats %}
+                <li>{{ stat }}: {{ value }}</li>
+                {% endfor %}
             </ul>
         </div>
         <div class="clear"></div>
     </div>
 
-    <div class="entries-table">
+    <div class="entries-table module">
         <h4>Existing entries</h4>
         <table>
             <thead>
                 <th colspan="4">Archer</th>
                 {% for session in competition.sessions_with_rounds %}
-                <th>{{ session.start }}</th>
+                <th>{{ session.start|date:"l j/n" }}</th>
                 {% endfor %}
             </thead>
             {% for entry in entries %}
