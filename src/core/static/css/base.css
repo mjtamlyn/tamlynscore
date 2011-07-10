@@ -76,3 +76,32 @@ li {
 
 .arrow-values input[type=text] {
   width: 30px; }
+
+body.login .wrapper {
+  width: 300px;
+  padding-top: 15px; }
+  body.login .wrapper table {
+    border-spacing: 5px;
+    margin: 0 auto 10; }
+    body.login .wrapper table input {
+      border: 2px solid #dddafa;
+        border-radius: 4px;
+      font-family: Verdana;
+      margin: 0;
+      outline: none;
+      padding: 5px; }
+      body.login .wrapper table input:focus {
+        border-color: #6fb3ff; }
+  body.login .wrapper .submit {
+    text-align: center; }
+    body.login .wrapper .submit input[type=submit] {
+      border: 2px solid #111d2a;
+        border-radius: 10px;
+      background-image: -webkit-linear-gradient(#111d2a, #353345, #111d2a);
+      color: white;
+      cursor: pointer;
+      font-size: 18px;
+      font-family: Georgia;
+      font-weight: bold;
+      margin: 0 auto;
+      padding: 5px; }
