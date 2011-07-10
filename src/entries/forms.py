@@ -1,5 +1,4 @@
 from django import forms
-from django.db.models import Count
 from django.utils.safestring import mark_safe
 
 from core.models import Club, Archer, GENDER_CHOICES
@@ -117,7 +116,7 @@ def new_entry_form_for_competition(competition):
 
         def __init__(self, *args, **kwargs):
             super(NewEntryForm, self).__init__(*args, **kwargs)
-            sessions = competition.session_set.annotate(count=Count('sessionround')).filter(count__gt=0).order_by('start')
+            sessions = competition.sessions_with_rounds()
             self.session_fields = {}
             for i in range(len(sessions)):
                 session = sessions[i]

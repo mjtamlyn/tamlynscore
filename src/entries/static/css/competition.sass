@@ -150,11 +150,29 @@ $navborder: 1px solid $bluegrey
             margin: 0 10px 10px 10px
 
       .entries-table
+        background-color: white
+        border: 1px solid $darkbluegrey
         margin-top: 10px
-        width: 100%
+
+        h4
+          margin-top: 0
 
         table
+          border-collapse: collapse
           width: 100%
+
+          td
+            padding: 3px
+
+          .top td
+            border-top: 1px solid $darkbluegrey
+
+          .bottom td
+            font-size: 14px
+
+          .tall
+            border-left: 1px solid $darkbluegrey
+            text-align: center
 
 
 .select-widget
