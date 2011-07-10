@@ -4,6 +4,7 @@
     {% for round in entry.rounds_entered %}
     <td rowspan="2" class="tall">{{ round }}</td>
     {% endfor %}
+    <td rowspan="2" class="delete tall" rel="{{ entry.pk }}">X</td>
 </tr>
 <tr class="bottom">
     <td>{{ entry.bowstyle }}</td>

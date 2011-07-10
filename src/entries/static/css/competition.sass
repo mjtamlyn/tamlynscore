@@ -161,6 +161,13 @@ $navborder: 1px solid $bluegrey
           border-collapse: collapse
           width: 100%
 
+          td:last-child.delete
+            cursor: pointer
+          tr:hover
+            td:last-child.delete
+              background-color: $darkblue
+              color: white
+
           td
             padding: 3px
 

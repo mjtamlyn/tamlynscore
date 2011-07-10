@@ -39,6 +39,8 @@ class EntriesView(View):
         return self.render(locals())
 
     def post(self, request, slug):
+        if '_method' in request.POST and request.POST['_method'] == 'delete':
+            return self.delete(request, slug)
         competition = self.get_object(slug)
         instance = self.model(competition=competition)
         form = self.get_form_class(competition)(request.POST, instance=instance)
@@ -48,5 +50,10 @@ class EntriesView(View):
         else:
             errors = json.dumps(form.errors)
         return HttpResponseBadRequest(errors)
+
+    def delete(self, request, slug):
+        entry = get_object_or_404(self.model, pk=request.POST['pk'])
+        entry.delete()
+        return HttpResponse('deleted')
 
 entries = login_required(EntriesView.as_view())

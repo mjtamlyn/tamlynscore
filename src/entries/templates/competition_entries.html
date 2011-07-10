@@ -75,6 +75,23 @@ Elements.from = function(text, excludeScripts){
             this.toggleClass('selected');
         });
 
+        var deleteRow = function () {
+            data = {
+                'pk': this.get('rel'),
+                'csrfmiddlewaretoken': $$('input[name=csrfmiddlewaretoken]')[0].value
+            };
+            var request = new Request({
+                data: data,
+                method: 'delete',
+                onSuccess: function () {
+                    tr = this.getParent('tr');
+                    tr.getNext('tr').destroy();
+                    tr.destroy();
+                }.bind(this)
+            });
+            request.send();
+        };
+
         $$('.save').addEvent('click', function () {
             data = {}
             $$('.new-entry-form input').each(function (item) {
@@ -94,6 +111,7 @@ Elements.from = function(text, excludeScripts){
                         rows.push(tr.dispose());
                     });
                     table.adopt(row);
+                    row[0].getLast('td').addEvent('click', deleteRow);
                     rows.each(function (row) {
                         table.adopt(row);
                     });
@@ -104,6 +122,8 @@ Elements.from = function(text, excludeScripts){
             });
             request.send();
         });
+
+        $$('td:last-child').addEvent('click', deleteRow);
     });
 </script>
 {% endblock %}
