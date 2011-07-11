@@ -108,7 +108,6 @@ def target_list_pdf(request, slug):
     session_round = session_rounds[0]
 
     target_list = session_round.target_list()
-    print target_list
 
     PAGE_HEIGHT=defaultPageSize[1]
     PAGE_WIDTH=defaultPageSize[0]

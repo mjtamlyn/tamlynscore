@@ -3,6 +3,9 @@
 {% block scripts %}
 <script src="{{ STATIC_URL }}js/mootools-core-1.3.js"></script>
 <script>
+    Object.append(Element.NativeEvents, {
+        dragstart: 2, dragenter: 2, dragleave: 2, dragover: 2, dragend: 2, drop: 2
+    });
     window.addEvent('domready', function () {
         $$('.session-select a').addEvent('click', function (e) {
             e.stop();
@@ -27,10 +30,32 @@
             board.addClass('selected');
         });
 
-        //$$('.detail').addEvent('ondrop', function (e) {
-        dropEvent = function (item, e) {
-            console.log(item);
-        };
+        var draggingItem = undefined
+        $$('.archer').addEvent('dragstart', function (e) {
+            draggingItem = this;
+        });
+
+        $$('.archer').addEvent('dragend', function (e) {
+            draggingItem = undefined;
+        });
+
+        $$('.detail').addEvent('dragenter', function (e) {
+            this.addClass('drag-over');
+        });
+
+        $$('.detail').addEvent('dragleave', function (e) {
+            this.removeClass('drag-over');
+        });
+
+        $$('.detail').addEvent('dragover', function (e) {
+            e.stop();
+        });
+
+        $$('.detail').addEvent('drop', function (e) {
+            this.removeClass('drag-over');
+            this.empty();
+            this.adopt(draggingItem);
+        });
     });
 </script>
 {% endblock scripts %}
@@ -76,7 +101,7 @@
                 <div class="unallocated">
                     {% for entry in entries %}
                     {% if not entry.entered %}
-                    <div class="archer" ondrop="return dropEvent(this, event)">{{ entry.competition_entry.archer }}</div>
+                    <div class="archer" draggable="true">{{ entry.competition_entry.archer }}</div>
                     {% endif %}
                     {% endfor %}
                 </div>

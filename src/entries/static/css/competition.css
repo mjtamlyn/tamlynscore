@@ -166,6 +166,8 @@
                 width: 8%; }
               .competition-section .competition-content .target-list .target-list-gen .board-wrapper .board .target div.detail {
                 width: 92%; }
+                .competition-section .competition-content .target-list .target-list-gen .board-wrapper .board .target div.detail.drag-over {
+                  background-color: #dddafa; }
                 .competition-section .competition-content .target-list .target-list-gen .board-wrapper .board .target div.detail p {
                   padding-left: 5px; }
               .competition-section .competition-content .target-list .target-list-gen .board-wrapper .board .target div p {
