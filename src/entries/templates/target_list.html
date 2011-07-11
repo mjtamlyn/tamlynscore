@@ -1,0 +1,97 @@
+{% extends 'competition_index.html' %}
+
+{% block scripts %}
+<script src="{{ STATIC_URL }}js/mootools-core-1.3.js"></script>
+<script>
+    window.addEvent('domready', function () {
+        $$('.session-select a').addEvent('click', function (e) {
+            e.stop();
+            // do this row
+            $$('.session-select .link').removeClass('selected');
+            this.getElement('.link').addClass('selected');
+            // do the round select row
+            $$('.round-select').removeClass('selected');
+            var newRoundSelect = $$(this.get('href'));
+            newRoundSelect.addClass('selected');
+            newRoundSelect.getElement('.selected').getParent('a').fireEvent('click');
+        });
+
+        $$('.round-select a').addEvent('click', function (e) {
+            if (e) {e.stop();}
+            // do this row
+            this.getParent('.round-select').getElements('.link').removeClass('selected');
+            this.getElement('.link').addClass('selected');
+            // do the generator
+            var board = $$(this.get('href'));
+            $$('.target-list-gen').removeClass('selected');
+            board.addClass('selected');
+        });
+
+        //$$('.detail').addEvent('ondrop', function (e) {
+        dropEvent = function (item, e) {
+            console.log(item);
+        };
+    });
+</script>
+{% endblock scripts %}
+
+{% block competition_content %}
+<div class="target-list module">
+    <h4>Target Lists</h4>
+    <div class="target-list-nav">
+        <div class="session-select">
+            {% for session, rounds in sessions %}
+            <a href="#session-{{ session.pk }}"><div class="link {% if not forloop.counter0 %}selected{% endif %}" style="width: 50%">{{ session.start }}</div></a>
+            {% endfor %}
+        </div>
+        <div class="clear"></div>
+
+        {% for session, rounds in sessions %}
+        <div class="round-select {% if not forloop.counter0 %}selected{% endif %}" id="session-{{ session.pk }}">
+            {% for round in rounds %}
+            <a href="#session-{{ session.pk }}-round-{{ round.pk }}"><div class="link {% if not forloop.counter0 %}selected{% endif %}" style="width: 50%">{{ round.shot_round }}</div></a>
+            {% endfor %}
+        </div>
+        <div class="clear"></div>
+        {% endfor %}
+    </div>
+
+    {% for session, round, targets, entries in target_list %}
+    <div class="target-list-gen {% if not forloop.counter0 %}selected{% endif %}" id="session-{{ session.pk }}-round-{{ round.pk }}">
+        <div class="board-wrapper">
+            <div class="board">
+                {% for target, detail in targets %}
+                <div class="target">
+                    <div class="number"><p>{{ target }}</p></div>
+                    <div class="detail"><p>{{ detail }}</p></div>
+                    <div class="clear"></div>
+                </div>
+                {% endfor %}
+                <div class="clear"></div>
+            </div>
+        </div>
+        <div class="entries-wrapper">
+            <div class="entries">
+                <h5>Unallocated</h5>
+                <div class="unallocated">
+                    {% for entry in entries %}
+                    {% if not entry.entered %}
+                    <div class="archer" ondrop="return dropEvent(this, event)">{{ entry.competition_entry.archer }}</div>
+                    {% endif %}
+                    {% endfor %}
+                </div>
+                <h5>Allocated</h5>
+                <div class="allocated">
+                    {% for entry in entries %}
+                    {% if entry.entered %}
+                    <div class="archer">{{ entry.competition_entry.archer }}</div>
+                    {% endif %}
+                    {% endfor %}
+                </div>
+            </div>
+        </div>
+        <div class="clear"></div>
+    </div>
+    {% endfor %}
+</div>
+{% endblock %}

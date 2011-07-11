@@ -1,12 +1,14 @@
 from django.contrib.auth.decorators import login_required
+from django.db.models import Count
 from django.http import HttpResponse, HttpResponseBadRequest
 from django.views.generic import View
 from django.shortcuts import render, get_object_or_404
 
 from entries.forms import new_entry_form_for_competition
-from entries.models import Tournament, Competition, CompetitionEntry
+from entries.models import Tournament, Competition, CompetitionEntry, SessionRound
 
 import json
+from itertools import groupby
 
 @login_required
 def tournaments(request):
@@ -76,3 +78,20 @@ class EntriesView(View):
         return HttpResponse('deleted')
 
 entries = login_required(EntriesView.as_view())
+
+class TargetListView(View):
+    def get(self, request, slug):
+        competition = get_object_or_404(Competition, slug=slug)
+        session_rounds = SessionRound.objects.filter(session__competition=competition).order_by('session__start')
+        target_list = [(
+            session_round.session, # session
+            session_round, # round
+            session_round.target_list(), # target_list
+            session_round.sessionentry_set.annotate(entered=Count('targetallocation')), # entries
+            ) for session_round in session_rounds]
+        sessions = []
+        for key, values in groupby(target_list, lambda x: x[0]):
+            sessions.append((key, [value[1] for value in values]))
+        return render(request, 'target_list.html', locals())
+
+target_list = login_required(TargetListView.as_view())
