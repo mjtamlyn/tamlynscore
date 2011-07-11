@@ -4,6 +4,11 @@ from django.http import HttpResponse, HttpResponseBadRequest
 from django.views.generic import View
 from django.shortcuts import render, get_object_or_404
 
+from reportlab.platypus import SimpleDocTemplate, Paragraph, Spacer, Table
+from reportlab.lib.styles import getSampleStyleSheet
+from reportlab.rl_config import defaultPageSize
+from reportlab.lib.units import inch
+
 from entries.forms import new_entry_form_for_competition
 from entries.models import Tournament, Competition, CompetitionEntry, SessionRound
 
@@ -95,3 +100,27 @@ class TargetListView(View):
         return render(request, 'target_list.html', locals())
 
 target_list = login_required(TargetListView.as_view())
+
+def target_list_pdf(request, slug):
+    competition = get_object_or_404(Competition, slug=slug)
+
+    session_rounds = SessionRound.objects.filter(session__competition=competition).order_by('session__start')
+    session_round = session_rounds[0]
+
+    target_list = session_round.target_list()
+    print target_list
+
+    PAGE_HEIGHT=defaultPageSize[1]
+    PAGE_WIDTH=defaultPageSize[0]
+    styles = getSampleStyleSheet()
+
+    title = "Target List for Oxford Archers 720"
+    header = Paragraph(title, styles['Title'])
+    table = Table(target_list)
+    spacer = Spacer(PAGE_WIDTH, 0.5*inch)
+
+    response = HttpResponse(mimetype='application/pdf')
+    doc = SimpleDocTemplate(response)
+    doc.build([header, spacer, table])
+
+    return response

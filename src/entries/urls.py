@@ -8,4 +8,5 @@ urlpatterns = patterns('entries.views',
     (r'^(?P<slug>[\w-]+)/$', 'competition_index'),
     (r'^(?P<slug>[\w-]+)/entries/$', 'entries'),
     (r'^(?P<slug>[\w-]+)/target-list/$', 'target_list'),
+    (r'^(?P<slug>[\w-]+)/target-list/pdf/$', 'target_list_pdf'),
 )
