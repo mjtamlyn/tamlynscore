@@ -3,6 +3,8 @@ from django.template.defaultfilters import slugify
 
 from core.models import Archer, Bowstyle, Club, Round, AGE_CHOICES, NOVICE_CHOICES
 
+import math
+
 SCORING_SYSTEMS = (
     ('F', 'Full running slips'),
     ('D', 'Dozen running slips'),
@@ -51,13 +53,37 @@ class Session(models.Model):
     start = models.DateTimeField()
 
     scoring_system = models.CharField(max_length=1, choices=SCORING_SYSTEMS)
+    archers_per_target = models.IntegerField()
 
     def __unicode__(self):
         return u'{0} - {1}'.format(self.competition, self.start)
 
+    def details(self):
+        details = ['A', 'B', 'C', 'D', 'E', 'F']
+        return details[:self.archers_per_target]
+
 class SessionRound(models.Model):
     session = models.ForeignKey(Session)
     shot_round = models.ForeignKey(Round)
+
+    def target_list(self):
+        entries = self.sessionentry_set.count()
+        archers_per_target = self.session.archers_per_target
+        needed_bosses = int(math.ceil(entries / float(archers_per_target)))
+        current_target_allocations = TargetAllocation.objects.filter(session_entry__session_round=self)
+        current_bosses = current_target_allocations.aggregate(models.Max('boss'))['boss__max']
+        bosses = range(1, max(needed_bosses, current_bosses) + 1)
+
+        details = self.session.details()
+
+        allocations_lookup = dict([('{0}{1}'.format(allocation.boss, allocation.target), allocation) for allocation in current_target_allocations])
+
+        targets = []
+        for boss in bosses:
+            for detail in details:
+                target = '{0}{1}'.format(boss, detail)
+                targets.append((target, allocations_lookup.get(target, u'-')))
+        return targets
 
     def __unicode__(self):
         return u'{0}, {1}'.format(self.session, self.shot_round)

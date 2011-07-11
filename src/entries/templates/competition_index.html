@@ -13,7 +13,7 @@
         <h2>Before the shoot</h2>
         <ul>
             <a href="{% url entries.views.entries slug=competition.slug %}"><li>Manage Entries</li></a>
-            <li>Target lists</li>
+            <a href="{% url entries.views.target_list slug=competition.slug %}"><li>Target lists</li></a>
             <li>Score sheets</li>
         </ul>
         <h2>On the day</h2>

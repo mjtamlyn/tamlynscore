@@ -133,6 +133,65 @@
         .competition-section .competition-content .competition-entries .entries-table table .tall {
           border-left: 1px solid #111d2a;
           text-align: center; }
+    .competition-section .competition-content .target-list .target-list-nav .session-select {
+      width: 100%; }
+    .competition-section .competition-content .target-list .target-list-nav .round-select {
+      display: none;
+      width: 100%; }
+      .competition-section .competition-content .target-list .target-list-nav .round-select.selected {
+        display: block; }
+    .competition-section .competition-content .target-list .target-list-nav .link {
+      background-color: #dddafa;
+      float: left;
+      font-weight: bold;
+      text-align: center; }
+    .competition-section .competition-content .target-list .target-list-nav .selected {
+      background-color: #6fb3ff; }
+    .competition-section .competition-content .target-list .target-list-gen {
+      display: none;
+      width: 100%; }
+      .competition-section .competition-content .target-list .target-list-gen.selected {
+        display: block; }
+      .competition-section .competition-content .target-list .target-list-gen .board-wrapper {
+        float: left;
+        width: 70%; }
+        .competition-section .competition-content .target-list .target-list-gen .board-wrapper .board {
+          margin: 8px 0 8px 8px; }
+          .competition-section .competition-content .target-list .target-list-gen .board-wrapper .board .target {
+            width: 100%; }
+            .competition-section .competition-content .target-list .target-list-gen .board-wrapper .board .target div {
+              float: left; }
+              .competition-section .competition-content .target-list .target-list-gen .board-wrapper .board .target div.number {
+                text-align: center;
+                width: 8%; }
+              .competition-section .competition-content .target-list .target-list-gen .board-wrapper .board .target div.detail {
+                width: 92%; }
+                .competition-section .competition-content .target-list .target-list-gen .board-wrapper .board .target div.detail p {
+                  padding-left: 5px; }
+              .competition-section .competition-content .target-list .target-list-gen .board-wrapper .board .target div p {
+                margin: 0;
+                padding: 2px 0;
+                border: 1px solid #111d2a; }
+      .competition-section .competition-content .target-list .target-list-gen .entries-wrapper {
+        float: right;
+        width: 30%; }
+        .competition-section .competition-content .target-list .target-list-gen .entries-wrapper .entries {
+          border: 1px solid #111d2a;
+          border-bottom: none;
+          margin: 8px; }
+          .competition-section .competition-content .target-list .target-list-gen .entries-wrapper .entries h5 {
+            margin: 0; }
+          .competition-section .competition-content .target-list .target-list-gen .entries-wrapper .entries .archer {
+            background-color: #dddafa;
+            cursor: default;
+            padding: 2px;
+            border-bottom: 1px solid #111d2a;
+            -webkit-user-select: none; }
+          .competition-section .competition-content .target-list .target-list-gen .entries-wrapper .entries .unallocated .archer {
+            cursor: pointer;
+            -webkit-user-drag: element; }
+            .competition-section .competition-content .target-list .target-list-gen .entries-wrapper .entries .unallocated .archer:-webkit-drag {
+              opacity: 0.5; }
 
 .select-widget .select {
   display: none; }

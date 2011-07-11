@@ -179,6 +179,80 @@ $navborder: 1px solid $bluegrey
             text-align: center
 
 
+    $border: 1px solid $darkbluegrey
+
+    .target-list
+      .target-list-nav
+        .session-select
+          width: 100%
+        .round-select
+          display: none
+          &.selected
+            display: block
+          width: 100%
+        .link 
+          background-color: $vlightblue
+          float: left
+          font-weight: bold
+          text-align: center
+        .selected
+          background-color: $lightblue
+
+      .target-list-gen
+        display: none
+        &.selected
+          display: block
+        width: 100%
+        .board-wrapper
+          float: left
+          width: 70%
+
+          .board
+            margin: 8px 0 8px 8px
+          
+            .target
+              width: 100%
+                
+              div
+                float: left
+                &.number
+                  text-align: center
+                  width: 8%
+                &.detail
+                  width: 92%
+                  p
+                    padding-left: 5px
+                p
+                  margin: 0
+                  padding: 2px 0
+                  border: $border
+
+        .entries-wrapper
+          float: right
+          width: 30%
+
+          .entries
+            border: $border
+            border-bottom: none
+            margin: 8px
+
+            h5
+              margin: 0
+
+            .archer
+              background-color: $vlightblue
+              cursor: default
+              padding: 2px
+              border-bottom: $border
+              -webkit-user-select: none
+            .unallocated .archer
+              cursor: pointer
+              -webkit-user-drag: element
+              &:-webkit-drag
+                opacity: 0.5
+
+
+
 .select-widget
   .select
     display: none
