@@ -37,6 +37,7 @@
 
         $$('.archer').addEvent('dragend', function (e) {
             draggingItem = undefined;
+            draggingItemSrc = undefined
         });
 
         $$('.detail').addEvent('dragenter', function (e) {
@@ -53,7 +54,36 @@
 
         $$('.detail').addEvent('drop', function (e) {
             this.removeClass('drag-over');
+            var current = this.getElement('.archer');
+            var targetBlank = this.getElement('.archer').hasClass('blank');
+            var movingOnBoard = draggingItem.getParent('.detail');
+            if (!targetBlank && !movingOnBoard) {
+                $$('.unallocated')[0].adopt(current);
+            }
+            if (targetBlank && movingOnBoard)  {
+                var archer = new Element('div', {'class': 'archer blank'});
+                var name = new Element('p', {'class': 'name', html: '-'});
+                archer.adopt(name);
+                draggingItem.getParent('.detail').grab(archer, 'top');
+            }
+            if (!targetBlank && movingOnBoard) {
+                movingOnBoard.adopt(current);
+            }
             this.empty();
+            this.adopt(draggingItem);
+        });
+
+        $$('.unallocated').addEvent('dragover', function (e) {
+            if (!draggingItem.getParent('.unallocated')) {
+                e.stop();
+            }
+        });
+
+        $$('.unallocated').addEvent('drop', function (e) {
+            var archer = new Element('div', {'class': 'archer blank'});
+            var name = new Element('p', {'class': 'name', html: '-'});
+            archer.adopt(name);
+            draggingItem.getParent('.detail').grab(archer, 'top');
             this.adopt(draggingItem);
         });
     });
@@ -88,7 +118,18 @@
                 {% for target, detail in targets %}
                 <div class="target">
                     <div class="number"><p>{{ target }}</p></div>
-                    <div class="detail"><p>{{ detail }}</p></div>
+                    <div class="detail">
+                        <div class="archer {% if not detail %}blank{% endif %}">
+                            {% if detail %}
+                            <p class="code">{{ detail.session_entry.competition_entry.code }}</p>
+                            <p class="name">{{ detail.session_entry.competition_entry.archer }}</p>
+                            <p class="club">{{ detail.session_entry.competition_entry.club }}</p>
+                            {% else %}
+                            <p class="name">-</p>
+                            {% endif %}
+                            <div class="clear"></div>
+                        </div>
+                    </div>
                     <div class="clear"></div>
                 </div>
                 {% endfor %}
@@ -97,20 +138,15 @@
         </div>
         <div class="entries-wrapper">
             <div class="entries">
-                <h5>Unallocated</h5>
                 <div class="unallocated">
+                    <h5>Unallocated</h5>
                     {% for entry in entries %}
-                    {% if not entry.entered %}
-                    <div class="archer" draggable="true">{{ entry.competition_entry.archer }}</div>
-                    {% endif %}
-                    {% endfor %}
-                </div>
-                <h5>Allocated</h5>
-                <div class="allocated">
-                    {% for entry in entries %}
-                    {% if entry.entered %}
-                    <div class="archer">{{ entry.competition_entry.archer }}</div>
-                    {% endif %}
+                    <div class="archer" draggable="true">
+                        <p class="code">{{ entry.competition_entry.code }}</p>
+                        <p class="name">{{ entry.competition_entry.archer }}</p>
+                        <p class="club">{{ entry.competition_entry.club }}</p>
+                        <div class="clear"></div>
+                    </div>
                     {% endfor %}
                 </div>
             </div>

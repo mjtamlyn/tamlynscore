@@ -82,7 +82,7 @@ class SessionRound(models.Model):
         for boss in bosses:
             for detail in details:
                 target = '{0}{1}'.format(boss, detail)
-                targets.append((target, allocations_lookup.get(target, u'-')))
+                targets.append((target, allocations_lookup.get(target, None)))
         return targets
 
     def __unicode__(self):
@@ -112,6 +112,11 @@ class CompetitionEntry(models.Model):
             else:
                 rounds.append(u'-')
         return rounds
+
+    def code(self):
+        gender = self.archer.gender
+        bowstyle = self.bowstyle.name[0]
+        return gender + bowstyle
 
 class SessionEntry(models.Model):
     competition_entry = models.ForeignKey(CompetitionEntry)

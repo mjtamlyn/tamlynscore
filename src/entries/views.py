@@ -92,7 +92,7 @@ class TargetListView(View):
             session_round.session, # session
             session_round, # round
             session_round.target_list(), # target_list
-            session_round.sessionentry_set.annotate(entered=Count('targetallocation')), # entries
+            session_round.sessionentry_set.annotate(entered=Count('targetallocation')).filter(entered=0), # entries
             ) for session_round in session_rounds]
         sessions = []
         for key, values in groupby(target_list, lambda x: x[0]):
