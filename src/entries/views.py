@@ -114,21 +114,25 @@ def target_list_pdf(request, slug):
     competition = get_object_or_404(Competition, slug=slug)
 
     session_rounds = SessionRound.objects.filter(session__competition=competition).order_by('session__start')
-    session_round = session_rounds[0]
-
-    target_list = session_round.target_list()
 
     PAGE_HEIGHT=defaultPageSize[1]
     PAGE_WIDTH=defaultPageSize[0]
     styles = getSampleStyleSheet()
 
-    title = "Target List for Oxford Archers 720"
-    header = Paragraph(title, styles['Title'])
-    table = Table(target_list)
-    spacer = Spacer(PAGE_WIDTH, 0.5*inch)
+    doc_elements = []
+
+    for session_round in session_rounds:
+        target_list = session_round.target_list()
+
+        title = "Target List for {0}".format(session_round)
+        header = Paragraph(title, styles['Title'])
+        table = Table(target_list)
+        spacer = Spacer(PAGE_WIDTH, 0.5*inch)
+
+        doc_elements += [header, spacer, table, spacer]
 
     response = HttpResponse(mimetype='application/pdf')
     doc = SimpleDocTemplate(response)
-    doc.build([header, spacer, table])
+    doc.build(doc_elements)
 
     return response
