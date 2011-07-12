@@ -152,6 +152,21 @@
       width: 100%; }
       .competition-section .competition-content .target-list .target-list-gen.selected {
         display: block; }
+      .competition-section .competition-content .target-list .target-list-gen .archer {
+        background-color: #dddafa;
+        padding: 2px;
+        border-bottom: 1px solid #111d2a;
+        -webkit-user-select: none; }
+        .competition-section .competition-content .target-list .target-list-gen .archer:not(.blank) {
+          cursor: pointer;
+          -webkit-user-drag: element; }
+        .competition-section .competition-content .target-list .target-list-gen .archer:-webkit-drag {
+          border: 1px solid #111d2a;
+          opacity: 0.5; }
+          .competition-section .competition-content .target-list .target-list-gen .archer:-webkit-drag p:not(.name) {
+            display: none; }
+        .competition-section .competition-content .target-list .target-list-gen .archer.blank {
+          background-color: #fbeedb; }
       .competition-section .competition-content .target-list .target-list-gen .board-wrapper {
         float: left;
         width: 70%; }
@@ -164,16 +179,25 @@
               .competition-section .competition-content .target-list .target-list-gen .board-wrapper .board .target div.number {
                 text-align: center;
                 width: 8%; }
+                .competition-section .competition-content .target-list .target-list-gen .board-wrapper .board .target div.number p {
+                  border: 1px solid #111d2a;
+                  margin: 0;
+                  padding: 2px 0; }
               .competition-section .competition-content .target-list .target-list-gen .board-wrapper .board .target div.detail {
                 width: 92%; }
                 .competition-section .competition-content .target-list .target-list-gen .board-wrapper .board .target div.detail.drag-over {
                   background-color: #dddafa; }
-                .competition-section .competition-content .target-list .target-list-gen .board-wrapper .board .target div.detail p {
-                  padding-left: 5px; }
-              .competition-section .competition-content .target-list .target-list-gen .board-wrapper .board .target div p {
-                margin: 0;
-                padding: 2px 0;
-                border: 1px solid #111d2a; }
+                .competition-section .competition-content .target-list .target-list-gen .board-wrapper .board .target div.detail .archer {
+                  border: 1px solid #111d2a;
+                  padding: 2px 0 2px 0;
+                  width: 100%; }
+                  .competition-section .competition-content .target-list .target-list-gen .board-wrapper .board .target div.detail .archer p {
+                    margin: 0;
+                    padding-left: 5px;
+                    float: left; }
+                    .competition-section .competition-content .target-list .target-list-gen .board-wrapper .board .target div.detail .archer p.club {
+                      float: right;
+                      padding-right: 5px; }
       .competition-section .competition-content .target-list .target-list-gen .entries-wrapper {
         float: right;
         width: 30%; }
@@ -183,17 +207,13 @@
           margin: 8px; }
           .competition-section .competition-content .target-list .target-list-gen .entries-wrapper .entries h5 {
             margin: 0; }
-          .competition-section .competition-content .target-list .target-list-gen .entries-wrapper .entries .archer {
-            background-color: #dddafa;
-            cursor: default;
-            padding: 2px;
-            border-bottom: 1px solid #111d2a;
-            -webkit-user-select: none; }
-          .competition-section .competition-content .target-list .target-list-gen .entries-wrapper .entries .unallocated .archer {
-            cursor: pointer;
-            -webkit-user-drag: element; }
-            .competition-section .competition-content .target-list .target-list-gen .entries-wrapper .entries .unallocated .archer:-webkit-drag {
-              opacity: 0.5; }
+          .competition-section .competition-content .target-list .target-list-gen .entries-wrapper .entries .archer p {
+            margin: 0;
+            float: right; }
+            .competition-section .competition-content .target-list .target-list-gen .entries-wrapper .entries .archer p.name {
+              float: left; }
+            .competition-section .competition-content .target-list .target-list-gen .entries-wrapper .entries .archer p.club {
+              display: none; }
 
 .select-widget .select {
   display: none; }

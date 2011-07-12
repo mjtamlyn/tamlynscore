@@ -203,6 +203,23 @@ $navborder: 1px solid $bluegrey
         &.selected
           display: block
         width: 100%
+
+        .archer
+          background-color: $vlightblue
+          padding: 2px
+          border-bottom: $border
+          -webkit-user-select: none
+          &:not(.blank)
+            cursor: pointer
+            -webkit-user-drag: element
+          &:-webkit-drag
+            border: $border
+            opacity: 0.5
+            p:not(.name)
+              display: none
+          &.blank
+            background-color: $bg
+
         .board-wrapper
           float: left
           width: 70%
@@ -218,16 +235,25 @@ $navborder: 1px solid $bluegrey
                 &.number
                   text-align: center
                   width: 8%
+                  p
+                    border: $border
+                    margin: 0
+                    padding: 2px 0
                 &.detail
                   width: 92%
                   &.drag-over
                     background-color: $vlightblue
-                  p
-                    padding-left: 5px
-                p
-                  margin: 0
-                  padding: 2px 0
-                  border: $border
+                  .archer
+                    border: $border
+                    padding: 2px 0 2px 0
+                    width: 100%
+                    p
+                      margin: 0
+                      padding-left: 5px
+                      float: left
+                      &.club
+                        float: right
+                        padding-right: 5px
 
         .entries-wrapper
           float: right
@@ -242,16 +268,13 @@ $navborder: 1px solid $bluegrey
               margin: 0
 
             .archer
-              background-color: $vlightblue
-              cursor: default
-              padding: 2px
-              border-bottom: $border
-              -webkit-user-select: none
-            .unallocated .archer
-              cursor: pointer
-              -webkit-user-drag: element
-              &:-webkit-drag
-                opacity: 0.5
+              p
+                margin: 0
+                float: right
+                &.name
+                  float: left
+                &.club
+                  display: none
 
 
 
