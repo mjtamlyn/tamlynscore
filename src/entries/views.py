@@ -10,7 +10,7 @@ from reportlab.rl_config import defaultPageSize
 from reportlab.lib.units import inch
 
 from entries.forms import new_entry_form_for_competition
-from entries.models import Tournament, Competition, CompetitionEntry, SessionRound
+from entries.models import *
 
 import json
 from itertools import groupby
@@ -98,6 +98,15 @@ class TargetListView(View):
         for key, values in groupby(target_list, lambda x: x[0]):
             sessions.append((key, [value[1] for value in values]))
         return render(request, 'target_list.html', locals())
+
+    def post(self, request, slug):
+        targets = json.loads(request.POST['targets'])
+        for target in targets:
+            TargetAllocation.objects.filter(session_entry__pk=target['entry']).delete()
+            entry = SessionEntry.objects.get(pk=target['entry'])
+            new_allocation = TargetAllocation(session_entry=entry, boss=target['target'][:-1], target=target['target'][-1])
+            new_allocation.save()
+        return HttpResponse()
 
 target_list = login_required(TargetListView.as_view())
 
