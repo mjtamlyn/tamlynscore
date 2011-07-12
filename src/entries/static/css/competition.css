@@ -185,8 +185,8 @@
                   padding: 2px 0; }
               .competition-section .competition-content .target-list .target-list-gen .board-wrapper .board .target div.detail {
                 width: 92%; }
-                .competition-section .competition-content .target-list .target-list-gen .board-wrapper .board .target div.detail.drag-over {
-                  background-color: #dddafa; }
+                .competition-section .competition-content .target-list .target-list-gen .board-wrapper .board .target div.detail.drag-over .archer {
+                  background-color: #6fb3ff; }
                 .competition-section .competition-content .target-list .target-list-gen .board-wrapper .board .target div.detail .archer {
                   border: 1px solid #111d2a;
                   padding: 2px 0 2px 0;

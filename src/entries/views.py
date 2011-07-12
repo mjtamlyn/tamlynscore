@@ -4,7 +4,7 @@ from django.http import HttpResponse, HttpResponseBadRequest
 from django.views.generic import View
 from django.shortcuts import render, get_object_or_404
 
-from reportlab.platypus import SimpleDocTemplate, Paragraph, Spacer, Table
+from reportlab.platypus import SimpleDocTemplate, Paragraph, Spacer, Table, PageBreak
 from reportlab.lib.styles import getSampleStyleSheet
 from reportlab.rl_config import defaultPageSize
 from reportlab.lib.units import inch
@@ -129,7 +129,7 @@ def target_list_pdf(request, slug):
         table = Table(target_list)
         spacer = Spacer(PAGE_WIDTH, 0.5*inch)
 
-        doc_elements += [header, spacer, table, spacer]
+        doc_elements += [header, spacer, table, PageBreak()]
 
     response = HttpResponse(mimetype='application/pdf')
     doc = SimpleDocTemplate(response)
