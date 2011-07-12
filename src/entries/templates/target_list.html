@@ -7,6 +7,16 @@
         dragstart: 2, dragenter: 2, dragleave: 2, dragover: 2, dragend: 2, drop: 2
     });
     window.addEvent('domready', function () {
+        doRequest = function (data) {
+            var request = new Request({
+                data: {
+                    targets: JSON.encode(data.targets),
+                    csrfmiddlewaretoken: $$('input[name=csrfmiddlewaretoken]')[0].value
+                }
+            });
+            request.send();
+        };
+
         $$('.session-select a').addEvent('click', function (e) {
             e.stop();
             // do this row
@@ -57,8 +67,18 @@
             var current = this.getElement('.archer');
             var targetBlank = this.getElement('.archer').hasClass('blank');
             var movingOnBoard = draggingItem.getParent('.detail');
+            var data = {
+                targets: [{
+                    target: this.getParent('.target').get('rel'),
+                    entry: draggingItem.get('rel')
+                }]
+            };
             if (!targetBlank && !movingOnBoard) {
                 $$('.unallocated')[0].adopt(current);
+                data.targets.push({
+                    target: null,
+                    entry: current.get('rel')
+                });
             }
             if (targetBlank && movingOnBoard)  {
                 var archer = new Element('div', {'class': 'archer blank'});
@@ -67,8 +87,14 @@
                 draggingItem.getParent('.detail').grab(archer, 'top');
             }
             if (!targetBlank && movingOnBoard) {
+                data.targets.push({
+                    target: draggingItem.getParent('.target').get('rel'),
+                    entry: current.get('rel')
+                });
+                console.log(data.targets);
                 movingOnBoard.adopt(current);
             }
+            doRequest(data);
             this.empty();
             this.adopt(draggingItem);
         });
@@ -85,12 +111,20 @@
             archer.adopt(name);
             draggingItem.getParent('.detail').grab(archer, 'top');
             this.adopt(draggingItem);
+            data = {
+                targets: [{
+                    target: null,
+                    entry: draggingItem.get('rel')
+                }]
+            }
+            doRequest(data);
         });
     });
 </script>
 {% endblock scripts %}
 
 {% block competition_content %}
+{% csrf_token %}
 <div class="target-list module">
     <h4>Target Lists</h4>
     <div class="target-list-nav">
@@ -116,10 +150,10 @@
         <div class="board-wrapper">
             <div class="board">
                 {% for target, detail in targets %}
-                <div class="target">
+                <div class="target" rel="{{ target }}">
                     <div class="number"><p>{{ target }}</p></div>
                     <div class="detail">
-                        <div class="archer {% if not detail %}blank{% endif %}">
+                        <div class="archer {% if not detail %}blank{% endif %}" rel="{{ detail.session_entry.pk }}">
                             {% if detail %}
                             <p class="code">{{ detail.session_entry.competition_entry.code }}</p>
                             <p class="name">{{ detail.session_entry.competition_entry.archer }}</p>
@@ -141,7 +175,7 @@
                 <div class="unallocated">
                     <h5>Unallocated</h5>
                     {% for entry in entries %}
-                    <div class="archer" draggable="true">
+                    <div class="archer" rel="{{ entry.pk }}">
                         <p class="code">{{ entry.competition_entry.code }}</p>
                         <p class="name">{{ entry.competition_entry.archer }}</p>
                         <p class="club">{{ entry.competition_entry.club }}</p>
