@@ -139,3 +139,11 @@ def target_list_pdf(request, slug):
     doc.build(doc_elements)
 
     return response
+
+def score_sheets(request, slug):
+    competition = get_object_or_404(Competition, slug=slug)
+    rounds = SessionRound.objects.filter(session__competition=competition)
+    return render(request, 'score_sheets.html', locals())
+
+def score_sheets_pdf(request, slug, round_id):
+    return
