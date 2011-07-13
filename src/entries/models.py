@@ -85,6 +85,32 @@ class SessionRound(models.Model):
                 targets.append((target, allocations_lookup.get(target, None)))
         return targets
 
+    def target_list_pdf(self):
+        current_target_allocations = TargetAllocation.objects.filter(session_entry__session_round=self)
+        current_bosses = current_target_allocations.aggregate(models.Max('boss'))['boss__max']
+        bosses = range(1, current_bosses + 1)
+        allocations_lookup = dict([('{0}{1}'.format(allocation.boss, allocation.target), allocation) for allocation in current_target_allocations])
+        details = self.session.details()
+
+        targets = []
+        for boss in bosses:
+            for detail in details:
+                target = '{0}{1}'.format(boss, detail)
+                allocation = allocations_lookup.get(target, None)
+                if allocation:
+                    entry = allocation.session_entry.competition_entry
+                    allocation = (
+                            entry.archer,
+                            entry.club,
+                            entry.archer.get_gender_display(),
+                            entry.bowstyle,
+                            entry.get_age_display(),
+                    )
+                    targets.append((target,) + allocation)
+                else:
+                    targets.append((target, None))
+        return targets
+
     def __unicode__(self):
         return u'{0}, {1}'.format(self.session, self.shot_round)
 

@@ -119,13 +119,16 @@ def target_list_pdf(request, slug):
     PAGE_WIDTH=defaultPageSize[0]
     styles = getSampleStyleSheet()
 
-    doc_elements = []
+    styles['h2'].alignment = 1
+
+    main_title = Paragraph(u'{0}: Target List'.format(competition), styles['Title'])
+    doc_elements = [main_title]
 
     for session_round in session_rounds:
-        target_list = session_round.target_list()
+        target_list = session_round.target_list_pdf()
 
-        title = "Target List for {0}".format(session_round)
-        header = Paragraph(title, styles['Title'])
+        title = "Target List for {0} - {1}".format(session_round.shot_round, session_round.session.start.strftime('%A, %d %B %Y, %X'))
+        header = Paragraph(title, styles['h2'])
         table = Table(target_list)
         spacer = Spacer(PAGE_WIDTH, 0.5*inch)
 
