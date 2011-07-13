@@ -4,16 +4,18 @@ from django.http import HttpResponse, HttpResponseBadRequest
 from django.views.generic import View
 from django.shortcuts import render, get_object_or_404
 
-from reportlab.platypus import SimpleDocTemplate, Paragraph, Spacer, Table, PageBreak
+from reportlab.platypus import SimpleDocTemplate, Paragraph, Spacer, Table, PageBreak, TableStyle, KeepTogether
 from reportlab.lib.styles import getSampleStyleSheet
 from reportlab.rl_config import defaultPageSize
+from reportlab.lib import colors
 from reportlab.lib.units import inch
 
 from entries.forms import new_entry_form_for_competition
 from entries.models import *
 
-import json
 from itertools import groupby
+import json
+import math
 
 @login_required
 def tournaments(request):
@@ -110,6 +112,10 @@ class TargetListView(View):
 
 target_list = login_required(TargetListView.as_view())
 
+styles = getSampleStyleSheet()
+def para(string, style='Normal'):
+    return Paragraph(unicode(string), styles[style])
+
 def target_list_pdf(request, slug):
     competition = get_object_or_404(Competition, slug=slug)
 
@@ -117,18 +123,17 @@ def target_list_pdf(request, slug):
 
     PAGE_HEIGHT=defaultPageSize[1]
     PAGE_WIDTH=defaultPageSize[0]
-    styles = getSampleStyleSheet()
 
     styles['h2'].alignment = 1
 
-    main_title = Paragraph(u'{0}: Target List'.format(competition), styles['Title'])
+    main_title = para(u'{0}: Target List'.format(competition), 'Title')
     doc_elements = [main_title]
 
     for session_round in session_rounds:
         target_list = session_round.target_list_pdf()
 
         title = "Target List for {0} - {1}".format(session_round.shot_round, session_round.session.start.strftime('%A, %d %B %Y, %X'))
-        header = Paragraph(title, styles['h2'])
+        header = para(title, 'h2')
         table = Table(target_list)
         spacer = Spacer(PAGE_WIDTH, 0.5*inch)
 
@@ -146,4 +151,96 @@ def score_sheets(request, slug):
     return render(request, 'score_sheets.html', locals())
 
 def score_sheets_pdf(request, slug, round_id):
-    return
+    competition = get_object_or_404(Competition, slug=slug)
+    session_round = get_object_or_404(SessionRound, pk=round_id)
+    shot_round = session_round.shot_round
+    subrounds = shot_round.subrounds.order_by('-distance')
+
+    PAGE_HEIGHT=defaultPageSize[1]
+    PAGE_WIDTH=defaultPageSize[0]
+
+    def draw_title(canvas, doc):
+        canvas.saveState()
+        canvas.setFont('Helvetica-Bold', 18)
+        canvas.drawCentredString(PAGE_WIDTH/2.0, PAGE_HEIGHT-58, u'{0}: {1}'.format(competition, shot_round))
+        canvas.restoreState()
+
+    table_style = TableStyle([
+        # alignment
+        ('ALIGN', (0, 0), (-1, -1), 'CENTER'),
+        ('VALIGN', (0, 0), (-1, -1), 'MIDDLE'),
+
+        # arrows grid
+        ('BOX', (0, 1), (-1, -2), 2, colors.black),
+        ('INNERGRID', (0, 1), (-1, -2), 0.25, colors.black),
+
+        # end totals columns
+        ('BOX', (6, 0), (6, -2), 2, colors.black),
+        ('BOX', (13, 0), (13, -2), 2, colors.black),
+
+        # totals grid
+        ('BOX', (14, 0), (-1, -2), 2, colors.black),
+        ('BOX', (14, -1), (-2, -1), 2, colors.black),
+        ('LINEBEFORE', (15, 0), (-1, -1), 1.5, colors.black),
+    ])
+
+    box_size = 0.35*inch
+    wide_box = box_size*1.35
+    total_cols = 12 + 2 + 5
+    col_widths = 6*[box_size] + [wide_box] + 6*[box_size] + 6*[wide_box]
+    spacer = Spacer(PAGE_WIDTH, box_size*0.4)
+    score_sheet_elements = []
+    for subround in subrounds:
+        subround_title = para(u'{0}{1}'.format(subround.distance, subround.unit), 'h3')
+        dozens = subround.arrows / 12
+        total_rows = dozens + 2
+        table_data = [[subround_title] + [None] * 5 + ['ET'] + [None] * 6 + ['ET', 'DT', 'H', 'G', 'X', 'RT']]
+        table_data += [[None for i in range(total_cols)] for j in range(total_rows - 1)]
+        table = Table(table_data, col_widths, total_rows*[box_size])
+        table.setStyle(table_style)
+
+        score_sheet_elements += [table, spacer]
+
+    compound_round = bool(subrounds.count() - 1)
+    if compound_round:
+        table_style = TableStyle([
+            ('BOX', (14, 0), (-2, 0), 2, colors.black),
+            ('LINEBEFORE', (15, 0), (-1, -1), 1.5, colors.black),
+        ])
+        totals_table = Table([[None]*total_cols], col_widths, [box_size])
+        totals_table.setStyle(table_style)
+
+        score_sheet_elements += [totals_table, spacer]
+
+    signing_table_widths = [0.7*inch, 2*inch]
+    signing_table = Table([[para('Archer', 'h3'), None, None, para('Scorer', 'h3'), '']], signing_table_widths + [0.5*inch] + signing_table_widths)
+    signing_table.setStyle(TableStyle([
+        ('LINEBELOW', (1, 0), (1, 0), 1, colors.black),
+        ('LINEBELOW', (4, 0), (4, 0), 1, colors.black),
+    ]))
+    score_sheet_elements += [spacer, signing_table, spacer]
+
+    doc_elements = []
+    for boss, entries in groupby(session_round.target_list(), lambda x: x[0][:-1]):
+        for target, entry in entries:
+            if entry:
+                entry = entry.session_entry.competition_entry
+                table_data = [
+                        [para(target, 'h2'), para(entry.archer, 'h2'), para(entry.club.name, 'h2')],
+                        [None, para(u'{0} {1}'.format(entry.archer.get_gender_display(), entry.bowstyle), 'h2'), para(entry.get_age_display(), 'h2')],
+                ]
+            else:
+                table_data = [
+                        [para(target, 'h2'), None, None],
+                        [None],
+                ]
+            header_table = Table(table_data, [0.5*inch, 3*inch, 3*inch])
+            doc_elements.append(KeepTogether([header_table, spacer] + score_sheet_elements))
+        doc_elements.append(PageBreak())
+
+    response = HttpResponse(mimetype='application/pdf')
+    doc = SimpleDocTemplate(response)
+    doc.build(doc_elements, onFirstPage=draw_title, onLaterPages=draw_title)
+
+    return response
+

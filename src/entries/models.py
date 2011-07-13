@@ -43,7 +43,7 @@ class Competition(models.Model):
         return sessions
 
     def __unicode__(self):
-        return u'{0}: {1}'.format(self.tournament, self.date.year)
+        return u'{0} {1}'.format(self.tournament, self.date.year)
 
     class Meta:
         unique_together = ('date', 'tournament')
