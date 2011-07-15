@@ -101,7 +101,7 @@ class SessionRound(models.Model):
                     entry = allocation.session_entry.competition_entry
                     allocation = (
                             entry.archer,
-                            entry.club,
+                            entry.club.name,
                             entry.archer.get_gender_display(),
                             entry.bowstyle,
                             entry.get_age_display(),

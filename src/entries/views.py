@@ -112,60 +112,157 @@ class TargetListView(View):
 
 target_list = login_required(TargetListView.as_view())
 
-styles = getSampleStyleSheet()
-def para(string, style='Normal'):
-    return Paragraph(unicode(string), styles[style])
-
-def target_list_pdf(request, slug):
-    competition = get_object_or_404(Competition, slug=slug)
-
-    session_rounds = SessionRound.objects.filter(session__competition=competition).order_by('session__start')
-
-    PAGE_HEIGHT=defaultPageSize[1]
-    PAGE_WIDTH=defaultPageSize[0]
-
-    styles['h2'].alignment = 1
-
-    main_title = para(u'{0}: Target List'.format(competition), 'Title')
-    doc_elements = [main_title]
-
-    for session_round in session_rounds:
-        target_list = session_round.target_list_pdf()
-
-        title = "Target List for {0} - {1}".format(session_round.shot_round, session_round.session.start.strftime('%A, %d %B %Y, %X'))
-        header = para(title, 'h2')
-        table = Table(target_list)
-        spacer = Spacer(PAGE_WIDTH, 0.5*inch)
-
-        doc_elements += [header, spacer, table, PageBreak()]
-
-    response = HttpResponse(mimetype='application/pdf')
-    doc = SimpleDocTemplate(response)
-    doc.build(doc_elements)
-
-    return response
-
 def score_sheets(request, slug):
     competition = get_object_or_404(Competition, slug=slug)
     rounds = SessionRound.objects.filter(session__competition=competition)
     return render(request, 'score_sheets.html', locals())
 
-def score_sheets_pdf(request, slug, round_id):
-    competition = get_object_or_404(Competition, slug=slug)
-    session_round = get_object_or_404(SessionRound, pk=round_id)
-    shot_round = session_round.shot_round
-    subrounds = shot_round.subrounds.order_by('-distance')
 
+# PDF views
+
+class PdfView(View):
+
+    styles = getSampleStyleSheet()
     PAGE_HEIGHT=defaultPageSize[1]
     PAGE_WIDTH=defaultPageSize[0]
 
-    def draw_title(canvas, doc):
+    def set_options(self, slug=None, round_id=None):
+        if slug:
+            self.competition = get_object_or_404(Competition, slug=slug)
+        if round_id:
+            self.session_round = get_object_or_404(SessionRound, pk=round_id)
+
+    def get(self, request, **kwargs):
+        self.set_options(**kwargs)
+        self.update_style()
+        elements = self.get_elements()
+        return self.response(elements)
+
+    def update_style(self):
+        """Subclasses can customise to amend self.style"""
+        pass
+
+    def setMargins(self, doc):
+        pass
+
+    def response(self, elements):
+        response = HttpResponse(mimetype='application/pdf')
+        doc = SimpleDocTemplate(response)
+        self.setMargins(doc)
+        doc.build(elements)
+        return response
+
+    def Para(self, string, style='Normal'):
+        return Paragraph(unicode(string), self.styles[style])
+
+    def get_elements(self):
+        return [self.Para('This is not done yet')]
+
+class HeadedPdfView(PdfView):
+    title = ''
+
+    def draw_title(self, canvas, doc):
         canvas.saveState()
         canvas.setFont('Helvetica-Bold', 18)
-        canvas.drawCentredString(PAGE_WIDTH/2.0, PAGE_HEIGHT-58, u'{0}: {1}'.format(competition, shot_round))
+        canvas.drawCentredString(self.PAGE_WIDTH/2.0, self.PAGE_HEIGHT-58, u'{0}: {1}'.format(self.competition, self.title))
         canvas.restoreState()
 
-    table_style = TableStyle([
+    def response(self, elements):
+        response = HttpResponse(mimetype='application/pdf')
+        doc = SimpleDocTemplate(response)
+        self.setMargins(doc)
+        doc.build(elements, onFirstPage=self.draw_title, onLaterPages=self.draw_title)
+        return response
+
+class TargetListPdf(HeadedPdfView):
+    title = 'Target List'
+
+    def update_style(self):
+        self.styles['h2'].alignment = 1
+
+    def get_elements(self):
+        session_rounds = SessionRound.objects.filter(session__competition=self.competition).order_by('session__start')
+
+        elements = []
+        for session_round in session_rounds:
+            target_list = session_round.target_list_pdf()
+
+            title = "Target List for {0} - {1}".format(session_round.shot_round, session_round.session.start.strftime('%A, %d %B %Y, %X'))
+            header = self.Para(title, 'h2')
+            table = Table(target_list)
+            spacer = Spacer(self.PAGE_WIDTH, 0.25*inch)
+
+            elements.append(KeepTogether([header, spacer, table, spacer]))
+        return elements
+
+target_list_pdf = login_required(TargetListPdf.as_view())
+
+class ScoreSheetsPdf(HeadedPdfView):
+
+    box_size = 0.35*inch
+    wide_box = box_size*1.35
+    total_cols = 12 + 2 + 5
+    col_widths = 6*[box_size] + [wide_box] + 6*[box_size] + 6*[wide_box]
+
+    def update_style(self):
+        self.title = self.session_round.shot_round
+        self.spacer = Spacer(self.PAGE_WIDTH, self.box_size*0.4)
+
+    def get_elements(self):
+
+        score_sheet_elements = self.get_score_sheet_elements()
+
+        elements = []
+        for boss, entries in groupby(self.session_round.target_list(), lambda x: x[0][:-1]):
+            for target, entry in entries:
+                if entry:
+                    entry = entry.session_entry.competition_entry
+                    table_data = [
+                            [self.Para(target, 'h2'), self.Para(entry.archer, 'h2'), self.Para(entry.club.name, 'h2')],
+                            [None, self.Para(u'{0} {1}'.format(entry.archer.get_gender_display(), entry.bowstyle), 'h2'), self.Para(entry.get_age_display(), 'h2')],
+                    ]
+                else:
+                    table_data = [
+                            [self.Para(target, 'h2'), None, None],
+                            [],
+                    ]
+                header_table = Table(table_data, [0.5*inch, 3*inch, 3*inch])
+                elements.append(KeepTogether([header_table, self.spacer] + score_sheet_elements))
+            elements.append(PageBreak())
+
+        return elements
+
+
+    def get_score_sheet_elements(self):
+        subrounds = self.session_round.shot_round.subrounds.order_by('-distance')
+        score_sheet_elements = []
+
+        for subround in subrounds:
+            subround_title = self.Para(u'{0}{1}'.format(subround.distance, subround.unit), 'h3')
+            dozens = subround.arrows / 12
+            total_rows = dozens + 2
+            table_data = [[subround_title] + [None] * 5 + ['ET'] + [None] * 6 + ['ET', 'DT', 'H', 'G', 'X', 'RT']]
+            table_data += [[None for i in range(self.total_cols)] for j in range(total_rows - 1)]
+            table = Table(table_data, self.col_widths, total_rows*[self.box_size])
+            table.setStyle(self.scores_table_style)
+
+            score_sheet_elements += [table, self.spacer]
+
+        compound_round = bool(subrounds.count() - 1)
+        if compound_round:
+            totals_table = Table([[None]*self.total_cols], self.col_widths, [self.box_size])
+            totals_table.setStyle(self.totals_table_style)
+
+            score_sheet_elements += [totals_table, self.spacer]
+
+        signing_table_widths = [0.7*inch, 2*inch]
+        signing_table = Table([[self.Para('Archer', 'h3'), None, None, self.Para('Scorer', 'h3'), '']], signing_table_widths + [0.5*inch] + signing_table_widths)
+        signing_table.setStyle(self.signing_table_style)
+        score_sheet_elements += [self.spacer, signing_table, self.spacer]
+
+        return score_sheet_elements
+
+    scores_table_style = TableStyle([
         # alignment
         ('ALIGN', (0, 0), (-1, -1), 'CENTER'),
         ('VALIGN', (0, 0), (-1, -1), 'MIDDLE'),
@@ -184,63 +281,68 @@ def score_sheets_pdf(request, slug, round_id):
         ('LINEBEFORE', (15, 0), (-1, -1), 1.5, colors.black),
     ])
 
-    box_size = 0.35*inch
-    wide_box = box_size*1.35
-    total_cols = 12 + 2 + 5
-    col_widths = 6*[box_size] + [wide_box] + 6*[box_size] + 6*[wide_box]
-    spacer = Spacer(PAGE_WIDTH, box_size*0.4)
-    score_sheet_elements = []
-    for subround in subrounds:
-        subround_title = para(u'{0}{1}'.format(subround.distance, subround.unit), 'h3')
-        dozens = subround.arrows / 12
-        total_rows = dozens + 2
-        table_data = [[subround_title] + [None] * 5 + ['ET'] + [None] * 6 + ['ET', 'DT', 'H', 'G', 'X', 'RT']]
-        table_data += [[None for i in range(total_cols)] for j in range(total_rows - 1)]
-        table = Table(table_data, col_widths, total_rows*[box_size])
-        table.setStyle(table_style)
+    totals_table_style = TableStyle([
+        ('BOX', (14, 0), (-2, 0), 2, colors.black),
+        ('LINEBEFORE', (15, 0), (-1, -1), 1.5, colors.black),
+    ])
 
-        score_sheet_elements += [table, spacer]
-
-    compound_round = bool(subrounds.count() - 1)
-    if compound_round:
-        table_style = TableStyle([
-            ('BOX', (14, 0), (-2, 0), 2, colors.black),
-            ('LINEBEFORE', (15, 0), (-1, -1), 1.5, colors.black),
-        ])
-        totals_table = Table([[None]*total_cols], col_widths, [box_size])
-        totals_table.setStyle(table_style)
-
-        score_sheet_elements += [totals_table, spacer]
-
-    signing_table_widths = [0.7*inch, 2*inch]
-    signing_table = Table([[para('Archer', 'h3'), None, None, para('Scorer', 'h3'), '']], signing_table_widths + [0.5*inch] + signing_table_widths)
-    signing_table.setStyle(TableStyle([
+    signing_table_style = TableStyle([
         ('LINEBELOW', (1, 0), (1, 0), 1, colors.black),
         ('LINEBELOW', (4, 0), (4, 0), 1, colors.black),
-    ]))
-    score_sheet_elements += [spacer, signing_table, spacer]
+    ])
 
-    doc_elements = []
-    for boss, entries in groupby(session_round.target_list(), lambda x: x[0][:-1]):
-        for target, entry in entries:
-            if entry:
-                entry = entry.session_entry.competition_entry
-                table_data = [
-                        [para(target, 'h2'), para(entry.archer, 'h2'), para(entry.club.name, 'h2')],
-                        [None, para(u'{0} {1}'.format(entry.archer.get_gender_display(), entry.bowstyle), 'h2'), para(entry.get_age_display(), 'h2')],
-                ]
-            else:
-                table_data = [
-                        [para(target, 'h2'), None, None],
-                        [None],
-                ]
-            header_table = Table(table_data, [0.5*inch, 3*inch, 3*inch])
-            doc_elements.append(KeepTogether([header_table, spacer] + score_sheet_elements))
-        doc_elements.append(PageBreak())
+score_sheets_pdf = login_required(ScoreSheetsPdf.as_view())
 
-    response = HttpResponse(mimetype='application/pdf')
-    doc = SimpleDocTemplate(response)
-    doc.build(doc_elements, onFirstPage=draw_title, onLaterPages=draw_title)
+class RunningSlipsPdf(ScoreSheetsPdf):
+    def draw_title(self, canvas, doc):
+        pass
 
-    return response
+    def setMargins(self, doc):
+        doc.topMargin = doc.bottomMargin = 0.3*inch
+
+    def get_elements(self):
+        elements = []
+        for boss, entries in groupby(self.session_round.target_list(), lambda x: x[0][:-1]):
+            elements += self.get_running_slip_elements(boss, list(entries))
+        return elements
+
+    def get_running_slip_elements(self, target, entries):
+        dozens = self.session_round.shot_round.arrows / 12
+        elements = []
+        for dozen in range(1, dozens + 1):
+            table_data = [['Dozen {0}'.format(dozen)] + [None] * 6 + ['ET'] + [None] * 6 + ['ET', 'DT', 'H', 'G', 'X', 'RT']]
+            for entry in entries:
+                table_data.append([entry[0]] + [None for i in range(self.total_cols)])
+            table = Table(table_data, [self.box_size] + self.col_widths, (len(entries) + 1)*[self.box_size])
+            table.setStyle(self.scores_table_style)
+            elements.append(KeepTogether(table))
+            elements += [self.spacer] * 3
+        return elements
+
+    scores_table_style = TableStyle([
+        # alignment
+        ('ALIGN', (0, 0), (-1, -1), 'CENTER'),
+        ('VALIGN', (0, 0), (-1, -1), 'MIDDLE'),
+
+        # arrows grid
+        ('BOX', (0, 1), (-1, -1), 2, colors.black),
+        ('INNERGRID', (0, 1), (-1, -1), 0.25, colors.black),
+
+        # end totals columns
+        ('BOX', (7, 0), (7, -1), 2, colors.black),
+        ('BOX', (14, 0), (14, -1), 2, colors.black),
+
+        # details column
+        ('BOX', (0, 1), (0, -1), 2, colors.black),
+
+        # totals grid
+        ('BOX', (15, 0), (-1, -1), 2, colors.black),
+        ('LINEBEFORE', (15, 0), (-1, -1), 1.5, colors.black),
+
+        # title
+        ('ALIGN', (0, 0), (0, 0), 'LEFT'),
+    ])
+
+
+running_slips_pdf = login_required(RunningSlipsPdf.as_view())
 
