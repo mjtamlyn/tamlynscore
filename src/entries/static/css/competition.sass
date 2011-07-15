@@ -181,23 +181,23 @@ $navborder: 1px solid $bluegrey
 
     $border: 1px solid $darkbluegrey
 
-    .target-list
-      .target-list-nav
-        .session-select
-          width: 100%
-        .round-select
-          display: none
-          &.selected
-            display: block
-          width: 100%
-        .link 
-          background-color: $vlightblue
-          float: left
-          font-weight: bold
-          text-align: center
-        .selected
-          background-color: $lightblue
+    .target-list-nav
+      .session-select
+        width: 100%
+      .round-select
+        display: none
+        &.selected
+          display: block
+        width: 100%
+      .link 
+        background-color: $vlightblue
+        float: left
+        font-weight: bold
+        text-align: center
+      .selected
+        background-color: $lightblue
 
+    .target-list
       .target-list-gen
         display: none
         &.selected
@@ -276,6 +276,39 @@ $navborder: 1px solid $bluegrey
                   float: left
                 &.club
                   display: none
+
+    .registration
+      .registration-board
+        display: none
+        &.selected
+          display: block
+
+        .actions
+          margin: 10px
+          .action
+            float: left
+            &.active
+              font-style: italic
+
+        table
+          border-collapse: collapse
+          margin-top: 10px
+          width: 100%
+          th
+            background-color: $vlightblue
+          th, td
+            border: $border
+            padding: 4px
+
+          tr.present
+            background-color: $bg
+      
+            a.present
+              display: none
+          tr:not(.present)
+            a.not-present
+              display: none
+
 
 
 

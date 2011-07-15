@@ -149,8 +149,10 @@
 
 {% block competition_content %}
 {% csrf_token %}
-<div class="target-list module">
-    <h4>Target Lists</h4>
+<div class="{% block moduleclass %}target-list{% endblock %} module">
+    <h4>{% block title %}Target Lists{% endblock %}</h4>
+
+    {% block target-list-nav %}
     <div class="target-list-nav">
         <div class="session-select">
             {% for session, rounds in sessions %}
@@ -168,7 +170,9 @@
         <div class="clear"></div>
         {% endfor %}
     </div>
+    {% endblock %}
 
+    {% block main %}
     {% for session, round, targets, entries in target_list %}
     <div class="target-list-gen {% if not forloop.counter0 %}selected{% endif %}" id="session-{{ session.pk }}-round-{{ round.pk }}" rel="{{ session.archers_per_target }}">
         <div class="board-wrapper">
@@ -214,5 +218,6 @@
         <div class="clear"></div>
     </div>
     {% endfor %}
+    {% endblock %}
 </div>
 {% endblock %}
