@@ -5,7 +5,8 @@
     <h4>Score Sheets</h4>
     <ul>
         {% for round in rounds %}
-        <a href="{% url entries.views.score_sheets_pdf slug=competition.slug round_id=round.pk %}"><li>{{ round.shot_round }} - {{ round.session.start }}</li></a>
+        <a href="{% url entries.views.score_sheets_pdf slug=competition.slug round_id=round.pk %}"><li>{{ round.shot_round }} Score Sheet - {{ round.session.start }}</li></a>
+        <a href="{% url entries.views.running_slips_pdf slug=competition.slug round_id=round.pk %}"><li>{{ round.shot_round }} Running Slips - {{ round.session.start }}</li></a>
         {% endfor %}
     </ul>
 </div>
