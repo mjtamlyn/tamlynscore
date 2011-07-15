@@ -87,6 +87,8 @@ class EntriesView(View):
 entries = login_required(EntriesView.as_view())
 
 class TargetListView(View):
+    template = 'target_list.html'
+
     def get(self, request, slug):
         competition = get_object_or_404(Competition, slug=slug)
         session_rounds = SessionRound.objects.filter(session__competition=competition).order_by('session__start')
@@ -99,7 +101,7 @@ class TargetListView(View):
         sessions = []
         for key, values in groupby(target_list, lambda x: x[0]):
             sessions.append((key, [value[1] for value in values]))
-        return render(request, 'target_list.html', locals())
+        return render(request, self.template, locals())
 
     def post(self, request, slug):
         targets = json.loads(request.POST['targets'])
@@ -346,3 +348,13 @@ class RunningSlipsPdf(ScoreSheetsPdf):
 
 running_slips_pdf = login_required(RunningSlipsPdf.as_view())
 
+class RegistrationView(TargetListView):
+    template = 'registration.html'
+
+    def post(self, request, slug):
+        entry = get_object_or_404(SessionEntry, pk=request.POST['pk'])
+        entry.present = json.loads(request.POST['present'])
+        entry.save()
+        return HttpResponse('ok')
+
+registration = login_required(RegistrationView.as_view())

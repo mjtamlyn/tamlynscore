@@ -12,4 +12,6 @@ urlpatterns = patterns('entries.views',
     (r'^(?P<slug>[\w-]+)/score-sheets/$', 'score_sheets'),
     (r'^(?P<slug>[\w-]+)/score-sheets/(?P<round_id>\d+)/$', 'score_sheets_pdf'),
     (r'^(?P<slug>[\w-]+)/running-slips/(?P<round_id>\d+)/$', 'running_slips_pdf'),
+
+    (r'^(?P<slug>[\w-]+)/registration/$', 'registration'),
 )

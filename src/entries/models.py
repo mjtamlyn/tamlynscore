@@ -148,6 +148,8 @@ class SessionEntry(models.Model):
     competition_entry = models.ForeignKey(CompetitionEntry)
     session_round = models.ForeignKey(SessionRound)
 
+    present = models.BooleanField(default=False)
+
     def __unicode__(self):
         return u'{0} - {1}'.format(self.competition_entry, self.session_round.shot_round)
 

@@ -133,19 +133,19 @@
         .competition-section .competition-content .competition-entries .entries-table table .tall {
           border-left: 1px solid #111d2a;
           text-align: center; }
-    .competition-section .competition-content .target-list .target-list-nav .session-select {
+    .competition-section .competition-content .target-list-nav .session-select {
       width: 100%; }
-    .competition-section .competition-content .target-list .target-list-nav .round-select {
+    .competition-section .competition-content .target-list-nav .round-select {
       display: none;
       width: 100%; }
-      .competition-section .competition-content .target-list .target-list-nav .round-select.selected {
+      .competition-section .competition-content .target-list-nav .round-select.selected {
         display: block; }
-    .competition-section .competition-content .target-list .target-list-nav .link {
+    .competition-section .competition-content .target-list-nav .link {
       background-color: #dddafa;
       float: left;
       font-weight: bold;
       text-align: center; }
-    .competition-section .competition-content .target-list .target-list-nav .selected {
+    .competition-section .competition-content .target-list-nav .selected {
       background-color: #6fb3ff; }
     .competition-section .competition-content .target-list .target-list-gen {
       display: none;
@@ -214,6 +214,31 @@
               float: left; }
             .competition-section .competition-content .target-list .target-list-gen .entries-wrapper .entries .archer p.club {
               display: none; }
+    .competition-section .competition-content .registration .registration-board {
+      display: none; }
+      .competition-section .competition-content .registration .registration-board.selected {
+        display: block; }
+      .competition-section .competition-content .registration .registration-board .actions {
+        margin: 10px; }
+        .competition-section .competition-content .registration .registration-board .actions .action {
+          float: left; }
+          .competition-section .competition-content .registration .registration-board .actions .action.active {
+            font-style: italic; }
+      .competition-section .competition-content .registration .registration-board table {
+        border-collapse: collapse;
+        margin-top: 10px;
+        width: 100%; }
+        .competition-section .competition-content .registration .registration-board table th {
+          background-color: #dddafa; }
+        .competition-section .competition-content .registration .registration-board table th, .competition-section .competition-content .registration .registration-board table td {
+          border: 1px solid #111d2a;
+          padding: 4px; }
+        .competition-section .competition-content .registration .registration-board table tr.present {
+          background-color: #fbeedb; }
+          .competition-section .competition-content .registration .registration-board table tr.present a.present {
+            display: none; }
+        .competition-section .competition-content .registration .registration-board table tr:not(.present) a.not-present {
+          display: none; }
 
 .select-widget .select {
   display: none; }
