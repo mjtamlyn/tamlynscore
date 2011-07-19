@@ -29,6 +29,7 @@ class InputScoresView(TargetListView):
         sessions = []
         for key, values in groupby(scores, lambda x: x[0]):
             sessions.append((key, [value[1] for value in values]))
+        focus = request.GET.get('fd', '') + '-' + request.GET.get('ft', '')
         return render(request, self.template, locals())
 
 input_scores = login_required(InputScoresView.as_view())
@@ -56,7 +57,7 @@ class InputArrowsView(View):
         if not failed:
             for arrow in arrows:
                 arrow.save()
-            return HttpResponseRedirect(reverse(input_scores, kwargs={'slug': slug}) + '?fd={0}&ft={1}#session-{2}-round-{3}'.format(dozen, boss, round_id, SessionRound.objects.get(pk=round_id).session.pk))
+            return HttpResponseRedirect(reverse(input_scores, kwargs={'slug': slug}) + '?fd={0}&ft={1}#session-{3}-round-{2}'.format(dozen, boss, round_id, SessionRound.objects.get(pk=round_id).session.pk))
         return render(request, self.template, locals())
 
 input_arrows = login_required(InputArrowsView.as_view())
