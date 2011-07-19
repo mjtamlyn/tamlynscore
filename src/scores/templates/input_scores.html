@@ -30,10 +30,54 @@
             board.getElement('.boss-link')[0].focus();
         });
 
+        $$('.boss-link').addEvent('keydown', function (e) {
+            if (e.key == 'left') {
+                e.stop();
+                target = this.getPrevious('.boss-link');
+                if (target) {
+                    target.focus();
+                } else {
+                    nextBosses = this.getParent('.bosses').getPrevious('.bosses');
+                    if (nextBosses) {
+                        nextBosses.getLast('.boss-link').focus();
+                    }
+                }
+            }
+            if (e.key == 'right') {
+                e.stop();
+                target = this.getNext('.boss-link');
+                if (target) {
+                    target.focus();
+                } else {
+                    nextBosses = this.getParent('.bosses').getNext('.bosses');
+                    if (nextBosses) {
+                        nextBosses.getElement('.boss-link').focus();
+                    }
+                }
+            }
+            if (e.key == 'up') {
+                e.stop();
+                nextBosses = this.getParent('.bosses').getPrevious('.bosses');
+                if (nextBosses) {
+                    nextBosses.getLast('.boss-link').focus();
+                }
+            }
+            if (e.key == 'down') {
+                e.stop();
+                nextBosses = this.getParent('.bosses').getNext('.bosses');
+                if (nextBosses) {
+                    nextBosses.getElement('.boss-link').focus();
+                }
+            }
+        });
+
         $$('.boss-link')[0].focus();
         if (document.location.hash) {
             $$('a[href=' + document.location.hash.replace('#!', '#') + ']').fireEvent('click');
             $$('a[href=' + document.location.hash.replace('#!', '#').replace(/-round-\d/, '') + ']').fireEvent('click');
+        }
+        if ('{{ focus }}') {
+            $$('.input-board.selected').getElement('[rel={{ focus }}]')[0].fireEvent('keydown', {key: 'right', stop: function () {}});
         }
 
     });
@@ -49,10 +93,12 @@
 <div class="input-board {% if not forloop.counter0 %}selected{% endif %}" id="session-{{ session.pk }}-round-{{ round.pk }}">
     {% for dozen in round.shot_round.iter_dozens %}
     <h5>Dozen {{ dozen }}</h5>
+    <div class="bosses">
         {% for boss in bosses %}
-        <a href="{% url scores.views.input_arrows slug=slug round_id=round.pk dozen=dozen boss=boss %}" class="boss-link"><div class="boss">{{ boss }}</div></a>
+        <a href="{% url scores.views.input_arrows slug=slug round_id=round.pk dozen=dozen boss=boss %}" class="boss-link" rel="{{ dozen }}-{{ boss }}"><div class="boss">{{ boss }}</div></a>
         {% endfor %}
-    <div class="clear"></div>
+        <div class="clear"></div>
+    </div>
     {% endfor %}
 </div>
 {% endfor %}
