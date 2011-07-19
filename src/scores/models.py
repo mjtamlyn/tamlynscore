@@ -49,6 +49,6 @@ class Arrow(models.Model):
             return u'X'
         if self.arrow_value == 0:
             return u'M'
-        return unicode(self.score)
+        return unicode(self.arrow_value)
 
 #TODO: H2H models

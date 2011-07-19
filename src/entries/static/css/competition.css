@@ -257,6 +257,31 @@
         .competition-section .competition-content .input-scores .input-board .boss-link:focus .boss {
           border-color: #ffc600;
           box-shadow: 0 0 5px #ffc600; }
+    .competition-section .competition-content .input-arrows table {
+      margin: 0 auto; }
+    .competition-section .competition-content .input-arrows input {
+      border: 1px solid #6fb3ff;
+      border-radius: 3px;
+      outline: none;
+      text-align: center;
+      width: 20px; }
+      .competition-section .competition-content .input-arrows input:focus {
+        box-shadow: 0 0 5px #ffc600; }
+    .competition-section .competition-content .input-arrows .save {
+      text-align: center; }
+      .competition-section .competition-content .input-arrows .save input {
+        background-image: -webkit-linear-gradient(#b4adf4, #dddafa, #b4adf4);
+        border-color: #6fb3ff;
+        border-width: 2px;
+        border-radius: 10px;
+        font-family: Georgia;
+        font-size: 16px;
+        margin: 10px;
+        padding: 5px 8px;
+        width: auto; }
+        .competition-section .competition-content .input-arrows .save input:focus {
+          border-color: #ffc600;
+          box-shadow: 0 0 5px #ffc600; }
 
 .select-widget .select {
   display: none; }

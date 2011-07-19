@@ -331,6 +331,37 @@ $navborder: 1px solid $bluegrey
             border-color: $hlyellow
             box-shadow: 0 0 5px $hlyellow
 
+    .input-arrows
+      table
+        margin: 0 auto
+
+      input
+        border: 1px solid $lightblue
+        border-radius: 3px
+        outline: none
+        text-align: center
+        width: 20px
+        &:focus
+          box-shadow: 0 0 5px $hlyellow
+
+      .save
+        text-align: center
+        input
+          background-image: -webkit-linear-gradient(darken($vlightblue, 10%), $vlightblue, darken($vlightblue, 10%))
+          border:
+            color: $lightblue
+            width: 2px
+            radius: 10px
+          font:
+            family: Georgia
+            size: 16px
+          margin: 10px
+          padding: 5px 8px
+          width: auto
+          &:focus
+            border-color: $hlyellow
+            box-shadow: 0 0 5px $hlyellow
+
 
 .select-widget
   .select

@@ -69,14 +69,6 @@ li {
   .footer p {
     margin: 0; }
 
-.archer-select {
-  margin: 0 20px; }
-  .archer-select.selected {
-    color: red; }
-
-.arrow-values input[type=text] {
-  width: 30px; }
-
 body.login .wrapper {
   width: 300px;
   padding-top: 15px; }
