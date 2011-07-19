@@ -19,7 +19,7 @@
         <h2>On the day</h2>
         <ul>
             <a href="{% url entries.views.registration slug=competition.slug %}"><li>Registration</li></a>
-            <li>Input scores</li>
+            <a href="{% url scores.views.input_scores slug=competition.slug %}"><li>Input scores</li></a>
             <li>Leaderboard</li>
             <li>Head to heads panel</li>
         </ul>

@@ -239,6 +239,24 @@
             display: none; }
         .competition-section .competition-content .registration .registration-board table tr:not(.present) a.not-present {
           display: none; }
+    .competition-section .competition-content .input-scores .input-board {
+      display: none; }
+      .competition-section .competition-content .input-scores .input-board.selected {
+        display: block; }
+      .competition-section .competition-content .input-scores .input-board .boss {
+        background-color: #dddafa;
+        border: 1px solid #6fb3ff;
+        float: left;
+        font-size: 20px;
+        height: 30px;
+        margin: 5px;
+        text-align: center;
+        width: 30px; }
+      .competition-section .competition-content .input-scores .input-board .boss-link:focus {
+        outline: none; }
+        .competition-section .competition-content .input-scores .input-board .boss-link:focus .boss {
+          border-color: #ffc600;
+          box-shadow: 0 0 5px #ffc600; }
 
 .select-widget .select {
   display: none; }
