@@ -89,13 +89,16 @@ entries = login_required(EntriesView.as_view())
 class TargetListView(View):
     template = 'target_list.html'
 
+    def get_target_list(self, session_round):
+        return session_round.target_list()
+
     def get(self, request, slug):
         competition = get_object_or_404(Competition, slug=slug)
         session_rounds = SessionRound.objects.filter(session__competition=competition).order_by('session__start')
         target_list = [(
             session_round.session, # session
             session_round, # round
-            session_round.target_list(), # target_list
+            self.get_target_list(session_round),
             session_round.sessionentry_set.annotate(entered=Count('targetallocation')).filter(entered=0), # entries
             ) for session_round in session_rounds]
         sessions = []

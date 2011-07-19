@@ -309,7 +309,27 @@ $navborder: 1px solid $bluegrey
             a.not-present
               display: none
 
+    .input-scores
+      .input-board
+        display: none
+        &.selected
+          display: block
 
+        $boss-size: 30px 
+        .boss
+          background-color: $vlightblue
+          border: 1px solid $lightblue
+          float: left
+          font-size: 20px
+          height: $boss-size
+          margin: 5px
+          text-align: center
+          width: $boss-size
+        .boss-link:focus
+          outline: none
+          .boss
+            border-color: $hlyellow
+            box-shadow: 0 0 5px $hlyellow
 
 
 .select-widget
