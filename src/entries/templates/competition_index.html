@@ -20,7 +20,7 @@
         <ul>
             <a href="{% url entries.views.registration slug=competition.slug %}"><li>Registration</li></a>
             <a href="{% url scores.views.input_scores slug=competition.slug %}"><li>Input scores</li></a>
-            <li>Leaderboard</li>
+            <a href="{% url scores.views.leaderboard slug=competition.slug %}"><li>Leaderboard</li></a>
             <li>Head to heads panel</li>
         </ul>
         <h2>After the shoot</h2>

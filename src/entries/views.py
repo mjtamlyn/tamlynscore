@@ -246,7 +246,7 @@ class ScoreSheetsPdf(HeadedPdfView):
             subround_title = self.Para(u'{0}{1}'.format(subround.distance, subround.unit), 'h3')
             dozens = subround.arrows / 12
             total_rows = dozens + 2
-            table_data = [[subround_title] + [None] * 5 + ['ET'] + [None] * 6 + ['ET', 'DT', 'H', 'G', 'X', 'RT']]
+            table_data = [[subround_title] + [None] * 5 + ['ET'] + [None] * 6 + ['ET', 'S', 'H', 'G', 'X', 'RT']]
             table_data += [[None for i in range(self.total_cols)] for j in range(total_rows - 1)]
             table = Table(table_data, self.col_widths, total_rows*[self.box_size])
             table.setStyle(self.scores_table_style)
@@ -315,7 +315,7 @@ class RunningSlipsPdf(ScoreSheetsPdf):
         dozens = self.session_round.shot_round.arrows / 12
         elements = []
         for dozen in range(1, dozens + 1):
-            table_data = [['Dozen {0}'.format(dozen)] + [None] * 6 + ['ET'] + [None] * 6 + ['ET', 'DT', 'H', 'G', 'X', 'RT']]
+            table_data = [['Dozen {0}'.format(dozen)] + [None] * 6 + ['ET'] + [None] * 6 + ['ET', 'S', 'H', 'G', 'X', 'RT']]
             for entry in entries:
                 table_data.append([entry[0]] + [None for i in range(self.total_cols)])
             table = Table(table_data, [self.box_size] + self.col_widths, (len(entries) + 1)*[self.box_size])

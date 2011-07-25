@@ -282,6 +282,10 @@
         .competition-section .competition-content .input-arrows .save input:focus {
           border-color: #ffc600;
           box-shadow: 0 0 5px #ffc600; }
+    .competition-section .competition-content .leaderboard .board {
+      display: none; }
+      .competition-section .competition-content .leaderboard .board.selected {
+        display: block; }
 
 .select-widget .select {
   display: none; }

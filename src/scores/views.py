@@ -61,3 +61,28 @@ class InputArrowsView(View):
         return render(request, self.template, locals())
 
 input_arrows = login_required(InputArrowsView.as_view())
+
+class LeaderboardView(View):
+    template = 'leaderboard.html'
+
+    def get_context(self, request, slug):
+        competition = get_object_or_404(Competition, slug=slug)
+        session_rounds = SessionRound.objects.filter(session__competition=competition).order_by('session__start')
+        scores = [
+            (
+                session_round.session,
+                session_round,
+                Score.objects.results(session_round, leaderboard=True),
+            )
+            for session_round in session_rounds
+        ]
+        sessions = []
+        for key, values in groupby(scores, lambda x: x[0]):
+            sessions.append((key, [value[1] for value in values]))
+        return locals()
+
+    def get(self, request, *args, **kwargs):
+        context = self.get_context(request, *args, **kwargs)
+        return render(request, self.template, context)
+
+leaderboard = login_required(LeaderboardView.as_view())
