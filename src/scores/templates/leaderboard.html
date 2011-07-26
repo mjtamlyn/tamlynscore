@@ -43,11 +43,14 @@
 {% block main %}
 {% for session, round, results in scores %}
 <div class="board {% if not forloop.counter0 %}selected{% endif %}" id="session-{{ session.pk }}-round-{{ round.pk }}">
-    {% for category, scores in results %}
-    <h5>{{ category }}</h5>
     <table>
+        {% for category, scores in results %}
+        <tr>
+            <td colspan="100%"><h5>{{ category }}</h5></td>
+        </tr>
         {% for score in scores %}
         <tr>
+            <td>{{ forloop.counter }}</td>
             <td>{{ score.target.session_entry.competition_entry.archer }}</td>
             <td>{{ score.target.session_entry.competition_entry.club}}</td>
             <td>{{ score.score }}</td>
@@ -56,8 +59,8 @@
             <td>{{ score.xs }}</td>
         </tr>
         {% endfor %}
-    </table>
     {% endfor %}
+    </table>
 </div>
 {% endfor %}
 {% endblock %}
