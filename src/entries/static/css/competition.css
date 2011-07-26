@@ -286,6 +286,8 @@
       display: none; }
       .competition-section .competition-content .leaderboard .board.selected {
         display: block; }
+      .competition-section .competition-content .leaderboard .board table {
+        width: 100%; }
 
 .select-widget .select {
   display: none; }
