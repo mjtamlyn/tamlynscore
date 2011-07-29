@@ -76,4 +76,3 @@ class Arrow(models.Model):
             return u'M'
         return unicode(self.arrow_value)
 
-#TODO: H2H models
