@@ -120,6 +120,7 @@ INSTALLED_APPS = (
     'core',
     'entries',
     'scores',
+    'olympic',
     'accounts',
 
     #'django_extensions',

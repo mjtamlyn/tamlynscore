@@ -13,14 +13,20 @@ class OlympicRound(models.Model):
     match_type = models.CharField(max_length=1, choices=MATCH_TYPES)
 
     def __unicode__(self):
-        return 'Olympic Round at {0}m'.format(self.distance)
+        return 'Olympic Round at {0}m ({1})'.format(self.distance, self.get_match_type_display())
 
 class Category(models.Model):
-    bowstyles = models.ManyToMany(Bowstyle)
+    bowstyles = models.ManyToManyField(Bowstyle)
     gender = models.CharField(max_length=1, choices=GENDER_CHOICES)
 
+    class Meta:
+        verbose_name_plural = 'categories'
+
     def __unicode__(self):
-        return u'Category: {0} '.format(self.get_gender_display()) + ', '.join(self.bowstyles.all())
+        return u'Category: {0} '.format(self.get_gender_display()) + u', '.join([unicode(b) for b in self.bowstyles.all()])
+
+    def code(self):
+        return self.gender + u''.join([unicode(b)[0] for b in self.bowstyles.all()])
 
 class OlympicSessionRound(models.Model):
     session = models.ForeignKey(Session)
@@ -41,14 +47,20 @@ class Seeding(models.Model):
 
 class Match(models.Model):
     session_round = models.ForeignKey(OlympicSessionRound)
-    target = models.PostitiveIntegerField()
+    target = models.PositiveIntegerField()
     level = models.PositiveIntegerField()
-    match = models.PostitiveIntegerField()
+    match = models.PositiveIntegerField()
+
+    class Meta:
+        verbose_name_plural = 'matches'
 
     def __unicode__(self):
         return u'Match {0} at level {1}'.format(self.match, self.level)
 
 class Result(models.Model):
     match = models.ForeignKey(Match)
-    winner = models.ForeignKey(Seeding)
-    loser = models.ForeignKey(Seeding)
+    winner = models.ForeignKey(Seeding, related_name='result_winner_set')
+    loser = models.ForeignKey(Seeding, null=True, blank=True, related_name='result_loser_set')
+
+    def __unicode__(self):
+        return u'Result of match {0}'.format(self.match)

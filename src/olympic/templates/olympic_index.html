@@ -1,0 +1,103 @@
+{% extends 'competition_index.html' %}
+
+{% block scripts %}
+<script src="{{ STATIC_URL }}js/mootools-core-1.3.js"></script>
+<script>
+    window.addEvent('domready', function () {
+        $$('.session-select a').addEvent('click', function (e) {
+            if (e) { e.stop(); }
+            // do this row
+            $$('.session-select .link').removeClass('selected');
+            this.getElement('.link').addClass('selected');
+            // do the round select row
+            $$('.round-select').removeClass('selected');
+            var newRoundSelect = $$(this.get('href'));
+            newRoundSelect.addClass('selected');
+            newRoundSelect.getElement('.selected').getParent('a').fireEvent('click');
+        });
+
+        $$('.round-select a').addEvent('click', function (e) {
+            if (e) { e.stop(); }
+            // do this row
+            this.getParent('.round-select').getElements('.link').removeClass('selected');
+            this.getElement('.link').addClass('selected');
+            // do the generator
+            target = this.get('href');
+            var board = $$(target);
+            document.location.hash = target.replace('#', '#!');
+            $$('.board').removeClass('selected');
+            board.addClass('selected');
+        });
+
+        if (document.location.hash) {
+            $$('a[href=' + document.location.hash.replace('#!', '#') + ']').fireEvent('click');
+            $$('a[href=' + document.location.hash.replace('#!', '#').replace(/-round-\d/, '') + ']').fireEvent('click');
+        }
+
+        $$('.select-all').addEvent('change', function () {
+            checkboxes = this.getParent('.board').getElement('table').getElements('input[type=checkbox]');
+            if (this.get('value') === 'on') {
+                checkboxes.set('checked', 'checked');
+            } else {
+                checkboxes.set('checked', '');
+            }
+        });
+    });
+</script>
+{% endblock scripts %}
+
+{% block competition_content %}
+<div class="module olympic">
+    <h4>Head to Heads</h4>
+    <div class="target-list-nav">
+        <div class="session-select">
+            {% for session, rounds in sessions %}
+            <a href="#session-{{ session.pk }}"><div class="link {% if not forloop.counter0 %}selected{% endif %}" style="width: 100%">{{ session.start }}</div></a>
+            {% endfor %}
+        </div>
+        <div class="clear"></div>
+
+        {% for session, rounds in sessions %}
+        <div class="round-select {% if not forloop.counter0 %}selected{% endif %}" id="session-{{ session.pk }}">
+            {% for round in rounds %}
+            <a href="#session-{{ session.pk }}-round-{{ round.pk }}"><div class="link {% if not forloop.counter0 %}selected{% endif %}" style="width: 25%">{{ round.shot_round }} {{ round.category.code }}</div></a>
+            {% endfor %}
+        </div>
+        <div class="clear"></div>
+        {% endfor %}
+    </div>
+
+    {% for session, round, seedings, ranking_results in session_info %}
+    <div class="board {% if not forloop.counter0 %}selected{% endif %}" id="session-{{ session.pk }}-round-{{ round.pk }}">
+        <p>
+            Current status:
+            {% if not seedings %}
+            Seedings not yet confirmed.
+            {% endif %}
+        </p>
+        {% if not seedings %}
+        <form method="post">
+            {% csrf_token %}
+            <input type="hidden" name="form-id" value="confirm-seedings-{{ round.pk }}" >
+            <table>
+                {% for score in ranking_results %}
+                <tr>
+                    <td><input type="checkbox" name="score-{{ score.pk }}" value="{{ forloop.counter }}" /></td>
+                    <td>{{ forloop.counter }}</td>
+                    <td>{{ score.target.session_entry.competition_entry.archer }}</td>
+                    <td>{{ score.target.session_entry.competition_entry.club}}</td>
+                    <td>{{ score.score }}</td>
+                    <td>{{ score.hits }}</td>
+                    <td>{{ score.golds }}</td>
+                    <td>{{ score.xs }}</td>
+                </tr>
+                {% endfor %}
+            </table>
+            <p><input type="checkbox" id="select-all-{{ round.pk }}" class="select-all" /> <label for="select-all-{{ round.pk }}">Select all</label></p>
+            <input type="submit" value="Confirm Seedings" />
+        </form>
+        {% endif %}
+    </div>
+    {% endfor %}
+</div>
+{% endblock %}
