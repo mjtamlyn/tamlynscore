@@ -76,6 +76,9 @@ class Club(models.Model):
 
     slug = models.SlugField(editable=False, unique=True)
 
+    class Meta:
+        ordering = ('short_name',)
+
     def clean(self, *args, **kwargs):
         self.slug = slugify(self.short_name)
         return super(Club, self).clean(*args, **kwargs)
