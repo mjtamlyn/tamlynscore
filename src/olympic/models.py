@@ -2,6 +2,7 @@ from django.db import models
 
 from core.models import Bowstyle, GENDER_CHOICES
 from entries.models import Session, SessionRound, CompetitionEntry
+from scores.models import Score
 
 MATCH_TYPES = (
     ('T', 'Sets'),
@@ -37,13 +38,23 @@ class OlympicSessionRound(models.Model):
     def __unicode__(self):
         return u'{0}, {1}'.format(self.session, self.shot_round)
 
+    def set_seedings(self, scores):
+        scores = Score.objects.results(self.ranking_round, leaderboard=False, category=self.category).filter(pk__in=scores)
+        for score in scores:
+            seeding = Seeding(
+                    entry=score.target.session_entry.competition_entry,
+                    session_round=self,
+                    seed=list(scores).index(score) + 1,
+            )
+            seeding.save()
+
 class Seeding(models.Model):
     entry = models.ForeignKey(CompetitionEntry)
     session_round = models.ForeignKey(OlympicSessionRound)
     seed = models.PositiveIntegerField()
 
     def __unicode__(self):
-        return u'{0} - {1}'.format(self.competition_entry, self.session_round.shot_round)
+        return u'Seed {0} - {1} {2}'.format(self.seed, self.session_round.shot_round, self.entry)
 
 class Match(models.Model):
     session_round = models.ForeignKey(OlympicSessionRound)

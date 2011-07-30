@@ -5,7 +5,7 @@ from django.shortcuts import render, get_object_or_404
 
 from entries.models import Competition
 from scores.models import Score
-from olympic.models import OlympicSessionRound
+from olympic.models import OlympicSessionRound, Seeding
 
 from itertools import groupby
 
@@ -22,6 +22,9 @@ class OlympicIndex(View):
         sessions = []
         for key, values in groupby(session_info, lambda x: x[0]):
             sessions.append((key, [value[1] for value in values]))
+
+        if 'remove-all' in request.GET:
+            Seeding.objects.filter(session_round__pk=request.GET['remove-all']).delete()
         return render(request, 'olympic_index.html', locals())
 
     def post(self, request, slug):

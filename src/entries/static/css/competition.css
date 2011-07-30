@@ -294,6 +294,11 @@
         display: block; }
       .competition-section .competition-content .olympic .board table {
         width: 100%; }
+      .competition-section .competition-content .olympic .board .remove-all {
+        color: red;
+        float: right;
+        font-size: 12px;
+        margin: 5px; }
 
 .select-widget .select {
   display: none; }
