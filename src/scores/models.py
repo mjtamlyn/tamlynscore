@@ -5,7 +5,7 @@ from entries.models import TargetAllocation
 from itertools import groupby
 
 class ScoreManager(models.Manager):
-    def active(self, session_round):
+    def active(self, session_round, category=None):
         active_targets = TargetAllocation.objects.filter(session_entry__session_round=session_round).filter(session_entry__present=True)
         active_scores = self.filter(target__in=active_targets).select_related()
         targets_with_scores = [score.target for score in active_scores]
@@ -14,10 +14,14 @@ class ScoreManager(models.Manager):
                 score = Score(target=target)
                 score.save()
         active_scores = self.filter(target__in=active_targets).select_related().order_by('target__boss')
+        if category:
+            active_scores = active_scores.filter(target__session_entry__competition_entry__bowstyle__in=category.bowstyles.all(), target__session_entry__competition_entry__archer__gender=category.gender)
         return active_scores
 
-    def results(self, session_round, leaderboard=True):
-        scores = self.active(session_round)
+    def results(self, session_round, leaderboard=True, category=None):
+        scores = self.active(session_round, category=category)
+        if not leaderboard:
+            scores = scores.annotate(arrows=models.Count('arrow')).filter(arrows__ne=session_round.shot_round.arrows)
         for score in scores:
             score.update_score()
             score.save()
@@ -28,9 +32,12 @@ class ScoreManager(models.Manager):
                 '-golds', 
                 '-xs'
                 )
-        results = []
-        for category, scores in groupby(scores, lambda s: s.target.session_entry.competition_entry.code()):
-            results.append((category, list(scores)))
+        if category:
+            results = scores
+        else:
+            results = []
+            for category, scores in groupby(scores, lambda s: s.target.session_entry.competition_entry.code()):
+                results.append((category, list(scores)))
         return results
 
     def boss_groups(self, session_round):

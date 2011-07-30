@@ -288,6 +288,12 @@
         display: block; }
       .competition-section .competition-content .leaderboard .board table {
         width: 100%; }
+    .competition-section .competition-content .olympic .board {
+      display: none; }
+      .competition-section .competition-content .olympic .board.selected {
+        display: block; }
+      .competition-section .competition-content .olympic .board table {
+        width: 100%; }
 
 .select-widget .select {
   display: none; }
