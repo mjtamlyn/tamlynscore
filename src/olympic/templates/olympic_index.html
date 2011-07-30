@@ -71,12 +71,27 @@
     <div class="board {% if not forloop.counter0 %}selected{% endif %}" id="session-{{ session.pk }}-round-{{ round.pk }}">
         <p>
             Current status:
-            {% if not seedings %}
+            {% if seedings %}
+            Seedings confirmed.
+            {% else %}
             Seedings not yet confirmed.
             {% endif %}
         </p>
-        {% if not seedings %}
-        <form method="post">
+        {% if seedings %}
+        <table>
+            {% for seed in seedings %}
+            <tr>
+                <td>{{ seed.seed }}</td>
+                <td>{{ seed.entry.archer }}</td>
+                <td>{{ seed.entry.club }}</td>
+                <td>{{ seed.entry.bowstyle }}</td>
+            </tr>
+            {% endfor %}
+        </table>
+        <a class="remove-all" href="?remove-all={{ round.pk }}#session-{{ session.pk }}-round-{{ round.pk }}">DANGER Remove all seedings and results</a>
+        <div class="clear"></div>
+        {% else %}
+        <form method="post" action="{% url olympic.views.olympic_index slug=competition.slug %}#session-{{ session.pk }}-round-{{ round.pk }}">
             {% csrf_token %}
             <input type="hidden" name="form-id" value="confirm-seedings-{{ round.pk }}" >
             <table>
@@ -85,7 +100,7 @@
                     <td><input type="checkbox" name="score-{{ score.pk }}" value="{{ forloop.counter }}" /></td>
                     <td>{{ forloop.counter }}</td>
                     <td>{{ score.target.session_entry.competition_entry.archer }}</td>
-                    <td>{{ score.target.session_entry.competition_entry.club}}</td>
+                    <td>{{ score.target.session_entry.competition_entry.club }}</td>
                     <td>{{ score.score }}</td>
                     <td>{{ score.hits }}</td>
                     <td>{{ score.golds }}</td>
