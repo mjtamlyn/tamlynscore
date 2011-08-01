@@ -56,11 +56,38 @@ class Seeding(models.Model):
     def __unicode__(self):
         return u'Seed {0} - {1} {2}'.format(self.seed, self.session_round.shot_round, self.entry)
 
+class MatchManager(models.Manager):
+
+    def _match_number_for_seed(self, seed, level):
+        # get supremum
+        n = 1
+        while 2 ** n < seed:
+            n += 1
+        # move seed down til we get to level
+        while n > level and seed > 2 ** level:
+            if seed < 2 ** (n - 1):
+                n -= 1
+                continue
+            seed = 2 ** n - seed + 1
+            n -= 1
+        return seed
+
+    def target_for_seed(self, seed, level):
+        match_number = self._match_number_for_seed(seed.seed, level)
+        match = self.get(level=level, session_round=seed.session_round, match=match_number)
+        if match.target_2 and seeding.seed * 2 < level:
+            return match.target_2
+        return match.target
+
 class Match(models.Model):
     session_round = models.ForeignKey(OlympicSessionRound)
     target = models.PositiveIntegerField()
+    # for later matches spread across 2 bosses
+    target_2 = models.PositiveIntegerField(blank=True, null=True)
     level = models.PositiveIntegerField()
     match = models.PositiveIntegerField()
+
+    objects = MatchManager()
 
     class Meta:
         verbose_name_plural = 'matches'
