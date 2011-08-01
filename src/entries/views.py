@@ -62,7 +62,7 @@ class EntriesView(View):
                 for gender in ['Gent', 'Lady']:
                     stats.append((
                         '{0} entries for {1}'.format(gender, session_round.shot_round),
-                        competition.competitionentry_set.filter(archer__gender=gender[0]).count(),
+                        competition.competitionentry_set.filter(sessionentry__session_round=session_round, archer__gender=gender[0]).count(),
                     ))
         return stats
 
