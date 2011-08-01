@@ -70,9 +70,38 @@ class Bowstyle(models.Model):
     def __unicode__(self):
         return self.name
 
+class Country(models.Model):
+    name = models.CharField(max_length=50, unique=True)
+
+    class Meta:
+        verbose_name_plural = 'countries'
+    
+    def __unicode__(self):
+        return self.name
+
+class Region(models.Model):
+    name = models.CharField(max_length=50, unique=True)
+    country = models.ForeignKey(Country)
+
+    def __unicode__(self):
+        return self.name
+
+class County(models.Model):
+    name = models.CharField(max_length=50, unique=True)
+    region = models.ForeignKey(Region)
+
+    class Meta:
+        verbose_name_plural = 'counties'
+    
+    def __unicode__(self):
+        return self.name
+
 class Club(models.Model):
     name = models.CharField(max_length=500, unique=True)
     short_name = models.CharField(max_length=50, unique=True)
+    abbreviation = models.CharField(max_length=10)
+
+    county = models.ForeignKey(County, blank=True, null=True)
 
     slug = models.SlugField(editable=False, unique=True)
 
