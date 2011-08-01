@@ -57,6 +57,13 @@ class EntriesView(View):
                     'Entries for {0}'.format(session_round.shot_round),
                     competition.competitionentry_set.filter(sessionentry__session_round=session_round).count(),
                 ))
+        for session in competition.sessions_with_rounds()[:1]:
+            for session_round in session.sessionround_set.all():
+                for gender in ['Gent', 'Lady']:
+                    stats.append((
+                        '{0} entries for {1}'.format(gender, session_round.shot_round),
+                        competition.competitionentry_set.filter(archer__gender=gender[0]).count(),
+                    ))
         return stats
 
     def get(self, request, slug):
