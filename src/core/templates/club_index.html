@@ -47,7 +47,7 @@
         <ul class="names">
             <li>Full name <h4>{{ club.name }}</h4></li>
             <li>Short name <h4>{{ club.short_name }}</h4></li>
-            <li>Abbreviation <h4>(( club.abbreviation ))</h4></li>
+            <li>Abbreviation <h4>{{ club.abbreviation }}</h4></li>
         </ul>
     </div>
     <div class="basic details left">
@@ -63,11 +63,13 @@
     <div class="clear"></div>
     <div class="basic affiliations">
         <p>Affiliated to:</p>
+        {% if club.county %}
         <ul class="affiliations">
-            <li><a href="#">(( club.county ))</a></li>
-            <li><a href="#">(( club.region ))</a></li>
-            <li><a href="#">(( club.country ))</a></li>
+            <li><a href="#">{{ club.county }}</a></li>
+            <li><a href="#">{{ club.county.region }}</a></li>
+            <li><a href="#">{{ club.county.region.country }}</a></li>
         </ul>
+        {% endif %}
     </div>
 </div>
 <div class="logo_block right">
