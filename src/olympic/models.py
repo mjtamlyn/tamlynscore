@@ -48,6 +48,32 @@ class OlympicSessionRound(models.Model):
             )
             seeding.save()
 
+    def _get_match_layout(self, level, half_only=False):
+        seedings = [1, 2]
+        for m in range(2, level):
+            seedings = map(lambda x: [x, 2 ** m + 1 - x] if x % 2 else [2 ** m + 1 - x, x], seedings)
+            seedings = [item for sublist in seedings for item in sublist]
+        if half_only:
+            seedings = [item for item in seedings if item > 2 ** (level - 2)]
+        return seedings
+
+    def _get_target_mapping(self, level, start=1, expanded=False, half_only=False):
+        layout = self._get_match_layout(level, half_only)
+        return [(m, layout.index(m) * (1 + int(expanded)) + start) for m in layout]
+
+    def make_matches(self, level, start=1, expanded=False, half_only=False):
+        mapping = self._get_target_mapping(level, start, expanded, half_only)
+        for match_id, target in mapping:
+            match = Match(
+                    session_round=self,
+                    target=target,
+                    level=level,
+                    match=match_id,
+            )
+            if expanded:
+                match.target_2 = match.target + 1
+            match.save()
+
 class Seeding(models.Model):
     entry = models.ForeignKey(CompetitionEntry)
     session_round = models.ForeignKey(OlympicSessionRound)
@@ -93,7 +119,7 @@ class Match(models.Model):
         verbose_name_plural = 'matches'
 
     def __unicode__(self):
-        return u'Match {0} at level {1}'.format(self.match, self.level)
+        return u'Match {0} at level {1} on round {2}'.format(self.match, self.level, self.session_round)
 
 class Result(models.Model):
     match = models.ForeignKey(Match)
