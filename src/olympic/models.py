@@ -85,12 +85,14 @@ class Seeding(models.Model):
 class MatchManager(models.Manager):
 
     def _match_number_for_seed(self, seed, level):
+        if level == 1:
+            return 1
         # get supremum
         n = 1
         while 2 ** n < seed:
             n += 1
         # move seed down til we get to level
-        while n > level and seed > 2 ** level:
+        while n >= level and seed > 2 ** (level - 1):
             if seed < 2 ** (n - 1):
                 n -= 1
                 continue
@@ -98,12 +100,32 @@ class MatchManager(models.Manager):
             n -= 1
         return seed
 
+    def _effective_seed(self, seed, level):
+        return self._match_number_for_seed(seed, level + 1)
+
     def target_for_seed(self, seed, level):
         match_number = self._match_number_for_seed(seed.seed, level)
-        match = self.get(level=level, session_round=seed.session_round, match=match_number)
-        if match.target_2 and seeding.seed * 2 < level:
+        effective_seed = self._effective_seed(seed.seed, level)
+        try:
+            match = self.get(level=level, session_round=seed.session_round, match=match_number)
+        except self.model.DoesNotExist:
+            return None
+        if match.target_2 and effective_seed * 2 > 2 ** level:
             return match.target_2
         return match.target
+
+    def matches_for_seed(self, seed, highest_seed=None):
+        highest_level = self.filter(session_round=seed.session_round).order_by('-level')[:1]
+        if not highest_level.exists():
+            return None
+        highest_level = highest_level[0].level
+        matches = []
+        for level in range(1, highest_level + 1):
+            if highest_seed and 2 ** level + 1 - seed.seed > highest_seed:
+                matches.append(None)
+            else:
+                matches.append(self.target_for_seed(seed, level))
+        return matches
 
 class Match(models.Model):
     session_round = models.ForeignKey(OlympicSessionRound)
