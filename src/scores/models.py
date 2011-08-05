@@ -44,7 +44,7 @@ class ScoreManager(models.Manager):
         active = self.active(session_round)
         bosses = []
         for boss, entries in groupby(active, lambda s: s.target.boss):
-            bosses.append(boss)
+            bosses.append((boss, list(entries)))
         return bosses
 
 class Score(models.Model):
@@ -70,11 +70,17 @@ class Score(models.Model):
         if not self.score:
             self.score = 0
 
+class ArrowManager(models.Manager):
+    def filter_by_dozen(self, dozen):
+        return self.filter(arrow_of_round__lte=(dozen+1)*12, arrow_of_round__gt=dozen*12)
+
 class Arrow(models.Model):
     score = models.ForeignKey(Score)
     arrow_value = models.PositiveIntegerField()
     arrow_of_round = models.PositiveIntegerField()
     is_x = models.BooleanField(default=False)
+
+    objects = ArrowManager()
 
     def __unicode__(self):
         if self.is_x:
