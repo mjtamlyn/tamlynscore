@@ -252,6 +252,10 @@
         margin: 5px;
         text-align: center;
         width: 30px; }
+        .competition-section .competition-content .input-scores .input-board .boss.done {
+          background-color: #353345;
+          border-color: #111d2a;
+          color: white; }
       .competition-section .competition-content .input-scores .input-board .boss-link:focus {
         outline: none; }
         .competition-section .competition-content .input-scores .input-board .boss-link:focus .boss {

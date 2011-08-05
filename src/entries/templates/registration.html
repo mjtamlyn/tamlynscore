@@ -104,8 +104,8 @@
             <td>{{ detail.session_entry.competition_entry.get_age_display }}</td>
             <td>
                 {% if detail %}
-                <a href="#present" class="present" rel="{{ detail.session_entry.pk }}">Present</a>
-                <a href="#not-present" class="not-present" rel="{{ detail.session_entry.pk }}">Not Present</a>
+                <a href="#present" class="present" rel="{{ detail.session_entry.pk }}">Not Present</a>
+                <a href="#not-present" class="not-present" rel="{{ detail.session_entry.pk }}">Present</a>
                 {% endif %}
             </td>
         </tr>

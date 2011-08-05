@@ -70,9 +70,15 @@ class Score(models.Model):
         if not self.score:
             self.score = 0
 
+    def running_total(self, dozen):
+        return self.arrow_set.filter_up_to_dozen(dozen).aggregate(models.Sum('arrow_value'))['arrow_value__sum']
+
 class ArrowManager(models.Manager):
     def filter_by_dozen(self, dozen):
         return self.filter(arrow_of_round__lte=(dozen+1)*12, arrow_of_round__gt=dozen*12)
+
+    def filter_up_to_dozen(self, dozen):
+        return self.filter(arrow_of_round__lte=int(dozen)*12)
 
 class Arrow(models.Model):
     score = models.ForeignKey(Score)
