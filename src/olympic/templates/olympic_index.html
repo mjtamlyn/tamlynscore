@@ -89,6 +89,7 @@
             {% endfor %}
         </table>
         <a class="remove-all" href="?remove-all={{ round.pk }}#session-{{ session.pk }}-round-{{ round.pk }}">DANGER Remove all seedings and results</a>
+        <p><a href="{% url olympic.views.olympic_score_sheet slug=competition.slug round_id=round.pk %}">Get Scoresheets</a </p>
         <div class="clear"></div>
         {% else %}
         <form method="post" action="{% url olympic.views.olympic_index slug=competition.slug %}#session-{{ session.pk }}-round-{{ round.pk }}">
