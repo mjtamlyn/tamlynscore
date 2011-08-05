@@ -29,7 +29,8 @@ class InputScoresView(TargetListView):
         sessions = []
         for key, values in groupby(scores, lambda x: x[0]):
             sessions.append((key, [value[1] for value in values]))
-        focus = request.GET.get('fd', '') + '-' + request.GET.get('ft', '')
+        if 'ft' in request.GET and 'fd' in request.GET:
+            focus = request.GET['fd'] + '-' + request.GET['ft']
         return render(request, self.template, locals())
 
 input_scores = login_required(InputScoresView.as_view())
