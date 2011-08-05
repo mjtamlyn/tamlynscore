@@ -26,6 +26,7 @@
                 <th>Hits</th>
                 <th>Golds</th>
                 <th>Xs</th>
+                <th>RT</th>
             </tr>
             {% for target in forms %}
             <tr>
@@ -42,6 +43,7 @@
                 <th class="hits">0</th>
                 <th class="golds">0</th>
                 <th class="xs">0</th>
+                <th class="rt" rel="{{ target.running_total }}">{{ target.running_total }}</th>
                 {% endif %}
                 {% endfor %}
             </tr>

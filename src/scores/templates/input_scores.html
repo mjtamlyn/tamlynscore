@@ -98,7 +98,7 @@
     <div class="bosses">
         {% for boss in bosses %}
         <a href="{% url scores.views.input_arrows slug=slug round_id=round.pk dozen=dozen boss=boss.0 %}" class="boss-link" rel="{{ dozen }}-{{ boss.0 }}">
-            <div class="boss" {% if boss.1|bosscomplete:dozen %}style="background-color: #6fb3ff"{% endif %}>{{ boss.0 }}</div>
+            <div class="boss {{ boss.1|bosscomplete:dozen }}">{{ boss.0 }}</div>
         </a>
         {% endfor %}
         <div class="clear"></div>
