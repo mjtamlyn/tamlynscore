@@ -193,18 +193,21 @@ class TargetListPdf(HeadedPdfView):
         self.styles['h2'].alignment = 1
 
     def get_elements(self):
-        session_rounds = SessionRound.objects.filter(session__competition=self.competition).order_by('session__start')
+        session_rounds = SessionRound.objects.filter(session__competition=self.competition).order_by('session', 'session__start')
 
         elements = []
         for session_round in session_rounds:
             target_list = session_round.target_list_pdf()
+            if not target_list:
+                continue
 
             title = "Target List for {0} - {1}".format(session_round.shot_round, session_round.session.start.strftime('%A, %d %B %Y, %X'))
             header = self.Para(title, 'h2')
             table = Table(target_list)
             spacer = Spacer(self.PAGE_WIDTH, 0.25*inch)
 
-            elements.append(KeepTogether([header, spacer, table, spacer]))
+            elements += [header, spacer, table, spacer]
+            elements.append(PageBreak())
         return elements
 
 target_list_pdf = login_required(TargetListPdf.as_view())
