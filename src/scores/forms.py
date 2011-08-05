@@ -29,6 +29,7 @@ def get_arrow_formset(session_round, boss, dozen, data=None):
                 'forms': [],
                 'archer': score.target.session_entry.competition_entry.archer,
                 'target': score.target.target,
+                'running_total': score.running_total(dozen),
         }
         for arrow in range(1, 13):
             prefix = score.target.target + str(arrow)

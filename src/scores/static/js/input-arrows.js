@@ -71,6 +71,7 @@ var Arrows = new Class({
         var hits = 0;
         var golds = 0;
         var xs = 0;
+        var rt = row.getElement('.rt').get('rel').toInt();
         inputs.each(function (item, index) {
             var value = item.get('value');
             if (value == 'M' || value == '') {
@@ -91,7 +92,7 @@ var Arrows = new Class({
                 golds += 1;
             }
         });
-        var values = [ET1, ET2, ET1 + ET2, hits, golds, xs];
+        var values = [ET1, ET2, ET1 + ET2, hits, golds, xs, rt + ET1 + ET2];
         row.getElements('th').each(function (item, index) {
             item.set('html', values[index]);
         });
