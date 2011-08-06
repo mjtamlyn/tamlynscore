@@ -229,6 +229,9 @@ class ScoreSheetsPdf(HeadedPdfView):
 
         elements = []
         for boss, entries in groupby(self.session_round.target_list(), lambda x: x[0][:-1]):
+            entries = list(entries)
+            if not reduce(lambda e, f: e or f, map(lambda e: e[1], entries)):
+                continue
             for target, entry in entries:
                 if entry:
                     entry = entry.session_entry.competition_entry
@@ -318,6 +321,9 @@ class RunningSlipsPdf(ScoreSheetsPdf):
     def get_elements(self):
         elements = []
         for boss, entries in groupby(self.session_round.target_list(), lambda x: x[0][:-1]):
+            entries = list(entries)
+            if not reduce(lambda e, f: e or f, map(lambda e: e[1], entries)):
+                continue
             elements += self.get_running_slip_elements(boss, list(entries))
         return elements
 
@@ -325,7 +331,7 @@ class RunningSlipsPdf(ScoreSheetsPdf):
         dozens = self.session_round.shot_round.arrows / 12
         elements = []
         for dozen in range(1, dozens + 1):
-            table_data = [['Dozen {0}'.format(dozen)] + [None] * 6 + ['ET'] + [None] * 6 + ['ET', 'S', 'H', 'G', 'X', 'RT']]
+            table_data = [['Dozen {0}'.format(dozen)] + [None] * 6 + ['ET'] + [None] * 6 + ['ET', 'S', 'H', 'G', 'X', 'RT' if dozen > 1 else 'Inits.']]
             for entry in entries:
                 table_data.append([entry[0]] + [None for i in range(self.total_cols)])
             table = Table(table_data, [self.box_size] + self.col_widths, (len(entries) + 1)*[self.box_size])
