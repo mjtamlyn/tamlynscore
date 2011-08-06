@@ -2,6 +2,8 @@ from django.db import models
 
 from entries.models import TargetAllocation
 
+from denorm import denormalized, depend_on_related
+
 from itertools import groupby
 
 class ScoreManager(models.Manager):
@@ -51,7 +53,13 @@ class ScoreManager(models.Manager):
 class Score(models.Model):
     target = models.ForeignKey(TargetAllocation)
 
-    score = models.PositiveIntegerField(default=0, db_index=True)
+    # score = models.PositiveIntegerField(default=0, db_index=True)
+
+    @denormalized(models.PositiveIntegerField, db_index=True)
+    @depend_on_related('Arrow')
+    def score(self):
+        return self.arrow_set.aggregate(models.Sum('arrow_value'))['arrow_value__sum']
+
     hits = models.PositiveIntegerField(default=0)
     golds = models.PositiveIntegerField(default=0)
     xs = models.PositiveIntegerField(default=0)
@@ -64,7 +72,7 @@ class Score(models.Model):
         return u'Score for {0}'.format(self.target)
 
     def update_score(self):
-        self.score = self.arrow_set.aggregate(models.Sum('arrow_value'))['arrow_value__sum']
+        #self.score = self.arrow_set.aggregate(models.Sum('arrow_value'))['arrow_value__sum']
         self.hits = self.arrow_set.filter(arrow_value__gt=0).count()
         self.golds = self.arrow_set.filter(arrow_value=10).count()
         self.xs = self.arrow_set.filter(is_x=True).count()

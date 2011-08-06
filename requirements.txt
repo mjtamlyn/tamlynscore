@@ -1,3 +1,4 @@
 Django
 south
 reportlab
+git+https://github.com/initcrash/django-denorm.git
