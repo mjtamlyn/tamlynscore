@@ -36,7 +36,7 @@ class ScoreManager(models.Manager):
             results = scores
         else:
             results = []
-            for category, scores in groupby(scores, lambda s: s.target.session_entry.competition_entry.code()):
+            for category, scores in groupby(scores, lambda s: s.target.session_entry.competition_entry.category()):
                 results.append((category, list(scores)))
         return results
 

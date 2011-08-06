@@ -39,7 +39,8 @@ class OlympicSessionRound(models.Model):
         return u'{0}, {1}'.format(self.session, self.shot_round)
 
     def set_seedings(self, scores):
-        scores = Score.objects.results(self.ranking_round, leaderboard=False, category=self.category).filter(pk__in=scores)
+        scores = Score.objects.results(self.ranking_round, leaderboard=True, category=self.category).filter(pk__in=scores)
+        scores = sorted(scores, key=lambda s: 0 - s.score)
         for score in scores:
             seeding = Seeding(
                     entry=score.target.session_entry.competition_entry,
@@ -93,7 +94,7 @@ class MatchManager(models.Manager):
             n += 1
         # move seed down til we get to level
         while n >= level and seed > 2 ** (level - 1):
-            if seed < 2 ** (n - 1):
+            if seed <= 2 ** (n - 1):
                 n -= 1
                 continue
             seed = 2 ** n - seed + 1
@@ -122,6 +123,8 @@ class MatchManager(models.Manager):
         matches = []
         for level in range(1, highest_level + 1):
             if highest_seed and 2 ** level + 1 - seed.seed > highest_seed:
+                if seed.seed == 13:
+                    print self.target_for_seed(seed, level)
                 matches.append(None)
             else:
                 matches.append(self.target_for_seed(seed, level))

@@ -71,8 +71,12 @@ class SessionRound(models.Model):
         archers_per_target = self.session.archers_per_target
         needed_bosses = int(math.ceil(entries / float(archers_per_target)))
         current_target_allocations = TargetAllocation.objects.filter(session_entry__session_round=self)
+        #FIXME: Don't do this for making target lists
+        minimum_boss = current_target_allocations.aggregate(models.Min('boss'))['boss__min']
+        if not minimum_boss:
+            minimum_boss = 1
         current_bosses = current_target_allocations.aggregate(models.Max('boss'))['boss__max']
-        bosses = range(1, max(needed_bosses, current_bosses) + 1)
+        bosses = range(minimum_boss, max(needed_bosses, current_bosses) + 1)
 
         details = self.session.details()
 
@@ -85,7 +89,7 @@ class SessionRound(models.Model):
                 targets.append((target, allocations_lookup.get(target, None)))
         return targets
 
-    def target_list_pdf(self):
+    def target_list_pdf(self, lunch=False):
         current_target_allocations = TargetAllocation.objects.filter(session_entry__session_round=self)
         minimum_boss = current_target_allocations.aggregate(models.Min('boss'))['boss__min']
         current_bosses = current_target_allocations.aggregate(models.Max('boss'))['boss__max']
@@ -105,10 +109,15 @@ class SessionRound(models.Model):
                     allocation = (
                             entry.archer,
                             entry.club.name,
-                            entry.archer.get_gender_display(),
-                            entry.bowstyle,
-                            entry.get_age_display(),
                     )
+                    if lunch:
+                        allocation += (None, None, None)
+                    else:
+                        allocation += (
+                                entry.archer.get_gender_display(),
+                                entry.bowstyle,
+                                entry.get_age_display(),
+                        )
                     targets.append((target,) + allocation)
                 else:
                     targets.append((target, None))
@@ -146,6 +155,9 @@ class CompetitionEntry(models.Model):
         gender = self.archer.gender
         bowstyle = self.bowstyle.name[0]
         return gender + bowstyle
+
+    def category(self):
+        return u'{0} {1}'.format(self.archer.get_gender_display(), self.bowstyle)
 
 class SessionEntry(models.Model):
     competition_entry = models.ForeignKey(CompetitionEntry)
