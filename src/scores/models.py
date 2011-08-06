@@ -50,7 +50,7 @@ class ScoreManager(models.Manager):
 class Score(models.Model):
     target = models.ForeignKey(TargetAllocation)
 
-    score = models.PositiveIntegerField(default=0) # TODO: db_index=True
+    score = models.PositiveIntegerField(default=0, db_index=True)
     hits = models.PositiveIntegerField(default=0)
     golds = models.PositiveIntegerField(default=0)
     xs = models.PositiveIntegerField(default=0)
