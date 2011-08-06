@@ -33,6 +33,9 @@
             {% endfor %}
         </table>
     </div>
+    {% if forloop.counter == 2 %}
+    <div class="clear"></div>
+    {% endif %}
     {% endif %}
     {% endfor %}
 {% endif %}
