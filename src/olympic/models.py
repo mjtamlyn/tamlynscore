@@ -85,39 +85,28 @@ class Seeding(models.Model):
 
 class MatchManager(models.Manager):
 
-    def _match_number_for_seed(self, seed, level, v=0):
+    def _match_number_for_seed(self, seed, level):
         if level == 1:
             return 1
         # get supremum
         n = 1
         while 2 ** n < seed:
             n += 1
-        if v:
-            print 'this is n', n
         # move seed down til we get to level
         while n >= level and seed > 2 ** (level - 1):
             if seed <= 2 ** (n - 1):
                 n -= 1
                 continue
-            if v:
-                print 'old seed', seed
             seed = 2 ** n - seed + 1
-            if v:
-                print 'next seed', seed
             n -= 1
         return seed
 
     def _effective_seed(self, seed, level):
-        if seed == 13:
-            print seed, level, self._match_number_for_seed(13, 2, v=1)
-            print seed, level, self._match_number_for_seed(13, 3)
         return self._match_number_for_seed(seed, level + 1)
 
     def target_for_seed(self, seed, level):
         match_number = self._match_number_for_seed(seed.seed, level)
         effective_seed = self._effective_seed(seed.seed, level)
-        if seed.seed == 13:
-            print effective_seed
         try:
             match = self.get(level=level, session_round=seed.session_round, match=match_number)
         except self.model.DoesNotExist:
