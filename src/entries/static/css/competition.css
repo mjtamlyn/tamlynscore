@@ -1,3 +1,9 @@
+.module {
+  background-color: white;
+  border: 1px solid #111d2a; }
+  .module h4 {
+    margin-top: 0; }
+
 .competition-section {
   margin: 15px 10px; }
   .competition-section .competition-nav {
@@ -26,11 +32,6 @@
     float: left;
     margin: 0 10px;
     width: 758px; }
-    .competition-section .competition-content .module {
-      background-color: white;
-      border: 1px solid #111d2a; }
-      .competition-section .competition-content .module h4 {
-        margin-top: 0; }
     .competition-section .competition-content .competition-entries .top .new-entry {
       float: left; }
       .competition-section .competition-content .competition-entries .top .new-entry .new-entry-form {
@@ -320,3 +321,18 @@
   .buttons-widget .button {
     display: inline-block;
     margin: 0 2px; }
+
+.leaderboard-big-screen .wrapper {
+  width: 1800px; }
+  .leaderboard-big-screen .wrapper h1 {
+    font-size: 70px; }
+  .leaderboard-big-screen .wrapper h2 {
+    margin-top: 0;
+    font-size: 50px; }
+  .leaderboard-big-screen .wrapper .module {
+    float: left;
+    margin: 10px;
+    width: 850px; }
+    .leaderboard-big-screen .wrapper .module td {
+      font-size: 30px;
+      padding: 5px 15px; }

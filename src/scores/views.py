@@ -87,3 +87,8 @@ class LeaderboardView(View):
         return render(request, self.template, context)
 
 leaderboard = login_required(LeaderboardView.as_view())
+
+class LeaderboardBigScreen(LeaderboardView):
+    template = 'leaderboard_big_screen.html'
+
+leaderboard_big_screen = login_required(LeaderboardBigScreen.as_view())
