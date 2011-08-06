@@ -188,6 +188,7 @@ class HeadedPdfView(PdfView):
 
 class TargetListPdf(HeadedPdfView):
     title = 'Target List'
+    lunch = False
 
     def update_style(self):
         self.styles['h2'].alignment = 1
@@ -197,7 +198,7 @@ class TargetListPdf(HeadedPdfView):
 
         elements = []
         for session_round in session_rounds:
-            target_list = session_round.target_list_pdf()
+            target_list = session_round.target_list_pdf(lunch=self.lunch)
             if not target_list:
                 continue
 
@@ -211,6 +212,10 @@ class TargetListPdf(HeadedPdfView):
         return elements
 
 target_list_pdf = login_required(TargetListPdf.as_view())
+
+class TargetListLunch(TargetListPdf):
+    lunch = True
+target_list_lunch = login_required(TargetListLunch.as_view())
 
 class ScoreSheetsPdf(HeadedPdfView):
 
