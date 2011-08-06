@@ -22,6 +22,7 @@ class ScoreManager(models.Manager):
         scores = self.active(session_round, category=category)
         if not leaderboard:
             scores = scores.annotate(arrows=models.Count('arrow')).filter(arrows__ne=session_round.shot_round.arrows)
+        # TODO: Don't do this here!
         for score in scores:
             score.update_score()
             score.save()
@@ -50,7 +51,7 @@ class ScoreManager(models.Manager):
 class Score(models.Model):
     target = models.ForeignKey(TargetAllocation)
 
-    score = models.PositiveIntegerField(default=0)
+    score = models.PositiveIntegerField(default=0, db_index=True)
     hits = models.PositiveIntegerField(default=0)
     golds = models.PositiveIntegerField(default=0)
     xs = models.PositiveIntegerField(default=0)

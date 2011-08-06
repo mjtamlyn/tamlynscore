@@ -4,8 +4,10 @@ from django.http import HttpResponseRedirect
 from django.shortcuts import render, get_object_or_404
 from django.views.generic import View
 
+from reportlab.platypus import PageBreak, Table
+
 from entries.models import Competition, SessionRound
-from entries.views import TargetListView
+from entries.views import TargetListView, HeadedPdfView
 
 from scores.forms import get_arrow_formset
 from scores.models import Score
@@ -65,21 +67,28 @@ input_arrows = login_required(InputArrowsView.as_view())
 
 class LeaderboardView(View):
     template = 'leaderboard.html'
+    title = 'Leaderboard'
+    leaderboard = True
 
-    def get_context(self, request, slug):
-        competition = get_object_or_404(Competition, slug=slug)
-        session_rounds = SessionRound.objects.filter(session__competition=competition).order_by('session__start')
+    def get_results(self):
+        session_rounds = SessionRound.objects.filter(session__competition=self.competition).order_by('session__start')
         scores = [
             (
                 session_round.session,
                 session_round,
-                Score.objects.results(session_round, leaderboard=True),
+                Score.objects.results(session_round, leaderboard=False),
             )
             for session_round in session_rounds
         ]
         sessions = []
         for key, values in groupby(scores, lambda x: x[0]):
             sessions.append((key, [value[1] for value in values]))
+        return session_rounds, scores, sessions
+
+    def get_context(self, request, slug):
+        competition = self.competition = get_object_or_404(Competition, slug=slug)
+        session_rounds, scores, sessions = self.get_results()
+        title = self.title
         return locals()
 
     def get(self, request, *args, **kwargs):
@@ -92,3 +101,41 @@ class LeaderboardBigScreen(LeaderboardView):
     template = 'leaderboard_big_screen.html'
 
 leaderboard_big_screen = login_required(LeaderboardBigScreen.as_view())
+
+class ResultsView(LeaderboardView):
+    leaderboard = False # FIXME: set this back to True when leaderboard has been made more efficient! The massive counted annotate is slooooow.
+    title = 'Results'
+
+results = login_required(ResultsView.as_view())
+
+class ResultsPdf(HeadedPdfView, ResultsView):
+    title = 'Results' # because ResultsView is a mixin, its attrs are not used.
+
+    def update_style(self):
+        self.styles['h1'].alignment = 1
+        self.styles['h2'].alignment = 1
+
+    def get_elements(self):
+        elements = []
+
+        session_rounds, scores, sessions = self.get_results()
+        for session, session_round, results in scores:
+            elements.append(self.Para(session_round.shot_round, 'h1'))
+
+            for category, entries in results:
+                elements.append(self.Para(category , 'h2'))
+                table = Table([[
+                    entries.index(entry) + 1,
+                    entry.target.session_entry.competition_entry.archer.name,
+                    entry.target.session_entry.competition_entry.club.name,
+                    entry.score,
+                    entry.golds,
+                    entry.xs,
+                ] for entry in entries])
+                elements.append(table)
+            
+            elements.append(PageBreak())
+
+        return elements
+
+results_pdf = login_required(ResultsPdf.as_view())
