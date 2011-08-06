@@ -156,6 +156,9 @@ class CompetitionEntry(models.Model):
         bowstyle = self.bowstyle.name[0]
         return gender + bowstyle
 
+    def category(self):
+        return u'{0} {1}'.format(self.archer.get_gender_display(), self.bowstyle)
+
 class SessionEntry(models.Model):
     competition_entry = models.ForeignKey(CompetitionEntry)
     session_round = models.ForeignKey(SessionRound)
