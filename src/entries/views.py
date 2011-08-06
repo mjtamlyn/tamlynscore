@@ -322,7 +322,7 @@ class RunningSlipsPdf(ScoreSheetsPdf):
         elements = []
         for boss, entries in groupby(self.session_round.target_list(), lambda x: x[0][:-1]):
             entries = list(entries)
-            if not reduce(lambda e, f: e or f, map(lambda e: e[1], entries)):
+            if not reduce(lambda e, f: e or f, entries):
                 continue
             elements += self.get_running_slip_elements(boss, list(entries))
         return elements
