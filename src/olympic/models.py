@@ -39,7 +39,8 @@ class OlympicSessionRound(models.Model):
         return u'{0}, {1}'.format(self.session, self.shot_round)
 
     def set_seedings(self, scores):
-        scores = Score.objects.results(self.ranking_round, leaderboard=False, category=self.category).filter(pk__in=scores)
+        scores = Score.objects.results(self.ranking_round, leaderboard=True, category=self.category).filter(pk__in=scores)
+        scores = sorted(scores, key=lambda s: 0 - s.score)
         for score in scores:
             seeding = Seeding(
                     entry=score.target.session_entry.competition_entry,
