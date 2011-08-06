@@ -221,7 +221,7 @@ class ScoreSheetsPdf(HeadedPdfView):
 
     box_size = 0.35*inch
     wide_box = box_size*1.35
-    total_cols = 12 + 2 + 5
+    total_cols = 12 + 2 + 4
     col_widths = 6*[box_size] + [wide_box] + 6*[box_size] + 6*[wide_box]
 
     def update_style(self):
@@ -264,7 +264,7 @@ class ScoreSheetsPdf(HeadedPdfView):
             subround_title = self.Para(u'{0}{1}'.format(subround.distance, subround.unit), 'h3')
             dozens = subround.arrows / 12
             total_rows = dozens + 2
-            table_data = [[subround_title] + [None] * 5 + ['ET'] + [None] * 6 + ['ET', 'S', 'H', 'G', 'X', 'RT']]
+            table_data = [[subround_title] + [None] * 5 + ['ET'] + [None] * 6 + ['ET', 'S', '10+X', 'X', 'RT']]
             table_data += [[None for i in range(self.total_cols)] for j in range(total_rows - 1)]
             table = Table(table_data, self.col_widths, total_rows*[self.box_size])
             table.setStyle(self.scores_table_style)
@@ -281,7 +281,7 @@ class ScoreSheetsPdf(HeadedPdfView):
         signing_table_widths = [0.7*inch, 2*inch]
         signing_table = Table([[self.Para('Archer', 'h3'), None, None, self.Para('Scorer', 'h3'), '']], signing_table_widths + [0.5*inch] + signing_table_widths)
         signing_table.setStyle(self.signing_table_style)
-        score_sheet_elements += [self.spacer, signing_table, self.spacer]
+        score_sheet_elements += [self.spacer, signing_table]
 
         return score_sheet_elements
 
