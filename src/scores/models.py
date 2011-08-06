@@ -22,9 +22,9 @@ class ScoreManager(models.Manager):
         scores = self.active(session_round, category=category)
         if not leaderboard:
             scores = scores.annotate(arrows=models.Count('arrow')).filter(arrows__ne=session_round.shot_round.arrows)
-        for score in scores:
-            score.update_score()
-            score.save()
+        #for score in scores:
+            #score.update_score()
+            #score.save()
         scores = scores.order_by(
                 'target__session_entry__competition_entry__bowstyle',
                 'target__session_entry__competition_entry__archer__gender',
@@ -50,7 +50,7 @@ class ScoreManager(models.Manager):
 class Score(models.Model):
     target = models.ForeignKey(TargetAllocation)
 
-    score = models.PositiveIntegerField(default=0)
+    score = models.PositiveIntegerField(default=0) # TODO: db_index=True
     hits = models.PositiveIntegerField(default=0)
     golds = models.PositiveIntegerField(default=0)
     xs = models.PositiveIntegerField(default=0)

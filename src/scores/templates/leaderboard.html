@@ -38,7 +38,7 @@
 {% endblock scripts %}
 
 {% block moduleclass %}leaderboard{% endblock %}
-{% block title %}Leaderboard{% endblock %}
+{% block title %}{{ title }}{% endblock %}
 
 {% block main %}
 {% for session, round, results in scores %}

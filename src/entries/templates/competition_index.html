@@ -25,7 +25,7 @@
         </ul>
         <h2>After the shoot</h2>
         <ul>
-            <li>Full Results</li>
+            <a href="{% url scores.views.results slug=competition.slug %}"><li>Full Results</li></a>
         </ul>
     </div>
     {% endblock %}
