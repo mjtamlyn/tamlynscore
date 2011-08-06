@@ -22,7 +22,7 @@ class OlympicIndex(View):
             session_round.session,
             session_round,
             session_round.seeding_set.all(),
-            Score.objects.results(session_round.ranking_round, leaderboard=False, category=session_round.category),
+            Score.objects.results(session_round.ranking_round, leaderboard=True, category=session_round.category),
         ) for session_round in session_rounds]
         sessions = []
         for key, values in groupby(session_info, lambda x: x[0]):
@@ -36,6 +36,7 @@ class OlympicIndex(View):
         session_round = OlympicSessionRound.objects.get(pk=request.POST['form-id'].replace('confirm-seedings-', ''))
         score_ids = map(lambda s: int(s.replace('score-', '')), filter(lambda s: s.startswith('score-'), request.POST))
         scores = Score.objects.filter(pk__in=score_ids)
+        print scores
         session_round.set_seedings(scores)
         return self.get(request, slug)
 
@@ -47,9 +48,9 @@ class OlympicScoreSheet(ScoreSheetsPdf):
             'Final / Bronze',
             'Semi Final',
             'Quarter Final',
-            'Round of 16',
-            'Round of 32',
-            'Round of 64',
+            '1/8 Round',
+            '1/16 Round',
+            '1/32 Round',
     ]
 
     def set_options(self, slug=None, round_id=None):
@@ -95,7 +96,7 @@ class OlympicScoreSheet(ScoreSheetsPdf):
                         [match_title, None, None, None, boss, None, self.Para('Opponent', 'h3'), None],
                         ['Arrows' if match else self.Para('BYE', 'h3'), None, None, 'S',
                             'Pts' if self.session_round.shot_round.match_type == 'T' else 'RT',
-                            'RPT' if self.session_round.shot_round.match_type == 'T' else 'Opp.S',
+                            'RT' if self.session_round.shot_round.match_type == 'T' else 'Opp.S',
                             self.Para('Seed', 'h3'), None],
                         [None] * 6 + ['Your Signature', None],
                         [None] * 8,
