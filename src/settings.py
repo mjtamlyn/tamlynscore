@@ -123,6 +123,8 @@ INSTALLED_APPS = (
     'olympic',
     'accounts',
 
+    'denorm',
+
     #'django_extensions',
 )
 
