@@ -87,10 +87,11 @@ class SessionRound(models.Model):
 
     def target_list_pdf(self):
         current_target_allocations = TargetAllocation.objects.filter(session_entry__session_round=self)
+        minimum_boss = current_target_allocations.aggregate(models.Min('boss'))['boss__min']
         current_bosses = current_target_allocations.aggregate(models.Max('boss'))['boss__max']
         if not current_bosses:
             return []
-        bosses = range(1, current_bosses + 1)
+        bosses = range(minimum_boss, current_bosses + 1)
         allocations_lookup = dict([('{0}{1}'.format(allocation.boss, allocation.target), allocation) for allocation in current_target_allocations])
         details = self.session.details()
 
