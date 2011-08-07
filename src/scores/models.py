@@ -19,6 +19,7 @@ class ScoreManager(models.Manager):
         return active_scores
 
     def results(self, session_round, leaderboard=True, category=None):
+        print session_round
         scores = self.active(session_round, category=category)
         if not leaderboard:
             scores = scores.annotate(arrows=models.Count('arrow')).filter(arrows__ne=session_round.shot_round.arrows)
