@@ -104,11 +104,15 @@ class MatchManager(models.Manager):
     def _effective_seed(self, seed, level):
         return self._match_number_for_seed(seed, level + 1)
 
-    def target_for_seed(self, seed, level):
+    def match_for_seed(self, seed, level):
         match_number = self._match_number_for_seed(seed.seed, level)
         effective_seed = self._effective_seed(seed.seed, level)
+        match = self.get(level=level, session_round=seed.session_round, match=match_number)
+        return match
+
+    def target_for_seed(self, seed, level):
         try:
-            match = self.get(level=level, session_round=seed.session_round, match=match_number)
+            match = self.match_for_seed(seed, level)
         except self.model.DoesNotExist:
             return None
         if match.target_2 and effective_seed * 2 > 2 ** level:
