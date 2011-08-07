@@ -148,8 +148,10 @@ class Match(models.Model):
 
 class Result(models.Model):
     match = models.ForeignKey(Match)
-    winner = models.ForeignKey(Seeding, related_name='result_winner_set')
-    loser = models.ForeignKey(Seeding, null=True, blank=True, related_name='result_loser_set')
+    seed = models.ForeignKey(Seeding)
+
+    total = models.PositiveIntegerField()
+    win = models.BooleanField()
 
     def __unicode__(self):
         return u'Result of match {0}'.format(self.match)
