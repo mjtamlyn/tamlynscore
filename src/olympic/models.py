@@ -24,10 +24,14 @@ class Category(models.Model):
         verbose_name_plural = 'categories'
 
     def __unicode__(self):
-        return u'Category: {0} '.format(self.get_gender_display()) + u', '.join([unicode(b) for b in self.bowstyles.all()])
+        return u'Category: {0}'.format(self.name)
 
     def code(self):
         return self.gender + u''.join([unicode(b)[0] for b in self.bowstyles.all()])
+
+    @property
+    def name(self):
+        return self.get_gender_display() + ' ' + u', '.join([unicode(b) for b in self.bowstyles.all()])
 
 class OlympicSessionRound(models.Model):
     session = models.ForeignKey(Session)
@@ -127,8 +131,6 @@ class MatchManager(models.Manager):
         matches = []
         for level in range(1, highest_level + 1):
             if highest_seed and 2 ** level + 1 - seed.seed > highest_seed:
-                if seed.seed == 13:
-                    print self.target_for_seed(seed, level)
                 matches.append(None)
             else:
                 matches.append(self.target_for_seed(seed, level))

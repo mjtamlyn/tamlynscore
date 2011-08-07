@@ -7,7 +7,7 @@ class MatchAdmin(admin.ModelAdmin):
 
 class ResultAdmin(admin.ModelAdmin):
     list_display = ('match', 'seed', 'total', 'win')
-    list_filter = ('match__session_round',)
+    list_filter = ('match__session_round', 'match__level')
     
 admin.site.register(OlympicRound)
 admin.site.register(Category)
