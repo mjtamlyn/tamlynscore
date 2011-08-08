@@ -213,31 +213,36 @@ class OlympicResults(HeadedPdfView):
         olympic_rounds = OlympicSessionRound.objects.filter(session__competition=self.competition).order_by('shot_round__distance', 'category')
 
         for olympic_round in olympic_rounds:
+            elements += self.get_round_elements(olympic_round)
 
-            seedings = olympic_round.seeding_set.all()
-            total_levels = olympic_round.match_set.aggregate(Max('level'))['level__max']
+        return elements
 
-            seedings_with_results = []
-            for seeding in seedings:
-                results = seeding.result_set.order_by('match__level')
-                seedings_with_results.append((seeding, results))
+    def get_round_elements(self, olympic_round):
 
-            seedings_with_results = sorted(seedings_with_results, key=lambda s: (s[1][0].match.level, s[1][0].match.match if s[1][0].match.level == 1 else None, -s[1][0].total, s[0].seed))
+        elements = []
+        seedings = olympic_round.seeding_set.all()
+        total_levels = olympic_round.match_set.aggregate(Max('level'))['level__max']
 
-            table_headers = ['Rank', 'Seed', 'Name'] + self.match_headers[-total_levels:]
-            table_data = [table_headers] + [[
-                self.pretty_rank(seedings_with_results.index((seeding, results)) + 1),
-                seeding.seed,
-                seeding.entry.archer.name,
-            ] + self.format_results(results, total_levels)
-                for seeding, results in seedings_with_results]
-            table = Table(table_data)
-            table.setStyle(self.table_style)
-            elements.append(KeepTogether([
-                self.Para(u'{1}m: {0}'.format(olympic_round.category.name, olympic_round.shot_round.distance), 'h2'),
-                table,
-            ]))
-            
+        seedings_with_results = []
+        for seeding in seedings:
+            results = seeding.result_set.order_by('match__level')
+            seedings_with_results.append((seeding, results))
+
+        seedings_with_results = sorted(seedings_with_results, key=lambda s: (s[1][0].match.level, s[1][0].match.match if s[1][0].match.level == 1 else None, -s[1][0].total, s[0].seed))
+
+        table_headers = ['Rank', 'Seed', 'Name'] + self.match_headers[-total_levels:]
+        table_data = [table_headers] + [[
+            self.pretty_rank(seedings_with_results.index((seeding, results)) + 1),
+            seeding.seed,
+            seeding.entry.archer.name,
+        ] + self.format_results(results, total_levels)
+            for seeding, results in seedings_with_results]
+        table = Table(table_data)
+        table.setStyle(self.table_style)
+        elements.append(KeepTogether([
+            self.Para(u'{1}m: {0}'.format(olympic_round.category.name, olympic_round.shot_round.distance), 'h2'),
+            table,
+        ]))
         return elements
 
     table_style = TableStyle((
@@ -252,3 +257,5 @@ olympic_results = login_required(OlympicResults.as_view())
 
 class OlympicTree(OlympicResults):
     pass
+
+olympic_tree = login_required(OlympicTree.as_view())
