@@ -12,7 +12,7 @@
 {% block content %}
 <h1>{{ competition }} - Leaderboard</h1>
 {% for session, round, results in scores %}
-{% if forloop.counter < 3 %}
+{% if forloop.counter > 2 %}
     {% for category, scores in results %}
     {% if scores|length > 1 %}
     <div class="module">
@@ -39,7 +39,7 @@
     {% endif %}
     {% endfor %}
 {% endif %}
-<div class="clear"></div>
 {% endfor %}
+<div class="clear"></div>
 {% endblock %}
 

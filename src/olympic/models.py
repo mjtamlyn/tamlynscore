@@ -24,10 +24,14 @@ class Category(models.Model):
         verbose_name_plural = 'categories'
 
     def __unicode__(self):
-        return u'Category: {0} '.format(self.get_gender_display()) + u', '.join([unicode(b) for b in self.bowstyles.all()])
+        return u'Category: {0}'.format(self.name)
 
     def code(self):
         return self.gender + u''.join([unicode(b)[0] for b in self.bowstyles.all()])
+
+    @property
+    def name(self):
+        return self.get_gender_display() + ' ' + u', '.join([unicode(b) for b in self.bowstyles.all()])
 
 class OlympicSessionRound(models.Model):
     session = models.ForeignKey(Session)
@@ -104,11 +108,15 @@ class MatchManager(models.Manager):
     def _effective_seed(self, seed, level):
         return self._match_number_for_seed(seed, level + 1)
 
-    def target_for_seed(self, seed, level):
+    def match_for_seed(self, seed, level):
         match_number = self._match_number_for_seed(seed.seed, level)
         effective_seed = self._effective_seed(seed.seed, level)
+        match = self.get(level=level, session_round=seed.session_round, match=match_number)
+        return match
+
+    def target_for_seed(self, seed, level):
         try:
-            match = self.get(level=level, session_round=seed.session_round, match=match_number)
+            match = self.match_for_seed(seed, level)
         except self.model.DoesNotExist:
             return None
         if match.target_2 and effective_seed * 2 > 2 ** level:
@@ -123,8 +131,6 @@ class MatchManager(models.Manager):
         matches = []
         for level in range(1, highest_level + 1):
             if highest_seed and 2 ** level + 1 - seed.seed > highest_seed:
-                if seed.seed == 13:
-                    print self.target_for_seed(seed, level)
                 matches.append(None)
             else:
                 matches.append(self.target_for_seed(seed, level))
@@ -148,8 +154,10 @@ class Match(models.Model):
 
 class Result(models.Model):
     match = models.ForeignKey(Match)
-    winner = models.ForeignKey(Seeding, related_name='result_winner_set')
-    loser = models.ForeignKey(Seeding, null=True, blank=True, related_name='result_loser_set')
+    seed = models.ForeignKey(Seeding)
+
+    total = models.PositiveIntegerField()
+    win = models.BooleanField()
 
     def __unicode__(self):
         return u'Result of match {0}'.format(self.match)
