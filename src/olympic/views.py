@@ -1,4 +1,5 @@
 from django.contrib.auth.decorators import login_required
+from django.db.models import Min, Max
 from django.http import HttpResponse
 from django.views.generic import View
 from django.shortcuts import render, get_object_or_404
@@ -8,7 +9,7 @@ from reportlab.lib.units import inch
 from reportlab.platypus import KeepTogether, PageBreak, Spacer, Table, TableStyle
 
 from entries.models import Competition
-from entries.views import ScoreSheetsPdf
+from entries.views import ScoreSheetsPdf, HeadedPdfView
 from scores.models import Score
 from olympic.models import OlympicSessionRound, Seeding, Match
 
@@ -181,3 +182,80 @@ class OlympicScoreSheet(ScoreSheetsPdf):
     ])
 
 olympic_score_sheet = login_required(OlympicScoreSheet.as_view())
+
+class OlympicResults(HeadedPdfView):
+    title = 'Head To Head Results'
+
+    match_headers = ['1/32', '1/16', '1/8', 'QF', 'SF', 'F']
+
+    def update_style(self):
+        self.styles['h1'].alignment = 1
+        self.styles['h2'].alignment = 1
+
+    def setMargins(self, doc):
+        doc.bottomMargin = 0.3*inch
+
+    def pretty_rank(self, rank):
+        if rank <= 8:
+            return rank
+        real_rank = 8
+        while real_rank < rank:
+            real_rank = real_rank * 2
+        return real_rank/2 + 1
+
+    def format_results(self, results, total_levels):
+        results = results.reverse()
+        max_level = results[0].match.level
+        return ['BYE'] * (total_levels - max_level) + [result.total for result in results]
+    
+    def get_elements(self):
+        elements = []
+        olympic_rounds = OlympicSessionRound.objects.filter(session__competition=self.competition).order_by('shot_round__distance', 'category')
+
+        for olympic_round in olympic_rounds:
+            elements += self.get_round_elements(olympic_round)
+
+        return elements
+
+    def get_round_elements(self, olympic_round):
+
+        elements = []
+        seedings = olympic_round.seeding_set.all()
+        total_levels = olympic_round.match_set.aggregate(Max('level'))['level__max']
+
+        seedings_with_results = []
+        for seeding in seedings:
+            results = seeding.result_set.order_by('match__level')
+            seedings_with_results.append((seeding, results))
+
+        seedings_with_results = sorted(seedings_with_results, key=lambda s: (s[1][0].match.level, s[1][0].match.match if s[1][0].match.level == 1 else None, -s[1][0].total, s[0].seed))
+
+        table_headers = ['Rank', 'Seed', 'Name'] + self.match_headers[-total_levels:]
+        table_data = [table_headers] + [[
+            self.pretty_rank(seedings_with_results.index((seeding, results)) + 1),
+            seeding.seed,
+            seeding.entry.archer.name,
+        ] + self.format_results(results, total_levels)
+            for seeding, results in seedings_with_results]
+        table = Table(table_data)
+        table.setStyle(self.table_style)
+        elements.append(KeepTogether([
+            self.Para(u'{1}m: {0}'.format(olympic_round.category.name, olympic_round.shot_round.distance), 'h2'),
+            table,
+        ]))
+        return elements
+
+    table_style = TableStyle((
+        ('ALIGN', (0, 0), (-1, 0), 'CENTER'),
+        ('ALIGN', (0, 0), (1, -1), 'CENTER'),
+
+        ('LINEBELOW', (0, 0), (-1, 0), 1, colors.black),
+        ('LINEAFTER', (0, 0), (-2, -1), 0.5, colors.black),
+    ))
+
+olympic_results = login_required(OlympicResults.as_view())
+
+class OlympicTree(OlympicResults):
+    pass
+
+olympic_tree = login_required(OlympicTree.as_view())

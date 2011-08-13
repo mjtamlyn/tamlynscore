@@ -76,7 +76,7 @@ class LeaderboardView(View):
             (
                 session_round.session,
                 session_round,
-                Score.objects.results(session_round, leaderboard=False),
+                Score.objects.results(session_round, leaderboard=self.leaderboard),
             )
             for session_round in session_rounds
         ]

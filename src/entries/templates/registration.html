@@ -5,7 +5,7 @@
 <script>
     window.addEvent('domready', function () {
         $$('.session-select a').addEvent('click', function (e) {
-            e.stop();
+            if (e) { e.stop(); }
             // do this row
             $$('.session-select .link').removeClass('selected');
             this.getElement('.link').addClass('selected');
@@ -23,6 +23,7 @@
             this.getElement('.link').addClass('selected');
             // do the generator
             var board = $$(this.get('href'));
+            document.location.hash = this.get('href').replace('#', '#!');
             $$('.registration-board').removeClass('selected');
             board.addClass('selected');
         });
@@ -69,6 +70,12 @@
             });
             request.send();
         });
+
+        if (document.location.hash) {
+            $$('a[href=' + document.location.hash.replace('#!', '#') + ']').fireEvent('click');
+            $$('a[href=' + document.location.hash.replace('#!', '#').replace(/-round-\d/, '') + ']').fireEvent('click');
+        }
+
     });
 </script>
 {% endblock scripts %}
