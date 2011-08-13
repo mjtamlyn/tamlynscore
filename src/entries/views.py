@@ -159,10 +159,14 @@ class PdfView(View):
 
     def response(self, elements):
         response = HttpResponse(mimetype='application/pdf')
-        doc = SimpleDocTemplate(response)
+        doc = self.get_doc(response)
         self.setMargins(doc)
         doc.build(elements)
         return response
+
+    def get_doc(self, response):
+        doc = SimpleDocTemplate(response, pagesize=(self.PAGE_WIDTH, self.PAGE_HEIGHT))
+        return doc
 
     def Para(self, string, style='Normal'):
         return Paragraph(unicode(string), self.styles[style])
@@ -181,7 +185,7 @@ class HeadedPdfView(PdfView):
 
     def response(self, elements):
         response = HttpResponse(mimetype='application/pdf')
-        doc = SimpleDocTemplate(response)
+        doc = self.get_doc(response)
         self.setMargins(doc)
         doc.build(elements, onFirstPage=self.draw_title, onLaterPages=self.draw_title)
         return response
