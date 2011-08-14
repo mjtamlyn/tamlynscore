@@ -1,9 +1,5 @@
 {% extends 'base.html' %}
 
-{% block extrastyles %}
-<link rel="stylesheet" href="{{ STATIC_URL }}css/competition.css">
-{% endblock %}
-
 {% block content %}
 <a href="{% url entries.views.competition_index slug=competition.slug %}"><h1>{{ competition }}</h1></a>
 
