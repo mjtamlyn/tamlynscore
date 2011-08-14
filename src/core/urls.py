@@ -1,13 +1,9 @@
 from django.conf.urls.defaults import *
 
-from django.contrib import admin
-admin.autodiscover()
-
 urlpatterns = patterns('core.views',
 
-    (r'^$', 'index'),
-    (r'^clubs/$', 'clubs'),
-    (r'^clubs/(?P<club>[\w-]+)/$', 'club_index'),
+    url(r'^$', 'index', name='index'),
+    url(r'^clubs/$', 'club_list', name='club_list'),
+    url(r'^clubs/(?P<slug>[\w-]+)/$', 'club_detail', name='club_detail'),
 
-    #TODO: accounts (login/logout etc)
 )

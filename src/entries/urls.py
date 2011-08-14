@@ -1,10 +1,7 @@
 from django.conf.urls.defaults import *
 
-from django.contrib import admin
-admin.autodiscover()
-
 urlpatterns = patterns('entries.views',
-    (r'^$', 'tournaments'),
+    url(r'^$', 'tournaments', name='tournaments_list'),
     (r'^(?P<slug>[\w-]+)/$', 'competition_index'),
     (r'^(?P<slug>[\w-]+)/entries/$', 'entries'),
     (r'^(?P<slug>[\w-]+)/target-list/$', 'target_list'),
