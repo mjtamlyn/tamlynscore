@@ -37,7 +37,7 @@ li {
   margin: 20px auto;
   width: 1000px; }
 
-.navigation {
+nav {
   background-image: -webkit-linear-gradient(#dddafa, #fbeedb);
   border-radius: 15px 15px 0 0;
   font-weight: bold;
@@ -45,7 +45,7 @@ li {
   padding-bottom: 10px;
   text-align: center;
   width: 100%; }
-  .navigation .nav-link {
+  nav .nav-link {
     background-color: #002147;
     border-radius: 0 0 5px 5px;
     box-shadow: 0px 1px 2px #000f1f;
@@ -55,7 +55,7 @@ li {
     position: relative;
     top: -5px;
     -webkit-transition: all 0.15s ease-in-out; }
-    .navigation .nav-link:hover {
+    nav .nav-link:hover {
       box-shadow: 0px 1px 3px #000f1f;
       background-color: #8579fa;
       position: relative;

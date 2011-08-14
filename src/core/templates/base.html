@@ -16,14 +16,14 @@
     <body class="{% block bodyclass %}{% endblock %}">
         <div class="wrapper">
             {% block nav %}
-            <div class="navigation">
+            <nav>
                 {% block nav_links %}
                 <a href="{% url core.views.index %}"><div class="nav-link">Home</div></a>
                 <a href="{% url core.views.clubs %}"><div class="nav-link">Clubs</div></a>
                 <a href="{% url entries.views.tournaments %}"><div class="nav-link">Tournaments</div></a>
                 <a href="{% url django.contrib.auth.views.logout_then_login %}"><div class="nav-link">Log Out</div></a>
                 {% endblock nav_links %}
-            </div>
+            </nav>
             {% endblock nav %}
             {% block content %}
             {% endblock %}
