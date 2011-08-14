@@ -1,21 +1,17 @@
 from django.contrib.auth.decorators import login_required
-from django.shortcuts import render
-from django.views.generic import View
+from django.views.generic import TemplateView, ListView, DetailView
 
 from core.models import Club
 
-@login_required
-def index(request):
-    return render(request, 'index.html', locals())
+class Index(TemplateView):
+    template_name = 'index.html'
+index = login_required(Index.as_view())
 
-class ClubView(View):
-    def get(self, request):
-        clubs = Club.objects.all()
-        return render(request, 'clubs.html', locals())
-clubs = login_required(ClubView.as_view())
+class ClubList(ListView):
+    model = Club
+club_list = login_required(ClubList.as_view())
 
-@login_required
-def club_index(request, club):
-    club = Club.objects.get(slug=club)
-    return render(request, 'club_index.html', locals())
+class ClubDetail(DetailView):
+    model = Club
+club_detail = login_required(ClubDetail.as_view())
 

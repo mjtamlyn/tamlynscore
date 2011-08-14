@@ -69,24 +69,24 @@ footer {
   footer p {
     margin: 0; }
 
-body.login .wrapper {
+#login {
   width: 300px;
   padding-top: 15px; }
-  body.login .wrapper table {
+  #login table {
     border-spacing: 5px;
     margin: 0 auto 10; }
-    body.login .wrapper table input {
+    #login table input {
       border: 2px solid #dddafa;
         border-radius: 4px;
       font-family: Verdana;
       margin: 0;
       outline: none;
       padding: 5px; }
-      body.login .wrapper table input:focus {
+      #login table input:focus {
         border-color: #6fb3ff; }
-  body.login .wrapper .submit {
+  #login .submit {
     text-align: center; }
-    body.login .wrapper .submit input[type=submit] {
+    #login .submit input[type=submit] {
       border: 2px solid #111d2a;
         border-radius: 10px;
       background-image: -webkit-linear-gradient(#111d2a, #353345, #111d2a);
