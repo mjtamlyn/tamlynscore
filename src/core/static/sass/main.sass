@@ -73,39 +73,5 @@ footer
   p
     margin: 0
 
-#login
-  width: 300px
-  padding-top: 15px
-
-  table
-    border-spacing: 5px
-    margin: 0 auto 10
-
-    input
-      border: 2px solid $vlightblue
-        radius: 4px
-      font:
-        family: Verdana
-      margin: 0
-      outline: none
-      padding: 5px
-      &:focus
-        border-color: $lightblue
-
-  .submit
-    text-align: center
-
-    input[type=submit]
-      border: 2px solid $darkbluegrey
-        radius: 10px
-      background-image: -webkit-linear-gradient($darkbluegrey, $bluegrey, $darkbluegrey)
-      color: white
-      cursor: pointer
-      font:
-        size: 18px
-        family: Georgia
-        weight: bold
-      margin: 0 auto
-      padding: 5px
-
+@import accounts.sass
 @import competition.sass

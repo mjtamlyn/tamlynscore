@@ -72,6 +72,11 @@ footer {
 #login {
   width: 300px;
   padding-top: 15px; }
+  #login .error {
+    color: #d58100;
+    font-size: 12px;
+    text-align: center;
+    padding: 0 10px; }
   #login table {
     border-spacing: 5px;
     margin: 0 auto 10; }
