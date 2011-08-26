@@ -7,6 +7,7 @@ from django.shortcuts import render, get_object_or_404
 from reportlab.lib import colors
 from reportlab.lib.units import inch
 from reportlab.platypus import KeepTogether, PageBreak, Spacer, Table, TableStyle
+from reportlab.rl_config import defaultPageSize
 
 from entries.models import Competition
 from entries.views import ScoreSheetsPdf, HeadedPdfView
@@ -256,6 +257,105 @@ class OlympicResults(HeadedPdfView):
 olympic_results = login_required(OlympicResults.as_view())
 
 class OlympicTree(OlympicResults):
-    pass
+
+    PAGE_HEIGHT=defaultPageSize[0]
+    PAGE_WIDTH=defaultPageSize[1]
+
+    def setMargins(self, doc):
+        doc.bottomMargin = 0.4*inch
+
+    @property
+    def match_cols(self):
+        return [i for i in range(self.cols) if i % 3 is 0]
+
+    def get_table_style(self):
+        properties = [
+            ('SIZE', (0, 0), (-1, -1), 8),
+            ('LEFTPADDING', (0, 0), (-1, -1), 1),
+            ('RIGHTPADDING', (0, 0), (-1, -1), 1),
+            ('TOPPADDING', (0, 0), (-1, -1), 1),
+            ('BOTTOMPADDING', (0, 0), (-1, -1), 1),
+
+            ('LINEAFTER', (2, 0), (2, -1), 1, colors.black),
+            ('LINEBELOW', (0, -1), (2, -1), 1, colors.black),
+        ]
+        vert_line = None
+        for i in self.match_cols:
+
+            offset = 2 ** (i/3 - 1) if i else 0
+
+            for j in range(self.rows):
+                if (not i is 0 and not j % 2 ** (i/3)) or (i is 0 and not j % 2):
+                    properties.append(
+                        ('LINEABOVE', (i, j + offset), (i + 2, j + offset), 1, colors.black),
+                    )
+                    if vert_line is not None:
+                        properties.append(
+                            ('LINEAFTER', (i + 2, vert_line + offset), (i + 2, j + offset - 1), 1, colors.black)
+                        )
+                        vert_line = None
+                    else:
+                        vert_line = j
+
+        return TableStyle(properties)
+
+    def match_blocks(self, level):
+        nmatches = 2 ** (level - 1)
+        block_size = self.rows / nmatches
+        offset = self.rows / (2 ** (level + 1))
+        blocks = [(i * block_size + offset, (i + 1) * block_size - offset) for i in range(nmatches)]
+        return blocks
+
+    def name_rows(self, col):
+        level = self.total_levels - col/3
+        rows = []
+        for start, end in self.match_blocks(level):
+            rows += [start, end-1]
+        return rows
+
+    def get_round_elements(self, olympic_round):
+
+        elements = []
+        self.total_levels = olympic_round.match_set.aggregate(Max('level'))['level__max']
+
+        self.rows = 2 ** self.total_levels
+        self.cols = 3 * self.total_levels
+
+        table_data = [[None for i in range(self.cols)] for j in range(self.rows)]
+
+        for i in self.match_cols:
+            level = self.total_levels - i/3
+            blocks = self.match_blocks(level)
+            matches = olympic_round.match_set.filter(level=level).order_by('target')
+            if len(blocks) > len(matches):
+                old_matches = matches
+                matches = []
+                for j in range(len(old_matches)):
+                    if not j % 2:
+                        matches += [None, old_matches[j], old_matches[j + 1], None]
+            for m in range(len(blocks)):
+                match = matches[m]
+                if match is None:
+                    continue
+                results = match.result_set.select_related()
+                results = sorted(results, key=lambda r: Match.objects._effective_seed(r.seed.seed, level))
+                if m % 2:
+                    results.reverse()
+                if results:
+                    table_data[blocks[m][0]][i] = results[0].seed.seed
+                    table_data[blocks[m][0]][i + 1] = results[0].seed.entry.archer
+                    table_data[blocks[m][0]][i + 2] = results[0].total
+                    table_data[blocks[m][1] - 1][i] = results[1].seed.seed
+                    table_data[blocks[m][1] - 1][i + 1] = results[1].seed.entry.archer
+                    table_data[blocks[m][1] - 1][i + 2] = results[1].total
+
+        table = Table(table_data)
+        table.setStyle(self.get_table_style())
+
+        elements.append(KeepTogether([
+            self.Para(u'{1}m: {0}'.format(olympic_round.category.name, olympic_round.shot_round.distance), 'h2'),
+            table,
+        ]))
+        return elements
 
 olympic_tree = login_required(OlympicTree.as_view())
