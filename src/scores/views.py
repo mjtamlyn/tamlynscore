@@ -125,12 +125,12 @@ class ResultsPdf(HeadedPdfView, ResultsView):
             for category, entries in results:
                 elements.append(self.Para(category , 'h2'))
                 table = Table([[
-                    entries.index(entry) + 1,
+                    entries.index(entry) + 1 if not entry.disqualified else None,
                     entry.target.session_entry.competition_entry.archer.name,
                     entry.target.session_entry.competition_entry.club.name,
-                    entry.score,
-                    entry.golds,
-                    entry.xs,
+                    entry.score if not entry.disqualified else 'DSQ',
+                    entry.golds if not entry.disqualified else None,
+                    entry.xs if not entry.disqualified else None,
                 ] for entry in entries])
                 elements.append(table)
             

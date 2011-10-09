@@ -19,8 +19,10 @@ class ScoreManager(models.Manager):
         return active_scores
 
     def results(self, session_round, leaderboard=True, category=None):
-        print session_round
         scores = self.active(session_round, category=category)
+        if session_round.pk == 3:
+            print scores
+            print len(scores)
         if not leaderboard:
             scores = scores.annotate(arrows=models.Count('arrow')).filter(arrows__ne=session_round.shot_round.arrows)
         # TODO: Don't do this here!
@@ -30,6 +32,7 @@ class ScoreManager(models.Manager):
         scores = scores.order_by(
                 'target__session_entry__competition_entry__bowstyle',
                 'target__session_entry__competition_entry__archer__gender',
+                'disqualified',
                 '-score', 
                 '-golds', 
                 '-xs'
@@ -58,6 +61,7 @@ class Score(models.Model):
     xs = models.PositiveIntegerField(default=0)
 
     retired = models.BooleanField(default=False)
+    disqualified = models.BooleanField(default=False)
 
     objects = ScoreManager()
 
