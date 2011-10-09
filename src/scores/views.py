@@ -1,5 +1,6 @@
 from django.contrib.auth.decorators import login_required
 from django.core.urlresolvers import reverse
+from django.db.models import Sum
 from django.http import HttpResponseRedirect
 from django.shortcuts import render, get_object_or_404
 from django.views.generic import View
@@ -55,7 +56,6 @@ class InputArrowsView(View):
                 if form.is_valid():
                     arrows.append(form.save(commit=False))
                 else:
-                    print form.errors
                     failed = True
         if not failed:
             for arrow in arrows:
@@ -115,6 +115,34 @@ class ResultsPdf(HeadedPdfView, ResultsView):
         self.styles['h1'].alignment = 1
         self.styles['h2'].alignment = 1
 
+    def row_from_entry(self, entries, entry):
+        row = [
+            entries.index(entry) + 1 if not entry.disqualified else None,
+            entry.target.session_entry.competition_entry.archer.name,
+            entry.target.session_entry.competition_entry.club.name,
+        ]
+        # TODO: Denormalise this (or something!)
+        subrounds = entry.target.session_entry.session_round.shot_round.subrounds
+        if subrounds.count() > 1:
+            if entry.disqualified:
+                row += [None] * 4
+            else:
+                # Arrow of round has been stored off by a dozen
+                counter = 13
+                subround_scores = []
+                for subround in subrounds.order_by('-distance'):
+                    subround_scores.append(entry.arrow_set.filter(arrow_of_round__in=range(counter, counter + subround.arrows)).aggregate(Sum('arrow_value'))['arrow_value__sum'])
+                    counter += subround.arrows
+
+                row += subround_scores
+
+        row += [
+            entry.score if not entry.disqualified else 'DSQ',
+            entry.golds if not entry.disqualified else None,
+            entry.xs if not entry.disqualified else None,
+        ]
+        return row
+
     def get_elements(self):
         elements = []
 
@@ -124,14 +152,7 @@ class ResultsPdf(HeadedPdfView, ResultsView):
 
             for category, entries in results:
                 elements.append(self.Para(category , 'h2'))
-                table = Table([[
-                    entries.index(entry) + 1 if not entry.disqualified else None,
-                    entry.target.session_entry.competition_entry.archer.name,
-                    entry.target.session_entry.competition_entry.club.name,
-                    entry.score if not entry.disqualified else 'DSQ',
-                    entry.golds if not entry.disqualified else None,
-                    entry.xs if not entry.disqualified else None,
-                ] for entry in entries])
+                table = Table([self.row_from_entry(entries, entry) for entry in entries])
                 elements.append(table)
             
             elements.append(PageBreak())
