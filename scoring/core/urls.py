@@ -1,9 +1,9 @@
 from django.conf.urls.defaults import *
 
-urlpatterns = patterns('core.views',
+import views
 
-    url(r'^$', 'index', name='index'),
+urlpatterns = patterns('core.views',
+    url(r'^$', views.Index.as_view(), name='index'),
     url(r'^clubs/$', 'club_list', name='club_list'),
     url(r'^clubs/(?P<slug>[\w-]+)/$', 'club_detail', name='club_detail'),
-
 )
