@@ -3,9 +3,11 @@ from django.views.generic import TemplateView, ListView, DetailView
 
 from core.models import Club
 
+from utils import class_view_decorator
+
+@class_view_decorator(login_required)
 class Index(TemplateView):
     template_name = 'index.html'
-index = login_required(Index.as_view())
 
 class ClubList(ListView):
     model = Club
