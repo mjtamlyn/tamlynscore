@@ -124,6 +124,7 @@ INSTALLED_APPS = (
     'accounts',
 
     #'django_extensions',
+    'djcelery',
 )
 
 LOGIN_REDIRECT_URL = '/'
@@ -150,3 +151,6 @@ LOGGING = {
         },
     }
 }
+
+import djcelery
+djcelery.setup_loader()
