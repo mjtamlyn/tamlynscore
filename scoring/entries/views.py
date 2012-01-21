@@ -1,3 +1,7 @@
+from itertools import groupby
+import json
+import math
+
 from django.contrib.auth.decorators import login_required
 from django.db.models import Count
 from django.http import HttpResponse, HttpResponseBadRequest
@@ -12,10 +16,6 @@ from reportlab.lib.units import inch
 
 from entries.forms import new_entry_form_for_competition
 from entries.models import *
-
-from itertools import groupby
-import json
-import math
 
 @login_required
 def tournaments(request):
