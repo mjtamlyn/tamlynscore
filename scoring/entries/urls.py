@@ -1,7 +1,9 @@
 from django.conf.urls.defaults import *
 
+from entries import views
+
 urlpatterns = patterns('entries.views',
-    url(r'^$', 'tournaments', name='tournaments_list'),
+    url(r'^$', views.CompetitionList.as_view(), name='tournaments_list'),
     (r'^(?P<slug>[\w-]+)/$', 'competition_index'),
     (r'^(?P<slug>[\w-]+)/entries/$', 'entries'),
     (r'^(?P<slug>[\w-]+)/target-list/$', 'target_list'),

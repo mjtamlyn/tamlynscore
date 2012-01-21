@@ -5,7 +5,7 @@ import math
 from django.contrib.auth.decorators import login_required
 from django.db.models import Count
 from django.http import HttpResponse, HttpResponseBadRequest
-from django.views.generic import View
+from django.views.generic import View, ListView
 from django.shortcuts import render, get_object_or_404
 
 from reportlab.platypus import SimpleDocTemplate, Paragraph, Spacer, Table, PageBreak, TableStyle, KeepTogether
@@ -17,10 +17,15 @@ from reportlab.lib.units import inch
 from entries.forms import new_entry_form_for_competition
 from entries.models import *
 
-@login_required
-def tournaments(request):
-    tournaments = Tournament.objects.all()
-    return render(request, 'tournaments.html', locals())
+from utils import class_view_decorator
+
+
+@class_view_decorator(login_required)
+class CompetitionList(ListView):
+    model = Competition
+
+    def get_queryset(self):
+        return self.model.objects.all().select_related('tournament')
 
 @login_required
 def competition_index(request, slug):

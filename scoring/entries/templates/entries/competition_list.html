@@ -3,9 +3,10 @@
 {% block content %}
 <h1>Tournaments</h1>
 
+{% regroup object_list by tournament as competitions %}
 <ul>
-{% for tournament in tournaments %}
-{% for competition in tournament.competition_set.all %}
+{% for tournament in competitions %}
+{% for competition in tournament.list %}
 <li><a href="{% url entries.views.competition_index slug=competition.slug %}">{{ competition }}</a></li>
 {% endfor %}
 {% endfor %}
