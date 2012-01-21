@@ -8,7 +8,7 @@
     <div class="competition-nav">
         <h2>Before the shoot</h2>
         <ul>
-            <a href="{% url entries.views.entries slug=competition.slug %}"><li>Manage Entries</li></a>
+            <a href="{% url entry_list slug=competition.slug %}"><li>Manage Entries</li></a>
             <a href="{% url entries.views.target_list slug=competition.slug %}"><li>Target lists</li></a>
             <a href="{% url entries.views.score_sheets slug=competition.slug %}"><li>Score sheets</li></a>
         </ul>

@@ -90,7 +90,7 @@ class SessionChoiceField(forms.ModelChoiceField):
     widget = ButtonWidget
 
     def __init__(self, session, *args, **kwargs):
-        qs = session.sessionround_set
+        qs = session.sessionround_set.select_related('shot_round')
         super(SessionChoiceField, self).__init__(qs, *args, **kwargs)
 
     def label_from_instance(self, obj):
@@ -99,7 +99,7 @@ class SessionChoiceField(forms.ModelChoiceField):
 def new_entry_form_for_competition(competition):
     class NewEntryForm(forms.ModelForm):
 
-        archer = JsonChoiceField(queryset=Archer.objects, widget=SelectWidget(attrs={'placeholder': 'Add an archer...'}))
+        archer = JsonChoiceField(queryset=Archer.objects.select_related('bowstyle', 'club'), widget=SelectWidget(attrs={'placeholder': 'Add an archer...'}))
         club = JsonChoiceField(queryset=Club.objects, widget=SelectWidget(attrs={'placeholder': 'Club'}))
 
         gender = forms.ChoiceField(choices=GENDER_CHOICES, widget=ButtonWidget)
