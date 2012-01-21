@@ -98,6 +98,7 @@ MIDDLEWARE_CLASSES = (
     'django.middleware.csrf.CsrfViewMiddleware',
     'django.contrib.auth.middleware.AuthenticationMiddleware',
     'django.contrib.messages.middleware.MessageMiddleware',
+    'debug_toolbar.middleware.DebugToolbarMiddleware',
 )
 
 ROOT_URLCONF = 'scoring.urls'
@@ -125,6 +126,7 @@ INSTALLED_APPS = (
 
     #'django_extensions',
     'djcelery',
+    'debug_toolbar',
 )
 
 LOGIN_REDIRECT_URL = '/'
@@ -151,6 +153,8 @@ LOGGING = {
         },
     }
 }
+
+INTERNAL_IPS = ('127.0.0.1',)
 
 import djcelery
 djcelery.setup_loader()
