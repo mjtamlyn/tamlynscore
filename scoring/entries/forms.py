@@ -103,7 +103,7 @@ def new_entry_form_for_competition(competition):
         club = JsonChoiceField(queryset=Club.objects, widget=SelectWidget(attrs={'placeholder': 'Club'}))
 
         gender = forms.ChoiceField(choices=GENDER_CHOICES, widget=ButtonWidget)
-        gnas_no = forms.CharField(widget=forms.widgets.TextInput(attrs={'placeholder': 'GNAS number'}))
+        gnas_no = forms.IntegerField(widget=forms.widgets.TextInput(attrs={'placeholder': 'GNAS number'}), required=False)
 
         class Meta:
             model = CompetitionEntry
