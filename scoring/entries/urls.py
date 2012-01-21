@@ -4,7 +4,7 @@ from entries import views
 
 urlpatterns = patterns('entries.views',
     url(r'^$', views.CompetitionList.as_view(), name='tournaments_list'),
-    (r'^(?P<slug>[\w-]+)/$', 'competition_index'),
+    url(r'^(?P<slug>[\w-]+)/$', views.CompetitionDetail.as_view(), name='competition_detail'),
     (r'^(?P<slug>[\w-]+)/entries/$', 'entries'),
     (r'^(?P<slug>[\w-]+)/target-list/$', 'target_list'),
     (r'^(?P<slug>[\w-]+)/target-list/pdf/$', 'target_list_pdf'),

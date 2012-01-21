@@ -7,7 +7,7 @@
 <ul>
 {% for tournament in competitions %}
 {% for competition in tournament.list %}
-<li><a href="{% url entries.views.competition_index slug=competition.slug %}">{{ competition }}</a></li>
+<li><a href="{% url competition_detail slug=competition.slug %}">{{ competition }}</a></li>
 {% endfor %}
 {% endfor %}
 </ul>

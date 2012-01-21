@@ -1,7 +1,7 @@
 {% extends 'base.html' %}
 
 {% block content %}
-<a href="{% url entries.views.competition_index slug=competition.slug %}"><h1>{{ competition }}</h1></a>
+<a href="{% url competition_detail slug=competition.slug %}"><h1>{{ competition }}</h1></a>
 
 {% block competition_nav %}
 <div class="competition-section">
