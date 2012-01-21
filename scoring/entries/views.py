@@ -5,7 +5,7 @@ import math
 from django.contrib.auth.decorators import login_required
 from django.db.models import Count
 from django.http import HttpResponse, HttpResponseBadRequest
-from django.views.generic import View, ListView
+from django.views.generic import View, DetailView, ListView
 from django.shortcuts import render, get_object_or_404
 
 from reportlab.platypus import SimpleDocTemplate, Paragraph, Spacer, Table, PageBreak, TableStyle, KeepTogether
@@ -27,10 +27,12 @@ class CompetitionList(ListView):
     def get_queryset(self):
         return self.model.objects.all().select_related('tournament')
 
-@login_required
-def competition_index(request, slug):
-    competition = get_object_or_404(Competition, slug=slug)
-    return render(request, 'competition_index.html', locals())
+
+@class_view_decorator(login_required)
+class CompetitionDetail(DetailView):
+    model = Competition
+    object_name = 'competition'
+
 
 class EntriesView(View):
     template = 'competition_entries.html'
