@@ -185,8 +185,13 @@ Elements.from = function(text, excludeScripts){
                 <th>{{ session.start|date:"l j/n" }}</th>
                 {% endfor %}
             </thead>
-            {% for entry in entries %}
+            {% regroup object_list by competition_entry as entries %}
+            {% for group in entries %}
+            {% with group.grouper as entry %}
+            {% with group.list as rounds_entered %}
             {% include 'includes/entry_row.html' %}
+            {% endwith %}
+            {% endwith %}
             {% endfor %}
         </table>
     </div>

@@ -14,6 +14,8 @@ from reportlab.rl_config import defaultPageSize
 from reportlab.lib import colors
 from reportlab.lib.units import inch
 
+from core.models import GENDER_CHOICES
+
 from entries.forms import new_entry_form_for_competition
 from entries.models import *
 
@@ -34,51 +36,58 @@ class CompetitionDetail(DetailView):
     object_name = 'competition'
 
 
-class EntriesView(View):
-    template = 'competition_entries.html'
-    category = Competition
-    model = CompetitionEntry
+@class_view_decorator(login_required)
+class EntryList(ListView):
+    model = SessionEntry
+    template_name = 'entries/entry_list.html'
 
-    def render(self, context):
-        return render(self.request, self.template, context)
+    def get_queryset(self):
+        return self.model.objects.filter(competition_entry__competition__slug=self.kwargs['slug']).select_related('competition_entry__competition', 'competition_entry__club', 'competition_entry__bowstyle', 'competition_entry__archer', 'session_round__session', 'session_round__shot_round')
 
-    def get_object(self, slug):
-        return get_object_or_404(self.category, slug=slug)
+    def get_context_data(self, **kwargs):
+        context = super(EntryList, self).get_context_data(**kwargs)
+        self.entries = context['object_list']
+        if self.entries:
+            self.competition = self.entries[0].competition_entry.competition
+        else:
+            self.competition = Competition.objects.get(slug=slug)
+        context.update({
+            'competition': self.competition,
+            'stats': self.get_stats(),
+            'form': self.get_form_class()(),
+        })
+        return context
 
-    def get_form_class(self, competition):
-        return new_entry_form_for_competition(competition)
+    def get_form_class(self):
+        return new_entry_form_for_competition(self.competition)
 
-    def get_stats(self, competition):
+    def get_stats(self):
+        competition = self.competition
+        entries = self.entries
         stats = []
         stats.append(
-            ('Total Entries', competition.competitionentry_set.count()),
+            ('Total Entries', len(entries)),
         )
-        for session in competition.sessions_with_rounds():
-            stats.append((
-                'Entries for {0}'.format(session.start.strftime('%A')),
-                competition.competitionentry_set.filter(sessionentry__session_round__session=session).count(),
-            ))
-        for session in competition.sessions_with_rounds():
-            for session_round in session.sessionround_set.all():
-                stats.append((
-                    'Entries for {0}'.format(session_round.shot_round),
-                    competition.competitionentry_set.filter(sessionentry__session_round=session_round).count(),
-                ))
-        for session in competition.sessions_with_rounds()[:1]:
-            for session_round in session.sessionround_set.all():
-                for gender in ['Gent', 'Lady']:
-                    stats.append((
-                        '{0} entries for {1}'.format(gender, session_round.shot_round),
-                        competition.competitionentry_set.filter(sessionentry__session_round=session_round, archer__gender=gender[0]).count(),
-                    ))
+        # TODO: Make all the stats much better. These ones are rubbish.
+        #sessions = competition.sessions_with_rounds()
+        #for session in sessions:
+        #    stats.append((
+        #        'Entries for {0}'.format(session.start.strftime('%A')),
+        #        competition.competitionentry_set.filter(sessionentry__session_round__session=session).count(),
+        #    ))
+        #    for session_round in session.sessionround_set.all():
+        #        stats.append((
+        #            'Entries for {0}'.format(session_round.shot_round),
+        #            competition.competitionentry_set.filter(sessionentry__session_round=session_round).count(),
+        #        ))
+        #for session in sessions:
+        #    for session_round in session.sessionround_set.all():
+        #        for gender_code, gender in GENDER_CHOICES:
+        #            stats.append((
+        #                '{0} entries for {1}'.format(gender, session_round.shot_round),
+        #                entries.filter(sessionentry__session_round=session_round, archer__gender=gender_code).count(),
+        #            ))
         return stats
-
-    def get(self, request, slug):
-        competition = self.get_object(slug)
-        entries = competition.competitionentry_set.all().order_by('-pk')
-        stats = self.get_stats(competition)
-        form = self.get_form_class(competition)()
-        return self.render(locals())
 
     def post(self, request, slug):
         if '_method' in request.POST and request.POST['_method'] == 'delete':
@@ -97,8 +106,6 @@ class EntriesView(View):
         entry = get_object_or_404(self.model, pk=request.POST['pk'])
         entry.delete()
         return HttpResponse('deleted')
-
-entries = login_required(EntriesView.as_view())
 
 class TargetListView(View):
     template = 'target_list.html'
