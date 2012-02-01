@@ -92,9 +92,9 @@ class EntryList(ListView):
     def post(self, request, slug):
         if '_method' in request.POST and request.POST['_method'] == 'delete':
             return self.delete(request, slug)
-        competition = self.get_object(slug)
-        instance = self.model(competition=competition)
-        form = self.get_form_class(competition)(request.POST, instance=instance)
+        self.competition = Competition.objects.get(slug=slug)
+        instance = CompetitionEntry(competition=self.competition)
+        form = self.get_form_class()(request.POST, instance=instance)
         if form.is_valid():
             entry = form.save()
             return render(request, 'includes/entry_row.html', locals())
@@ -103,7 +103,7 @@ class EntryList(ListView):
         return HttpResponseBadRequest(errors)
 
     def delete(self, request, slug):
-        entry = get_object_or_404(self.model, pk=request.POST['pk'])
+        entry = get_object_or_404(CompetitionEntry, pk=request.POST['pk'])
         entry.delete()
         return HttpResponse('deleted')
 
@@ -260,7 +260,8 @@ class ScoreSheetsPdf(HeadedPdfView):
                     entry = entry.session_entry.competition_entry
                     table_data = [
                             [self.Para(target, 'h2'), self.Para(entry.archer, 'h2'), self.Para(entry.club.name, 'h2')],
-                            [None, self.Para(u'{0} {1}'.format(entry.archer.get_gender_display(), entry.bowstyle), 'h2'), self.Para(entry.get_age_display(), 'h2')],
+                            #[None, self.Para(u'{0} {1}'.format(entry.archer.get_gender_display(), entry.bowstyle), 'h2'), self.Para(entry.get_age_display(), 'h2')],
+                            [None, self.Para(u'{0} {1}'.format(entry.archer.get_gender_display(), entry.bowstyle), 'h2'), self.Para(entry.get_novice_display(), 'h2')],
                     ]
                 else:
                     table_data = [
