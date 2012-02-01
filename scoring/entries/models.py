@@ -171,6 +171,6 @@ class TargetAllocation(models.Model):
     target = models.CharField(max_length=1)
 
     def __unicode__(self):
-        return u'{0}{1} - {2}'.format(self.boss, self.target, self.session_entry)
+        return u''#{0}{1} - {2}'.format(self.boss, self.target, self.session_entry)
 
 
