@@ -107,7 +107,32 @@ class EntryList(ListView):
         entry.delete()
         return HttpResponse('deleted')
 
-class TargetListView(View):
+
+@class_view_decorator(login_required)
+class BetterTargetList(ListView):
+    template_name = 'entries/target_list.html'
+    model = TargetAllocation
+
+    def get_queryset(self):
+        return self.model.objects.filter(session_entry__competition_entry__competition__slug=self.kwargs['slug'])
+
+    def get_context_data(self, **kwargs):
+        context = super(BetterTargetList, self).get_context_data(**kwargs)
+        self.allocations  = context['object_list']
+        if self.allocations:
+            self.competition = self.allocations[0].session_entry.competition_entry.competition
+        else:
+            self.competition = Competition.objects.get(slug=slug)
+        context.update({
+            'competition': self.competition,
+            'entries': SessionEntry.objects.filter(competition_entry__competition=self.competition),
+            'sessions': Session.objects.filter(competition=self.competition),
+        })
+        return context
+
+
+@class_view_decorator(login_required)
+class TargetList(View):
     template = 'target_list.html'
 
     def get_target_list(self, session_round):
@@ -136,7 +161,6 @@ class TargetListView(View):
             new_allocation.save()
         return HttpResponse()
 
-target_list = login_required(TargetListView.as_view())
 
 def score_sheets(request, slug):
     competition = get_object_or_404(Competition, slug=slug)
@@ -390,7 +414,7 @@ class RunningSlipsPdf(ScoreSheetsPdf):
 
 running_slips_pdf = login_required(RunningSlipsPdf.as_view())
 
-class RegistrationView(TargetListView):
+class RegistrationView(TargetList):
     template = 'registration.html'
 
     def post(self, request, slug):
