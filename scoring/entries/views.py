@@ -116,17 +116,7 @@ class BetterTargetList(ListView):
     def get_queryset(self):
         return self.model.objects.filter(session_entry__competition_entry__competition__slug=self.kwargs['slug']).select_related('session_entry__competition_entry__competition__tournament', 'session_entry__session_round__session', 'session_entry__session_round__shot_round', 'session_entry__competition_entry__bowstyle', 'session_entry__competition_entry__club', 'session_entry__competition_entry__archer')
 
-    def get_context_data(self, **kwargs):
-        context = super(BetterTargetList, self).get_context_data(**kwargs)
-        self.allocations  = context['object_list']
-
-        if self.allocations:
-            self.competition = self.allocations[0].session_entry.competition_entry.competition
-        else:
-            self.competition = Competition.objects.get(slug=slug)
-
-        entries = SessionEntry.objects.filter(competition_entry__competition=self.competition).exclude(targetallocation__isnull=False).select_related('session_round__session', 'competition_entry__club', 'competition_entry__archer', 'competition_entry__bowstyle')
-
+    def get_target_list(self):
         target_list = {}
         for allocation in self.allocations:
             # Split on session
@@ -163,6 +153,10 @@ class BetterTargetList(ListView):
                     for detail in details:
                         target = '{0}{1}'.format(boss, detail)
                         sr_target_list.append((target, allocations_lookup.get(target, None)))
+        return target_list
+
+    def add_unallocated_entries(self, target_list):
+        entries = SessionEntry.objects.filter(competition_entry__competition=self.competition).exclude(targetallocation__isnull=False).select_related('session_round__session', 'competition_entry__club', 'competition_entry__archer', 'competition_entry__bowstyle')
 
         for entry in entries:
             session = entry.session_round.session
@@ -171,6 +165,18 @@ class BetterTargetList(ListView):
             if 'entries' not in target_list[session][session_round]:
                 target_list[session][session_round]['entries'] = []
             target_list[session][session_round]['entries'].append(entry)
+
+    def get_context_data(self, **kwargs):
+        context = super(BetterTargetList, self).get_context_data(**kwargs)
+        self.allocations  = context['object_list']
+
+        if self.allocations:
+            self.competition = self.allocations[0].session_entry.competition_entry.competition
+        else:
+            self.competition = Competition.objects.get(slug=slug)
+
+        target_list = self.get_target_list()
+        self.add_unallocated_entries(target_list)
 
         context.update({
             'competition': self.competition,
@@ -190,6 +196,9 @@ class BetterTargetList(ListView):
 
 class Registration(BetterTargetList):
     template_name = 'entries/registration.html'
+
+    def add_unallocated_entries(self, target_list):
+        pass
 
     def post(self, request, slug):
         entry = get_object_or_404(SessionEntry, pk=request.POST['pk'])
