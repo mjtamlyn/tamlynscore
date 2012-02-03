@@ -1,3 +1,6 @@
+from itertools import groupby
+import math
+
 from django.contrib.auth.decorators import login_required
 from django.core.urlresolvers import reverse
 from django.db.models import Sum
@@ -8,35 +11,63 @@ from django.views.generic import View
 from reportlab.platypus import PageBreak, Table
 
 from entries.models import Competition, SessionRound
-from entries.views import TargetList, HeadedPdfView
+from entries.views import TargetList, HeadedPdfView, BetterTargetList
 
 from scores.forms import get_arrow_formset
-from scores.models import Score
+from scores.models import Score, Arrow
 
-from itertools import groupby
+from utils import class_view_decorator
 
-class InputScoresView(TargetList):
-    template = 'input_scores.html'
 
-    def get(self, request, slug):
-        competition = get_object_or_404(Competition, slug=slug)
-        session_rounds = SessionRound.objects.filter(session__competition=competition).order_by('session__start')
-        scores = [
-            (
-                session_round.session,
-                session_round,
-                Score.objects.boss_groups(session_round),
-            )
-            for session_round in session_rounds
-        ]
-        sessions = []
-        for key, values in groupby(scores, lambda x: x[0]):
-            sessions.append((key, [value[1] for value in values]))
-        if 'ft' in request.GET and 'fd' in request.GET:
-            focus = request.GET['fd'] + '-' + request.GET['ft']
-        return render(request, self.template, locals())
+@class_view_decorator(login_required)
+class InputScores(BetterTargetList):
+    template_name = 'scores/input_scores.html'
 
-input_scores = login_required(InputScoresView.as_view())
+    def get_queryset(self):
+        return super(InputScores, self).get_queryset().order_by('boss', 'target')
+
+    def add_unallocated_entries(self, target_list):
+        pass
+
+    def get_context_data(self, **kwargs):
+        context = super(InputScores, self).get_context_data(**kwargs)
+
+        for allocation in self.allocations.filter(score__isnull=True):
+            Score.objects.create(target=allocation)
+
+        arrows = Arrow.objects.filter(score__target__in=self.allocations).select_related('score__target')
+        target_lookup = {}
+        for arrow in arrows:
+            target = arrow.score.target
+            if target not in target_lookup:
+                target_lookup[target] = {}
+            dozen = math.floor((arrow.arrow_of_round - 1) / 12)
+            dozen = int(dozen)
+            if dozen not in target_lookup[target]:
+                target_lookup[target][dozen] = []
+            target_lookup[target][dozen].append(arrow)
+
+        for session in context['target_list']:
+            for session_round, options in context['target_list'][session].iteritems():
+                targets = options['targets']
+                bosses = options['bosses'] = []
+                for boss, allocations in groupby(targets, lambda t: t.boss):
+                    combined_lookup = {}
+                    allocations = list(allocations)
+                    for dozen in session_round.shot_round.iter_dozens():
+                        combined_lookup[dozen] = True
+                        for allocation in allocations:
+                            if (allocation not in target_lookup
+                                    or dozen not in target_lookup[allocation]
+                                    or not len(target_lookup[allocation][dozen]) == 12):
+                                combined_lookup[dozen] = False
+                    bosses.append((boss, combined_lookup))
+
+        if 'ft' in self.request.GET and 'fd' in self.request.GET:
+            context['focus'] = self.request.GET['fd'] + '-' + self.request.GET['ft']
+
+        return context
+
 
 class InputArrowsView(View):
     template = 'input_arrows.html'
@@ -60,7 +91,7 @@ class InputArrowsView(View):
         if not failed:
             for arrow in arrows:
                 arrow.save()
-            return HttpResponseRedirect(reverse(input_scores, kwargs={'slug': slug}) + '?fd={0}&ft={1}#session-{3}-round-{2}'.format(dozen, boss, round_id, SessionRound.objects.get(pk=round_id).session.pk))
+            return HttpResponseRedirect(reverse('input_scores', kwargs={'slug': slug}) + '?fd={0}&ft={1}#session-{3}-round-{2}'.format(dozen, boss, round_id, SessionRound.objects.get(pk=round_id).session.pk))
         return render(request, self.template, locals())
 
 input_arrows = login_required(InputArrowsView.as_view())
