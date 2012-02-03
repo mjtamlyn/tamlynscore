@@ -188,6 +188,16 @@ class BetterTargetList(ListView):
         return HttpResponse()
 
 
+class Registration(BetterTargetList):
+    template_name = 'entries/registration.html'
+
+    def post(self, request, slug):
+        entry = get_object_or_404(SessionEntry, pk=request.POST['pk'])
+        entry.present = json.loads(request.POST['present'])
+        entry.save()
+        return HttpResponse('ok')
+
+
 @class_view_decorator(login_required)
 class TargetList(View):
     template = 'target_list.html'
@@ -482,14 +492,3 @@ class RunningSlipsPdf(ScoreSheetsPdf):
 
 
 running_slips_pdf = login_required(RunningSlipsPdf.as_view())
-
-class RegistrationView(TargetList):
-    template = 'registration.html'
-
-    def post(self, request, slug):
-        entry = get_object_or_404(SessionEntry, pk=request.POST['pk'])
-        entry.present = json.loads(request.POST['present'])
-        entry.save()
-        return HttpResponse('ok')
-
-registration = login_required(RegistrationView.as_view())

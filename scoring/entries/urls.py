@@ -13,5 +13,5 @@ urlpatterns = patterns('entries.views',
     (r'^(?P<slug>[\w-]+)/score-sheets/(?P<round_id>\d+)/$', 'score_sheets_pdf'),
     (r'^(?P<slug>[\w-]+)/running-slips/(?P<round_id>\d+)/$', 'running_slips_pdf'),
 
-    (r'^(?P<slug>[\w-]+)/registration/$', 'registration'),
+    url(r'^(?P<slug>[\w-]+)/registration/$', views.Registration.as_view(), name='registration'),
 )
