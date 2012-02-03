@@ -8,14 +8,14 @@ from django.views.generic import View
 from reportlab.platypus import PageBreak, Table
 
 from entries.models import Competition, SessionRound
-from entries.views import TargetListView, HeadedPdfView
+from entries.views import TargetList, HeadedPdfView
 
 from scores.forms import get_arrow_formset
 from scores.models import Score
 
 from itertools import groupby
 
-class InputScoresView(TargetListView):
+class InputScoresView(TargetList):
     template = 'input_scores.html'
 
     def get(self, request, slug):
