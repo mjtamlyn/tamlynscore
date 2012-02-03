@@ -224,7 +224,7 @@ class ScoreSheets(ListView):
     template_name = 'entries/score_sheets.html'
 
     def get_queryset(self):
-        return SessionRound.objects.filter(session__competition__slug=self.kwargs['slug'])
+        return SessionRound.objects.filter(session__competition__slug=self.kwargs['slug']).select_related('session', 'shot_round', 'session__competition__tournament')
 
     def get_context_data(self, **kwargs):
         context = super(ScoreSheets, self).get_context_data(**kwargs)
