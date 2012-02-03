@@ -6,8 +6,8 @@ from scores.models import Arrow
 register = template.Library()
 
 @register.filter
-def bosscomplete(scores, dozen):
-    if Arrow.objects.filter_by_dozen(dozen).filter(score__in=scores).count() == len(scores) * 12:
+def dozcomplete(complete_lookup, dozen):
+    if complete_lookup[dozen]:
         return u'done'
     else:
         return u''
