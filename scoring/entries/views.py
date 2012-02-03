@@ -219,10 +219,21 @@ class TargetList(View):
         return HttpResponse()
 
 
-def score_sheets(request, slug):
-    competition = get_object_or_404(Competition, slug=slug)
-    rounds = SessionRound.objects.filter(session__competition=competition)
-    return render(request, 'score_sheets.html', locals())
+@class_view_decorator(login_required)
+class ScoreSheets(ListView):
+    template_name = 'entries/score_sheets.html'
+
+    def get_queryset(self):
+        return SessionRound.objects.filter(session__competition__slug=self.kwargs['slug'])
+
+    def get_context_data(self, **kwargs):
+        context = super(ScoreSheets, self).get_context_data(**kwargs)
+        rounds = context['object_list']
+        if rounds:
+            context['competition'] = rounds[0].session.competition
+        else:
+            context['competition'] = Competition.objects.get(slug=self.kwargs['slug'])
+        return context
 
 
 # PDF views
