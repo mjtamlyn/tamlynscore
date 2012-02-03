@@ -99,8 +99,9 @@
             <th>Club</th>
             <th>Bowstyle</th>
             <th>Gender</th>
+            <th>Experience</th>
             <!--th>Age</th-->
-            <th>GNAS No.</th>
+            <!--th>GNAS No.</th-->
             <th>Present</th>
         </thead>
         {% for target, detail in targets.target_list %}
@@ -110,8 +111,9 @@
             <td>{{ detail.session_entry.competition_entry.club }}</td>
             <td>{{ detail.session_entry.competition_entry.bowstyle }}</td>
             <td>{{ detail.session_entry.competition_entry.archer.get_gender_display }}</td>
+            <td>{{ detail.session_entry.competition_entry.archer.get_novice_display }}</td>
             <!--td>{{ detail.session_entry.competition_entry.get_age_display }}</td-->
-            <td>{{ detail.session_entry.competition_entry.archer.gnas_no }}</td>
+            <!--td>{{ detail.session_entry.competition_entry.archer.gnas_no }}</td-->
             <td>
                 {% if detail %}
                 <a href="#present" class="present" rel="{{ detail.session_entry.pk }}">Not Present</a>
