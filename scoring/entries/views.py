@@ -107,7 +107,89 @@ class EntryList(ListView):
         entry.delete()
         return HttpResponse('deleted')
 
-class TargetListView(View):
+
+@class_view_decorator(login_required)
+class BetterTargetList(ListView):
+    template_name = 'entries/target_list.html'
+    model = TargetAllocation
+
+    def get_queryset(self):
+        return self.model.objects.filter(session_entry__competition_entry__competition__slug=self.kwargs['slug']).select_related()  # TODO: specify the select_relateds
+
+    def get_context_data(self, **kwargs):
+        context = super(BetterTargetList, self).get_context_data(**kwargs)
+        self.allocations  = context['object_list']
+
+        if self.allocations:
+            self.competition = self.allocations[0].session_entry.competition_entry.competition
+        else:
+            self.competition = Competition.objects.get(slug=slug)
+
+        entries = SessionEntry.objects.filter(competition_entry__competition=self.competition).exclude(targetallocation__isnull=False).select_related()  #TODO: specify
+
+        target_list = {}
+        for allocation in self.allocations:
+            # Split on session
+            session = allocation.session_entry.session_round.session
+            if session not in target_list:
+                target_list[session] = {}
+            session_list = target_list[session]
+
+            # Split on session round
+            session_round = allocation.session_entry.session_round
+            if session_round not in session_list:
+                session_list[session_round] = {'targets': []}
+            session_list[session_round]['targets'].append(allocation)
+
+        # Turn the targets into an actual target list
+        for session, rounds in target_list.iteritems():
+            details = session.details
+            for session_round, options in rounds.iteritems():
+                # Work out which bosses and details we need
+                archers_per_target = session.archers_per_target
+                allocations = options['targets']
+                current_bosses = [allocation.boss for allocation in allocations]
+                min_boss = min(current_bosses)
+                needed_bosses = int(math.ceil(len(allocations) / float(archers_per_target)))
+                current_max_boss = max(current_bosses)
+                bosses = range(min_boss, max(needed_bosses, current_max_boss) + 1)
+
+                # Make a lookup dictionary from the current allocations
+                allocations_lookup = dict([('{0}{1}'.format(allocation.boss, allocation.target), allocation) for allocation in allocations])
+
+                sr_target_list = options['target_list'] = []
+
+                for boss in bosses:
+                    for detail in details:
+                        target = '{0}{1}'.format(boss, detail)
+                        sr_target_list.append((target, allocations_lookup.get(target, None)))
+
+        for entry in entries:
+            session = entry.session_round.session
+            session_round = entry.session_round
+
+            if 'entries' not in target_list[session][session_round]:
+                target_list[session][session_round]['entries'] = []
+            target_list[session][session_round]['entries'].append(entry)
+
+        context.update({
+            'competition': self.competition,
+            'target_list': target_list
+        })
+        return context
+
+    def post(self, request, slug):
+        targets = json.loads(request.POST['targets'])
+        for target in targets:
+            TargetAllocation.objects.filter(session_entry__pk=target['entry']).delete()
+            entry = SessionEntry.objects.get(pk=target['entry'])
+            new_allocation = TargetAllocation(session_entry=entry, boss=target['target'][:-1], target=target['target'][-1])
+            new_allocation.save()
+        return HttpResponse()
+
+
+@class_view_decorator(login_required)
+class TargetList(View):
     template = 'target_list.html'
 
     def get_target_list(self, session_round):
@@ -136,7 +218,6 @@ class TargetListView(View):
             new_allocation.save()
         return HttpResponse()
 
-target_list = login_required(TargetListView.as_view())
 
 def score_sheets(request, slug):
     competition = get_object_or_404(Competition, slug=slug)
@@ -391,7 +472,7 @@ class RunningSlipsPdf(ScoreSheetsPdf):
 
 running_slips_pdf = login_required(RunningSlipsPdf.as_view())
 
-class RegistrationView(TargetListView):
+class RegistrationView(TargetList):
     template = 'registration.html'
 
     def post(self, request, slug):
