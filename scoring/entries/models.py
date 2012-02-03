@@ -62,6 +62,7 @@ class Session(models.Model):
     def __unicode__(self):
         return u'{0} - {1}'.format(self.competition, self.start)
 
+    @property
     def details(self):
         details = ['A', 'B', 'C', 'D', 'E', 'F']
         return details[:self.archers_per_target]
@@ -82,7 +83,7 @@ class SessionRound(models.Model):
         current_bosses = current_target_allocations.aggregate(models.Max('boss'))['boss__max']
         bosses = range(minimum_boss, max(needed_bosses, current_bosses) + 1)
 
-        details = self.session.details()
+        details = self.session.details
 
         allocations_lookup = dict([('{0}{1}'.format(allocation.boss, allocation.target), allocation) for allocation in current_target_allocations])
 
@@ -101,7 +102,7 @@ class SessionRound(models.Model):
             return []
         bosses = range(minimum_boss, current_bosses + 1)
         allocations_lookup = dict([('{0}{1}'.format(allocation.boss, allocation.target), allocation) for allocation in current_target_allocations])
-        details = self.session.details()
+        details = self.session.details
 
         targets = []
         for boss in bosses:
@@ -171,6 +172,6 @@ class TargetAllocation(models.Model):
     target = models.CharField(max_length=1)
 
     def __unicode__(self):
-        return u''#{0}{1} - {2}'.format(self.boss, self.target, self.session_entry)
+        return u'{0}{1} - {2}'.format(self.boss, self.target, self.session_entry)
 
 
