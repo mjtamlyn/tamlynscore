@@ -114,7 +114,7 @@ class BetterTargetList(ListView):
     model = TargetAllocation
 
     def get_queryset(self):
-        return self.model.objects.filter(session_entry__competition_entry__competition__slug=self.kwargs['slug']).select_related()  # TODO: specify the select_relateds
+        return self.model.objects.filter(session_entry__competition_entry__competition__slug=self.kwargs['slug']).select_related('session_entry__competition_entry__competition__tournament', 'session_entry__session_round__session', 'session_entry__session_round__shot_round', 'session_entry__competition_entry__bowstyle', 'session_entry__competition_entry__club', 'session_entry__competition_entry__archer')
 
     def get_context_data(self, **kwargs):
         context = super(BetterTargetList, self).get_context_data(**kwargs)
@@ -125,7 +125,7 @@ class BetterTargetList(ListView):
         else:
             self.competition = Competition.objects.get(slug=slug)
 
-        entries = SessionEntry.objects.filter(competition_entry__competition=self.competition).exclude(targetallocation__isnull=False).select_related()  #TODO: specify
+        entries = SessionEntry.objects.filter(competition_entry__competition=self.competition).exclude(targetallocation__isnull=False).select_related('session_round__session', 'competition_entry__club', 'competition_entry__archer', 'competition_entry__bowstyle')
 
         target_list = {}
         for allocation in self.allocations:
