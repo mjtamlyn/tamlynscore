@@ -137,10 +137,10 @@ leaderboard = login_required(LeaderboardView.as_view())
 @class_view_decorator(login_required)
 class LeaderboardCombined(ListView):
     template_name = 'scores/leaderboard_combined.html'
+    title = 'Leaderboard (all archers)'
 
     def get_queryset(self):
-        scores = Score.objects.filter(target__session_entry__competition_entry__competition__slug=self.kwargs['slug']).select_related()
-        scores = scores.order_by(
+        scores = Score.objects.filter(target__session_entry__competition_entry__competition__slug=self.kwargs['slug']).select_related().order_by(
                 'target__session_entry__competition_entry__bowstyle',
                 'target__session_entry__competition_entry__archer__gender',
                 'disqualified',
@@ -158,13 +158,23 @@ class LeaderboardCombined(ListView):
         else:
             competition = Competition.objects.get(slug=self.kwargs['slug'])
         context['competition'] = competition
-        context['title'] = 'Leaderboard'
+        context['title'] = self.title
 
         results = []
         for category, scores in groupby(scores, lambda s: s.target.session_entry.competition_entry.category()):
             results.append((category, list(scores)))
         context['results'] = results
         return context
+
+
+@class_view_decorator(login_required)
+class LeaderboardCombinedNovice(LeaderboardCombined):
+    title = 'Leaderboard (Novice)'
+
+    def get_queryset(self):
+        scores = super(LeaderboardCombinedNovice, self).get_queryset()
+        scores = scores.filter(target__session_entry__competition_entry__novice='N')
+        return scores
 
 
 @class_view_decorator(login_required)

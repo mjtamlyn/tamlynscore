@@ -19,6 +19,7 @@
             {% endif %}
             <td>{{ score.target.session_entry.competition_entry.archer }}</td>
             <td>{{ score.target.session_entry.competition_entry.club}}</td>
+            <td>{% if score.target.session_entry.competition_entry.novice == 'N' %}Novice{% endif %}</td>
             {% if score.disqualified %}
             <td>DSQ</td>
             <td></td>
