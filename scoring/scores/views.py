@@ -3,10 +3,10 @@ import math
 
 from django.contrib.auth.decorators import login_required
 from django.core.urlresolvers import reverse
-from django.db.models import Sum
+from django.db import models
 from django.http import HttpResponseRedirect
 from django.shortcuts import render, get_object_or_404
-from django.views.generic import View
+from django.views.generic import View, ListView
 
 from reportlab.platypus import PageBreak, Table
 
@@ -128,6 +128,38 @@ class LeaderboardView(View):
 
 leaderboard = login_required(LeaderboardView.as_view())
 
+
+@class_view_decorator(login_required)
+class LeaderboardCombined(ListView):
+    template_name = 'scores/leaderboard_combined.html'
+
+    def get_queryset(self):
+        scores = Score.objects.filter(target__session_entry__competition_entry__competition__slug=self.kwargs['slug']).select_related()
+        for score in scores:
+            score.update_score()
+            score.save(force_update=True)
+        scores = scores.order_by(
+                'target__session_entry__competition_entry__bowstyle',
+                'target__session_entry__competition_entry__archer__gender',
+                'disqualified',
+                '-score', 
+                '-golds', 
+                '-xs'
+        )
+        return scores
+
+    def get_context_data(self, **kwargs):
+        context = super(LeaderboardCombined, self).get_context_data(**kwargs)
+        scores = context['object_list']
+        if scores:
+            competition = scores[0].target.session_entry.competition_entry.competition
+        else:
+            competition = Competition.objects.get(slug=self.kwargs['slug'])
+        context['competition'] = competition
+        context['title'] = 'Leaderboard'
+        return context
+
+
 class LeaderboardBigScreen(LeaderboardView):
     template = 'leaderboard_big_screen.html'
 
@@ -162,7 +194,7 @@ class ResultsPdf(HeadedPdfView, ResultsView):
                 counter = 13
                 subround_scores = []
                 for subround in subrounds.order_by('-distance'):
-                    subround_scores.append(entry.arrow_set.filter(arrow_of_round__in=range(counter, counter + subround.arrows)).aggregate(Sum('arrow_value'))['arrow_value__sum'])
+                    subround_scores.append(entry.arrow_set.filter(arrow_of_round__in=range(counter, counter + subround.arrows)).aggregate(models.Sum('arrow_value'))['arrow_value__sum'])
                     counter += subround.arrows
 
                 row += subround_scores

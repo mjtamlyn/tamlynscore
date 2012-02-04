@@ -66,12 +66,19 @@ class Score(models.Model):
         return u'Score for {0}'.format(self.target)
 
     def update_score(self):
-        self.score = self.arrow_set.aggregate(models.Sum('arrow_value'))['arrow_value__sum']
-        self.hits = self.arrow_set.filter(arrow_value__gt=0).count()
-        self.golds = self.arrow_set.filter(arrow_value=10).count()
-        self.xs = self.arrow_set.filter(is_x=True).count()
-        if not self.score:
-            self.score = 0
+        arrows = self.arrow_set.all()
+        self.score = 0
+        self.hits = 0
+        self.golds = 0
+        self.xs = 0
+        for arrow in arrows:
+            self.score += arrow.arrow_value
+            if arrow.arrow_value > 0:
+                self.hits += 1
+            if arrow.arrow_value == 10:
+                self.golds += 1
+            if arrow.is_x:
+                self.xs += 1
 
     def running_total(self, dozen):
         return self.arrow_set.filter_up_to_dozen(dozen).aggregate(models.Sum('arrow_value'))['arrow_value__sum']
