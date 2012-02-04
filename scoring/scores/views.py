@@ -74,12 +74,14 @@ class InputArrowsView(View):
 
     def get(self, request, slug, round_id, boss, dozen):
         competition = get_object_or_404(Competition, slug=slug)
-        forms = get_arrow_formset(round_id, boss, dozen)
+        scores = Score.objects.filter(target__session_entry__session_round=round_id, target__boss=boss).order_by('target__target').select_related()
+        forms = get_arrow_formset(scores, round_id, boss, dozen)
         return render(request, self.template, locals())
 
     def post(self, request, slug, round_id, boss, dozen):
         competition = get_object_or_404(Competition, slug=slug)
-        forms = get_arrow_formset(round_id, boss, dozen, data=request.POST)
+        scores = Score.objects.filter(target__session_entry__session_round=round_id, target__boss=boss).order_by('target__target').select_related()
+        forms = get_arrow_formset(scores, round_id, boss, dozen, data=request.POST)
         arrows = []
         failed = False
         for score in forms:
@@ -91,6 +93,9 @@ class InputArrowsView(View):
         if not failed:
             for arrow in arrows:
                 arrow.save()
+            for score in scores:
+                score.update_score()
+                score.save(force_update=True)
             return HttpResponseRedirect(reverse('input_scores', kwargs={'slug': slug}) + '?fd={0}&ft={1}#session-{3}-round-{2}'.format(dozen, boss, round_id, SessionRound.objects.get(pk=round_id).session.pk))
         return render(request, self.template, locals())
 
@@ -135,9 +140,6 @@ class LeaderboardCombined(ListView):
 
     def get_queryset(self):
         scores = Score.objects.filter(target__session_entry__competition_entry__competition__slug=self.kwargs['slug']).select_related()
-        for score in scores:
-            score.update_score()
-            score.save(force_update=True)
         scores = scores.order_by(
                 'target__session_entry__competition_entry__bowstyle',
                 'target__session_entry__competition_entry__archer__gender',
@@ -172,9 +174,6 @@ class LeaderboardTeams(ListView):
 
     def get_queryset(self):
         scores = Score.objects.filter(target__session_entry__competition_entry__competition__slug=self.kwargs['slug']).select_related().exclude(target__session_entry__competition_entry__bowstyle__name='Compound')
-        for score in scores:
-            score.update_score()
-            score.save(force_update=True)
         scores = scores.order_by(
                 'target__session_entry__competition_entry__bowstyle',
                 'target__session_entry__competition_entry__archer__gender',

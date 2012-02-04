@@ -21,8 +21,7 @@ class ArrowForm(forms.ModelForm):
         model = Arrow
         exclude = ['score', 'arrow_of_round']
 
-def get_arrow_formset(session_round, boss, dozen, data=None):
-    scores = Score.objects.filter(target__session_entry__session_round=session_round, target__boss=boss).order_by('target__target')
+def get_arrow_formset(scores, session_round, boss, dozen, data=None):
     forms_list = []
     for score in scores:
         target = {
