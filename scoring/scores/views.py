@@ -157,6 +157,11 @@ class LeaderboardCombined(ListView):
             competition = Competition.objects.get(slug=self.kwargs['slug'])
         context['competition'] = competition
         context['title'] = 'Leaderboard'
+
+        results = []
+        for category, scores in groupby(scores, lambda s: s.target.session_entry.competition_entry.category()):
+            results.append((category, list(scores)))
+        context['results'] = results
         return context
 
 
