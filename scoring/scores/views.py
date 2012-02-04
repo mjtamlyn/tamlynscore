@@ -165,6 +165,59 @@ class LeaderboardCombined(ListView):
         return context
 
 
+@class_view_decorator(login_required)
+class LeaderboardTeams(ListView):
+    template_name = 'scores/leaderboard_teams.html'
+    title = 'Leaderboard (Teams)'
+
+    def get_queryset(self):
+        scores = Score.objects.filter(target__session_entry__competition_entry__competition__slug=self.kwargs['slug']).select_related().exclude(target__session_entry__competition_entry__bowstyle__name='Compound')
+        for score in scores:
+            score.update_score()
+            score.save(force_update=True)
+        scores = scores.order_by(
+                'target__session_entry__competition_entry__bowstyle',
+                'target__session_entry__competition_entry__archer__gender',
+                'disqualified',
+                '-score',
+                '-golds',
+                '-xs'
+        )
+        return scores
+
+    def get_club_results(self, scores):
+        club_results = {}
+        for score in scores:
+            club = score.target.session_entry.competition_entry.club
+            if club not in club_results:
+                club_results[club] = []
+            club_results[club].append(score)
+        for club, scores in club_results.iteritems():
+            team = sorted(scores, key=lambda s: (s.score, s.hits, s.golds), reverse=True)[:4]
+            total = sum([s.score for s in team])
+            club_results[club] = {'team': team, 'total': total, 'club': club}
+        club_results = sorted(club_results.values(), key=lambda s: s['total'], reverse=True)
+        return club_results
+
+    def get_context_data(self, **kwargs):
+        context = super(LeaderboardTeams, self).get_context_data(**kwargs)
+        scores = context['object_list']
+        if scores:
+            competition = scores[0].target.session_entry.competition_entry.competition
+        else:
+            competition = Competition.objects.get(slug=self.kwargs['slug'])
+        context['competition'] = competition
+        context['title'] = 'Leaderboard'
+
+        context['club_results'] = self.get_club_results(scores)
+        novice_scores = scores.filter(target__session_entry__competition_entry__novice='N')
+        context['novice_results'] = self.get_club_results(novice_scores)
+
+        context['title'] = self.title
+
+        return context
+
+
 class LeaderboardBigScreen(LeaderboardView):
     template = 'leaderboard_big_screen.html'
 

@@ -18,6 +18,7 @@
             <a href="{% url input_scores slug=competition.slug %}"><li>Input scores</li></a>
             <a href="{% url scores.views.leaderboard slug=competition.slug %}"><li>Leaderboard</li></a>
             <a href="{% url leaderboard_combined slug=competition.slug %}"><li>Leaderboard (Combined)</li></a>
+            <a href="{% url leaderboard_teams slug=competition.slug %}"><li>Leaderboard (Teams)</li></a>
             <a href="{% url olympic.views.olympic_index slug=competition.slug %}"><li>Head to heads panel</li></a>
         </ul>
         <h2>After the shoot</h2>
