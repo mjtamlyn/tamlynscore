@@ -120,7 +120,7 @@
 {% for round, targets in rounds.iteritems %}
 <div class="registration-board {% if not counter %}selected{% endif %}" id="session-{{ session.pk }}-round-{{ round.pk }}" rel="{{ session.archers_per_target }}">
     <ul class="actions">
-        <a class="hide" href="#hide"><li class="action">Hide present</li></a>
+        <a class="hide" href="#hide"><!--li class="action">Hide present</li--></a>
         <select class="club-filter">
             <option data-club="--all--">--All--</option>
         </select>
