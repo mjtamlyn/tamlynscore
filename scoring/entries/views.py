@@ -5,6 +5,7 @@ import math
 from django.contrib.auth.decorators import login_required
 from django.db.models import Count
 from django.http import HttpResponse, HttpResponseBadRequest
+from django.utils.datastructures import SortedDict
 from django.views.generic import View, DetailView, ListView
 from django.shortcuts import render, get_object_or_404
 
@@ -117,7 +118,7 @@ class BetterTargetList(ListView):
         return self.model.objects.filter(session_entry__competition_entry__competition__slug=self.kwargs['slug']).select_related('session_entry__competition_entry__competition__tournament', 'session_entry__session_round__session', 'session_entry__session_round__shot_round', 'session_entry__competition_entry__bowstyle', 'session_entry__competition_entry__club', 'session_entry__competition_entry__archer')
 
     def get_target_list(self):
-        target_list = {}
+        target_list = SortedDict()
         for allocation in self.allocations:
             # Split on session
             session = allocation.session_entry.session_round.session
