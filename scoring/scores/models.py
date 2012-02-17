@@ -57,6 +57,8 @@ class Score(models.Model):
     golds = models.PositiveIntegerField(default=0)
     xs = models.PositiveIntegerField(default=0)
 
+    alteration = models.IntegerField(default=0)
+
     retired = models.BooleanField(default=False)
     disqualified = models.BooleanField(default=False)
 
@@ -67,7 +69,7 @@ class Score(models.Model):
 
     def update_score(self):
         arrows = self.arrow_set.all()
-        self.score = 0
+        self.score = self.alteration
         self.hits = 0
         self.golds = 0
         self.xs = 0
