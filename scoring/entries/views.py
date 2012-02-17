@@ -8,7 +8,7 @@ from django.http import HttpResponse, HttpResponseBadRequest
 from django.views.generic import View, DetailView, ListView
 from django.shortcuts import render, get_object_or_404
 
-from reportlab.platypus import SimpleDocTemplate, Paragraph, Spacer, Table, PageBreak, TableStyle, KeepTogether
+from reportlab.platypus import SimpleDocTemplate, Paragraph, Spacer, Table, PageBreak, TableStyle, KeepTogether, Image
 from reportlab.lib.styles import getSampleStyleSheet
 from reportlab.rl_config import defaultPageSize
 from reportlab.lib import colors
@@ -306,6 +306,11 @@ class HeadedPdfView(PdfView):
         canvas.saveState()
         canvas.setFont('Helvetica-Bold', 18)
         canvas.drawCentredString(self.PAGE_WIDTH/2.0, self.PAGE_HEIGHT-58, u'{0}: {1}'.format(self.competition, self.title))
+        img_top_offset = 165
+        canvas.drawImage('/home/marc/Desktop/clickers.jpg', 65, self.PAGE_HEIGHT-img_top_offset+25, width=165, height=38.5)
+        width = 105
+        canvas.drawImage('/home/marc/Desktop/wales.jpg', self.PAGE_WIDTH/2.0 - width/2, self.PAGE_HEIGHT-img_top_offset, width=width, height=91)
+        canvas.drawImage('/home/marc/Desktop/merlin.jpg', 374, self.PAGE_HEIGHT-img_top_offset+15, width=150, height=63)
         canvas.restoreState()
 
     def response(self, elements):
@@ -318,6 +323,10 @@ class HeadedPdfView(PdfView):
 class TargetListPdf(HeadedPdfView):
     title = 'Target List'
     lunch = False
+
+    def setMargins(self, doc):
+        doc.topMargin = 2.5*inch
+        doc.bottomMargin = 0.5*inch
 
     def update_style(self):
         self.styles['h2'].alignment = 1
@@ -353,6 +362,10 @@ class ScoreSheetsPdf(HeadedPdfView):
     total_cols = 12 + 2 + 4
     col_widths = 6*[box_size] + [wide_box] + 6*[box_size] + 6*[wide_box]
 
+    def setMargins(self, doc):
+        doc.topMargin = 1.9*inch
+        doc.bottomMargin = 0.5*inch
+
     def update_style(self):
         self.title = self.session_round.shot_round
         self.spacer = Spacer(self.PAGE_WIDTH, self.box_size*0.4)
@@ -379,8 +392,8 @@ class ScoreSheetsPdf(HeadedPdfView):
                             [self.Para(target, 'h2'), None, None],
                             [],
                     ]
-                header_table = Table(table_data, [0.5*inch, 3*inch, 3*inch])
-                elements.append(KeepTogether([header_table, self.spacer] + score_sheet_elements))
+                header_table = Table(table_data, [0.4*inch, 2.5*inch, 4*inch])
+                elements.append(KeepTogether([self.spacer, self.spacer, self.spacer, header_table, self.spacer] + score_sheet_elements))
             elements.append(PageBreak())
 
         return elements
@@ -394,7 +407,7 @@ class ScoreSheetsPdf(HeadedPdfView):
             subround_title = self.Para(u'{0}{1}'.format(subround.distance, subround.unit), 'h3')
             dozens = subround.arrows / 12
             total_rows = dozens + 2
-            table_data = [[subround_title] + [None] * 5 + ['ET'] + [None] * 6 + ['ET', 'S', '10+X', 'X', 'RT']]
+            table_data = [[subround_title] + [None] * 5 + ['ET'] + [None] * 6 + ['ET', 'S', 'H', '10s', 'RT']]
             table_data += [[None for i in range(self.total_cols)] for j in range(total_rows - 1)]
             table = Table(table_data, self.col_widths, total_rows*[self.box_size])
             table.setStyle(self.scores_table_style)
@@ -466,7 +479,7 @@ class RunningSlipsPdf(ScoreSheetsPdf):
         dozens = self.session_round.shot_round.arrows / 12
         elements = []
         for dozen in range(1, dozens + 1):
-            table_data = [['Dozen {0}'.format(dozen)] + [None] * 6 + ['ET'] + [None] * 6 + ['ET', 'S', 'H', 'G', 'X', 'RT' if dozen > 1 else 'Inits.']]
+            table_data = [['Dozen {0}'.format(dozen)] + [None] * 6 + ['ET'] + [None] * 6 + ['ET', 'S', 'H', '10s', 'RT' if dozen > 1 else 'Inits.']]
             for entry in entries:
                 table_data.append([entry[0]] + [None for i in range(self.total_cols)])
             table = Table(table_data, [self.box_size] + self.col_widths, (len(entries) + 1)*[self.box_size])
