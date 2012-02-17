@@ -156,7 +156,7 @@
     <div class="target-list-nav">
         <div class="session-select">
             {% for session in target_list %}
-            <a href="#session-{{ session.pk }}"><div class="link {% if not forloop.counter0 %}selected{% endif %}" style="width: 50%">{{ session.start }}</div></a>
+            <a href="#session-{{ session.pk }}"><div class="link {% if not forloop.counter0 %}selected{% endif %}" style="width: 33%">{{ session.start }}</div></a>
             {% endfor %}
         </div>
         <div class="clear"></div>
@@ -164,7 +164,7 @@
         {% for session, rounds in target_list.items %}
         <div class="round-select {% if not forloop.counter0 %}selected{% endif %}" id="session-{{ session.pk }}">
             {% for round in rounds %}
-            <a href="#session-{{ session.pk }}-round-{{ round.pk }}"><div class="link {% if not forloop.counter0 %}selected{% endif %}" style="width: 50%">{{ round.shot_round }}</div></a>
+            <a href="#session-{{ session.pk }}-round-{{ round.pk }}"><div class="link {% if not forloop.counter0 %}selected{% endif %}" style="width: 99%">{{ round.shot_round }}</div></a>
             {% endfor %}
         </div>
         <div class="clear"></div>
