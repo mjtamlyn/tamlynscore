@@ -160,11 +160,14 @@ class LeaderboardCombined(ListView):
         context['competition'] = competition
         context['title'] = self.title
 
+        context['results'] = self.get_categorised_results(scores)
+        return context
+
+    def get_categorised_results(self, scores):
         results = []
         for category, scores in groupby(scores, lambda s: s.target.session_entry.competition_entry.category()):
             results.append((category, list(scores)))
-        context['results'] = results
-        return context
+        return results
 
 
 @class_view_decorator(login_required)
@@ -234,6 +237,27 @@ class LeaderboardTeams(ListView):
 
         context['title'] = self.title
 
+        return context
+
+
+class LeaderboardSummary(LeaderboardCombined, LeaderboardTeams):
+    template_name = 'scores/leaderboard_summary.html'
+    title = 'Leaderboard (Summary)'
+
+    def get_context_data(self, **kwargs):
+        context = super(LeaderboardSummary, self).get_context_data(**kwargs)
+        scores = context['object_list']
+        exp_results = self.get_categorised_results(scores.filter(target__session_entry__competition_entry__novice='E'))
+        nov_results = self.get_categorised_results(scores.filter(target__session_entry__competition_entry__novice='N'))
+        context['exp_results'] = exp_results
+        context['nov_results'] = nov_results
+        context['club_results'] = self.get_club_results(scores)[:10]
+        novice_scores = scores.filter(target__session_entry__competition_entry__novice='N')
+        context['novice_results'] = self.get_club_results(novice_scores, 3)[:10]
+        for results in [exp_results, nov_results]:
+            for i, info in enumerate(results):
+                category, scores = info
+                results[i] = (category, scores[:8])
         return context
 
 

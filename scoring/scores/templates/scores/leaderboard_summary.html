@@ -1,0 +1,136 @@
+{% extends 'target_list.html' %}
+
+{% block moduleclass %}leaderboard{% endblock %}
+{% block title %}{{ title }}{% endblock %}
+
+{% block main %}
+<div class="board selected">
+    <h4>Experienced Results</h4>
+    <table>
+        {% for category, scores in exp_results %}
+        <tr>
+            <td colspan="100%"><h5>{{ category }}</h5></td>
+        </tr>
+        {% for score in scores %}
+        <tr>
+            {% if score.disqualified %}
+            <td></td>
+            {% else %}
+            <td>{{ forloop.counter }}</td>
+            {% endif %}
+            <td>{{ score.target.session_entry.competition_entry.archer }}</td>
+            <td>{{ score.target.session_entry.competition_entry.club}}</td>
+            <td>{% if score.target.session_entry.competition_entry.novice == 'N' %}Novice{% endif %}</td>
+            {% if score.disqualified %}
+            <td>DSQ</td>
+            <td></td>
+            <td></td>
+            <td></td>
+            {% else %}
+            <td>{{ score.score }}</td>
+            <td>{{ score.hits }}</td>
+            <td>{{ score.golds }}</td>
+            <td>{{ score.xs }}</td>
+            {% endif %}
+        </tr>
+        {% endfor %}
+    {% endfor %}
+    </table>
+</div>
+<div class="board selected">
+    <h4>Novice Results</h4>
+    <table>
+        {% for category, scores in nov_results %}
+        <tr>
+            <td colspan="100%"><h5>{{ category }}</h5></td>
+        </tr>
+        {% for score in scores %}
+        <tr>
+            {% if score.disqualified %}
+            <td></td>
+            {% else %}
+            <td>{{ forloop.counter }}</td>
+            {% endif %}
+            <td>{{ score.target.session_entry.competition_entry.archer }}</td>
+            <td>{{ score.target.session_entry.competition_entry.club}}</td>
+            <td>{% if score.target.session_entry.competition_entry.novice == 'N' %}Novice{% endif %}</td>
+            {% if score.disqualified %}
+            <td>DSQ</td>
+            <td></td>
+            <td></td>
+            <td></td>
+            {% else %}
+            <td>{{ score.score }}</td>
+            <td>{{ score.hits }}</td>
+            <td>{{ score.golds }}</td>
+            <td>{{ score.xs }}</td>
+            {% endif %}
+        </tr>
+        {% endfor %}
+    {% endfor %}
+    </table>
+</div><div class="board selected">
+    <h4>Teams</h4>
+    <table>
+        {% for details in club_results %}
+        <tr>
+            <td colspan="100%"><h5>{{ forloop.counter }}. {{ details.club }} - {{ details.total }}</h5></td>
+        </tr>
+        {% for score in details.team %}
+        <tr>
+            {% if score.disqualified %}
+            <td></td>
+            {% else %}
+            <td>{{ forloop.counter }}</td>
+            {% endif %}
+            <td>{{ score.target.session_entry.competition_entry.archer }}</td>
+            <td>{{ score.target.session_entry.competition_entry.club}}</td>
+            {% if score.disqualified %}
+            <td>DSQ</td>
+            <td></td>
+            <td></td>
+            <td></td>
+            {% else %}
+            <td>{{ score.score }}</td>
+            <td>{{ score.hits }}</td>
+            <td>{{ score.golds }}</td>
+            <td>{{ score.xs }}</td>
+            {% endif %}
+        </tr>
+        {% endfor %}
+    {% endfor %}
+    </table>
+</div>
+<div class="board selected">
+    <h4>Novice Teams</h4>
+    <table>
+        {% for details in novice_results %}
+        <tr>
+            <td colspan="100%"><h5>{{ forloop.counter }}. {{ details.club }} - {{ details.total }}</h5></td>
+        </tr>
+        {% for score in details.team %}
+        <tr>
+            {% if score.disqualified %}
+            <td></td>
+            {% else %}
+            <td>{{ forloop.counter }}</td>
+            {% endif %}
+            <td>{{ score.target.session_entry.competition_entry.archer }}</td>
+            <td>{{ score.target.session_entry.competition_entry.club}}</td>
+            {% if score.disqualified %}
+            <td>DSQ</td>
+            <td></td>
+            <td></td>
+            <td></td>
+            {% else %}
+            <td>{{ score.score }}</td>
+            <td>{{ score.hits }}</td>
+            <td>{{ score.golds }}</td>
+            <td>{{ score.xs }}</td>
+            {% endif %}
+        </tr>
+        {% endfor %}
+    {% endfor %}
+    </table>
+</div>
+{% endblock %}
