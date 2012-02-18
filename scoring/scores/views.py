@@ -2,6 +2,7 @@ from itertools import groupby
 import math
 
 from django.contrib.auth.decorators import login_required
+from django.core.cache import cache
 from django.core.urlresolvers import reverse
 from django.db import models
 from django.http import HttpResponseRedirect
@@ -35,7 +36,14 @@ class InputScores(BetterTargetList):
         for allocation in self.allocations.filter(score__isnull=True):
             Score.objects.create(target=allocation)
 
-        arrows = Arrow.objects.filter(score__target__in=self.allocations).select_related('score__target')
+        allocations = self.allocations
+
+        for session in context['target_list']:
+            for session_round in context['target_list'][session]:
+                if cache.get('bosses_cache_%d' % session_round.pk):
+                    allocations = allocations.exclude(session_entry__session_round=session_round)
+
+        arrows = Arrow.objects.filter(score__target__in=allocations).select_related('score__target')
         target_lookup = {}
         for arrow in arrows:
             target = arrow.score.target
@@ -49,8 +57,12 @@ class InputScores(BetterTargetList):
 
         for session in context['target_list']:
             for session_round, options in context['target_list'][session].iteritems():
+                cache_key = 'bosses_cache_%d' % session_round.pk
                 targets = options['targets']
-                bosses = options['bosses'] = []
+                bosses = options['bosses'] = cache.get(cache_key) or []
+                if bosses:
+                    print 'skipping', session_round
+                    continue
                 for boss, allocations in groupby(targets, lambda t: t.boss):
                     combined_lookup = {}
                     allocations = list(allocations)
@@ -62,6 +74,10 @@ class InputScores(BetterTargetList):
                                     or not len(target_lookup[allocation][dozen]) == 12):
                                 combined_lookup[dozen] = False
                     bosses.append((boss, combined_lookup))
+                combine = lambda x, y: x and y
+                session_complete = reduce(combine, reduce(combine, [b[1].values() for b in bosses]))
+                if session_complete:
+                    cache.set(cache_key, bosses, 30000)
 
         if 'ft' in self.request.GET and 'fd' in self.request.GET:
             context['focus'] = self.request.GET['fd'] + '-' + self.request.GET['ft']
