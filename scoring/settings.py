@@ -154,6 +154,12 @@ LOGGING = {
     }
 }
 
+CACHES = {
+    'default': {
+        'BACKEND': 'django.core.cache.backends.locmem.LocMemCache',
+    }
+}
+
 INTERNAL_IPS = ('127.0.0.1',)
 
 import djcelery
