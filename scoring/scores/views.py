@@ -233,8 +233,9 @@ class LeaderboardTeams(ListView):
         for club, scores in club_results.iteritems():
             team = sorted(scores, key=lambda s: (s.score, s.hits, s.golds), reverse=True)[:max_per_team]
             total = sum([s.score for s in team])
-            club_results[club] = {'team': team, 'total': total, 'club': club}
-        club_results = sorted(club_results.values(), key=lambda s: s['total'], reverse=True)
+            total_golds = sum([s.golds for s in team])
+            club_results[club] = {'team': team, 'total': total, 'total_golds': total_golds, 'club': club}
+        club_results = sorted(club_results.values(), key=lambda s: (s['total'], s['total_golds']), reverse=True)
         return club_results
 
     def get_context_data(self, **kwargs):
