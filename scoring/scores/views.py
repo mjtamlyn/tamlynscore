@@ -266,6 +266,7 @@ class LeaderboardSummary(LeaderboardCombined, LeaderboardTeams):
         scores = context['object_list']
         exp_results = self.get_categorised_results(scores.filter(target__session_entry__competition_entry__novice='E'))
         nov_results = self.get_categorised_results(scores.filter(target__session_entry__competition_entry__novice='N'))
+        scores = scores.exclude(target__session_entry__competition_entry__bowstyle__name='Compound')
         context['exp_results'] = exp_results
         context['nov_results'] = nov_results
         context['club_results'] = self.get_club_results(scores)[:10]
