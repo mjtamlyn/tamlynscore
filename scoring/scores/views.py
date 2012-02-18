@@ -74,7 +74,7 @@ class InputArrowsView(View):
 
     def get(self, request, slug, round_id, boss, dozen):
         competition = get_object_or_404(Competition, slug=slug)
-        scores = Score.objects.filter(target__session_entry__session_round=round_id, target__boss=boss).order_by('target__target').select_related()
+        scores = Score.objects.filter(target__session_entry__session_round=round_id, target__boss=boss, target__session_entry__present=True).order_by('target__target').select_related()
         forms = get_arrow_formset(scores, round_id, boss, dozen)
         return render(request, self.template, locals())
 
