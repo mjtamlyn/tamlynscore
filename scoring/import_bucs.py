@@ -9,7 +9,7 @@ session_rounds = SessionRound.objects.filter(session__competition=competition)
 
 clubs = set()
 total = 0
-for session_name, session_round in zip(['A'], session_rounds):
+for session_name, session_round in zip(['B'], session_rounds):
     file_name = '/home/marc/Desktop/BUSA%s.csv' % session_name
     f = open(file_name, 'r')
     reader = csv.reader(f)
