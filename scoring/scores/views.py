@@ -178,6 +178,16 @@ class LeaderboardCombinedNovice(LeaderboardCombined):
 
 
 @class_view_decorator(login_required)
+class LeaderboardCombinedExperienced(LeaderboardCombined):
+    title = 'Leaderboard (Experienced)'
+
+    def get_queryset(self):
+        scores = super(LeaderboardCombinedExperienced, self).get_queryset()
+        scores = scores.filter(target__session_entry__competition_entry__novice='E')
+        return scores
+
+
+@class_view_decorator(login_required)
 class LeaderboardTeams(ListView):
     template_name = 'scores/leaderboard_teams.html'
     title = 'Leaderboard (Teams)'
@@ -194,7 +204,7 @@ class LeaderboardTeams(ListView):
         )
         return scores
 
-    def get_club_results(self, scores):
+    def get_club_results(self, scores, max_per_team=4):
         club_results = {}
         for score in scores:
             club = score.target.session_entry.competition_entry.club
@@ -202,7 +212,7 @@ class LeaderboardTeams(ListView):
                 club_results[club] = []
             club_results[club].append(score)
         for club, scores in club_results.iteritems():
-            team = sorted(scores, key=lambda s: (s.score, s.hits, s.golds), reverse=True)[:4]
+            team = sorted(scores, key=lambda s: (s.score, s.hits, s.golds), reverse=True)[:max_per_team]
             total = sum([s.score for s in team])
             club_results[club] = {'team': team, 'total': total, 'club': club}
         club_results = sorted(club_results.values(), key=lambda s: s['total'], reverse=True)
@@ -218,9 +228,10 @@ class LeaderboardTeams(ListView):
         context['competition'] = competition
         context['title'] = 'Leaderboard'
 
-        context['club_results'] = self.get_club_results(scores)
+        experienced_scores = scores.filter(target__session_entry__competition_entry__novice='E')
+        context['club_results'] = self.get_club_results(experienced_scores)
         novice_scores = scores.filter(target__session_entry__competition_entry__novice='N')
-        context['novice_results'] = self.get_club_results(novice_scores)
+        context['novice_results'] = self.get_club_results(novice_scores, 3)
 
         context['title'] = self.title
 
