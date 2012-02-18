@@ -25,7 +25,7 @@ class InputScores(BetterTargetList):
     template_name = 'scores/input_scores.html'
 
     def get_queryset(self):
-        return super(InputScores, self).get_queryset().order_by('session_entry__session_round__session', 'boss', 'target')
+        return super(InputScores, self).get_queryset().filter(score__retired=False).order_by('session_entry__session_round__session', 'boss', 'target')
 
     def add_unallocated_entries(self, target_list):
         pass
@@ -90,7 +90,7 @@ class InputArrowsView(View):
 
     def get(self, request, slug, round_id, boss, dozen):
         competition = get_object_or_404(Competition, slug=slug)
-        scores = Score.objects.filter(target__session_entry__session_round=round_id, target__boss=boss, target__session_entry__present=True).order_by('target__target').select_related()
+        scores = Score.objects.filter(target__session_entry__session_round=round_id, target__boss=boss, target__session_entry__present=True, retired=False).order_by('target__target').select_related()
         forms = get_arrow_formset(scores, round_id, boss, dozen)
         return render(request, self.template, locals())
 
