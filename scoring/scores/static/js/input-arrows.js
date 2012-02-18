@@ -14,6 +14,19 @@ var Arrows = new Class({
         '189': 'X', // - key
         '77': 'M', // m key
         '192': 'M', // ` key
+        '223': 'M', // ` key (alternative code)
+        // keypad keys
+        '96': 'M', // keypad 0
+        '97': '1',
+        '98': '2',
+        '99': '3',
+        '100': '4',
+        '101': '5',
+        '102': '6',
+        '103': '7',
+        '104': '8',
+        '105': '9',
+        '110': '10', // keypad 10
     },
 
     initialize: function () {
@@ -32,6 +45,7 @@ var Arrows = new Class({
                 return;
             }
             item.addEvent('keydown', function (e) {
+                console.log(e.code);
                 if (e.code in this.validCodes) {
                     item.set('value', this.validCodes[e.code]);
                     if (array[index + 1]) {
