@@ -25,7 +25,7 @@ class InputScores(BetterTargetList):
     template_name = 'scores/input_scores.html'
 
     def get_queryset(self):
-        return super(InputScores, self).get_queryset().filter(score__retired=False).order_by('session_entry__session_round__session', 'boss', 'target')
+        return super(InputScores, self).get_queryset().order_by('session_entry__session_round__session', 'boss', 'target')
 
     def add_unallocated_entries(self, target_list):
         pass
@@ -75,7 +75,7 @@ class InputScores(BetterTargetList):
                                 combined_lookup[dozen] = False
                     bosses.append((boss, combined_lookup))
                 combine = lambda x, y: x and y
-                session_complete = reduce(combine, reduce(combine, [b[1].values() for b in bosses]))
+                session_complete = bosses and reduce(combine, [reduce(combine, b[1].values()) for b in bosses])
                 if session_complete:
                     cache.set(cache_key, bosses, 30000)
 
