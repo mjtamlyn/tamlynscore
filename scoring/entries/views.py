@@ -163,6 +163,12 @@ class BetterTargetList(ListView):
             session = entry.session_round.session
             session_round = entry.session_round
 
+            if session not in target_list:
+                target_list[session] = {}
+
+            if session_round not in target_list[session]:
+                target_list[session][session_round] = {}
+
             if 'entries' not in target_list[session][session_round]:
                 target_list[session][session_round]['entries'] = []
             target_list[session][session_round]['entries'].append(entry)
@@ -174,7 +180,7 @@ class BetterTargetList(ListView):
         if self.allocations:
             self.competition = self.allocations[0].session_entry.competition_entry.competition
         else:
-            self.competition = Competition.objects.get(slug=slug)
+            self.competition = Competition.objects.get(slug=self.kwargs['slug'])
 
         target_list = self.get_target_list()
         self.add_unallocated_entries(target_list)
