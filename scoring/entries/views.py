@@ -51,7 +51,7 @@ class EntryList(ListView):
         if self.entries:
             self.competition = self.entries[0].competition_entry.competition
         else:
-            self.competition = Competition.objects.get(slug=slug)
+            self.competition = Competition.objects.get(slug=self.kwargs['slug'])
         context.update({
             'competition': self.competition,
             'stats': self.get_stats(),
