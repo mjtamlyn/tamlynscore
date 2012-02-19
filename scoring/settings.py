@@ -125,7 +125,6 @@ INSTALLED_APPS = (
     'accounts',
 
     #'django_extensions',
-    'djcelery',
     'debug_toolbar',
 )
 
@@ -161,8 +160,5 @@ CACHES = {
 }
 
 INTERNAL_IPS = ('127.0.0.1',)
-
-import djcelery
-djcelery.setup_loader()
 
 DEBUG_TOOLBAR_CONFIG = {'INTERCEPT_REDIRECTS': False}
