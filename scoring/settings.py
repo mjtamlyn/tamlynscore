@@ -124,6 +124,8 @@ INSTALLED_APPS = (
     'olympic',
     'accounts',
 
+    'gunicorn',
+
     #'django_extensions',
     'debug_toolbar',
 )
