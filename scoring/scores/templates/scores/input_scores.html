@@ -95,7 +95,7 @@
 {% with forloop.counter0 as counter %}
 {% for round, details in rounds.items %}
 <div class="input-board {% if not counter %}selected{% endif %}" id="session-{{ session.pk }}-round-{{ round.pk }}">
-    {% for dozen in round.shot_round.iter_dozens %}
+    {% for dozen in details.dozens %}
     <h5>Dozen {{ dozen }}</h5>
     <div class="bosses">
         {% for boss, complete_lookup in details.bosses %}

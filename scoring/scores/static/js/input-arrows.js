@@ -45,7 +45,6 @@ var Arrows = new Class({
                 return;
             }
             item.addEvent('keydown', function (e) {
-                console.log(e.code);
                 if (e.code in this.validCodes) {
                     item.set('value', this.validCodes[e.code]);
                     if (array[index + 1]) {
@@ -106,9 +105,21 @@ var Arrows = new Class({
                 golds += 1;
             }
         });
-        var values = [ET1, ET2, ET1 + ET2, hits, golds, xs, rt + ET1 + ET2];
+        var values = {
+            'et1': ET1,
+            'et2': ET2,
+            'doz-total': ET1 + ET2,
+            'hits': hits,
+            'golds': golds,
+            'xs': xs,
+            'rt': rt + ET1 + ET2,
+        };
         row.getElements('th').each(function (item, index) {
-            item.set('html', values[index]);
+            Object.each(values, function (value, cls) {
+                if (item.hasClass(cls)) {
+                    item.set('html', value);
+                }
+            });
         });
     },
 

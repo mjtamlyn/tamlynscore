@@ -58,6 +58,7 @@ class Session(models.Model):
 
     scoring_system = models.CharField(max_length=1, choices=SCORING_SYSTEMS)
     archers_per_target = models.IntegerField()
+    arrows_entered_per_end = models.IntegerField(default=12)
 
     def __unicode__(self):
         return u'{0} - {1}'.format(self.competition, self.start)

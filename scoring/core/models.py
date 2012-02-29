@@ -51,12 +51,6 @@ class Round(models.Model):
     def arrows(self):
         return self.subrounds.aggregate(models.Sum('arrows'))['arrows__sum']
 
-    def iter_dozens(self):
-        if not getattr(self, '_dozens', None):
-            dozens = self.arrows / 12
-            self._dozens = range(1, 1 + dozens)
-        return self._dozens
-
     def get_subround(self, doz_no):
         arrows = int(doz_no) * 12
         subrounds = self.subrounds.order_by('-distance')

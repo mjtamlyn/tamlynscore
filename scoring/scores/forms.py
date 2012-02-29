@@ -21,7 +21,7 @@ class ArrowForm(forms.ModelForm):
         model = Arrow
         exclude = ['score', 'arrow_of_round']
 
-def get_arrow_formset(scores, session_round, boss, dozen, data=None):
+def get_arrow_formset(scores, session_round, boss, dozen, arrows_per_end, data=None):
     forms_list = []
     for score in scores:
         target = {
@@ -30,12 +30,12 @@ def get_arrow_formset(scores, session_round, boss, dozen, data=None):
                 'target': score.target.target,
                 'running_total': score.running_total(dozen),
         }
-        for arrow in range(1, 13):
+        for arrow in range(1, arrows_per_end + 1):
             prefix = score.target.target + str(arrow)
             try:
-                instance = Arrow.objects.get(score=score, arrow_of_round=int(dozen)*12 + arrow)
+                instance = Arrow.objects.get(score=score, arrow_of_round=int(dozen)*arrows_per_end + arrow)
             except Arrow.DoesNotExist:
-                instance = Arrow(score=score, arrow_of_round=int(dozen)*12 + arrow)
+                instance = Arrow(score=score, arrow_of_round=int(dozen)*arrows_per_end + arrow)
             target['forms'].append(ArrowForm(data, instance=instance, prefix=prefix))
         forms_list.append(target)
     return forms_list
