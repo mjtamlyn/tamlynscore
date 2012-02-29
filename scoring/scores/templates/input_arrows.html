@@ -18,10 +18,12 @@
         <table class="target">
             <tr>
                 <th colspan="2">Archer</th>
-                <td colspan="6"></td>
+                <td colspan="{% if forms.0.forms|length > 6 %}6{% else %}{{ forms.0.forms|length }}{% endif %}"></td>
+                {% if forms.0.forms|length > 6 %}
                 <th>ET</th>
                 <td colspan="6"></td>
                 <th>ET</th>
+                {% endif %}
                 <th>Doz</th>
                 <th>Hits</th>
                 <th>Golds</th>
@@ -34,11 +36,13 @@
                 <td>{{ target.archer }}</td>
                 {% for form in target.forms %}
                 <td>{{ form.arrow_value }}<span class="hidden">{{ form.is_x.value }}</span></td>
-                {% if forloop.counter == 6 %}
-                <th class="end-total">0</th>
+                {% if target.forms|length > 6 and forloop.counter == 6 %}
+                <th class="end-total et1">0</th>
                 {% endif %}
-                {% if forloop.counter == 12 %}
-                <th class="end-total">0</th>
+                {% if forloop.last %}
+                {% if target.forms|length > 6 %}
+                <th class="end-total et2">0</th>
+                {% endif %}
                 <th class="doz-total">0</th>
                 <th class="hits">0</th>
                 <th class="golds">0</th>

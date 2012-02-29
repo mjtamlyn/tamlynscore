@@ -43,13 +43,14 @@ class InputScores(BetterTargetList):
                 if cache.get('bosses_cache_%d' % session_round.pk):
                     allocations = allocations.exclude(session_entry__session_round=session_round)
 
-        arrows = Arrow.objects.filter(score__target__in=allocations).select_related('score__target')
+        arrows = Arrow.objects.filter(score__target__in=allocations).select_related('score__target', 'score__target__session_entry__session_round__session')
         target_lookup = {}
         for arrow in arrows:
             target = arrow.score.target
+            session = target.session_entry.session_round.session
             if target not in target_lookup:
                 target_lookup[target] = {}
-            dozen = math.floor((arrow.arrow_of_round - 1) / 12)
+            dozen = math.floor((arrow.arrow_of_round - 1) / session.arrows_entered_per_end)
             dozen = int(dozen)
             if dozen not in target_lookup[target]:
                 target_lookup[target][dozen] = []
@@ -60,18 +61,19 @@ class InputScores(BetterTargetList):
                 cache_key = 'bosses_cache_%d' % session_round.pk
                 targets = options['targets']
                 bosses = options['bosses'] = cache.get(cache_key) or []
+                dozens = options['dozens'] = range(1, 1 + session_round.shot_round.arrows / session_round.session.arrows_entered_per_end)
                 if bosses:
                     print 'skipping', session_round
                     continue
                 for boss, allocations in groupby(targets, lambda t: t.boss):
                     combined_lookup = {}
                     allocations = list(allocations)
-                    for dozen in session_round.shot_round.iter_dozens():
+                    for dozen in dozens:
                         combined_lookup[dozen] = True
                         for allocation in allocations:
                             if (allocation not in target_lookup
                                     or dozen not in target_lookup[allocation]
-                                    or not len(target_lookup[allocation][dozen]) == 12):
+                                    or not len(target_lookup[allocation][dozen]) == session_round.session.arrows_entered_per_end):
                                 combined_lookup[dozen] = False
                     bosses.append((boss, combined_lookup))
                 combine = lambda x, y: x and y
@@ -91,13 +93,13 @@ class InputArrowsView(View):
     def get(self, request, slug, round_id, boss, dozen):
         competition = get_object_or_404(Competition, slug=slug)
         scores = Score.objects.filter(target__session_entry__session_round=round_id, target__boss=boss, target__session_entry__present=True, retired=False).order_by('target__target').select_related()
-        forms = get_arrow_formset(scores, round_id, boss, dozen)
+        forms = get_arrow_formset(scores, round_id, boss, dozen, scores[0].target.session_entry.session_round.session.arrows_entered_per_end)
         return render(request, self.template, locals())
 
     def post(self, request, slug, round_id, boss, dozen):
         competition = get_object_or_404(Competition, slug=slug)
         scores = Score.objects.filter(target__session_entry__session_round=round_id, target__boss=boss).order_by('target__target').select_related()
-        forms = get_arrow_formset(scores, round_id, boss, dozen, data=request.POST)
+        forms = get_arrow_formset(scores, round_id, boss, dozen, scores[0].target.session_entry.session_round.session.arrows_entered_per_end, data=request.POST)
         arrows = []
         failed = False
         for score in forms:

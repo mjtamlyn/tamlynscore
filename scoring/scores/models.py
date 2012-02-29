@@ -82,23 +82,18 @@ class Score(models.Model):
             if arrow.is_x:
                 self.xs += 1
 
+    @property
+    def arrows_entered_per_end(self):
+        return self.target.session_entry.session_round.session.arrows_entered_per_end
+
     def running_total(self, dozen):
-        return self.arrow_set.filter_up_to_dozen(dozen).aggregate(models.Sum('arrow_value'))['arrow_value__sum']
-
-class ArrowManager(models.Manager):
-    def filter_by_dozen(self, dozen):
-        return self.filter(arrow_of_round__lte=(dozen+1)*12, arrow_of_round__gt=dozen*12)
-
-    def filter_up_to_dozen(self, dozen):
-        return self.filter(arrow_of_round__lte=int(dozen)*12)
+        return self.arrow_set.filter(arrow_of_round__lte=int(dozen)*self.arrows_entered_per_end).aggregate(models.Sum('arrow_value'))['arrow_value__sum']
 
 class Arrow(models.Model):
     score = models.ForeignKey(Score)
     arrow_value = models.PositiveIntegerField()
     arrow_of_round = models.PositiveIntegerField()
     is_x = models.BooleanField(default=False)
-
-    objects = ArrowManager()
 
     def __unicode__(self):
         if self.is_x:
