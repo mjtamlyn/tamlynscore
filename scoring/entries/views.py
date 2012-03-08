@@ -308,11 +308,6 @@ class HeadedPdfView(PdfView):
         canvas.saveState()
         canvas.setFont('Helvetica-Bold', 18)
         canvas.drawCentredString(self.PAGE_WIDTH/2.0, self.PAGE_HEIGHT-58, u'{0}: {1}'.format(self.competition, self.title))
-        img_top_offset = 165
-        canvas.drawImage('/home/marc/Desktop/clickers.jpg', 65, self.PAGE_HEIGHT-img_top_offset+25, width=165, height=38.5)
-        width = 105
-        canvas.drawImage('/home/marc/Desktop/wales.jpg', self.PAGE_WIDTH/2.0 - width/2, self.PAGE_HEIGHT-img_top_offset, width=width, height=91)
-        canvas.drawImage('/home/marc/Desktop/merlin.jpg', 374, self.PAGE_HEIGHT-img_top_offset+15, width=150, height=63)
         canvas.restoreState()
 
     def response(self, elements):
@@ -364,10 +359,6 @@ class ScoreSheetsPdf(HeadedPdfView):
     total_cols = 12 + 2 + 4
     col_widths = 6*[box_size] + [wide_box] + 6*[box_size] + 6*[wide_box]
 
-    def setMargins(self, doc):
-        doc.topMargin = 1.9*inch
-        doc.bottomMargin = 0.5*inch
-
     def update_style(self):
         self.title = self.session_round.shot_round
         self.spacer = Spacer(self.PAGE_WIDTH, self.box_size*0.4)
@@ -408,9 +399,20 @@ class ScoreSheetsPdf(HeadedPdfView):
         for subround in subrounds:
             subround_title = self.Para(u'{0}{1}'.format(subround.distance, subround.unit), 'h3')
             dozens = subround.arrows / 12
+            extra = subround.arrows % 12
             total_rows = dozens + 2
             table_data = [[subround_title] + [None] * 5 + ['ET'] + [None] * 6 + ['ET', 'S', 'H', '10s', 'RT']]
             table_data += [[None for i in range(self.total_cols)] for j in range(total_rows - 1)]
+            if extra is 6:
+                total_rows += 1
+                table_data += [[None for i in range(self.total_cols)]]
+                self.scores_table_style._cmds.append(('BOX', (7, 1), (12, -3), 2, colors.black))
+                self.scores_table_style._cmds.append(('INNERGRID', (0, -2), (6, -2), 0, colors.black))
+                self.scores_table_style._cmds.append(('LINEABOVE', (0, -2), (6, -2), 0.25, colors.black))
+                self.scores_table_style._cmds[3][2] = (-1, -3)
+                self.scores_table_style._cmds[4][2] = (-1, -3)
+                self.scores_table_style._cmds[6][2] = (-1, -3)
+
             table = Table(table_data, self.col_widths, total_rows*[self.box_size])
             table.setStyle(self.scores_table_style)
 
@@ -436,12 +438,13 @@ class ScoreSheetsPdf(HeadedPdfView):
         ('VALIGN', (0, 0), (-1, -1), 'MIDDLE'),
 
         # arrows grid
-        ('BOX', (0, 1), (-1, -2), 2, colors.black),
-        ('INNERGRID', (0, 1), (-1, -2), 0.25, colors.black),
+        ('BOX', (0, 1), (6, -2), 2, colors.black),
+        ['BOX', (7, 1), (-1, -2), 2, colors.black],
+        ['INNERGRID', (0, 1), (-1, -2), 0.25, colors.black],
 
         # end totals columns
         ('BOX', (6, 0), (6, -2), 2, colors.black),
-        ('BOX', (13, 0), (13, -2), 2, colors.black),
+        ['BOX', (13, 0), (13, -2), 2, colors.black],
 
         # totals grid
         ('BOX', (14, 0), (-1, -2), 2, colors.black),
