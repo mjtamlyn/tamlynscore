@@ -89,6 +89,10 @@ class InputScores(BetterTargetList):
         return context
 
 
+class InputScoresMobile(InputScores):
+    template_name = 'scores/input_scores_mobile.html'
+
+
 class InputArrowsView(View):
     template = 'input_arrows.html'
 
