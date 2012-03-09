@@ -96,10 +96,10 @@
 {% for round, details in rounds.items %}
 <div class="input-board {% if not counter %}selected{% endif %}" id="session-{{ session.pk }}-round-{{ round.pk }}">
     {% for dozen in details.dozens %}
-    <h5>Dozen {{ dozen }}</h5>
+    <h5>End {{ dozen }}</h5>
     <div class="bosses">
         {% for boss, complete_lookup in details.bosses %}
-        <a href="{% url scores.views.input_arrows slug=competition.slug round_id=round.pk dozen=dozen boss=boss %}" class="boss-link" rel="{{ dozen }}-{{ boss }}">
+        <a href="{% block linklocation %}{% url scores.views.input_arrows slug=competition.slug round_id=round.pk dozen=dozen boss=boss %}{% endblock %}" class="boss-link" rel="{{ dozen }}-{{ boss }}">
             <div class="boss {{ complete_lookup|dozcomplete:dozen }}">{{ boss }}</div>
         </a>
         {% endfor %}

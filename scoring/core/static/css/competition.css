@@ -305,6 +305,33 @@
         font-size: 12px;
         margin: 5px; }
 
+.mobile .wrapper {
+  width: 700px; }
+.mobile nav a {
+  display: none; }
+.mobile h1 {
+  font-size: 60px; }
+.mobile h4 {
+  font-size: 40px;
+  margin: 0 0 20px; }
+.mobile h5 {
+  font-size: 30px; }
+.mobile .competition-nav {
+  display: none; }
+.mobile .target-list-nav {
+  display: none; }
+.mobile .competition-section {
+  margin: 15px 0; }
+.mobile .competition-content {
+  margin: 0 15px;
+  width: 670px; }
+  .mobile .competition-content .input-scores .input-board .boss {
+    height: 71px;
+    width: 71px;
+    font-size: 55px; }
+.mobile .module {
+  width: 670px; }
+
 .select-widget .select {
   display: none; }
 .select-widget .options-wrapper {
