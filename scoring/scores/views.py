@@ -1,12 +1,14 @@
 from itertools import groupby
+import json
 import math
 
 from django.contrib.auth.decorators import login_required
 from django.core.cache import cache
 from django.core.urlresolvers import reverse
 from django.db import models
-from django.http import HttpResponseRedirect
+from django.http import HttpResponse, HttpResponseRedirect
 from django.shortcuts import render, get_object_or_404
+from django.template.loader import render_to_string
 from django.views.generic import View, ListView
 
 from reportlab.platypus import PageBreak, Table
@@ -256,6 +258,32 @@ class LeaderboardTeams(ListView):
 
         context['title'] = self.title
 
+        return context
+
+
+class LeaderboardBUTC(LeaderboardTeams):
+    template_name = 'scores/leaderboard_butc.html'
+    backbone_template = 'scores/leaderboard_butc_backbone.html'
+    title = 'BUTC 2012'
+
+    def render_to_response(self, context):
+        if self.request.is_ajax():
+            return HttpResponse(context['serialized_results'])
+        return super(LeaderboardBUTC, self).render_to_response(context)
+
+    def get_context_data(self, **kwargs):
+        context = super(LeaderboardBUTC, self).get_context_data(**kwargs)
+        context['serialized_results'] = json.dumps([{
+            'position': i + 1,
+            'id': d['club'].pk,
+            'club': d['club'].short_name.replace(' Uni', ''),
+            'team': [{
+                'name': a.target.session_entry.competition_entry.archer.name.split(' ')[-1],
+                'score': a.score,
+                } for a in d['team']],
+            'total': d['total'],
+        } for i, d in enumerate(context['club_results'])])
+        context['template'] = render_to_string(self.backbone_template)
         return context
 
 
