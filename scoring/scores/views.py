@@ -282,7 +282,7 @@ class LeaderboardBUTC(LeaderboardTeams):
                 'score': a.score,
                 } for a in d['team']],
             'total': d['total'],
-        } for i, d in enumerate(context['club_results'])])
+        } for i, d in enumerate(context['club_results'][:32])])
         context['template'] = render_to_string(self.backbone_template)
         return context
 

@@ -466,10 +466,10 @@ footer {
         -webkit-transition: all 2s ease-in-out; }
       .leaderboard-butc .wrapper #leaderboard .club [data-club] {
         position: relative;
-        width: 368px;
+        width: 327.2px;
         height: 128px; }
       .leaderboard-butc .wrapper #leaderboard .club .title {
-        color: white;
+        color: #fbeedb;
         font-size: 33.6px;
         font-weight: bold;
         display: block; }
@@ -484,12 +484,12 @@ footer {
         color: #d58100;
         right: 0; }
       .leaderboard-butc .wrapper #leaderboard .club ul {
-        width: 368px;
+        width: 327.2px;
         text-align: center;
-        color: white;
+        color: #dddafa;
         font-size: 16.8px;
         position: absolute;
-        bottom: 0; }
+        bottom: -5.6px; }
         .leaderboard-butc .wrapper #leaderboard .club ul li {
           display: inline; }
       .leaderboard-butc .wrapper #leaderboard .club.position-1 {
@@ -501,7 +501,7 @@ footer {
       .leaderboard-butc .wrapper #leaderboard .club.position-4 {
         -webkit-transform: translate(0, 504px); }
       .leaderboard-butc .wrapper #leaderboard .club.position-5 {
-        -webkit-transform: translate(408px, 0px);
+        -webkit-transform: translate(367.2px, 0px);
         padding: 10px; }
         .leaderboard-butc .wrapper #leaderboard .club.position-5 [data-club] {
           width: 174px;
@@ -514,7 +514,7 @@ footer {
         .leaderboard-butc .wrapper #leaderboard .club.position-5 ul {
           -webkit-transform: scale(0); }
       .leaderboard-butc .wrapper #leaderboard .club.position-6 {
-        -webkit-transform: translate(408px, 84px);
+        -webkit-transform: translate(367.2px, 84px);
         padding: 10px; }
         .leaderboard-butc .wrapper #leaderboard .club.position-6 [data-club] {
           width: 174px;
@@ -527,7 +527,7 @@ footer {
         .leaderboard-butc .wrapper #leaderboard .club.position-6 ul {
           -webkit-transform: scale(0); }
       .leaderboard-butc .wrapper #leaderboard .club.position-7 {
-        -webkit-transform: translate(408px, 168px);
+        -webkit-transform: translate(367.2px, 168px);
         padding: 10px; }
         .leaderboard-butc .wrapper #leaderboard .club.position-7 [data-club] {
           width: 174px;
@@ -540,7 +540,7 @@ footer {
         .leaderboard-butc .wrapper #leaderboard .club.position-7 ul {
           -webkit-transform: scale(0); }
       .leaderboard-butc .wrapper #leaderboard .club.position-8 {
-        -webkit-transform: translate(408px, 252px);
+        -webkit-transform: translate(367.2px, 252px);
         padding: 10px; }
         .leaderboard-butc .wrapper #leaderboard .club.position-8 [data-club] {
           width: 174px;
@@ -553,7 +553,7 @@ footer {
         .leaderboard-butc .wrapper #leaderboard .club.position-8 ul {
           -webkit-transform: scale(0); }
       .leaderboard-butc .wrapper #leaderboard .club.position-9 {
-        -webkit-transform: translate(408px, 336px);
+        -webkit-transform: translate(367.2px, 336px);
         padding: 10px; }
         .leaderboard-butc .wrapper #leaderboard .club.position-9 [data-club] {
           width: 174px;
@@ -566,7 +566,7 @@ footer {
         .leaderboard-butc .wrapper #leaderboard .club.position-9 ul {
           -webkit-transform: scale(0); }
       .leaderboard-butc .wrapper #leaderboard .club.position-10 {
-        -webkit-transform: translate(408px, 420px);
+        -webkit-transform: translate(367.2px, 420px);
         padding: 10px; }
         .leaderboard-butc .wrapper #leaderboard .club.position-10 [data-club] {
           width: 174px;
@@ -579,7 +579,7 @@ footer {
         .leaderboard-butc .wrapper #leaderboard .club.position-10 ul {
           -webkit-transform: scale(0); }
       .leaderboard-butc .wrapper #leaderboard .club.position-11 {
-        -webkit-transform: translate(408px, 504px);
+        -webkit-transform: translate(367.2px, 504px);
         padding: 10px; }
         .leaderboard-butc .wrapper #leaderboard .club.position-11 [data-club] {
           width: 174px;
@@ -592,7 +592,7 @@ footer {
         .leaderboard-butc .wrapper #leaderboard .club.position-11 ul {
           -webkit-transform: scale(0); }
       .leaderboard-butc .wrapper #leaderboard .club.position-12 {
-        -webkit-transform: translate(408px, 588px);
+        -webkit-transform: translate(367.2px, 588px);
         padding: 10px; }
         .leaderboard-butc .wrapper #leaderboard .club.position-12 [data-club] {
           width: 174px;
@@ -605,7 +605,7 @@ footer {
         .leaderboard-butc .wrapper #leaderboard .club.position-12 ul {
           -webkit-transform: scale(0); }
       .leaderboard-butc .wrapper #leaderboard .club.position-13 {
-        -webkit-transform: translate(408px, 672px);
+        -webkit-transform: translate(367.2px, 672px);
         padding: 10px; }
         .leaderboard-butc .wrapper #leaderboard .club.position-13 [data-club] {
           width: 174px;
@@ -618,7 +618,7 @@ footer {
         .leaderboard-butc .wrapper #leaderboard .club.position-13 ul {
           -webkit-transform: scale(0); }
       .leaderboard-butc .wrapper #leaderboard .club.position-14 {
-        -webkit-transform: translate(408px, 756px);
+        -webkit-transform: translate(367.2px, 756px);
         padding: 10px; }
         .leaderboard-butc .wrapper #leaderboard .club.position-14 [data-club] {
           width: 174px;
@@ -631,7 +631,7 @@ footer {
         .leaderboard-butc .wrapper #leaderboard .club.position-14 ul {
           -webkit-transform: scale(0); }
       .leaderboard-butc .wrapper #leaderboard .club.position-15 {
-        -webkit-transform: translate(408px, 840px);
+        -webkit-transform: translate(367.2px, 840px);
         padding: 10px; }
         .leaderboard-butc .wrapper #leaderboard .club.position-15 [data-club] {
           width: 174px;
@@ -644,7 +644,7 @@ footer {
         .leaderboard-butc .wrapper #leaderboard .club.position-15 ul {
           -webkit-transform: scale(0); }
       .leaderboard-butc .wrapper #leaderboard .club.position-16 {
-        -webkit-transform: translate(408px, 924px);
+        -webkit-transform: translate(367.2px, 924px);
         padding: 10px; }
         .leaderboard-butc .wrapper #leaderboard .club.position-16 [data-club] {
           width: 174px;
@@ -657,7 +657,7 @@ footer {
         .leaderboard-butc .wrapper #leaderboard .club.position-16 ul {
           -webkit-transform: scale(0); }
       .leaderboard-butc .wrapper #leaderboard .club.position-17 {
-        -webkit-transform: translate(408px, 1008px);
+        -webkit-transform: translate(367.2px, 1008px);
         padding: 10px; }
         .leaderboard-butc .wrapper #leaderboard .club.position-17 [data-club] {
           width: 174px;
@@ -670,7 +670,7 @@ footer {
         .leaderboard-butc .wrapper #leaderboard .club.position-17 ul {
           -webkit-transform: scale(0); }
       .leaderboard-butc .wrapper #leaderboard .club.position-18 {
-        -webkit-transform: translate(408px, 1092px);
+        -webkit-transform: translate(367.2px, 1092px);
         padding: 10px; }
         .leaderboard-butc .wrapper #leaderboard .club.position-18 [data-club] {
           width: 174px;
@@ -683,7 +683,7 @@ footer {
         .leaderboard-butc .wrapper #leaderboard .club.position-18 ul {
           -webkit-transform: scale(0); }
       .leaderboard-butc .wrapper #leaderboard .club.position-19 {
-        -webkit-transform: translate(408px, 1176px);
+        -webkit-transform: translate(367.2px, 1176px);
         padding: 10px; }
         .leaderboard-butc .wrapper #leaderboard .club.position-19 [data-club] {
           width: 174px;
@@ -696,7 +696,7 @@ footer {
         .leaderboard-butc .wrapper #leaderboard .club.position-19 ul {
           -webkit-transform: scale(0); }
       .leaderboard-butc .wrapper #leaderboard .club.position-20 {
-        -webkit-transform: translate(408px, 1260px);
+        -webkit-transform: translate(367.2px, 1260px);
         padding: 10px; }
         .leaderboard-butc .wrapper #leaderboard .club.position-20 [data-club] {
           width: 174px;
@@ -709,196 +709,196 @@ footer {
         .leaderboard-butc .wrapper #leaderboard .club.position-20 ul {
           -webkit-transform: scale(0); }
       .leaderboard-butc .wrapper #leaderboard .club.position-13 {
-        -webkit-transform: translate(612px, 0px); }
+        -webkit-transform: translate(571.2px, 0px); }
       .leaderboard-butc .wrapper #leaderboard .club.position-14 {
-        -webkit-transform: translate(612px, 84px); }
+        -webkit-transform: translate(571.2px, 84px); }
       .leaderboard-butc .wrapper #leaderboard .club.position-15 {
-        -webkit-transform: translate(612px, 168px); }
+        -webkit-transform: translate(571.2px, 168px); }
       .leaderboard-butc .wrapper #leaderboard .club.position-16 {
-        -webkit-transform: translate(612px, 252px); }
+        -webkit-transform: translate(571.2px, 252px); }
       .leaderboard-butc .wrapper #leaderboard .club.position-17 {
-        -webkit-transform: translate(612px, 336px); }
+        -webkit-transform: translate(571.2px, 336px); }
       .leaderboard-butc .wrapper #leaderboard .club.position-18 {
-        -webkit-transform: translate(612px, 420px); }
+        -webkit-transform: translate(571.2px, 420px); }
       .leaderboard-butc .wrapper #leaderboard .club.position-19 {
-        -webkit-transform: translate(612px, 504px); }
+        -webkit-transform: translate(571.2px, 504px); }
       .leaderboard-butc .wrapper #leaderboard .club.position-20 {
-        -webkit-transform: translate(612px, 588px); }
+        -webkit-transform: translate(571.2px, 588px); }
       .leaderboard-butc .wrapper #leaderboard .club.position-21 {
-        -webkit-transform: translate(816px, 0px);
+        -webkit-transform: translate(775.2px, 0px);
         padding: 10px; }
         .leaderboard-butc .wrapper #leaderboard .club.position-21 [data-club] {
-          width: 174px;
+          width: 214.8px;
           height: 26px; }
         .leaderboard-butc .wrapper #leaderboard .club.position-21 .title {
           font-size: 16.8px;
           padding-top: 3px;
-          margin-left: 33px; }
+          margin-left: 40px; }
         .leaderboard-butc .wrapper #leaderboard .club.position-21 .position, .leaderboard-butc .wrapper #leaderboard .club.position-21 .score {
           font-size: 28px;
           bottom: 0; }
         .leaderboard-butc .wrapper #leaderboard .club.position-21 ul {
           -webkit-transform: scale(0); }
       .leaderboard-butc .wrapper #leaderboard .club.position-22 {
-        -webkit-transform: translate(816px, 56px);
+        -webkit-transform: translate(775.2px, 56px);
         padding: 10px; }
         .leaderboard-butc .wrapper #leaderboard .club.position-22 [data-club] {
-          width: 174px;
+          width: 214.8px;
           height: 26px; }
         .leaderboard-butc .wrapper #leaderboard .club.position-22 .title {
           font-size: 16.8px;
           padding-top: 3px;
-          margin-left: 33px; }
+          margin-left: 40px; }
         .leaderboard-butc .wrapper #leaderboard .club.position-22 .position, .leaderboard-butc .wrapper #leaderboard .club.position-22 .score {
           font-size: 28px;
           bottom: 0; }
         .leaderboard-butc .wrapper #leaderboard .club.position-22 ul {
           -webkit-transform: scale(0); }
       .leaderboard-butc .wrapper #leaderboard .club.position-23 {
-        -webkit-transform: translate(816px, 112px);
+        -webkit-transform: translate(775.2px, 112px);
         padding: 10px; }
         .leaderboard-butc .wrapper #leaderboard .club.position-23 [data-club] {
-          width: 174px;
+          width: 214.8px;
           height: 26px; }
         .leaderboard-butc .wrapper #leaderboard .club.position-23 .title {
           font-size: 16.8px;
           padding-top: 3px;
-          margin-left: 33px; }
+          margin-left: 40px; }
         .leaderboard-butc .wrapper #leaderboard .club.position-23 .position, .leaderboard-butc .wrapper #leaderboard .club.position-23 .score {
           font-size: 28px;
           bottom: 0; }
         .leaderboard-butc .wrapper #leaderboard .club.position-23 ul {
           -webkit-transform: scale(0); }
       .leaderboard-butc .wrapper #leaderboard .club.position-24 {
-        -webkit-transform: translate(816px, 168px);
+        -webkit-transform: translate(775.2px, 168px);
         padding: 10px; }
         .leaderboard-butc .wrapper #leaderboard .club.position-24 [data-club] {
-          width: 174px;
+          width: 214.8px;
           height: 26px; }
         .leaderboard-butc .wrapper #leaderboard .club.position-24 .title {
           font-size: 16.8px;
           padding-top: 3px;
-          margin-left: 33px; }
+          margin-left: 40px; }
         .leaderboard-butc .wrapper #leaderboard .club.position-24 .position, .leaderboard-butc .wrapper #leaderboard .club.position-24 .score {
           font-size: 28px;
           bottom: 0; }
         .leaderboard-butc .wrapper #leaderboard .club.position-24 ul {
           -webkit-transform: scale(0); }
       .leaderboard-butc .wrapper #leaderboard .club.position-25 {
-        -webkit-transform: translate(816px, 224px);
+        -webkit-transform: translate(775.2px, 224px);
         padding: 10px; }
         .leaderboard-butc .wrapper #leaderboard .club.position-25 [data-club] {
-          width: 174px;
+          width: 214.8px;
           height: 26px; }
         .leaderboard-butc .wrapper #leaderboard .club.position-25 .title {
           font-size: 16.8px;
           padding-top: 3px;
-          margin-left: 33px; }
+          margin-left: 40px; }
         .leaderboard-butc .wrapper #leaderboard .club.position-25 .position, .leaderboard-butc .wrapper #leaderboard .club.position-25 .score {
           font-size: 28px;
           bottom: 0; }
         .leaderboard-butc .wrapper #leaderboard .club.position-25 ul {
           -webkit-transform: scale(0); }
       .leaderboard-butc .wrapper #leaderboard .club.position-26 {
-        -webkit-transform: translate(816px, 280px);
+        -webkit-transform: translate(775.2px, 280px);
         padding: 10px; }
         .leaderboard-butc .wrapper #leaderboard .club.position-26 [data-club] {
-          width: 174px;
+          width: 214.8px;
           height: 26px; }
         .leaderboard-butc .wrapper #leaderboard .club.position-26 .title {
           font-size: 16.8px;
           padding-top: 3px;
-          margin-left: 33px; }
+          margin-left: 40px; }
         .leaderboard-butc .wrapper #leaderboard .club.position-26 .position, .leaderboard-butc .wrapper #leaderboard .club.position-26 .score {
           font-size: 28px;
           bottom: 0; }
         .leaderboard-butc .wrapper #leaderboard .club.position-26 ul {
           -webkit-transform: scale(0); }
       .leaderboard-butc .wrapper #leaderboard .club.position-27 {
-        -webkit-transform: translate(816px, 336px);
+        -webkit-transform: translate(775.2px, 336px);
         padding: 10px; }
         .leaderboard-butc .wrapper #leaderboard .club.position-27 [data-club] {
-          width: 174px;
+          width: 214.8px;
           height: 26px; }
         .leaderboard-butc .wrapper #leaderboard .club.position-27 .title {
           font-size: 16.8px;
           padding-top: 3px;
-          margin-left: 33px; }
+          margin-left: 40px; }
         .leaderboard-butc .wrapper #leaderboard .club.position-27 .position, .leaderboard-butc .wrapper #leaderboard .club.position-27 .score {
           font-size: 28px;
           bottom: 0; }
         .leaderboard-butc .wrapper #leaderboard .club.position-27 ul {
           -webkit-transform: scale(0); }
       .leaderboard-butc .wrapper #leaderboard .club.position-28 {
-        -webkit-transform: translate(816px, 392px);
+        -webkit-transform: translate(775.2px, 392px);
         padding: 10px; }
         .leaderboard-butc .wrapper #leaderboard .club.position-28 [data-club] {
-          width: 174px;
+          width: 214.8px;
           height: 26px; }
         .leaderboard-butc .wrapper #leaderboard .club.position-28 .title {
           font-size: 16.8px;
           padding-top: 3px;
-          margin-left: 33px; }
+          margin-left: 40px; }
         .leaderboard-butc .wrapper #leaderboard .club.position-28 .position, .leaderboard-butc .wrapper #leaderboard .club.position-28 .score {
           font-size: 28px;
           bottom: 0; }
         .leaderboard-butc .wrapper #leaderboard .club.position-28 ul {
           -webkit-transform: scale(0); }
       .leaderboard-butc .wrapper #leaderboard .club.position-29 {
-        -webkit-transform: translate(816px, 448px);
+        -webkit-transform: translate(775.2px, 448px);
         padding: 10px; }
         .leaderboard-butc .wrapper #leaderboard .club.position-29 [data-club] {
-          width: 174px;
+          width: 214.8px;
           height: 26px; }
         .leaderboard-butc .wrapper #leaderboard .club.position-29 .title {
           font-size: 16.8px;
           padding-top: 3px;
-          margin-left: 33px; }
+          margin-left: 40px; }
         .leaderboard-butc .wrapper #leaderboard .club.position-29 .position, .leaderboard-butc .wrapper #leaderboard .club.position-29 .score {
           font-size: 28px;
           bottom: 0; }
         .leaderboard-butc .wrapper #leaderboard .club.position-29 ul {
           -webkit-transform: scale(0); }
       .leaderboard-butc .wrapper #leaderboard .club.position-30 {
-        -webkit-transform: translate(816px, 504px);
+        -webkit-transform: translate(775.2px, 504px);
         padding: 10px; }
         .leaderboard-butc .wrapper #leaderboard .club.position-30 [data-club] {
-          width: 174px;
+          width: 214.8px;
           height: 26px; }
         .leaderboard-butc .wrapper #leaderboard .club.position-30 .title {
           font-size: 16.8px;
           padding-top: 3px;
-          margin-left: 33px; }
+          margin-left: 40px; }
         .leaderboard-butc .wrapper #leaderboard .club.position-30 .position, .leaderboard-butc .wrapper #leaderboard .club.position-30 .score {
           font-size: 28px;
           bottom: 0; }
         .leaderboard-butc .wrapper #leaderboard .club.position-30 ul {
           -webkit-transform: scale(0); }
       .leaderboard-butc .wrapper #leaderboard .club.position-31 {
-        -webkit-transform: translate(816px, 560px);
+        -webkit-transform: translate(775.2px, 560px);
         padding: 10px; }
         .leaderboard-butc .wrapper #leaderboard .club.position-31 [data-club] {
-          width: 174px;
+          width: 214.8px;
           height: 26px; }
         .leaderboard-butc .wrapper #leaderboard .club.position-31 .title {
           font-size: 16.8px;
           padding-top: 3px;
-          margin-left: 33px; }
+          margin-left: 40px; }
         .leaderboard-butc .wrapper #leaderboard .club.position-31 .position, .leaderboard-butc .wrapper #leaderboard .club.position-31 .score {
           font-size: 28px;
           bottom: 0; }
         .leaderboard-butc .wrapper #leaderboard .club.position-31 ul {
           -webkit-transform: scale(0); }
       .leaderboard-butc .wrapper #leaderboard .club.position-32 {
-        -webkit-transform: translate(816px, 616px);
+        -webkit-transform: translate(775.2px, 616px);
         padding: 10px; }
         .leaderboard-butc .wrapper #leaderboard .club.position-32 [data-club] {
-          width: 174px;
+          width: 214.8px;
           height: 26px; }
         .leaderboard-butc .wrapper #leaderboard .club.position-32 .title {
           font-size: 16.8px;
           padding-top: 3px;
-          margin-left: 33px; }
+          margin-left: 40px; }
         .leaderboard-butc .wrapper #leaderboard .club.position-32 .position, .leaderboard-butc .wrapper #leaderboard .club.position-32 .score {
           font-size: 28px;
           bottom: 0; }
