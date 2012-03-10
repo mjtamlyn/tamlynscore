@@ -95,6 +95,7 @@ class InputScoresMobile(InputScores):
 
 class InputArrowsView(View):
     template = 'input_arrows.html'
+    next_url_name = 'input_scores'
 
     def get(self, request, slug, round_id, boss, dozen):
         competition = get_object_or_404(Competition, slug=slug)
@@ -120,10 +121,17 @@ class InputArrowsView(View):
             for score in scores:
                 score.update_score()
                 score.save(force_update=True)
-            return HttpResponseRedirect(reverse('input_scores', kwargs={'slug': slug}) + '?fd={0}&ft={1}#session-{3}-round-{2}'.format(dozen, boss, round_id, SessionRound.objects.get(pk=round_id).session.pk))
+            return HttpResponseRedirect(reverse(self.next_url_name, kwargs={'slug': slug}) + '?fd={0}&ft={1}#session-{3}-round-{2}'.format(dozen, boss, round_id, SessionRound.objects.get(pk=round_id).session.pk))
         return render(request, self.template, locals())
 
 input_arrows = login_required(InputArrowsView.as_view())
+
+class InputArrowsViewMobile(InputArrowsView):
+    template = 'input_arrows_mobile.html'
+    next_url_name = 'input_scores_mobile'
+
+input_arrows_mobile = login_required(InputArrowsViewMobile.as_view())
+
 
 class LeaderboardView(View):
     template = 'leaderboard.html'
