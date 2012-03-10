@@ -77,6 +77,9 @@ var Arrows = new Class({
     },
 
     updateTotals: function (input) {
+        if (!input) {
+            input = $$('.active input')[0];
+        }
         var row = input.getParent('tr');
         var inputs = row.getElements('input');
         var ET1 = 0;
@@ -84,7 +87,7 @@ var Arrows = new Class({
         var hits = 0;
         var golds = 0;
         var xs = 0;
-        var rt = row.getElement('.rt').get('rel').toInt();
+        var rt = parseInt(row.getElement('.rt').get('rel'));
         inputs.each(function (item, index) {
             var value = item.get('value');
             if (value == 'M' || value == '') {

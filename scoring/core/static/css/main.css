@@ -382,6 +382,7 @@ footer {
       text-align: center; }
       .competition-section .competition-content .input-arrows .save input {
         background-image: -webkit-linear-gradient(#b4adf4, #dddafa, #b4adf4);
+        background: #dddafa;
         border-color: #6fb3ff;
         border-width: 2px;
         border-radius: 10px;
@@ -437,6 +438,33 @@ footer {
     font-size: 55px; }
 .mobile .module {
   width: 670px; }
+.mobile table {
+  font-size: 24px;
+  border-spacing: 4px; }
+.mobile .competition-section .competition-content .input-arrows td.field {
+  width: 36px;
+  text-align: center; }
+  .mobile .competition-section .competition-content .input-arrows td.field input {
+    height: 1px;
+    width: 1px;
+    border-width: 0; }
+  .mobile .competition-section .competition-content .input-arrows td.field.active {
+    background-color: #6fb3ff; }
+    .mobile .competition-section .competition-content .input-arrows td.field.active input {
+      background-color: #6fb3ff; }
+.mobile .competition-section .competition-content .input-arrows input {
+  font-size: 24px;
+  width: 42px; }
+  .mobile .competition-section .competition-content .input-arrows input[type=submit] {
+    width: 100px; }
+.mobile .competition-section .competition-content .input-arrows .input-buttons {
+  margin: 0 auto;
+  width: 480px;
+  text-align: center; }
+  .mobile .competition-section .competition-content .input-arrows .input-buttons input[type=submit] {
+    width: 66px;
+    height: 66px;
+    margin: 5px; }
 
 .select-widget .select {
   display: none; }
@@ -517,7 +545,9 @@ footer {
         color: #dddafa;
         font-size: 16.8px;
         position: absolute;
-        bottom: -5.6px; }
+        bottom: -5.6px;
+        height: 20.8px;
+        overflow: hidden; }
         .leaderboard-butc .wrapper #leaderboard .club ul li {
           display: inline; }
       .leaderboard-butc .wrapper #leaderboard .club.position-1 {

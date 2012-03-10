@@ -4,8 +4,9 @@ from scores import views
 
 urlpatterns = patterns('scores.views',
     url(r'^(?P<slug>(\w+-?)+)/input-scores/$', views.InputScores.as_view(), name='input_scores'),
-    url(r'^(?P<slug>(\w+-?)+)/input-scores/mobile/$', views.InputScoresMobile.as_view(), name='input_scores-mobile'),
+    url(r'^(?P<slug>(\w+-?)+)/input-scores/mobile/$', views.InputScoresMobile.as_view(), name='input_scores_mobile'),
     (r'^(?P<slug>(\w+-?)+)/input-arrows/(?P<round_id>\d+)/doz(?P<dozen>\d+)/boss(?P<boss>\d+)/$', 'input_arrows'),
+    (r'^(?P<slug>(\w+-?)+)/input-arrows/(?P<round_id>\d+)/doz(?P<dozen>\d+)/boss(?P<boss>\d+)/mobile/$', 'input_arrows_mobile'),
     (r'^(?P<slug>(\w+-?)+)/leaderboard/$', 'leaderboard'),
     url(r'^(?P<slug>(\w+-?)+)/leaderboard/combined/$', views.LeaderboardCombined.as_view(), name='leaderboard_combined'),
     url(r'^(?P<slug>(\w+-?)+)/leaderboard/combined/experienced/$', views.LeaderboardCombinedExperienced.as_view(), name='leaderboard_combined_experienced'),

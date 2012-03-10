@@ -353,6 +353,7 @@ $navborder: 1px solid $bluegrey
         text-align: center
         input
           background-image: -webkit-linear-gradient(darken($vlightblue, 10%), $vlightblue, darken($vlightblue, 10%))
+          background: $vlightblue
           border:
             color: $lightblue
             width: 2px
@@ -422,6 +423,7 @@ $navborder: 1px solid $bluegrey
     margin: 0 15px
     width: $mobile-width - 30px
 
+    // input scores
     .input-scores .input-board .boss
       height: 71px
       width: 71px
@@ -429,6 +431,39 @@ $navborder: 1px solid $bluegrey
   
   .module
     width: $mobile-width - 30px
+
+  // input arrows
+  table
+    font-size: 24px
+    border-spacing: 4px
+
+  .competition-section .competition-content .input-arrows
+    td.field
+      width: 36px
+      text-align: center
+      input
+        height: 1px
+        width: 1px
+        border-width: 0
+      &.active
+        background-color: $lightblue
+        input
+          background-color: $lightblue
+
+    input
+      font-size: 24px
+      width: 42px
+      &[type=submit]
+        width: 100px
+
+    .input-buttons
+      margin: 0 auto
+      width: 480px
+      text-align: center
+      input[type=submit]
+        width: 66px
+        height: 66px
+        margin: 5px
 
 
 .select-widget
@@ -529,6 +564,8 @@ $navborder: 1px solid $bluegrey
           font-size: $hu*0.6
           position: absolute
           bottom: -$hu/5
+          height: $hu*0.6 + 4px
+          overflow: hidden
           li
             display: inline
 
