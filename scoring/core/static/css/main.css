@@ -3,8 +3,8 @@ body {
   font-family: Georgia; }
 
 h1, h2, h3, h4, h5, h6 {
-  background-image: -webkit-linear-gradient(#20364e, #111d2a, #111d2a, #20364e);
   background: #111d2a;
+  background-image: -webkit-linear-gradient(#20364e, #111d2a, #111d2a, #20364e);
   color: white;
   margin: 5px 0px;
   padding: 5px;
@@ -381,8 +381,8 @@ footer {
     .competition-section .competition-content .input-arrows .save {
       text-align: center; }
       .competition-section .competition-content .input-arrows .save input {
-        background-image: -webkit-linear-gradient(#b4adf4, #dddafa, #b4adf4);
         background: #dddafa;
+        background-image: -webkit-linear-gradient(#b4adf4, #dddafa, #b4adf4);
         border-color: #6fb3ff;
         border-width: 2px;
         border-radius: 10px;
