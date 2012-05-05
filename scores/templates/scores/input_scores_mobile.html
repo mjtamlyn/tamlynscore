@@ -1,0 +1,5 @@
+{% extends 'scores/input_scores.html' %}
+
+{% block bodyclass %}mobile{% endblock %}
+
+{% block linklocation %}{% url scores.views.input_arrows_mobile slug=competition.slug round_id=round.pk dozen=dozen boss=boss %}{% endblock %}

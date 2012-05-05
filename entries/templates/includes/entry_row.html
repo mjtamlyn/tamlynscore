@@ -1,0 +1,20 @@
+<tr class="top"entry>
+    <td colspan="2">{{ entry.archer }}</td>
+    <td colspan="2">{{ entry.club }}</td>
+    {% for session in competition.sessions_with_rounds %}
+    <td rowspan="2" class="tall">
+        {% for round in rounds_entered %}
+            {% if round.session_round.session == session %}
+                {{ round.session_round.shot_round }}
+            {% endif %}
+        {% endfor %}
+    </td>
+    {% endfor %}
+    <td rowspan="2" class="delete tall" rel="{{ entry.pk }}">X</td>
+</tr>
+<tr class="bottom">
+    <td>{{ entry.bowstyle }}</td>
+    <td>{{ entry.archer.get_gender_display }}</td>
+    <td>{{ entry.get_novice_display }}</td>
+    <td>{{ entry.get_age_display }}</td>
+</tr>

@@ -1,0 +1,38 @@
+<html>
+    <head>
+        {% block head %}
+            {% block meta %}
+            <title>{% block title %}Archery Tournaments{% endblock %}</title>
+            {% endblock meta %}
+            {% block styles %}
+                <link rel="stylesheet" href="{{ STATIC_URL }}css/main.css" />
+                {% block extrastyles %}
+                {% endblock extrastyles %}
+            {% endblock styles %}
+            {% block scripts %}
+            {% endblock scripts %}
+        {% endblock head %}
+    </head>
+    {# TODO: Remove bodyclass in favour of page_id #}
+    <body class="{% block bodyclass %}{% endblock %}">
+        <div class="wrapper" id="{% block page_id %}{% endblock %}">
+            {% block nav %}
+            <nav>
+                {% block nav_links %}
+                <a href="{% url index %}"><div class="nav-link">Home</div></a>
+                <a href="{% url club_list %}"><div class="nav-link">Clubs</div></a>
+                <a href="{% url tournaments_list %}"><div class="nav-link">Tournaments</div></a>
+                <a href="{% url logout %}"><div class="nav-link">Log Out</div></a>
+                {% endblock nav_links %}
+            </nav>
+            {% endblock nav %}
+            {% block content %}
+            {% endblock %}
+            {% block footer %}
+            <footer>
+                <p>Designed, built and maintained by Emma &amp; <a href="http://twitter.com/mjtamlyn">Marc Tamlyn</a></p>
+            </footer>
+            {% endblock footer %}
+        </div>
+    </body>
+</html>

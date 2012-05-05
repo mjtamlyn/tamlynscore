@@ -1,0 +1,85 @@
+{% extends 'base.html' %}
+
+{% block extrastyles %}
+<style>
+    .left{
+        float: left;
+    }
+    .right{
+        float: right;
+    }
+    .details_block {
+        margin: 20px;
+    }
+    .names {
+        margin: 17px 20px 0px 0px;
+    }
+    p {
+        margin: 20px 0px 0px 0px;
+    }
+    h4 {
+        margin: 1px 0px 0px 0px;
+    }
+    li {
+        margin: 5px 0px 0px 0px;
+    }
+    .logo_block {
+        margin: 20px;
+        padding: 0px 50px;
+    }
+    .logo {
+        width: 200px; 
+        height: 200px;
+        border: 1px solid blue;
+        margin: 20px;
+    }
+    .basic {
+        padding: 5px;
+    }
+</style>    
+{% endblock %}
+
+{% block content %}
+<h1>{{ club.name }}</h1>
+
+<div class="details_block left">
+    <div class="basic left">
+        <ul class="names">
+            <li>Full name <h4>{{ club.name }}</h4></li>
+            <li>Short name <h4>{{ club.short_name }}</h4></li>
+            <li>Abbreviation <h4>{{ club.abbreviation }}</h4></li>
+        </ul>
+    </div>
+    <div class="basic details left">
+        <p>Location:</p>
+        <div class="text">
+            (( club.location ))
+        </div>
+        <p>Club Colours:</p>
+        <div class="text">
+            (( club.colours ))
+        </div>
+    </div>
+    <div class="clear"></div>
+    <div class="basic affiliations">
+        <p>Affiliated to:</p>
+        {% if club.county %}
+        <ul class="affiliations">
+            <li><a href="#">{{ club.county }}</a></li>
+            <li><a href="#">{{ club.county.region }}</a></li>
+            <li><a href="#">{{ club.county.region.country }}</a></li>
+        </ul>
+        {% endif %}
+    </div>
+</div>
+<div class="logo_block right">
+    <div class="logo">
+        (( club.logo ))
+    </div>
+</div>
+<div class="clear"></div> 
+
+
+
+{% endblock %}
+

@@ -1,0 +1,24 @@
+{% extends 'base.html' %}
+
+{% block extrastyles %} 
+<style>
+    ul {
+        margin: 17px 25px;
+        -webkit-column-count: 4;
+    }
+</style>
+{% endblock %}
+
+{% block bodyclass %}club-list{% endblock %}
+
+{% block content %}
+<h1>Clubs</h1>
+
+<ul>
+    {% for club in club_list %}
+    <li><a href="{% url club_detail slug=club.slug %}">{{ club }}</a></li>
+    {% endfor %}
+</ul>
+
+{% endblock %}
+

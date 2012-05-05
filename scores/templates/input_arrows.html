@@ -1,0 +1,63 @@
+{% extends 'entries/competition_detail.html' %}
+
+{% block scripts %}
+<script src="{{ STATIC_URL }}js/mootools-core-1.3.js"></script>
+<script src="{{ STATIC_URL }}js/input-arrows.js"></script>
+<script>
+    window.addEvent('domready', function () {
+        arrows = new Arrows();
+        arrows.setUp();
+    });
+</script>
+{% endblock %}
+
+{% block competition_content %}
+<div class="module input-arrows">
+    <h4>Enter arrow values for boss {{ boss }}, dozen {{ dozen }}</h4>
+    <form action="" method="post" autocomplete="off">
+        <table class="target">
+            <tr>
+                <th colspan="2">Archer</th>
+                <td colspan="{% if forms.0.forms|length > 6 %}6{% else %}{{ forms.0.forms|length }}{% endif %}"></td>
+                {% if forms.0.forms|length > 6 %}
+                <th>ET</th>
+                <td colspan="6"></td>
+                <th>ET</th>
+                {% endif %}
+                <th>Doz</th>
+                <th>Hits</th>
+                <th>Golds</th>
+                <th>Xs</th>
+                <th>RT</th>
+            </tr>
+            {% for target in forms %}
+            <tr>
+                <td>{{ target.target }}</td>
+                <td>{{ target.archer }}</td>
+                {% for form in target.forms %}
+                <td>{{ form.arrow_value }}<span class="hidden">{{ form.is_x.value }}</span></td>
+                {% if target.forms|length > 6 and forloop.counter == 6 %}
+                <th class="end-total et1">0</th>
+                {% endif %}
+                {% if forloop.last %}
+                {% if target.forms|length > 6 %}
+                <th class="end-total et2">0</th>
+                {% endif %}
+                <th class="doz-total">0</th>
+                <th class="hits">0</th>
+                <th class="golds">0</th>
+                <th class="xs">0</th>
+                <th class="rt" rel="{{ target.running_total }}">{{ target.running_total }}</th>
+                {% endif %}
+                {% endfor %}
+            </tr>
+            {% endfor %}
+        </table>
+        <div class="save">
+            <input type="submit" value="Save" />
+        </div>
+        {% csrf_token %}
+    </form>
+    <div class="clear"></div>
+</div>
+{% endblock %}

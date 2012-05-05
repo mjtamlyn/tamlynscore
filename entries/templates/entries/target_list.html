@@ -1,0 +1,227 @@
+{% extends 'entries/competition_detail.html' %}
+
+{% block scripts %}
+<script src="{{ STATIC_URL }}js/mootools-core-1.3.js"></script>
+<script>
+    Object.append(Element.NativeEvents, {
+        dragstart: 2, dragenter: 2, dragleave: 2, dragover: 2, dragend: 2, drop: 2
+    });
+    window.addEvent('domready', function () {
+        doRequest = function (data) {
+            var request = new Request({
+                data: {
+                    targets: JSON.encode(data.targets),
+                    csrfmiddlewaretoken: $$('input[name=csrfmiddlewaretoken]')[0].value
+                }
+            });
+            request.send();
+        };
+
+        newBlank = function () {
+            var archer = new Element('div', {'class': 'archer blank'});
+            var name = new Element('p', {'class': 'name', html: '-'});
+            archer.adopt(name);
+            return archer
+        };
+
+        $$('.session-select a').addEvent('click', function (e) {
+            e.stop();
+            // do this row
+            $$('.session-select .link').removeClass('selected');
+            this.getElement('.link').addClass('selected');
+            // do the round select row
+            $$('.round-select').removeClass('selected');
+            var newRoundSelect = $$(this.get('href'));
+            newRoundSelect.addClass('selected');
+            newRoundSelect.getElement('.selected').getParent('a').fireEvent('click');
+        });
+
+        $$('.round-select a').addEvent('click', function (e) {
+            if (e) {e.stop();}
+            // do this row
+            this.getParent('.round-select').getElements('.link').removeClass('selected');
+            this.getElement('.link').addClass('selected');
+            // do the generator
+            var board = $$(this.get('href'));
+            $$('.target-list-gen').removeClass('selected');
+            board.addClass('selected');
+        });
+
+        var draggingItem = undefined
+        $$('.archer').addEvent('dragstart', function (e) {
+            draggingItem = this;
+        });
+
+        $$('.archer').addEvent('dragend', function (e) {
+            draggingItem = undefined;
+            draggingItemSrc = undefined
+        });
+
+        var detailEvents = {
+            dragenter: function (e) {
+                this.addClass('drag-over');
+            },
+
+            dragleave: function (e) {
+                this.removeClass('drag-over');
+            },
+
+            dragover: function (e) {
+                e.stop();
+            },
+
+            drop: function (e) {
+                this.removeClass('drag-over');
+                var current = this.getElement('.archer');
+                var targetBlank = this.getElement('.archer').hasClass('blank');
+                var movingOnBoard = draggingItem.getParent('.detail');
+                var data = {
+                    targets: [{
+                        target: this.getParent('.target').get('rel'),
+                        entry: draggingItem.get('rel')
+                    }]
+                };
+                if (!targetBlank && !movingOnBoard) {
+                    $$('.unallocated')[0].adopt(current);
+                    data.targets.push({
+                        target: null,
+                        entry: current.get('rel')
+                    });
+                }
+                if (targetBlank && movingOnBoard)  {
+                    var blank = newBlank();
+                    draggingItem.getParent('.detail').grab(blank, 'top');
+                }
+                if (!targetBlank && movingOnBoard) {
+                    data.targets.push({
+                        target: draggingItem.getParent('.target').get('rel'),
+                        entry: current.get('rel')
+                    });
+                    movingOnBoard.adopt(current);
+                }
+                doRequest(data);
+                this.empty();
+                this.adopt(draggingItem);
+            }
+        };
+        $$('.detail').addEvents(detailEvents);
+
+
+
+        $$('.unallocated').addEvent('dragover', function (e) {
+            if (!draggingItem.getParent('.unallocated')) {
+                e.stop();
+            }
+        });
+
+        $$('.unallocated').addEvent('drop', function (e) {
+            var blank = newBlank();
+            draggingItem.getParent('.detail').grab(blank, 'top');
+            this.adopt(draggingItem);
+            data = {
+                targets: [{
+                    target: null,
+                    entry: draggingItem.get('rel')
+                }]
+            }
+            doRequest(data);
+        });
+
+        $$('.new-target').addEvent('click', function (e) {
+            e.stop();
+            wrapper = this.getParent('.target-list-gen');
+            var total = parseInt(wrapper.get('rel'));
+            var lastNumber = parseInt(wrapper.getElements('.number p').getLast().get('html').replace(/[^\d]/, ''));
+            wrapper.getElements('.target').slice(0, total).each(function (item) {
+                var blank = newBlank();
+                var newTarget = item.clone();
+                newTarget.getElement('.detail').empty().adopt(blank).addEvents(detailEvents);
+                var targetNumber = newTarget.getElement('.number p');
+                var newTargetNumber = targetNumber.get('html').replace(/\d+/, lastNumber + 1);
+                targetNumber.set('html', newTargetNumber);
+                newTarget.set('rel', newTargetNumber);
+                newTarget.inject(this, 'before');
+            }.bind(this));
+        });
+    });
+</script>
+{% endblock scripts %}
+
+{% block competition_content %}
+{% csrf_token %}
+<div class="{% block moduleclass %}target-list{% endblock %} module">
+    <h4>{% block title %}Target Lists{% endblock %}</h4>
+
+    {% block target-list-nav %}
+    <div class="target-list-nav">
+        <div class="session-select">
+            {% for session in target_list %}
+            <a href="#session-{{ session.pk }}"><div class="link {% if not forloop.counter0 %}selected{% endif %}" style="width: 33%">{{ session.start }}</div></a>
+            {% endfor %}
+        </div>
+        <div class="clear"></div>
+
+        {% for session, rounds in target_list.items %}
+        <div class="round-select {% if not forloop.counter0 %}selected{% endif %}" id="session-{{ session.pk }}">
+            {% for round in rounds %}
+            <a href="#session-{{ session.pk }}-round-{{ round.pk }}"><div class="link {% if not forloop.counter0 %}selected{% endif %}" style="width: 99%">{{ round.shot_round }}</div></a>
+            {% endfor %}
+        </div>
+        <div class="clear"></div>
+        {% endfor %}
+    </div>
+    {% endblock %}
+
+    {% block main %}
+    {% for session, rounds in target_list.items %}
+    {% with forloop.counter0 as session_counter %}
+    {% for round, targets in rounds.items %}
+    <div class="target-list-gen {% if not session_counter %}selected{% endif %}" id="session-{{ session.pk }}-round-{{ round.pk }}" rel="{{ session.archers_per_target }}">
+        <div class="board-wrapper">
+            <div class="board">
+                {% for target, detail in targets.target_list %}
+                <div class="target" rel="{{ target }}">
+                    <div class="number"><p>{{ target }}</p></div>
+                    <div class="detail">
+                        <div class="archer {% if not detail %}blank{% endif %}" rel="{{ detail.session_entry.pk }}">
+                            {% if detail %}
+                            <p class="code">{{ detail.session_entry.competition_entry.code }}</p>
+                            <p class="name">{{ detail.session_entry.competition_entry.archer }}</p>
+                            <p class="club">{{ detail.session_entry.competition_entry.club }}</p>
+                            {% else %}
+                            <p class="name">-</p>
+                            {% endif %}
+                            <div class="clear"></div>
+                        </div>
+                    </div>
+                    <div class="clear"></div>
+                </div>
+                {% endfor %}
+                <a href="#new-target" class="new-target">+ Add another target</a>
+                <div class="clear"></div>
+            </div>
+        </div>
+        <div class="entries-wrapper">
+            <div class="entries">
+                <div class="unallocated">
+                    <h5>Unallocated</h5>
+                    {% for entry in targets.entries %}
+                    <div class="archer" rel="{{ entry.pk }}">
+                        <p class="code">{{ entry.competition_entry.code }}</p>
+                        <p class="name">{{ entry.competition_entry.archer }}</p>
+                        <p class="club">{{ entry.competition_entry.club }}</p>
+                        <div class="clear"></div>
+                    </div>
+                    {% endfor %}
+                </div>
+            </div>
+            <a href="{% url entries.views.target_list_pdf slug=competition.slug %}">Get pdf</a>
+        </div>
+        <div class="clear"></div>
+    </div>
+    {% endfor %}
+    {% endwith %}
+    {% endfor %}
+    {% endblock %}
+</div>
+{% endblock %}

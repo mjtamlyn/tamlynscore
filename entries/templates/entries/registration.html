@@ -1,0 +1,164 @@
+{% extends 'entries/target_list.html' %}
+
+{% block scripts %}
+<script src="{{ STATIC_URL }}js/mootools-core-1.3.js"></script>
+<script>
+    window.addEvent('domready', function () {
+        $$('.session-select a').addEvent('click', function (e) {
+            if (e) { e.stop(); }
+            // do this row
+            $$('.session-select .link').removeClass('selected');
+            this.getElement('.link').addClass('selected');
+            // do the round select row
+            $$('.round-select').removeClass('selected');
+            var newRoundSelect = $$(this.get('href'));
+            newRoundSelect.addClass('selected');
+            newRoundSelect.getElement('.selected').getParent('a').fireEvent('click');
+        });
+
+        $$('.round-select a').addEvent('click', function (e) {
+            if (e) {e.stop();}
+            // do this row
+            this.getParent('.round-select').getElements('.link').removeClass('selected');
+            this.getElement('.link').addClass('selected');
+            // do the generator
+            var board = $$(this.get('href'));
+            document.location.hash = this.get('href').replace('#', '#!');
+            $$('.registration-board').removeClass('selected');
+            board.addClass('selected');
+        });
+
+        $$('.hide').addEvent('click', function (e) {
+            e.stop();
+            this.getParent('.registration-board').getElements('tr.present').toggleClass('hidden');
+            this.getElement('li').toggleClass('active');
+        });
+
+        var setPresent = function (row) {
+            row.toggleClass('present');
+            if (row.hasClass('present') && row.getParent('.registration-board').getElement('.hide li').hasClass('active')) {
+                row.addClass('hidden');
+            }
+        };
+
+        $$('.present').addEvent('click', function (e) {
+            e.stop();
+            var request = new Request({
+                data: {
+                    present: true,
+                    pk: this.get('rel'),
+                    csrfmiddlewaretoken: $$('input[name=csrfmiddlewaretoken]')[0].value
+                },
+                onSuccess: function (response) {
+                    setPresent(this.getParent('tr'));
+                }.bind(this)
+            });
+            request.send();
+        });
+
+        $$('.not-present').addEvent('click', function (e) {
+            e.stop();
+            var request = new Request({
+                data: {
+                    present: false,
+                    pk: this.get('rel'),
+                    csrfmiddlewaretoken: $$('input[name=csrfmiddlewaretoken]')[0].value
+                },
+                onSuccess: function (response) {
+                    setPresent(this.getParent('tr'));
+                }.bind(this)
+            });
+            request.send();
+        });
+
+        $$('.registration-board').each(function (board) {
+            var clubs = {};
+            board.getChildren('table tr.archer').each(function (allocation) {
+                var club_id = allocation.getAttribute('data-club');
+                if (!club_id) { return; }
+                var club_name = allocation.getAttribute('data-clubname');
+                if (!(club_name in clubs)) {
+                    clubs[club_name] = {'id': club_id, 'archers': [], 'name': club_name};
+                }
+                clubs[club_name]['archers'].push(allocation);
+            });
+            var filter = board.getChildren('.actions .club-filter')[0];
+            for (var club in clubs) {
+                club = clubs[club];
+                filter.appendChild(new Element('option', {
+                    'data-club': club.name,
+                    'html': club.name,
+                }));
+            }
+            filter.addEvent('change', function () {
+                var club = this.value;
+                board.getChildren('table tr.archer.hidden').removeClass('hidden');
+                if (club === '--All--') {
+                    return;
+                } else {
+                    board.getChildren('table tr.archer:not([data-clubname='+club+'])').addClass('hidden');
+                }
+            });
+        });
+
+        if (document.location.hash) {
+            $$('a[href=' + document.location.hash.replace('#!', '#') + ']').fireEvent('click');
+            $$('a[href=' + document.location.hash.replace('#!', '#').replace(/-round-\d/, '') + ']').fireEvent('click');
+        }
+
+    });
+</script>
+{% endblock scripts %}
+
+{% block moduleclass %}registration{% endblock %}
+{% block title %}Registration{% endblock %}
+
+{% block main %}
+{% csrf_token %}
+{% for session, rounds in target_list.iteritems %}
+{% with forloop.counter0 as counter %}
+{% for round, targets in rounds.iteritems %}
+<div class="registration-board {% if not counter %}selected{% endif %}" id="session-{{ session.pk }}-round-{{ round.pk }}" rel="{{ session.archers_per_target }}">
+    <ul class="actions">
+        <a class="hide" href="#hide"><!--li class="action">Hide present</li--></a>
+        <select class="club-filter">
+            <option data-club="--all--">--All--</option>
+        </select>
+    </ul>
+    <div class="clear"></div>
+    <table>
+        <thead>
+            <th>Target</th>
+            <th>Name</th>
+            <th>Club</th>
+            <th>Bowstyle</th>
+            <th>Gender</th>
+            <th>Experience</th>
+            <!--th>Age</th-->
+            <!--th>GNAS No.</th-->
+            <th>Present</th>
+        </thead>
+        {% for target, detail in targets.target_list %}
+        <tr class="archer {% if not detail or detail.session_entry.present %}present{% endif %}" data-club="{{ detail.session_entry.competition_entry.club_id }}" data-clubname="{{ detail.session_entry.competition_entry.club }}">
+            <td>{{ target }}</td>
+            <td>{{ detail.session_entry.competition_entry.archer }}</td>
+            <td>{{ detail.session_entry.competition_entry.club }}</td>
+            <td>{{ detail.session_entry.competition_entry.bowstyle }}</td>
+            <td>{{ detail.session_entry.competition_entry.archer.get_gender_display }}</td>
+            <td>{{ detail.session_entry.competition_entry.archer.get_novice_display }}</td>
+            <!--td>{{ detail.session_entry.competition_entry.get_age_display }}</td-->
+            <!--td>{{ detail.session_entry.competition_entry.archer.gnas_no }}</td-->
+            <td>
+                {% if detail %}
+                <a href="#present" class="present" rel="{{ detail.session_entry.pk }}">Not Present</a>
+                <a href="#not-present" class="not-present" rel="{{ detail.session_entry.pk }}">Present</a>
+                {% endif %}
+            </td>
+        </tr>
+        {% endfor %}
+    </table>
+</div>
+{% endfor %}
+{% endwith %}
+{% endfor %}
+{% endblock %}
