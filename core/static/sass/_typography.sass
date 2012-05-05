@@ -1,0 +1,20 @@
+@import _fonts.sass
+
+$font-header: "MuseoSlab", serif
+$font-serif: "Museo", serif
+$font-sans-serif: "MuseoSans", sans-serif
+
+body
+  font-family: $font-serif
+
+h1, h2, h3, h4, h5, h6
+  font-family: $font-header
+  font-weight: normal
+  background: -webkit-linear-gradient(lighten($darkbluegrey, 10%), $darkbluegrey, $darkbluegrey, lighten($darkbluegrey, 10%)) $darkbluegrey
+  color: white
+  margin: 5px 0px
+  padding: 5px
+  text-align: center
+
+a, input
+  font-family: $font-sans-serif

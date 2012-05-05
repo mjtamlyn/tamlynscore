@@ -12,13 +12,28 @@
 
 {% block competition_content %}
 <div class="{% block moduleclass %}target-list{% endblock %} module">
-    <h4>{% block title %}Target Lists{% endblock %}</h4>
+    <h4>{% block title %}Manage Target Lists{% endblock %}</h4>
 
     {% block main %}
+    <div class="intro">
+        Sessions:
+        <ul>
+            {% for session, details in target_list.items %}
+            <li>
+            <span>{{ session.start|date:"l, jS F - f a" }}</span>
+            {% if details.entries|length %}
+            <span class="unallocated" title="Unallocated entries">{{ details.entries|length }}</span>
+            {% endif %}
+            <a class="btn" href="#session-{{ session.pk }}">Edit</a>
+            <a class="btn" href="#session-{{ session.pk }}">View PDF</a>
+            </li>
+            {% endfor %}
+        </ul>
+    </div>
+
     {% for session, details in target_list.items %}
-    <div class="session" data-archers="{{ details.entries_json }}">
-        <h5>{{ session }}</h5>
-        <p>Round{{ details.rounds|pluralize }}: {% for round in details.rounds %}{{ round.shot_round }}{% if not forloop.last %}, {% endif %}{% endfor %}</p>
+    <div class="session" id="session-{{ session.pk }}" data-archers="{{ details.entries_json }}">
+        <h5>{{ session.start|date:"l, jS F - f a" }}</h5>
         {% for boss, entries in details.target_list %}
             <div class="boss" data-boss="{{ boss }}">
                 <span class="boss_number">{{ boss }}</span>
