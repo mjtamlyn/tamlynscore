@@ -20,7 +20,7 @@ from core.models import GENDER_CHOICES
 from entries.forms import new_entry_form_for_competition
 from entries.models import *
 
-from utils import class_view_decorator
+from scoring.utils import class_view_decorator
 
 
 @class_view_decorator(login_required)

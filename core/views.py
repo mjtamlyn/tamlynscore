@@ -3,7 +3,7 @@ from django.views.generic import TemplateView, ListView, DetailView
 
 from core.models import Club
 
-from utils import class_view_decorator
+from scoring.utils import class_view_decorator
 
 @class_view_decorator(login_required)
 class Index(TemplateView):
