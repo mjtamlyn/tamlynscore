@@ -27,7 +27,7 @@
                     <li>
                         <span class="detail">{{ detail }}:</span>
                         {% if entry %}
-                            {{ entry.session_entry.competition_entry.archer }}
+                            <span class="archer">{{ entry.session_entry.competition_entry.archer }}</span> <a class="delete" data-location="{{ boss }}{{ detail }}" data-pk="{{ entry.pk }}" data-entry-pk="{{ entry.session_entry.pk }}">X</a>
                         {% else %}
                             <input data-location="{{ boss }}{{ detail }}">
                         {% endif %}

@@ -195,8 +195,12 @@ class BetterTargetList(ListView):
     def post(self, request, slug):
         data = json.loads(request.raw_post_data)
         if data['method'] == 'create':
-            TargetAllocation.objects.create(session_entry_id=data['entry'], boss=data['location'][:-1], target=data['location'][-1])
-        return HttpResponse('ok')
+            allocation = TargetAllocation.objects.create(session_entry_id=data['entry'], boss=data['location'][:-1], target=data['location'][-1])
+            return HttpResponse(allocation.pk)
+        elif data['method'] == 'delete':
+            TargetAllocation.objects.get(pk=data['entry']).delete()
+            return HttpResponse('ok')
+        return HttpResponseBadRequest()
 
 
 class Registration(BetterTargetList):

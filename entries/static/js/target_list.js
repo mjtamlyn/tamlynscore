@@ -40,7 +40,8 @@ jQuery(document).ajaxSend(function(event, xhr, settings) {
         $('.session').each(function (i, session) {
             session = $(session);
             var unallocated = JSON.parse(session.attr('data-archers'));
-            session.find('input').each(function (i, input) {
+
+            var initializeInput = function (input) {
                 input = $(input);
                 input.autocomplete({
                     source: function (request, response) {
@@ -69,14 +70,48 @@ jQuery(document).ajaxSend(function(event, xhr, settings) {
                         $.post(
                             '',
                             JSON.stringify({method: 'create', entry: ui.item.pk, location: input.attr('data-location')}),
-                            function () {
-                                el.replaceWith(ui.item.label);
+                            function (data) {
+                                // Replace this input with a label
+                                var archerSpan = $('<span>');
+                                archerSpan.text(ui.item.value);
+                                archerSpan.addClass('archer');
+                                var link = $('<a>');
+                                link.text('X');
+                                link.attr('data-entry-pk', ui.item.pk);
+                                link.attr('data-pk', data);
+                                link.addClass('delete');
+                                link.click(deleteAllocation);
+                                el.replaceWith(archerSpan);
+                                archerSpan.after(link);
                             }
                         );
-                        // Replace this input with a label
                     }
                 });
-            });
+            };
+
+            var deleteAllocation = function (e) {
+                var el = $(this);
+                $.post(
+                    '',
+                    JSON.stringify({method: 'delete', entry: el.attr('data-pk')}),
+                    function () {
+                        var input = $('<input>');
+                        input.attr('data-location', el.attr('data-location'));
+                        var archer = el.siblings('.archer');
+                        unallocated.push({'pk': el.attr('data-entry-pk'), 'value': archer.text()});
+                        var li = $('<li>');
+                        li.text(archer.text());
+                        li.attr('data-pk', el.attr('data-entry-pk'));
+                        el.closest('.session').find('.unallocated').append(li);
+                        el.replaceWith(input);
+                        archer.remove();
+                        initializeInput(input);
+                    }
+                )
+            };
+
+            session.find('input').each(function (i, input) {initializeInput(input)});
+            session.find('a.delete').click(deleteAllocation);
         });
     });
 })();
