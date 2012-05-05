@@ -31,7 +31,7 @@ Elements.from = function(text, excludeScripts){
             age.reset();
             novice.reset();
             session0.reset();
-            //session1.reset();
+            session1.reset();
             gnas_no.set('value', '');
             $$('.show-more-details').removeClass('selected');
             $$('.more-details').removeClass('shown');
@@ -68,7 +68,7 @@ Elements.from = function(text, excludeScripts){
         age = new ButtonWidget($('age-widget'));
         novice = new ButtonWidget($('novice-widget'));
         session0 = new ButtonWidget($('session-0-widget'));
-        //session1 = new ButtonWidget($('session-1-widget'));
+        session1 = new ButtonWidget($('session-1-widget'));
         gnas_no = $('id_gnas_no');
         $$('.show-more-details').addEvent('click', function () {
             $$('.more-details').toggleClass('shown');
