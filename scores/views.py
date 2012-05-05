@@ -19,7 +19,7 @@ from entries.views import TargetList, HeadedPdfView, BetterTargetList
 from scores.forms import get_arrow_formset
 from scores.models import Score, Arrow
 
-from utils import class_view_decorator
+from scoring.utils import class_view_decorator
 
 
 @class_view_decorator(login_required)
