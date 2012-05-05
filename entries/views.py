@@ -123,9 +123,9 @@ class BetterTargetList(ListView):
         for session_round in session_rounds:
             session = session_round.session
             if session not in target_list:
-                target_list[session] = {}
-            if session_round not in target_list[session]:
-                target_list[session][session_round] = {'targets': [], 'entries': []}
+                target_list[session] = {'rounds': [session_round], 'targets': [], 'entries': []}
+            else:
+                target_list[session]['rounds'].append(session_round)
         return target_list
 
     def get_target_list(self):
@@ -133,31 +133,32 @@ class BetterTargetList(ListView):
         for allocation in self.allocations:
             session_round = allocation.session_entry.session_round
             session = session_round.session
-            target_list[session][session_round]['targets'].append(allocation)
+            target_list[session]['targets'].append(allocation)
 
         # Turn the targets into an actual target list
-        for session, rounds in target_list.iteritems():
+        for session, options in target_list.iteritems():
             details = session.details
-            for session_round, options in rounds.iteritems():
-                # Work out which bosses and details we need
-                archers_per_target = session.archers_per_target
-                allocations = options['targets']
-                num_entries = session_round.sessionentry_set.count()
-                current_bosses = [allocation.boss for allocation in allocations]
-                min_boss = min(current_bosses) if current_bosses else 1
-                needed_bosses = int(math.ceil(num_entries / float(archers_per_target)))
-                current_max_boss = max(current_bosses) if current_bosses else 1
-                bosses = range(min_boss, max(needed_bosses, current_max_boss) + 1)
+            # Work out which bosses and details we need
+            archers_per_target = session.archers_per_target
+            allocations = options['targets']
+            num_entries = SessionEntry.objects.filter(session_round__session=session).count()
+            current_bosses = [allocation.boss for allocation in allocations]
+            min_boss = min(current_bosses) if current_bosses else 1
+            needed_bosses = int(math.ceil(num_entries / float(archers_per_target)))
+            current_max_boss = max(current_bosses) if current_bosses else 1
+            bosses = range(min_boss, max(needed_bosses, current_max_boss) + 1)
 
-                # Make a lookup dictionary from the current allocations
-                allocations_lookup = dict([('{0}{1}'.format(allocation.boss, allocation.target), allocation) for allocation in allocations])
+            # Make a lookup dictionary from the current allocations
+            allocations_lookup = dict([('{0}{1}'.format(allocation.boss, allocation.target), allocation) for allocation in allocations])
 
-                sr_target_list = options['target_list'] = []
+            session_target_list = options['target_list'] = []
 
-                for boss in bosses:
-                    for detail in details:
-                        target = '{0}{1}'.format(boss, detail)
-                        sr_target_list.append((target, allocations_lookup.get(target, None)))
+            for boss in bosses:
+                allocations = []
+                for detail in details:
+                    target = '{0}{1}'.format(boss, detail)
+                    allocations.append((detail, allocations_lookup.get(target, None)))
+                session_target_list.append((boss, allocations))
         return target_list
 
     def add_unallocated_entries(self, target_list):
@@ -166,7 +167,12 @@ class BetterTargetList(ListView):
         for entry in entries:
             session = entry.session_round.session
             session_round = entry.session_round
-            target_list[session][session_round]['entries'].append(entry)
+            target_list[session]['entries'].append(entry)
+
+        for details in target_list.values():
+            details['entries'] = sorted(details['entries'], key=lambda e: e.competition_entry.archer.name)
+            data = [{'pk': e.pk, 'label': e.competition_entry.archer.name} for e in details['entries']]
+            details['entries_json'] = json.dumps(data)
 
     def get_context_data(self, **kwargs):
         context = super(BetterTargetList, self).get_context_data(**kwargs)
@@ -187,13 +193,10 @@ class BetterTargetList(ListView):
         return context
 
     def post(self, request, slug):
-        targets = json.loads(request.POST['targets'])
-        for target in targets:
-            TargetAllocation.objects.filter(session_entry__pk=target['entry']).delete()
-            entry = SessionEntry.objects.get(pk=target['entry'])
-            new_allocation = TargetAllocation(session_entry=entry, boss=target['target'][:-1], target=target['target'][-1])
-            new_allocation.save()
-        return HttpResponse()
+        data = json.loads(request.raw_post_data)
+        if data['method'] == 'create':
+            TargetAllocation.objects.create(session_entry_id=data['entry'], boss=data['location'][:-1], target=data['location'][-1])
+        return HttpResponse('ok')
 
 
 class Registration(BetterTargetList):
