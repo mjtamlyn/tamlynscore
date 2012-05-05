@@ -1,18 +1,10 @@
-@import colors.sass
+@import _colors.sass
+@import _typography.sass
 
 $borderradius: 15px
 
 body
   background-color: $oxford
-  font-family: Georgia
-
-h1, h2, h3, h4, h5, h6
-  background-image: -webkit-linear-gradient(lighten($darkbluegrey, 10%), $darkbluegrey, $darkbluegrey, lighten($darkbluegrey, 10%))
-  background: $darkbluegrey
-  color: white
-  margin: 5px 0px
-  padding: 5px
-  text-align: center
 
 a
   color: $dark
@@ -74,5 +66,6 @@ footer
   p
     margin: 0
 
-@import accounts.sass
-@import competition.sass
+@import _accounts.sass
+@import _competition.sass
+@import _target_list.sass
