@@ -35,12 +35,10 @@ h1, h2, h3, h4, h5, h6 {
   background: -webkit-linear-gradient(#20364e, #111d2a, #111d2a, #20364e);
   background: -moz-linear-gradient(#20364e, #111d2a, #111d2a, #20364e);
   color: white;
+  text-shadow: 0 0 1px #fbeedb;
   margin: 5px 0px;
   padding: 5px;
   text-align: center; }
-
-input {
-  border: 0; }
 
 body {
   background-color: #002147; }
@@ -1016,3 +1014,15 @@ footer {
     padding: 5px;
     text-align: center;
     -webkit-user-select: none; }
+.target-list .session {
+  float: left;
+  width: 350px; }
+.target-list .boss {
+  padding: 5px 0;
+  border-bottom: 1px solid #000f1f; }
+  .target-list .boss .boss-number {
+    float: left; }
+  .target-list .boss ul {
+    margin-left: 20px; }
+    .target-list .boss ul li {
+      height: 25px; }

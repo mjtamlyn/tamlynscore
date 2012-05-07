@@ -36,7 +36,7 @@
         <h5>{{ session.start|date:"l, jS F - f a" }}</h5>
         {% for boss, entries in details.target_list %}
             <div class="boss" data-boss="{{ boss }}">
-                <span class="boss_number">{{ boss }}</span>
+                <span class="boss-number">{{ boss }}</span>
                 <ul>
                     {% for detail, entry in entries %}
                     <li>
