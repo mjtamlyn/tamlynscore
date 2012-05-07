@@ -43,7 +43,7 @@ class EntryList(ListView):
     template_name = 'entries/entry_list.html'
 
     def get_queryset(self):
-        return self.model.objects.filter(competition_entry__competition__slug=self.kwargs['slug']).select_related('competition_entry__competition', 'competition_entry__club', 'competition_entry__bowstyle', 'competition_entry__archer', 'session_round__session', 'session_round__shot_round')
+        return self.model.objects.filter(competition_entry__competition__slug=self.kwargs['slug']).select_related('competition_entry__competition', 'competition_entry__club', 'competition_entry__bowstyle', 'competition_entry__archer', 'session_round__session', 'session_round__shot_round').order_by('-competition_entry')
 
     def get_context_data(self, **kwargs):
         context = super(EntryList, self).get_context_data(**kwargs)
