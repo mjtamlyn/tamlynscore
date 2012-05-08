@@ -91,15 +91,15 @@
 
 {% block main %}
 {% csrf_token %}
-{% for session, rounds in target_list.items %} 
-{% with forloop.counter0 as counter %}
-{% for round, details in rounds.items %}
-<div class="input-board {% if not counter %}selected{% endif %}" id="session-{{ session.pk }}-round-{{ round.pk }}">
+{% for session, details in target_list.items %}
+<h4>{{ session.start|date:"l, jS F - f a" }}</h4>
+
+<div class="input-board" id="session-{{ session.pk }}">
     {% for dozen in details.dozens %}
-    <h5>End {{ dozen }}</h5>
+    <h5>Dozen {{ dozen }}</h5>
     <div class="bosses">
         {% for boss, complete_lookup in details.bosses %}
-        <a href="{% block linklocation %}{% url scores.views.input_arrows slug=competition.slug round_id=round.pk dozen=dozen boss=boss %}{% endblock %}" class="boss-link" rel="{{ dozen }}-{{ boss }}">
+        <a href="{% block linklocation %}{% url scores.views.input_arrows slug=competition.slug round_id=details.rounds.0.pk dozen=dozen boss=boss %}{% endblock %}" class="boss-link" rel="{{ dozen }}-{{ boss }}">
             <div class="boss {{ complete_lookup|dozcomplete:dozen }}">{{ boss }}</div>
         </a>
         {% endfor %}
@@ -107,7 +107,5 @@
     </div>
     {% endfor %}
 </div>
-{% endfor %}
-{% endwith %}
 {% endfor %}
 {% endblock %}

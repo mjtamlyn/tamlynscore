@@ -378,9 +378,7 @@ footer {
         .competition-section .competition-content .registration .registration-board table tr:not(.present) a.not-present {
           display: none; }
     .competition-section .competition-content .input-scores .input-board {
-      display: none; }
-      .competition-section .competition-content .input-scores .input-board.selected {
-        display: block; }
+      display: block; }
       .competition-section .competition-content .input-scores .input-board .boss {
         background-color: #dddafa;
         border: 1px solid #6fb3ff;
