@@ -41,9 +41,8 @@ class InputScores(BetterTargetList):
         allocations = self.allocations
 
         for session in context['target_list']:
-            for session_round in context['target_list'][session]:
-                if cache.get('bosses_cache_%d' % session_round.pk):
-                    allocations = allocations.exclude(session_entry__session_round=session_round)
+            if cache.get('bosses_cache_%d' % session.pk):
+                allocations = allocations.exclude(session_entry__session_round__session=session)
 
         arrows = Arrow.objects.filter(score__target__in=allocations).select_related('score__target', 'score__target__session_entry__session_round__session')
         target_lookup = {}
@@ -58,30 +57,29 @@ class InputScores(BetterTargetList):
                 target_lookup[target][dozen] = []
             target_lookup[target][dozen].append(arrow)
 
-        for session in context['target_list']:
-            for session_round, options in context['target_list'][session].iteritems():
-                cache_key = 'bosses_cache_%d' % session_round.pk
-                targets = options['targets']
-                bosses = options['bosses'] = cache.get(cache_key) or []
-                dozens = options['dozens'] = range(1, 1 + session_round.shot_round.arrows / session_round.session.arrows_entered_per_end)
-                if bosses:
-                    print 'skipping', session_round
-                    continue
-                for boss, allocations in groupby(targets, lambda t: t.boss):
-                    combined_lookup = {}
-                    allocations = list(allocations)
-                    for dozen in dozens:
-                        combined_lookup[dozen] = True
-                        for allocation in allocations:
-                            if (allocation not in target_lookup
-                                    or dozen not in target_lookup[allocation]
-                                    or not len(target_lookup[allocation][dozen]) == session_round.session.arrows_entered_per_end):
-                                combined_lookup[dozen] = False
-                    bosses.append((boss, combined_lookup))
-                combine = lambda x, y: x and y
-                session_complete = bosses and reduce(combine, [reduce(combine, b[1].values()) for b in bosses])
-                if session_complete:
-                    cache.set(cache_key, bosses, 30000)
+        for session, options in context['target_list'].items():
+            session_round = options['rounds'][0]
+            cache_key = 'bosses_cache_%d' % session.pk
+            targets = options['targets']
+            bosses = options['bosses'] = cache.get(cache_key) or []
+            dozens = options['dozens'] = range(1, 1 + session_round.shot_round.arrows / session_round.session.arrows_entered_per_end)
+            if bosses:
+                continue
+            for boss, allocations in groupby(targets, lambda t: t.boss):
+                combined_lookup = {}
+                allocations = list(allocations)
+                for dozen in dozens:
+                    combined_lookup[dozen] = True
+                    for allocation in allocations:
+                        if (allocation not in target_lookup
+                                or dozen not in target_lookup[allocation]
+                                or not len(target_lookup[allocation][dozen]) == session_round.session.arrows_entered_per_end):
+                            combined_lookup[dozen] = False
+                bosses.append((boss, combined_lookup))
+            combine = lambda x, y: x and y
+            session_complete = bosses and reduce(combine, [reduce(combine, b[1].values()) for b in bosses])
+            if session_complete:
+                cache.set(cache_key, bosses, 30000)
 
         if 'ft' in self.request.GET and 'fd' in self.request.GET:
             context['focus'] = self.request.GET['fd'] + '-' + self.request.GET['ft']
