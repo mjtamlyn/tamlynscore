@@ -81,8 +81,8 @@ class InputScores(BetterTargetList):
             if session_complete:
                 cache.set(cache_key, bosses, 30000)
 
-        if 'ft' in self.request.GET and 'fd' in self.request.GET:
-            context['focus'] = self.request.GET['fd'] + '-' + self.request.GET['ft']
+        if 'ft' in self.request.GET and 'fd' in self.request.GET and 'fs' in self.request.GET:
+            context['focus'] = self.request.GET['fd'] + '-' + self.request.GET['ft'] + '-' + self.request.GET['fs']
 
         return context
 
@@ -95,16 +95,19 @@ class InputArrowsView(View):
     template = 'input_arrows.html'
     next_url_name = 'input_scores'
 
-    def get(self, request, slug, round_id, boss, dozen):
+    def get(self, request, slug, session_id, boss, dozen):
         competition = get_object_or_404(Competition, slug=slug)
-        scores = Score.objects.filter(target__session_entry__session_round=round_id, target__boss=boss, target__session_entry__present=True, retired=False).order_by('target__target').select_related()
-        forms = get_arrow_formset(scores, round_id, boss, dozen, scores[0].target.session_entry.session_round.session.arrows_entered_per_end)
+        scores = Score.objects.filter(target__session_entry__session_round__session=session_id, target__boss=boss, target__session_entry__present=True, retired=False).order_by('target__target').select_related()
+        try:
+            forms = get_arrow_formset(scores, session_id, boss, dozen, scores[0].target.session_entry.session_round.session.arrows_entered_per_end)
+        except IndexError:
+            pass
         return render(request, self.template, locals())
 
-    def post(self, request, slug, round_id, boss, dozen):
+    def post(self, request, slug, session_id, boss, dozen):
         competition = get_object_or_404(Competition, slug=slug)
-        scores = Score.objects.filter(target__session_entry__session_round=round_id, target__boss=boss).order_by('target__target').select_related()
-        forms = get_arrow_formset(scores, round_id, boss, dozen, scores[0].target.session_entry.session_round.session.arrows_entered_per_end, data=request.POST)
+        scores = Score.objects.filter(target__session_entry__session_round__session=session_id, target__boss=boss).order_by('target__target').select_related()
+        forms = get_arrow_formset(scores, session_id, boss, dozen, scores[0].target.session_entry.session_round.session.arrows_entered_per_end, data=request.POST)
         arrows = []
         failed = False
         for score in forms:
@@ -119,7 +122,7 @@ class InputArrowsView(View):
             for score in scores:
                 score.update_score()
                 score.save(force_update=True)
-            return HttpResponseRedirect(reverse(self.next_url_name, kwargs={'slug': slug}) + '?fd={0}&ft={1}#session-{3}-round-{2}'.format(dozen, boss, round_id, SessionRound.objects.get(pk=round_id).session.pk))
+            return HttpResponseRedirect(reverse(self.next_url_name, kwargs={'slug': slug}) + '?fd={0}&ft={1}&fs={2}'.format(dozen, boss, session_id))
         return render(request, self.template, locals())
 
 input_arrows = login_required(InputArrowsView.as_view())
