@@ -355,9 +355,7 @@ footer {
             .competition-section .competition-content .target-list .target-list-gen .entries-wrapper .entries .archer p.club {
               display: none; }
     .competition-section .competition-content .registration .registration-board {
-      display: none; }
-      .competition-section .competition-content .registration .registration-board.selected {
-        display: block; }
+      display: block; }
       .competition-section .competition-content .registration .registration-board .actions {
         margin: 10px; }
         .competition-section .competition-content .registration .registration-board .actions .action {
