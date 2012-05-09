@@ -20,12 +20,9 @@ class ScoreManager(models.Manager):
 
     def results(self, session_round, leaderboard=True, category=None):
         scores = self.active(session_round, category=category)
+        scores = scores.select_related()
         if not leaderboard:
             scores = scores.annotate(arrows=models.Count('arrow')).filter(arrows__ne=session_round.shot_round.arrows)
-        # TODO: Don't do this here!
-        for score in scores:
-            score.update_score()
-            score.save()
         scores = scores.order_by(
                 'target__session_entry__competition_entry__bowstyle',
                 'target__session_entry__competition_entry__archer__gender',
