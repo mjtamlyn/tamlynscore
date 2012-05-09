@@ -19,11 +19,11 @@ from itertools import groupby
 class OlympicIndex(View):
     def get(self, request, slug):
         competition = get_object_or_404(Competition, slug=slug)
-        session_rounds = OlympicSessionRound.objects.filter(session__competition=competition).order_by('session__start')
+        session_rounds = OlympicSessionRound.objects.filter(session__competition=competition).order_by('session__start').select_related()
         session_info = [(
             session_round.session,
             session_round,
-            session_round.seeding_set.all(),
+            session_round.seeding_set.all().select_related().order_by('seed'),
             Score.objects.results(session_round.ranking_round, leaderboard=True, category=session_round.category),
         ) for session_round in session_rounds]
         sessions = []
