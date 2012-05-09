@@ -121,6 +121,7 @@ class MatchManager(models.Manager):
             match = self.match_for_seed(seed, level)
         except self.model.DoesNotExist:
             return None
+        effective_seed = self._effective_seed(seed.seed, level)
         if match.target_2 and effective_seed * 2 > 2 ** level:
             return match.target_2
         return match.target
