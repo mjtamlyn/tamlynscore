@@ -53,6 +53,7 @@ class OlympicScoreSheet(ScoreSheetsPdf):
             '1/8 Round',
             '1/16 Round',
             '1/32 Round',
+            '1/64 Round',
     ]
 
     def set_options(self, slug=None, round_id=None):
@@ -86,6 +87,11 @@ class OlympicScoreSheet(ScoreSheetsPdf):
 
             score_sheet_elements = []
             for i in range(len(matches)):
+                # FIXME? This is a hack to only display 6 matches per archer.
+                # If you have >64 archers in a category the final is not printed
+                # for >128 the semi isn't either, etc.
+                if len(matches) >= 7 and i < len(matches) - 6:
+                    continue
                 match = matches[i]
                 match_title = self.Para(self.match_names[i], 'h3')
                 if match and i > 0:
