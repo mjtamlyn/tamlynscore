@@ -1,6 +1,6 @@
 from django import forms
 
-from scores.models import Arrow, Score
+from scores.models import Arrow, Score, Dozen
 
 class ArrowForm(forms.ModelForm):
 
@@ -37,5 +37,30 @@ def get_arrow_formset(scores, session_round, boss, dozen, arrows_per_end, data=N
             except Arrow.DoesNotExist:
                 instance = Arrow(score=score, arrow_of_round=int(dozen)*arrows_per_end + arrow)
             target['forms'].append(ArrowForm(data, instance=instance, prefix=prefix))
+        forms_list.append(target)
+    return forms_list
+
+
+class DozenForm(forms.ModelForm):
+    class Meta:
+        model = Dozen
+        exclude = ['score', 'dozen']
+
+
+def get_dozen_formset(scores, session_round, boss, dozen, arrows_per_end, data=None):
+    forms_list = []
+    dozen = int(dozen)
+    for score in scores:
+        target = {
+                'archer': score.target.session_entry.competition_entry.archer,
+                'target': score.target.target,
+                'running_total': score.running_total(dozen),
+        }
+        prefix = score.target.target + str(dozen)
+        try:
+            instance = Dozen.objects.get(score=score, dozen=dozen)
+        except Dozen.DoesNotExist:
+            instance = Dozen(score=score, dozen=dozen)
+        target['form'] = DozenForm(data, instance=instance, prefix=prefix)
         forms_list.append(target)
     return forms_list

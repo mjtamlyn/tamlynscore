@@ -9,3 +9,4 @@ class ArrowAdmin(admin.ModelAdmin):
 
 admin.site.register(Score)
 admin.site.register(Arrow, ArrowAdmin)
+admin.site.register(Dozen)

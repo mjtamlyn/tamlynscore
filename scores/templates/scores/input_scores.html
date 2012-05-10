@@ -1,5 +1,6 @@
 {% extends 'entries/target_list.html' %}
 
+{% load url from future %}
 {% load bosses %}
 
 {% block scripts %}
@@ -99,7 +100,7 @@
     <h5>Dozen {{ dozen }}</h5>
     <div class="bosses">
         {% for boss, complete_lookup in details.bosses %}
-        <a href="{% block linklocation %}{% url scores.views.input_arrows slug=competition.slug session_id=session.pk dozen=dozen boss=boss %}{% endblock %}" class="boss-link" rel="{{ dozen }}-{{ boss }}-{{ session.pk }}">
+        <a href="{% block linklocation %}{% url session.input_view_name slug=competition.slug session_id=session.pk dozen=dozen boss=boss %}{% endblock %}" class="boss-link" rel="{{ dozen }}-{{ boss }}-{{ session.pk }}">
             <div class="boss {{ complete_lookup|dozcomplete:dozen }}">{{ boss }}</div>
         </a>
         {% endfor %}

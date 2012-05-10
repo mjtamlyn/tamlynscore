@@ -16,7 +16,7 @@ from reportlab.platypus import PageBreak, Table
 from entries.models import Competition, SessionRound
 from entries.views import TargetList, HeadedPdfView, BetterTargetList
 
-from scores.forms import get_arrow_formset
+from scores.forms import get_arrow_formset, get_dozen_formset
 from scores.models import Score, Arrow
 
 from scoring.utils import class_view_decorator
@@ -132,6 +132,41 @@ class InputArrowsViewMobile(InputArrowsView):
     next_url_name = 'input_scores_mobile'
 
 input_arrows_mobile = login_required(InputArrowsViewMobile.as_view())
+
+
+class InputDozens(View):
+    template = 'input_dozens.html'
+    next_url_name = 'input_scores'
+
+    def get(self, request, slug, session_id, boss, dozen):
+        competition = get_object_or_404(Competition, slug=slug)
+        scores = Score.objects.filter(target__session_entry__session_round__session=session_id, target__boss=boss, target__session_entry__present=True, retired=False).order_by('target__target').select_related()
+        try:
+            forms = get_dozen_formset(scores, session_id, boss, dozen, scores[0].target.session_entry.session_round.session.arrows_entered_per_end)
+        except IndexError:
+            pass
+        return render(request, self.template, locals())
+
+    def post(self, request, slug, session_id, boss, dozen):
+        competition = get_object_or_404(Competition, slug=slug)
+        scores = Score.objects.filter(target__session_entry__session_round__session=session_id, target__boss=boss, target__session_entry__present=True, retired=False).order_by('target__target').select_related()
+        forms = get_dozen_formset(scores, session_id, boss, dozen, scores[0].target.session_entry.session_round.session.arrows_entered_per_end, data=request.POST)
+        dozens = []
+        failed = False
+        for score in forms:
+            if score['form'].is_valid():
+                dozens.append(score['form'].save(commit=False))
+            else:
+                failed = True
+        if not failed:
+            for dbdozen in dozens:
+                dbdozen.save()
+            for score in scores:
+                score.update_score()
+                score.save(force_update=True)
+            return HttpResponseRedirect(reverse(self.next_url_name, kwargs={'slug': slug}) + '?fd={0}&ft={1}&fs={2}'.format(dozen, boss, session_id))
+        return render(request, self.template, locals())
+
 
 
 class LeaderboardView(View):

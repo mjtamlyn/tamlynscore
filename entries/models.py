@@ -72,6 +72,14 @@ class Session(models.Model):
         details = ['A', 'B', 'C', 'D', 'E', 'F']
         return details[:self.archers_per_target]
 
+    @property
+    def input_view_name(self):
+        return {
+            SCORING_FULL: 'input_arrows',
+            SCORING_DOZENS: 'input_dozens',
+            SCORING_TOTALS: 'input_arrows', #FIXME
+        }[self.scoring_system]
+
 class SessionRound(models.Model):
     session = models.ForeignKey(Session)
     shot_round = models.ForeignKey(Round)
