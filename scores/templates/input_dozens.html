@@ -1,0 +1,31 @@
+{% extends 'entries/competition_detail.html' %}
+
+{% block competition_content %}
+<div class="module input-dozens">
+    <h4>Enter arrow values for boss {{ boss }}, dozen {{ dozen }}</h4>
+    <form action="" method="post" autocomplete="off">
+        <table class="target">
+            <tr>
+                <th colspan="2">Archer</th>
+                <th>Doz</th>
+                <th>RT</th>
+            </tr>
+            {% for target in forms %}
+            <tr>
+                <td>{{ target.target }}</td>
+                <td>{{ target.archer }}</td>
+                <th class="doz-total">{{ target.form.total }}</th>
+                <th class="rt" rel="{{ target.running_total }}">{{ target.running_total }}</th>
+            </tr>
+            {% empty %}
+            <tr><td colspan="10">No archers</td></tr>
+            {% endfor %}
+        </table>
+        <div class="save">
+            <input type="submit" value="Save" />
+        </div>
+        {% csrf_token %}
+    </form>
+    <div class="clear"></div>
+</div>
+{% endblock %}
