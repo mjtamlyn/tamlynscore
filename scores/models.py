@@ -1,6 +1,6 @@
 from django.db import models
 
-from entries.models import TargetAllocation
+from entries.models import TargetAllocation, SCORING_FULL, SCORING_DOZENS
 
 from itertools import groupby
 
@@ -65,19 +65,23 @@ class Score(models.Model):
         return u'Score for {0}'.format(self.target)
 
     def update_score(self):
-        arrows = self.arrow_set.all()
-        self.score = self.alteration
-        self.hits = 0
-        self.golds = 0
-        self.xs = 0
-        for arrow in arrows:
-            self.score += arrow.arrow_value
-            if arrow.arrow_value > 0:
-                self.hits += 1
-            if arrow.arrow_value == 10:
-                self.golds += 1
-            if arrow.is_x:
-                self.xs += 1
+        print self.target.session_entry.session_round.session.scoring_system 
+        if self.target.session_entry.session_round.session.scoring_system == SCORING_FULL:
+            arrows = self.arrow_set.all()
+            self.score = self.alteration
+            self.hits = 0
+            self.golds = 0
+            self.xs = 0
+            for arrow in arrows:
+                self.score += arrow.arrow_value
+                if arrow.arrow_value > 0:
+                    self.hits += 1
+                if arrow.arrow_value == 10:
+                    self.golds += 1
+                if arrow.is_x:
+                    self.xs += 1
+        elif self.target.session_entry.session_round.session.scoring_system == SCORING_DOZENS:
+            self.score = self.dozen_set.aggregate(total=models.Sum('total'))['total'] or 0
 
     @property
     def arrows_entered_per_end(self):
@@ -85,6 +89,7 @@ class Score(models.Model):
 
     def running_total(self, dozen):
         return self.arrow_set.filter(arrow_of_round__lte=int(dozen)*self.arrows_entered_per_end).aggregate(models.Sum('arrow_value'))['arrow_value__sum']
+
 
 class Arrow(models.Model):
     score = models.ForeignKey(Score)
@@ -99,3 +104,11 @@ class Arrow(models.Model):
             return u'M'
         return unicode(self.arrow_value)
 
+
+class Dozen(models.Model):
+    score = models.ForeignKey(Score)
+    total = models.PositiveIntegerField()
+    dozen = models.PositiveIntegerField()
+
+    def __unicode__(self):
+        return self.total

@@ -5,10 +5,14 @@ from core.models import Archer, Bowstyle, Club, Round, AGE_CHOICES, NOVICE_CHOIC
 
 import math
 
+SCORING_FULL = 'F'
+SCORING_DOZENS = 'D'
+SCORING_TOTALS = 'T'
+
 SCORING_SYSTEMS = (
-    ('F', 'Full running slips'),
-    ('D', 'Dozen running slips'),
-    ('T', 'Totals only'),
+    (SCORING_FULL, 'Full running slips'),
+    (SCORING_DOZENS, 'Dozen running slips'),
+    (SCORING_TOTALS, 'Totals only'),
 )
 
 class Tournament(models.Model):

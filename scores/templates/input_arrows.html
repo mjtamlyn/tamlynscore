@@ -51,6 +51,8 @@
                 {% endif %}
                 {% endfor %}
             </tr>
+            {% empty %}
+            <tr><td colspan="10">No archers</td></tr>
             {% endfor %}
         </table>
         <div class="save">
