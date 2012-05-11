@@ -421,7 +421,7 @@ class ScoreSheetsPdf(HeadedPdfView):
             dozens = subround.arrows / 12
             extra = subround.arrows % 12
             total_rows = dozens + 2
-            table_data = [[subround_title] + [None] * 5 + ['ET'] + [None] * 6 + ['ET', 'S', '10', 'X', 'RT']]
+            table_data = [[subround_title] + [None] * 5 + ['ET'] + [None] * 6 + ['ET', 'S', '10+X', 'X', 'RT']]
             table_data += [[None for i in range(self.total_cols)] for j in range(total_rows - 1)]
             if extra is 6:
                 total_rows += 1
@@ -504,7 +504,7 @@ class RunningSlipsPdf(ScoreSheetsPdf):
         dozens = self.session_round.shot_round.arrows / 12
         elements = []
         for dozen in range(1, dozens + 1):
-            table_data = [['Dozen {0}'.format(dozen)] + [None] * 6 + ['ET'] + [None] * 6 + ['ET', 'S', '10', 'X', 'RT' if dozen > 1 else 'Inits.']]
+            table_data = [['Dozen {0}'.format(dozen)] + [None] * 6 + ['ET'] + [None] * 6 + ['ET', 'S', '10+X', 'X', 'RT' if dozen > 1 else 'Inits.']]
             for entry in entries:
                 table_data.append([entry[0]] + [None for i in range(self.total_cols)])
             table = Table(table_data, [self.box_size] + self.col_widths, (len(entries) + 1)*[self.box_size])

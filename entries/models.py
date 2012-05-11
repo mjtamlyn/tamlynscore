@@ -145,8 +145,8 @@ class SessionRound(models.Model):
                         allocation += (
                                 entry.archer.get_gender_display(),
                                 entry.bowstyle,
-                                #entry.get_age_display(),
-                                entry.get_novice_display(),
+                                entry.get_age_display(),
+                                #entry.get_novice_display(),
                         )
                     targets.append((target,) + allocation)
                 else:
