@@ -7,10 +7,16 @@ class CompetitionEntryAdmin(admin.ModelAdmin):
     list_display = ('archer', 'club', 'competition')
     list_filter = ('competition', 'club')
 
+class SessionEntryAdmin(admin.ModelAdmin):
+    list_display = ('competition_entry', 'session_round')
+    list_filter = ('session_round',)
+
+    raw_id_fields = ('competition_entry',)
+
 admin.site.register(Tournament)
 admin.site.register(Competition)
 admin.site.register(Session)
 admin.site.register(SessionRound)
 admin.site.register(CompetitionEntry, CompetitionEntryAdmin)
-admin.site.register(SessionEntry)
+admin.site.register(SessionEntry, SessionEntryAdmin)
 admin.site.register(TargetAllocation)
