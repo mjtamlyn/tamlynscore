@@ -24,6 +24,15 @@ class Tournament(models.Model):
     def __unicode__(self):
         return self.short_name
 
+
+class Sponsor(models.Model):
+    name = models.CharField(max_length=200)
+    logo = models.ImageField(upload_to='sponsors')
+
+    def __unicode__(self):
+        return self.name
+
+
 class Competition(models.Model):
     tournament = models.ForeignKey(Tournament)
 
@@ -34,6 +43,8 @@ class Competition(models.Model):
 
     created = models.DateTimeField(auto_now_add=True)
     modified = models.DateTimeField(auto_now=True)
+
+    sponsors = models.ManyToManyField(Sponsor)
 
     def clean(self, *args, **kwargs):
         if self.end_date is None:
