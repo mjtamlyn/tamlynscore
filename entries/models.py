@@ -119,7 +119,7 @@ class SessionRound(models.Model):
         return targets
 
     def target_list_pdf(self, lunch=False):
-        current_target_allocations = TargetAllocation.objects.filter(session_entry__session_round=self)
+        current_target_allocations = TargetAllocation.objects.filter(session_entry__session_round=self).select_related()
         minimum_boss = current_target_allocations.aggregate(models.Min('boss'))['boss__min']
         current_bosses = current_target_allocations.aggregate(models.Max('boss'))['boss__max']
         if not current_bosses:
