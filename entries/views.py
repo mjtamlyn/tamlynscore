@@ -314,7 +314,17 @@ class HeadedPdfView(PdfView):
     def draw_title(self, canvas, doc):
         canvas.saveState()
         canvas.setFont('Helvetica-Bold', 18)
-        canvas.drawCentredString(self.PAGE_WIDTH/2.0, self.PAGE_HEIGHT-58, u'{0}: {1}'.format(self.competition, self.title))
+        canvas.drawCentredString(self.PAGE_WIDTH/2.0, self.PAGE_HEIGHT-70, u'{0}: {1}'.format(self.competition, self.title))
+
+        sponsors = self.competition.sponsors.all()
+
+        positions = (
+            (30, self.PAGE_HEIGHT-240),
+            (self.PAGE_WIDTH-140, self.PAGE_HEIGHT-120),
+        )
+        for i, sponsor in enumerate(sponsors):
+            canvas.drawImage(sponsors[i].logo.path, positions[i][0], positions[i][1], width=100, preserveAspectRatio=True, anchor='nw')
+
         canvas.restoreState()
 
     def response(self, elements):
@@ -329,7 +339,7 @@ class TargetListPdf(HeadedPdfView):
     lunch = False
 
     def setMargins(self, doc):
-        doc.topMargin = 1*inch
+        doc.topMargin = 1.5*inch
         doc.bottomMargin = 0.5*inch
 
     def update_style(self):
@@ -361,14 +371,17 @@ target_list_lunch = login_required(TargetListLunch.as_view())
 
 class ScoreSheetsPdf(HeadedPdfView):
 
-    box_size = 0.35*inch
+    box_size = 0.32*inch
     wide_box = box_size*1.35
     total_cols = 12 + 2 + 4
     col_widths = 6*[box_size] + [wide_box] + 6*[box_size] + 6*[wide_box]
 
+    def setMargins(self, doc):
+        doc.topMargin = 1.5*inch
+
     def update_style(self):
         self.title = self.session_round.shot_round
-        self.spacer = Spacer(self.PAGE_WIDTH, self.box_size*0.4)
+        self.spacer = Spacer(self.PAGE_WIDTH, self.box_size*0.5)
 
     def get_elements(self):
 
