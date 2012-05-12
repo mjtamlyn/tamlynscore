@@ -1,5 +1,21 @@
 {% extends 'entries/competition_detail.html' %}
 
+{% block scripts %}
+<script src="{{ STATIC_URL }}js/jquery-1.7.2.min.js"></script>
+<script>
+    $(document).ready(function () {
+        $('input')[0].focus();
+        $('input').keyup(function () {
+            var input = $(this);
+            var rt = input.closest('tr').find('.rt');
+            var total = parseInt(rt.attr('rel')) + parseInt(input.val());
+            rt.html(total);
+        });
+        $('input').trigger('keyup')
+    });
+</script>
+{% endblock %}
+
 {% block competition_content %}
 <div class="module input-dozens">
     <h4>Enter arrow values for boss {{ boss }}, dozen {{ dozen }}</h4>
