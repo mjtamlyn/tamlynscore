@@ -1001,15 +1001,6 @@ footer {
     cursor: help; }
   .target-list .intro li {
     padding: 10px 0; }
-  .target-list .intro .btn {
-    font-family: "MuseoSans", sans-serif;
-    border-radius: 7px;
-    background-image: -webkit-linear-gradient(#b4adf4, #dddafa, #b4adf4);
-    font-size: 14px;
-    cursor: pointer;
-    padding: 5px;
-    text-align: center;
-    -webkit-user-select: none; }
 .target-list .session {
   float: left;
   width: 350px; }
@@ -1022,3 +1013,13 @@ footer {
     margin-left: 20px; }
     .target-list .boss ul li {
       height: 25px; }
+
+.btn {
+  font-family: "MuseoSans", sans-serif;
+  border-radius: 7px;
+  background-image: -webkit-linear-gradient(#b4adf4, #dddafa, #b4adf4);
+  font-size: 14px;
+  cursor: pointer;
+  padding: 5px;
+  text-align: center;
+  -webkit-user-select: none; }

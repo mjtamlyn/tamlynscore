@@ -47,7 +47,13 @@ class DozenForm(forms.ModelForm):
         exclude = ['score', 'dozen']
 
 
-def get_dozen_formset(scores, session_round, boss, dozen, arrows_per_end, data=None):
+class ScoreForm(forms.ModelForm):
+    class Meta:
+        model = Score
+        exclude = ['target', 'score', 'hits', 'retired', 'disqualified']
+
+
+def get_dozen_formset(scores, num_dozens, boss, dozen, arrows_per_end, data=None):
     forms_list = []
     dozen = int(dozen)
     for score in scores:
@@ -55,6 +61,7 @@ def get_dozen_formset(scores, session_round, boss, dozen, arrows_per_end, data=N
                 'archer': score.target.session_entry.competition_entry.archer,
                 'target': score.target.target,
                 'running_total': score.running_total(dozen),
+                'score_form': None,
         }
         prefix = score.target.target + str(dozen)
         try:
@@ -62,5 +69,7 @@ def get_dozen_formset(scores, session_round, boss, dozen, arrows_per_end, data=N
         except Dozen.DoesNotExist:
             instance = Dozen(score=score, dozen=dozen)
         target['form'] = DozenForm(data, instance=instance, prefix=prefix)
+        if dozen == num_dozens:
+            target['score_form'] = ScoreForm(data, instance=score, prefix=prefix)
         forms_list.append(target)
     return forms_list

@@ -17,7 +17,7 @@ from entries.models import Competition, SessionRound
 from entries.views import TargetList, HeadedPdfView, BetterTargetList
 
 from scores.forms import get_arrow_formset, get_dozen_formset
-from scores.models import Score, Arrow
+from scores.models import Score, Arrow, Dozen
 
 from scoring.utils import class_view_decorator
 
@@ -45,6 +45,7 @@ class InputScores(BetterTargetList):
                 allocations = allocations.exclude(session_entry__session_round__session=session)
 
         arrows = Arrow.objects.filter(score__target__in=allocations).select_related('score__target', 'score__target__session_entry__session_round__session')
+        dozens = Dozen.objects.filter(score__target__in=allocations).select_related('score__target', 'score__target__session_entry__session_round__session')
         target_lookup = {}
         for arrow in arrows:
             target = arrow.score.target
@@ -141,8 +142,9 @@ class InputDozens(View):
     def get(self, request, slug, session_id, boss, dozen):
         competition = get_object_or_404(Competition, slug=slug)
         scores = Score.objects.filter(target__session_entry__session_round__session=session_id, target__boss=boss, target__session_entry__present=True, retired=False).order_by('target__target').select_related()
+        num_dozens = SessionRound.objects.filter(session__pk=session_id)[0].shot_round.arrows / 12
         try:
-            forms = get_dozen_formset(scores, session_id, boss, dozen, scores[0].target.session_entry.session_round.session.arrows_entered_per_end)
+            forms = get_dozen_formset(scores, num_dozens, boss, dozen, scores[0].target.session_entry.session_round.session.arrows_entered_per_end)
         except IndexError:
             pass
         return render(request, self.template, locals())
@@ -150,12 +152,18 @@ class InputDozens(View):
     def post(self, request, slug, session_id, boss, dozen):
         competition = get_object_or_404(Competition, slug=slug)
         scores = Score.objects.filter(target__session_entry__session_round__session=session_id, target__boss=boss, target__session_entry__present=True, retired=False).order_by('target__target').select_related()
-        forms = get_dozen_formset(scores, session_id, boss, dozen, scores[0].target.session_entry.session_round.session.arrows_entered_per_end, data=request.POST)
+        num_dozens = SessionRound.objects.filter(session__pk=session_id)[0].shot_round.arrows / 12
+        forms = get_dozen_formset(scores, num_dozens, boss, dozen, scores[0].target.session_entry.session_round.session.arrows_entered_per_end, data=request.POST)
         dozens = []
         failed = False
         for score in forms:
             if score['form'].is_valid():
                 dozens.append(score['form'].save(commit=False))
+                if score['score_form']:
+                    if score['score_form'].is_valid():
+                        score['score_form'].save(commit=False)
+                    else:
+                        failed = True
             else:
                 failed = True
         if not failed:

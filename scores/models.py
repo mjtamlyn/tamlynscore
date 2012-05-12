@@ -21,8 +21,8 @@ class ScoreManager(models.Manager):
     def results(self, session_round, leaderboard=True, category=None):
         scores = self.active(session_round, category=category)
         scores = scores.select_related()
-        if not leaderboard:
-            scores = scores.annotate(arrows=models.Count('arrow')).filter(arrows__ne=session_round.shot_round.arrows)
+        #if not leaderboard:
+        #    scores = scores.annotate(arrows=models.Count('arrow')).filter(arrows__ne=session_round.shot_round.arrows)
         scores = scores.order_by(
                 'target__session_entry__competition_entry__bowstyle',
                 'target__session_entry__competition_entry__archer__gender',
@@ -80,7 +80,7 @@ class Score(models.Model):
                 if arrow.is_x:
                     self.xs += 1
         elif self.target.session_entry.session_round.session.scoring_system == SCORING_DOZENS:
-            self.score = self.dozen_set.aggregate(total=models.Sum('total'))['total'] or 0
+            self.score = self.dozen_set.aggregate(total=models.Sum('total'))['total'] or 0 + self.alteration
 
     @property
     def arrows_entered_per_end(self):
@@ -113,4 +113,4 @@ class Dozen(models.Model):
     dozen = models.PositiveIntegerField()
 
     def __unicode__(self):
-        return self.total
+        return unicode(self.total)

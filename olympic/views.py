@@ -1,7 +1,8 @@
+from django.core.urlresolvers import reverse
 from django.contrib.auth.decorators import login_required
 from django.db.models import Min, Max
-from django.http import HttpResponse
-from django.views.generic import View
+from django.http import HttpResponse, HttpResponseRedirect
+from django.views.generic import View, TemplateView
 from django.shortcuts import render, get_object_or_404
 
 from reportlab.lib import colors
@@ -12,7 +13,8 @@ from reportlab.rl_config import defaultPageSize
 from entries.models import Competition
 from entries.views import ScoreSheetsPdf, HeadedPdfView
 from scores.models import Score
-from olympic.models import OlympicSessionRound, Seeding, Match
+from olympic.models import OlympicSessionRound, Seeding, Match, Result
+from olympic.forms import ResultForm
 
 from itertools import groupby
 
@@ -43,6 +45,56 @@ class OlympicIndex(View):
         return self.get(request, slug)
 
 olympic_index = login_required(OlympicIndex.as_view())
+
+
+class OlympicInput(TemplateView):
+    template_name = 'olympic/input.html'
+
+    labels = [None, 'Final', 'Semi', '1/4', '1/8', '1/16', '1/32', '1/64']
+
+    def dispatch(self, request, slug, seed_pk):
+        self.competition = get_object_or_404(Competition, slug=slug)
+        self.seed = get_object_or_404(Seeding.objects.select_related(), pk=seed_pk)
+        self.results = self.seed.result_set.all()
+        highest_level = Match.objects.filter(session_round=self.seed.session_round).order_by('-level')[0].level
+        self.forms = []
+        for i in range(1, highest_level + 1):
+            try:
+                match = Match.objects.match_for_seed(self.seed, i)
+            except Match.DoesNotExist:
+                match = None
+            if match:
+                try:
+                    instance = Result.objects.get(match=match, seed=self.seed)
+                except Result.DoesNotExist:
+                    instance = Result(match=match, seed=self.seed)
+                form = ResultForm(instance=instance, data=request.POST if request.method == 'POST' else None, prefix='level-%s' % i)
+            else:
+                form = None
+            self.forms.insert(0, {
+                'form': form,
+                'match': match,
+                'label': self.labels[match.level] if match else None,
+            })
+        return super(OlympicInput, self).dispatch(request, slug, seed_pk)
+
+    def get_context_data(self):
+        return {
+            'competition': self.competition,
+            'seed': self.seed,
+            'results': self.results,
+            'forms': self.forms,
+        }
+
+    def post(self, request, *args, **kwargs):
+        for form in self.forms:
+            if form['form']:
+                if form['form'].is_valid():
+                    form['form'].save()
+                elif form['form'].instance.pk:
+                    form['form'].instance.delete()
+        return HttpResponseRedirect(reverse(olympic_index, kwargs={'slug': self.competition.slug}))
+
 
 class OlympicScoreSheet(ScoreSheetsPdf):
 
@@ -95,7 +147,7 @@ class OlympicScoreSheet(ScoreSheetsPdf):
                 match = matches[i]
                 match_title = self.Para(self.match_names[i], 'h3')
                 if match and i > 0:
-                    boss = self.Para('Target {0}'.format(match), 'h3') 
+                    boss = self.Para('T. {0}'.format(match), 'h3') 
                 elif match:
                     boss = self.Para('T. {0} / {1}'.format(match, match + 2), 'h3')
                 else:
@@ -191,9 +243,9 @@ class OlympicScoreSheet(ScoreSheetsPdf):
 olympic_score_sheet = login_required(OlympicScoreSheet.as_view())
 
 class OlympicResults(HeadedPdfView):
-    title = 'Head To Head Results'
+    title = 'H2H'
 
-    match_headers = ['1/32', '1/16', '1/8', 'QF', 'SF', 'F']
+    match_headers = ['1/64', '1/32', '1/16', '1/8', 'QF', 'SF', 'F']
 
     def update_style(self):
         self.styles['h1'].alignment = 1
@@ -227,7 +279,7 @@ class OlympicResults(HeadedPdfView):
     def get_round_elements(self, olympic_round):
 
         elements = []
-        seedings = olympic_round.seeding_set.all()
+        seedings = olympic_round.seeding_set.all().select_related()
         total_levels = olympic_round.match_set.aggregate(Max('level'))['level__max']
 
         seedings_with_results = []
@@ -235,7 +287,7 @@ class OlympicResults(HeadedPdfView):
             results = seeding.result_set.order_by('match__level')
             seedings_with_results.append((seeding, results))
 
-        seedings_with_results = sorted(seedings_with_results, key=lambda s: (s[1][0].match.level, s[1][0].match.match if s[1][0].match.level == 1 else None, -s[1][0].total, s[0].seed))
+        seedings_with_results = sorted(seedings_with_results, key=lambda s: (s[1][0].match.level, s[1][0].match.match if s[1][0].match.level == 1 else None, -s[1][0].total, -s[1][0].win, s[0].seed))
 
         table_headers = ['Rank', 'Seed', 'Name'] + self.match_headers[-total_levels:]
         table_data = [table_headers] + [[

@@ -8,6 +8,8 @@ class MatchAdmin(admin.ModelAdmin):
 class ResultAdmin(admin.ModelAdmin):
     list_display = ('match', 'seed', 'total', 'win')
     list_filter = ('match__session_round', 'match__level')
+
+    raw_id_fields = ('seed', 'match')
     
 admin.site.register(OlympicRound)
 admin.site.register(Category)
