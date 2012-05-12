@@ -1,0 +1,18 @@
+{% extends 'entries/competition_detail.html' %}
+
+{% block competition_content %}
+<h4>Input scores for {{ seed.entry.archer }} ({{ seed.session_round.category.name }} {{ seed.seed }})</h4>
+
+<form method="post" action="">
+{% csrf_token %}
+{% for form in forms %}
+    {% if form.form %}
+        <h5>{{ form.label }}</h5>
+        <ul>
+            {{ form.form.as_ul }}
+        </ul>
+    {% endif %}
+{% endfor %}
+<input type="submit" class="btn">
+</form>
+{% endblock %}

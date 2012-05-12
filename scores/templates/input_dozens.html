@@ -5,7 +5,7 @@
 <script>
     $(document).ready(function () {
         $('input')[0].focus();
-        $('input').keyup(function () {
+        $('.doz-total input').keyup(function () {
             var input = $(this);
             var rt = input.closest('tr').find('.rt');
             var total = parseInt(rt.attr('rel')) + parseInt(input.val());
@@ -31,6 +31,9 @@
                 <td>{{ target.target }}</td>
                 <td>{{ target.archer }}</td>
                 <th class="doz-total">{{ target.form.total }}</th>
+                {% if target.score_form %}
+                <td><ul>{{ target.score_form.as_ul }}</ul></td>
+                {% endif %}
                 <th class="rt" rel="{{ target.running_total }}">{{ target.running_total }}</th>
             </tr>
             {% empty %}

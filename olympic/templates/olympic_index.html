@@ -85,6 +85,7 @@
                 <td>{{ seed.entry.archer }}</td>
                 <td>{{ seed.entry.club }}</td>
                 <td>{{ seed.entry.bowstyle }}</td>
+                <td><a class="btn" href="{% url olympic_input slug=competition.slug seed_pk=seed.pk %}">Add scores</a></td>
             </tr>
             {% endfor %}
         </table>

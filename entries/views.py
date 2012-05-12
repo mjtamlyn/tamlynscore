@@ -324,6 +324,7 @@ class HeadedPdfView(PdfView):
         )
         for i, sponsor in enumerate(sponsors):
             canvas.drawImage(sponsors[i].logo.path, positions[i][0], positions[i][1], width=100, preserveAspectRatio=True, anchor='nw')
+            pass
 
         canvas.restoreState()
 
