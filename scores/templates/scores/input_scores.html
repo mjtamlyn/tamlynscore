@@ -80,7 +80,7 @@
             $$('a[href=' + document.location.hash.replace('#!', '#').replace(/-round-\d/, '') + ']').fireEvent('click');
         }
         if ('{{ focus }}') {
-            $$('.input-board').getElement('[rel={{ focus }}]')[0].fireEvent('keydown', {key: 'right', stop: function () {}});
+            $$('[rel={{ focus }}]')[0].fireEvent('keydown', {key: 'right', stop: function () {}});
         }
 
     });
