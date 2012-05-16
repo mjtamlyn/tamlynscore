@@ -6,6 +6,7 @@ from django.contrib.auth.decorators import login_required
 from django.core.cache import cache
 from django.core.urlresolvers import reverse
 from django.db import models
+from django.db.models import Q
 from django.http import HttpResponse, HttpResponseRedirect
 from django.shortcuts import render, get_object_or_404
 from django.template.loader import render_to_string
@@ -445,9 +446,10 @@ class ResultsPdf(HeadedPdfView, ResultsView):
                     gender = entries[0].target.session_entry.competition_entry.archer.gender
                     bowstyle = entries[0].target.session_entry.competition_entry.bowstyle
                     did_not_starts = session_round.sessionentry_set.select_related().filter(
-                            targetallocation__score=None,
                             competition_entry__archer__gender=gender,
                             competition_entry__bowstyle=bowstyle,
+                    ).filter(
+                            Q(targetallocation__score=None) | Q(targetallocation__score__score=0) | Q(targetallocation=None)
                     )
                     for dns in did_not_starts:
                         table_data.append([None, dns.competition_entry.archer.name, dns.competition_entry.club.name, 'DNS'])
