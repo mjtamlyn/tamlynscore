@@ -11,6 +11,7 @@ from django.shortcuts import render, get_object_or_404
 from django.template.loader import render_to_string
 from django.views.generic import View, ListView
 
+from reportlab.lib.units import inch
 from reportlab.platypus import PageBreak, Table
 
 from entries.models import Competition, SessionRound, SCORING_TOTALS, SCORING_DOZENS, SCORING_FULL
@@ -379,6 +380,10 @@ results = login_required(ResultsView.as_view())
 class ResultsPdf(HeadedPdfView, ResultsView):
     title = 'Results' # because ResultsView is a mixin, its attrs are not used.
 
+    def setMargins(self, doc):
+        doc.topMargin = 1.5*inch
+        doc.bottomMargin = 0.7*inch
+
     def update_style(self):
         self.styles['h1'].alignment = 1
         self.styles['h2'].alignment = 1
@@ -413,11 +418,17 @@ class ResultsPdf(HeadedPdfView, ResultsView):
 
                 row += subround_scores
 
-        row += [
-            entry.score if not entry.disqualified else 'DSQ',
-            entry.golds if not entry.disqualified else None,
-            entry.xs if not entry.disqualified else None,
+        scores = [
+            entry.score,
+            entry.golds,
+            entry.xs,
         ]
+        if entry.disqualified:
+            scores = ['DSQ', None, None]
+            row[0] = None
+        elif entry.retired:
+            scores = [entry.score, 'Retired', None]
+        row += scores
         return row
 
     def get_elements(self):
@@ -429,7 +440,21 @@ class ResultsPdf(HeadedPdfView, ResultsView):
 
             for category, entries in results:
                 elements.append(self.Para(category , 'h2'))
-                table = Table([self.row_from_entry(entries, entry) for entry in entries])
+                table_data = [self.row_from_entry(entries, entry) for entry in entries]
+                if table_data:
+                    gender = entries[0].target.session_entry.competition_entry.archer.gender
+                    bowstyle = entries[0].target.session_entry.competition_entry.bowstyle
+                    did_not_starts = session_round.sessionentry_set.select_related().filter(
+                            targetallocation__score=None,
+                            competition_entry__archer__gender=gender,
+                            competition_entry__bowstyle=bowstyle,
+                    )
+                    for dns in did_not_starts:
+                        table_data.append([None, dns.competition_entry.archer.name, dns.competition_entry.club.name, 'DNS'])
+                else:
+                    #FIXME! DNS for a category where everyone shot...
+                    pass
+                table = Table(table_data)
                 elements.append(table)
             
             elements.append(PageBreak())
