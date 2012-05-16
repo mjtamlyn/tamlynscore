@@ -385,12 +385,18 @@ class OlympicTree(OlympicResults):
             level = self.total_levels - i/3
             blocks = self.match_blocks(level)
             matches = olympic_round.match_set.filter(level=level).order_by('target')
-            if len(blocks) > len(matches):
+            if (len(blocks) / len(matches)) == 2:
                 old_matches = matches
                 matches = []
                 for j in range(len(old_matches)):
                     if not j % 2:
                         matches += [None, old_matches[j], old_matches[j + 1], None]
+            if (len(blocks) / len(matches)) == 4:
+                old_matches = matches
+                matches = []
+                for j in range(len(old_matches)):
+                    if not j % 2:
+                        matches += [old_matches[j], None, None, None, None, None, None, old_matches[j + 1]]
             for m in range(len(blocks)):
                 match = matches[m]
                 if match is None:
