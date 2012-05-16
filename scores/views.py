@@ -13,7 +13,7 @@ from django.views.generic import View, ListView
 
 from reportlab.platypus import PageBreak, Table
 
-from entries.models import Competition, SessionRound
+from entries.models import Competition, SessionRound, SCORING_TOTALS, SCORING_DOZENS, SCORING_FULL
 from entries.views import TargetList, HeadedPdfView, BetterTargetList
 
 from scores.forms import get_arrow_formset, get_dozen_formset
@@ -391,16 +391,25 @@ class ResultsPdf(HeadedPdfView, ResultsView):
         ]
         # TODO: Denormalise this (or something!)
         subrounds = entry.target.session_entry.session_round.shot_round.subrounds
-        if subrounds.count() > 1:
-            if entry.disqualified:
-                row += [None] * 4
+        num_subrounds = subrounds.count()
+        if num_subrounds > 1:
+            if entry.disqualified or entry.target.session_entry.session_round.session.scoring_system == SCORING_TOTALS:
+                row += [None] * num_subrounds
             else:
-                # Arrow of round has been stored off by a dozen
-                counter = 13
                 subround_scores = []
-                for subround in subrounds.order_by('-distance'):
-                    subround_scores.append(entry.arrow_set.filter(arrow_of_round__in=range(counter, counter + subround.arrows)).aggregate(models.Sum('arrow_value'))['arrow_value__sum'])
-                    counter += subround.arrows
+
+                if entry.target.session_entry.session_round.session.scoring_system == SCORING_FULL:
+                    # Arrow of round has been stored off by a dozen
+                    counter = 13
+                    for subround in subrounds.order_by('-distance'):
+                        subround_scores.append(entry.arrow_set.filter(arrow_of_round__in=range(counter, counter + subround.arrows)).aggregate(models.Sum('arrow_value'))['arrow_value__sum'])
+                        counter += subround.arrows
+
+                elif entry.target.session_entry.session_round.session.scoring_system == SCORING_DOZENS:
+                    counter = 1
+                    for subround in subrounds.order_by('-distance'):
+                        subround_scores.append(entry.dozen_set.filter(dozen__in=range(counter, counter + subround.arrows / 12)).aggregate(models.Sum('total'))['total__sum'])
+                        counter += subround.arrows / 12
 
                 row += subround_scores
 
