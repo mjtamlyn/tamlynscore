@@ -254,8 +254,15 @@ class OlympicResults(HeadedPdfView):
     def setMargins(self, doc):
         doc.bottomMargin = 0.3*inch
 
-    def pretty_rank(self, rank):
+    def pretty_rank(self, rank, extra_rank_info=None):
         if rank <= 8:
+            if extra_rank_info:
+                index = rank - 5
+                last_result = list(extra_rank_info[index][1])[0]
+                if last_result.match.session_round.shot_round.match_type == 'C':
+                    while index > 0 and last_result.total == list(extra_rank_info[index - 1][1])[0].total:
+                        index -= 1
+                    rank = index + 5
             return rank
         real_rank = 8
         while real_rank < rank:
@@ -290,12 +297,18 @@ class OlympicResults(HeadedPdfView):
         seedings_with_results = sorted(seedings_with_results, key=lambda s: (s[1][0].match.level, s[1][0].match.match if s[1][0].match.level == 1 else None, -s[1][0].total, -s[1][0].win, s[0].seed))
 
         table_headers = ['Rank', 'Seed', 'Name'] + self.match_headers[-total_levels:]
-        table_data = [table_headers] + [[
-            self.pretty_rank(seedings_with_results.index((seeding, results)) + 1),
-            seeding.seed,
-            seeding.entry.archer.name,
-        ] + self.format_results(results, total_levels)
-            for seeding, results in seedings_with_results]
+        table_data = [table_headers]
+        for rank, (seeding, results) in enumerate(seedings_with_results):
+            rank = rank + 1
+            extra_rank_info = None
+            if rank in [6, 7, 8]:
+                extra_rank_info = seedings_with_results[4:8]
+            rank = self.pretty_rank(rank, extra_rank_info)
+            table_data.append([
+                rank,
+                seeding.seed,
+                seeding.entry.archer.name,
+            ] + self.format_results(results, total_levels))
         table = Table(table_data)
         table.setStyle(self.table_style)
         elements.append(KeepTogether([
