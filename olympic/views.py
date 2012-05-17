@@ -243,7 +243,7 @@ class OlympicScoreSheet(ScoreSheetsPdf):
 olympic_score_sheet = login_required(OlympicScoreSheet.as_view())
 
 class OlympicResults(HeadedPdfView):
-    title = 'H2H'
+    title = 'Results'
 
     match_headers = ['1/64', '1/32', '1/16', '1/8', 'QF', 'SF', 'F']
 
@@ -409,7 +409,7 @@ class OlympicTree(OlympicResults):
                 matches = []
                 for j in range(len(old_matches)):
                     if not j % 2:
-                        matches += [old_matches[j], None, None, None, None, None, None, old_matches[j + 1]]
+                        matches += [None, old_matches[j], None, None, None, None, old_matches[j + 1], None]
             for m in range(len(blocks)):
                 match = matches[m]
                 if match is None:
