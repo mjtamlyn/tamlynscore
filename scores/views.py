@@ -475,3 +475,32 @@ class ResultsPdf(HeadedPdfView, ResultsView):
     ])
 
 results_pdf = login_required(ResultsPdf.as_view())
+
+
+class ResultsPdfOverall(ResultsPdf):
+    """This view is a big hack for the AGBNS weekend."""
+    title = 'Results'
+
+    def get_elements(self):
+        elements = []
+
+        i = 1
+        import csv
+        session_rounds, scores, sessions = self.get_results()
+        for session, session_round, results in scores[:2]:
+            for category, entries in results:
+                if not entries or len(entries) < 2:
+                    continue
+                elements.append(self.Para(category , 'h2'))
+                with open('%s.csv' % i) as f:
+                    data = csv.reader(f)
+                    table_data = list(data)
+                table = Table(table_data)
+                table.setStyle(self.table_style)
+                elements.append(table)
+                i += 1
+
+        return elements
+
+
+results_pdf_overall = login_required(ResultsPdfOverall.as_view())
