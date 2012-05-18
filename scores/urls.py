@@ -18,4 +18,5 @@ urlpatterns = patterns('scores.views',
     (r'^(?P<slug>(\w+-?)+)/leaderboard/big-screen/$', 'leaderboard_big_screen'),
     (r'^(?P<slug>(\w+-?)+)/results/$', 'results'),
     (r'^(?P<slug>(\w+-?)+)/results/pdf/$', 'results_pdf'),
+    (r'^(?P<slug>(\w+-?)+)/results/pdf/overall/$', 'results_pdf_overall'),
 )
