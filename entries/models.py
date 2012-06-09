@@ -44,7 +44,7 @@ class Competition(models.Model):
     created = models.DateTimeField(auto_now_add=True)
     modified = models.DateTimeField(auto_now=True)
 
-    sponsors = models.ManyToManyField(Sponsor)
+    sponsors = models.ManyToManyField(Sponsor, blank=True)
 
     def clean(self, *args, **kwargs):
         if self.end_date is None:
