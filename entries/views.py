@@ -340,7 +340,7 @@ class TargetListPdf(HeadedPdfView):
     lunch = False
 
     def setMargins(self, doc):
-        doc.topMargin = 1.5*inch
+        doc.topMargin = 1.1*inch
         doc.bottomMargin = 0.5*inch
 
     def update_style(self):
@@ -360,8 +360,7 @@ class TargetListPdf(HeadedPdfView):
             table = Table(target_list)
             spacer = Spacer(self.PAGE_WIDTH, 0.25*inch)
 
-            elements += [header, spacer, table, spacer]
-            elements.append(PageBreak())
+            elements = [header, spacer, table, spacer, PageBreak()] + elements
         return elements
 
 target_list_pdf = login_required(TargetListPdf.as_view())
