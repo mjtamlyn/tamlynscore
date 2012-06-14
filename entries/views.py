@@ -377,7 +377,7 @@ class ScoreSheetsPdf(HeadedPdfView):
     col_widths = 6*[box_size] + [wide_box] + 6*[box_size] + 6*[wide_box]
 
     def setMargins(self, doc):
-        doc.topMargin = 1.5*inch
+        doc.topMargin = 1.1*inch
 
     def update_style(self):
         self.title = self.session_round.shot_round
@@ -397,8 +397,8 @@ class ScoreSheetsPdf(HeadedPdfView):
                     entry = entry.session_entry.competition_entry
                     table_data = [
                             [self.Para(target, 'h2'), self.Para(entry.archer, 'h2'), self.Para(entry.club.name, 'h2')],
-                            [None, self.Para(u'{0} {1}'.format(entry.archer.get_gender_display(), entry.bowstyle), 'h2'), self.Para(entry.get_age_display(), 'h2')],
-                            #[None, self.Para(u'{0} {1}'.format(entry.archer.get_gender_display(), entry.bowstyle), 'h2'), self.Para(entry.get_novice_display(), 'h2')],
+                            #[None, self.Para(u'{0} {1}'.format(entry.archer.get_gender_display(), entry.bowstyle), 'h2'), self.Para(entry.get_age_display(), 'h2')],
+                            [None, self.Para(u'{0} {1}'.format(entry.archer.get_gender_display(), entry.bowstyle), 'h2'), self.Para(entry.get_novice_display(), 'h2')],
                     ]
                 else:
                     table_data = [
