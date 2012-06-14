@@ -311,7 +311,8 @@ class LeaderboardTeams(ListView):
         context['competition'] = competition
         context['title'] = 'Leaderboard'
 
-        context['club_results'] = self.get_club_results(scores)
+        exp_scores = scores.filter(target__session_entry__competition_entry__novice='E')
+        context['club_results'] = self.get_club_results(exp_scores)
         novice_scores = scores.filter(target__session_entry__competition_entry__novice='N')
         context['novice_results'] = self.get_club_results(novice_scores, 3)
 
