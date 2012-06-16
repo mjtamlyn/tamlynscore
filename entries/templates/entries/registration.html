@@ -40,7 +40,7 @@
             <th>Club</th>
             <th>Bowstyle</th>
             <th>Gender</th>
-            <!--th>Experience</th-->
+            <th>Experience</th>
             <!--th>Age</th-->
             <th>GNAS No.</th>
             <th>Present</th>
@@ -49,11 +49,11 @@
         {% for target, archer in archers %}
         <tr class="archer {% if not archer or archer.session_entry.present %}present{% endif %}" data-club="{{ archer.session_entry.competition_entry.club_id }}" data-clubname="{{ archer.session_entry.competition_entry.club }}">
             <td>{{ boss }}{{ target }}</td>
-            <td>{{ archer.session_entry.competition_entry.archer }}</td>
-            <td>{{ archer.session_entry.competition_entry.club }}</td>
+            <td>{% if archer %}<a href="{% url archer_update pk=archer.session_entry.competition_entry.archer_id %}?next={{ request.path }}">{{ archer.session_entry.competition_entry.archer }}</a>{% endif %}</td>
+            <td>{{ archer.session_entry.competition_entry.club }} {% if not archer.session_entry.competition_entry.club == archer.session_entry.competition_entry.archer.club %}({{ archer.session_entry.competition_entry.archer.club.name }}){% endif %}</td>
             <td>{{ archer.session_entry.competition_entry.bowstyle }}</td>
             <td>{{ archer.session_entry.competition_entry.archer.get_gender_display }}</td>
-            <!--td>{{ archer.session_entry.competition_entry.archer.get_novice_display }}</td-->
+            <td>{{ archer.session_entry.competition_entry.archer.get_novice_display }}</td>
             <!--td>{{ archer.session_entry.competition_entry.get_age_display }}</td-->
             <td>{{ archer.session_entry.competition_entry.archer.gnas_no }}</td>
             <td>
