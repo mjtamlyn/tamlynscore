@@ -1,7 +1,8 @@
 from django.contrib.auth.decorators import login_required
-from django.views.generic import TemplateView, ListView, DetailView
+from django.views.generic import TemplateView, ListView, DetailView, UpdateView
 
-from core.models import Club
+from .forms import ArcherUpdateForm
+from .models import Club, Archer
 
 from scoring.utils import class_view_decorator
 
@@ -17,3 +18,10 @@ class ClubDetail(DetailView):
     model = Club
 club_detail = login_required(ClubDetail.as_view())
 
+
+class ArcherUpdate(UpdateView):
+    model = Archer
+    form_class = ArcherUpdateForm
+
+    def get_success_url(self):
+        return self.request.GET.get('next') or self.request.path
