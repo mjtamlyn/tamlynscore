@@ -18,11 +18,14 @@ class ScoreManager(models.Manager):
             active_scores = active_scores.filter(target__session_entry__competition_entry__bowstyle__in=category.bowstyles.all(), target__session_entry__competition_entry__archer__gender=category.gender)
         return active_scores
 
-    def results(self, session_round, leaderboard=True, category=None):
-        scores = self.active(session_round, category=category)
+    def results(self, session_round, category=None, qs=None):
+        if qs:
+            scores = qs.filter(target__session_entry__session_round=session_round)
+            if category:
+                scores = scores.filter(target__session_entry__competition_entry__bowstyle__in=category.bowstyles.all(), target__session_entry__competition_entry__archer__gender=category.gender)
+        else:
+            scores = self.active(session_round, category=category)
         scores = scores.select_related()
-        #if not leaderboard:
-        #    scores = scores.annotate(arrows=models.Count('arrow')).filter(arrows__ne=session_round.shot_round.arrows)
         scores = scores.order_by(
                 'target__session_entry__competition_entry__bowstyle',
                 'target__session_entry__competition_entry__archer__gender',

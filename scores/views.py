@@ -183,15 +183,14 @@ class InputDozens(View):
 class LeaderboardView(View):
     template = 'leaderboard.html'
     title = 'Leaderboard'
-    leaderboard = True
 
-    def get_results(self):
+    def get_results(self, qs=None):
         session_rounds = SessionRound.objects.filter(session__competition=self.competition).order_by('session__start')
         scores = [
             (
                 session_round.session,
                 session_round,
-                Score.objects.results(session_round, leaderboard=self.leaderboard),
+                Score.objects.results(session_round, qs=qs),
             )
             for session_round in session_rounds
         ]
@@ -375,21 +374,35 @@ class LeaderboardBigScreen(LeaderboardView):
 leaderboard_big_screen = login_required(LeaderboardBigScreen.as_view())
 
 class ResultsView(LeaderboardView):
-    leaderboard = False # FIXME: set this back to True when leaderboard has been made more efficient! The massive counted annotate is slooooow.
     title = 'Results'
 
 results = login_required(ResultsView.as_view())
 
-class ResultsPdf(HeadedPdfView, ResultsView):
+class ResultsPdf(HeadedPdfView, LeaderboardSummary):
     title = 'Results' # because ResultsView is a mixin, its attrs are not used.
 
     def setMargins(self, doc):
-        doc.topMargin = 1.5*inch
+        doc.topMargin = 1.2*inch
         doc.bottomMargin = 0.7*inch
 
     def update_style(self):
         self.styles['h1'].alignment = 1
         self.styles['h2'].alignment = 1
+
+    def get_results(self, qs=None):
+        session_rounds = SessionRound.objects.filter(session__competition=self.competition).order_by('session__start')
+        scores = [
+            (
+                session_round.session,
+                session_round,
+                Score.objects.results(session_round, qs=qs),
+            )
+            for session_round in session_rounds
+        ]
+        sessions = []
+        for key, values in groupby(scores, lambda x: x[0]):
+            sessions.append((key, [value[1] for value in values]))
+        return scores
 
     def row_from_entry(self, entries, entry, subrounds):
         row = [
@@ -434,8 +447,38 @@ class ResultsPdf(HeadedPdfView, ResultsView):
     def get_elements(self):
         elements = []
 
-        session_rounds, scores, sessions = self.get_results()
-        for session, session_round, results in scores:
+        scores = self.get_queryset().exclude(score=0)
+        exp_scores = scores.filter(target__session_entry__competition_entry__novice='E')
+        nov_scores = scores.filter(target__session_entry__competition_entry__novice='N')
+
+        if nov_scores:
+            elements.append(self.Para('Experienced Results', 'h1'))
+        elements += self.get_elements_for_results_set(exp_scores)
+        if nov_scores:
+            elements.append(self.Para('Novice Results', 'h1'))
+            elements += self.get_elements_for_results_set(nov_scores)
+
+        # Teams - FIXME assume not needed if there aren't novices (hacky way of getting student shoots)
+        if nov_scores:
+            scores = scores.exclude(target__session_entry__competition_entry__bowstyle__name='Compound').exclude(retired=True)
+            exp_scores = scores.filter(target__session_entry__competition_entry__novice='E')
+            nov_scores = scores.filter(target__session_entry__competition_entry__novice='N')
+            club_results = self.get_club_results(exp_scores)
+            elements.append(self.Para('Experienced Teams', 'h1'))
+            elements += self.get_elements_for_teams(club_results)
+            nov_club_results = self.get_club_results(nov_scores, 3)
+            elements.append(self.Para('Novice Teams', 'h1'))
+            elements += self.get_elements_for_teams(nov_club_results)
+
+        return elements
+
+
+    def get_elements_for_results_set(self, scores):
+        elements = []
+
+        for session, session_round, results in self.get_results(qs=scores):
+            if not results:
+                continue
             elements.append(self.Para(session_round.shot_round, 'h1'))
 
             for category, entries in results:
@@ -470,6 +513,24 @@ class ResultsPdf(HeadedPdfView, ResultsView):
             elements.append(PageBreak())
 
         return elements
+
+    def get_elements_for_teams(self, results):
+        elements = []
+
+        table_data = []
+        for i, team in enumerate(results):
+            table_data += [[i+1, team['club'].name, team['total']]]
+            table_data += [[
+                None,
+                score.target.session_entry.competition_entry.archer.name,
+                score.score,
+                score.golds,
+                score.xs,
+            ] for score in team['team']]
+        elements.append(Table(table_data))
+
+        return elements
+
 
     table_style = TableStyle([
         ('LINEBELOW', (0, 0), (-1, 0), 0.5, colors.black),
