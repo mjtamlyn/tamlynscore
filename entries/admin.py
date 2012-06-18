@@ -10,6 +10,7 @@ class CompetitionAdmin(admin.ModelAdmin):
 class CompetitionEntryAdmin(admin.ModelAdmin):
     list_display = ('archer', 'club', 'competition')
     list_filter = ('competition', 'club')
+    raw_id_fields = ('archer',)
 
 
 class SessionEntryAdmin(admin.ModelAdmin):
