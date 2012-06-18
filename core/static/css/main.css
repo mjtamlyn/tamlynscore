@@ -515,17 +515,21 @@ footer {
 .leaderboard-big-screen .wrapper {
   width: 1800px; }
   .leaderboard-big-screen .wrapper h1 {
-    font-size: 70px; }
+    font-size: 50px; }
   .leaderboard-big-screen .wrapper h2 {
     margin-top: 0;
-    font-size: 50px; }
+    font-size: 36px;
+    overflow: hidden; }
+  .leaderboard-big-screen .wrapper h3 {
+    margin-top: 0;
+    font-size: 26px; }
   .leaderboard-big-screen .wrapper .module {
     float: left;
     margin: 10px;
-    width: 850px; }
+    width: 578px; }
     .leaderboard-big-screen .wrapper .module td {
-      font-size: 30px;
-      padding: 5px 15px; }
+      font-size: 18px;
+      padding: 2px 15px; }
 
 .leaderboard-butc .wrapper {
   width: 1020px;
