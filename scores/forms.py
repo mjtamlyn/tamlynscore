@@ -50,7 +50,7 @@ class DozenForm(forms.ModelForm):
 class ScoreForm(forms.ModelForm):
     class Meta:
         model = Score
-        exclude = ['target', 'score', 'hits', 'retired', 'disqualified']
+        exclude = ['target', 'score', 'xs', 'retired', 'disqualified']
 
 
 def get_dozen_formset(scores, num_dozens, boss, dozen, arrows_per_end, data=None):
