@@ -37,7 +37,11 @@ class Subround(models.Model):
     target_face = models.PositiveIntegerField()
 
     def __unicode__(self):
-        return u'{0} arrows at {1} {2}'.format(self.arrows, self.distance, self.get_unit_display())
+        return u'{0} arrows at {1} {2} ({3}cm)'.format(self.arrows, self.distance, self.get_unit_display(), self.target_face)
+
+    class Meta:
+        ordering = ('unit', '-distance', '-arrows', '-target_face')
+
 
 class Round(models.Model):
     name = models.CharField(max_length=100, unique=True)
