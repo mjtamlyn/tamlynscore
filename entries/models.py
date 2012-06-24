@@ -165,6 +165,8 @@ class CompetitionEntry(models.Model):
     age = models.CharField(max_length=1, choices=AGE_CHOICES)
     novice = models.CharField(max_length=1, choices=NOVICE_CHOICES)
 
+    guest = models.BooleanField(default=False)
+
     def __unicode__(self):
         return u'{0} at {1}'.format(self.archer, self.competition)
 
