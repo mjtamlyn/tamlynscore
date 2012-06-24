@@ -14,7 +14,7 @@ from django.views.generic import View, ListView
 
 from reportlab.lib import colors
 from reportlab.lib.units import inch
-from reportlab.platypus import PageBreak, Table, TableStyle
+from reportlab.platypus import PageBreak, Spacer, Table, TableStyle
 
 from entries.models import Competition, SessionRound, SCORING_TOTALS, SCORING_DOZENS, SCORING_FULL
 from entries.views import HeadedPdfView, BetterTargetList
@@ -404,13 +404,17 @@ class ResultsPdf(HeadedPdfView, LeaderboardSummary):
             sessions.append((key, [value[1] for value in values]))
         return scores
 
-    def row_from_entry(self, entries, entry, subrounds):
-        row = [
-            entries.index(entry) + 1 if not entry.disqualified else None,
-            entry.target.session_entry.competition_entry.archer.name,
-            entry.target.session_entry.competition_entry.club.name,
-        ]
-        if len(subrounds) > 1:
+
+    def row_from_entry(self, entries, entry, subrounds, round_scoring_type):
+        row = []
+        guest = entry.target.session_entry.competition_entry.guest
+        if entry.disqualified or guest:
+            row.append(None)
+        else:
+            row.append(entries.index(entry) + 1)
+        row.append(entry.target.session_entry.competition_entry.archer.name)
+        row.append(entry.target.session_entry.competition_entry.club.name + (' (Guest)' if guest else ''))
+        if len(subrounds) > 1 and not entries[0].target.session_entry.session_round.session.scoring_system == SCORING_TOTALS:
             if entry.disqualified or entry.target.session_entry.session_round.session.scoring_system == SCORING_TOTALS:
                 row += [None] * len(subrounds)
             else:
@@ -435,6 +439,10 @@ class ResultsPdf(HeadedPdfView, LeaderboardSummary):
             entry.score,
             entry.golds,
             entry.xs,
+        ] if round_scoring_type == 'X' else [
+            entry.score,
+            entry.hits,
+            entry.golds,
         ]
         if entry.disqualified:
             scores = ['DSQ', None, None]
@@ -448,11 +456,15 @@ class ResultsPdf(HeadedPdfView, LeaderboardSummary):
         elements = []
 
         scores = self.get_queryset().exclude(score=0)
-        exp_scores = scores.filter(target__session_entry__competition_entry__novice='E')
         nov_scores = scores.filter(target__session_entry__competition_entry__novice='N')
 
+        nov_scores = False
+
         if nov_scores:
+            exp_scores = scores.filter(target__session_entry__competition_entry__novice='E')
             elements.append(self.Para('Experienced Results', 'h1'))
+        else:
+            exp_scores = scores
         elements += self.get_elements_for_results_set(exp_scores)
         if nov_scores:
             elements.append(self.Para('Novice Results', 'h1'))
@@ -486,12 +498,13 @@ class ResultsPdf(HeadedPdfView, LeaderboardSummary):
                     continue
                 elements.append(self.Para(category , 'h2'))
                 table_header = ['Pl.', 'Archer', 'Club']
-                subrounds = entries[0].target.session_entry.session_round.shot_round.subrounds.order_by('-distance')
-                if len(subrounds) > 1:
+                subrounds = session_round.shot_round.subrounds.order_by('-distance')
+                if len(subrounds) > 1 and not session_round.session.scoring_system == SCORING_TOTALS:
                     table_header += ['{0}{1}'.format(subround.distance, subround.unit) for subround in subrounds]
-                table_header += ['Score', '10s', 'Xs']
+                round_scoring_type = session_round.shot_round.scoring_type
+                table_header += ['Score', '10s', 'Xs'] if round_scoring_type == 'X' else ['Score', 'Hits', 'Golds']
                 table_data = [table_header]
-                table_data += [self.row_from_entry(entries, entry, subrounds) for entry in entries]
+                table_data += [self.row_from_entry(entries, entry, subrounds, round_scoring_type) for entry in entries]
                 if table_data:
                     gender = entries[0].target.session_entry.competition_entry.archer.gender
                     bowstyle = entries[0].target.session_entry.competition_entry.bowstyle
@@ -509,8 +522,10 @@ class ResultsPdf(HeadedPdfView, LeaderboardSummary):
                 table = Table(table_data)
                 table.setStyle(self.table_style)
                 elements.append(table)
+
+            elements.append(Spacer(self.PAGE_WIDTH, 0.25*inch))
             
-            elements.append(PageBreak())
+            #elements.append(PageBreak())
 
         return elements
 
