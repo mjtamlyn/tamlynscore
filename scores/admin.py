@@ -9,6 +9,9 @@ class ArrowAdmin(admin.ModelAdmin):
 
 class ScoreAdmin(admin.ModelAdmin):
     raw_id_fields = ('target',)
+    list_display = ('target', 'score', 'hits', 'golds')
+    list_editable = ('score', 'hits', 'golds')
+    list_filter = ('target__session_entry__competition_entry__competition',)
 
     def queryset(self, request):
         return super(ScoreAdmin, self).queryset(request).select_related()
