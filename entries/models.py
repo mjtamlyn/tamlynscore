@@ -179,7 +179,7 @@ class CompetitionEntry(models.Model):
         return gender + bowstyle
 
     def category(self):
-        return u'{0} {1}'.format(self.archer.get_gender_display(), self.bowstyle)
+        return u'{2}{0} {1}'.format(self.archer.get_gender_display(), self.bowstyle, 'Junior ' if self.age == 'J' else '')
 
 class SessionEntry(models.Model):
     competition_entry = models.ForeignKey(CompetitionEntry)
