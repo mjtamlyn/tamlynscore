@@ -28,7 +28,9 @@ class ScoreManager(models.Manager):
         scores = scores.select_related()
         scores = scores.order_by(
                 'target__session_entry__competition_entry__bowstyle',
+                '-target__session_entry__competition_entry__age',
                 'target__session_entry__competition_entry__archer__gender',
+                'target__session_entry__competition_entry__guest',
                 'disqualified',
                 '-score', 
                 '-golds', 
