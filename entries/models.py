@@ -200,7 +200,7 @@ class SessionEntry(models.Model):
 
 
 class TargetAllocation(models.Model):
-    session_entry = models.ForeignKey(SessionEntry)
+    session_entry = models.ForeignKey(SessionEntry, unique=True)
     boss = models.PositiveIntegerField()
     target = models.CharField(max_length=1)
 
