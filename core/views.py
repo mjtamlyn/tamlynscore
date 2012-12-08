@@ -20,6 +20,7 @@ class ClubDetail(DetailView):
     model = Club
 
 
+@class_view_decorator(login_required)
 class ArcherUpdate(UpdateView):
     model = Archer
     form_class = ArcherUpdateForm
