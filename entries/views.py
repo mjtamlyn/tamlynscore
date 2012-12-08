@@ -419,7 +419,8 @@ class ScoreSheetsPdf(HeadedPdfView):
             dozens = subround.arrows / 12
             extra = subround.arrows % 12
             total_rows = dozens + 2
-            table_data = [[subround_title] + [None] * 5 + ['ET'] + [None] * 6 + ['ET', 'S', '10+X', 'X', 'RT']]
+            scoring_labels = ['ET', 'S', '10+X', 'X', 'RT'] if self.session_round.shot_round.scoring_type == 'X' else ['ET', 'S', 'H', 'G', 'RT']
+            table_data = [[subround_title] + [None] * 5 + ['ET'] + [None] * 6 + scoring_labels]
             table_data += [[None for i in range(self.total_cols)] for j in range(total_rows - 1)]
             if extra is 6:
                 total_rows += 1
