@@ -1,0 +1,50 @@
+{% extends 'entries/competition_detail.html' %}
+
+{% block scripts %}
+<script src="{{ STATIC_URL }}js/jquery-1.7.2.min.js"></script>
+<script>
+    $(document).ready(function () {
+        $('input')[0].focus();
+        $('.doz-total input').keyup(function () {
+            var input = $(this);
+            var rt = input.closest('tr').find('.rt');
+            var total = parseInt(rt.attr('rel')) + parseInt(input.val());
+            rt.html(total);
+        });
+        $('input').trigger('keyup')
+    });
+</script>
+{% endblock %}
+
+{% block competition_content %}
+<div class="module input-dozens">
+    <h4>Enter arrow values for boss {{ boss }}, dozen {{ dozen }}</h4>
+    <form action="" method="post" autocomplete="off">
+        <table class="target">
+            <tr>
+                <th colspan="2">Archer</th>
+                <th>Doz</th>
+                <th>RT</th>
+            </tr>
+            {% for target in forms %}
+            <tr>
+                <td>{{ target.target }}</td>
+                <td>{{ target.archer }}</td>
+                <th class="doz-total">{{ target.form.total }}</th>
+                {% if target.score_form %}
+                <td><ul>{{ target.score_form.as_ul }}</ul></td>
+                {% endif %}
+                <th class="rt" rel="{{ target.running_total }}">{{ target.running_total }}</th>
+            </tr>
+            {% empty %}
+            <tr><td colspan="10">No archers</td></tr>
+            {% endfor %}
+        </table>
+        <div class="save">
+            <input type="submit" value="Save" />
+        </div>
+        {% csrf_token %}
+    </form>
+    <div class="clear"></div>
+</div>
+{% endblock %}

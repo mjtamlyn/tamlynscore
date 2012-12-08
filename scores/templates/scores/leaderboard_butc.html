@@ -1,0 +1,30 @@
+{% extends 'base.html' %}
+
+{% block title %}{{ title }}{% endblock %}
+
+{% block bodyclass %}leaderboard-butc{% endblock %}
+
+{% block scripts %}
+<script src="{{ STATIC_URL }}js/jquery-1.7.2.min.js"></script>
+<script src="{{ STATIC_URL }}js/underscore-min.js"></script>
+<script src="{{ STATIC_URL }}js/backbone-min.js"></script>
+<script src="{{ STATIC_URL }}js/leaderboard-butc.js"></script>
+<script type="text/javascript">
+    $(document).ready(function () {
+        window.init(JSON.parse('{{ serialized_results|escapejs }}'), '{{ template|escapejs }}');
+    });
+</script>
+{% endblock %}
+
+{% block nav_links %}
+{% endblock %}
+
+{% block content %}
+<h1>{{ title }}</h1>
+<div id="leaderboard"></div>
+{% endblock %}
+
+{% block footer %}
+<a id="update">Update!</a>
+{{ block.super }}
+{% endblock %}
