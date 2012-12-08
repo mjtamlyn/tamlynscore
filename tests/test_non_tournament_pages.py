@@ -46,3 +46,8 @@ class TestIndex(BasicPageTest, TestCase):
     url_name = 'index'
     responses = (('get', 200),)
     login_required = True
+
+
+class TestClubList(BasicPageTest, TestCase):
+    url_name = 'club_list'
+    responses = (('get', 200),)
