@@ -396,7 +396,7 @@ class ScoreSheetsPdf(HeadedPdfView):
                     table_data = [
                             [self.Para(target, 'h2'), self.Para(entry.archer, 'h2'), self.Para(entry.club.name, 'h2')],
                             #[None, self.Para(u'{0} {1}'.format(entry.archer.get_gender_display(), entry.bowstyle), 'h2'), self.Para(entry.get_age_display(), 'h2')],
-                            [None, self.Para(u'{0} {1}'.format(entry.archer.get_gender_display(), entry.bowstyle), 'h2'), self.Para(entry.get_novice_display(), 'h2')],
+                            [None, self.Para(u'{0} {1}'.format(entry.archer.get_gender_display(), entry.bowstyle), 'h2'), self.Para(u'{0} {1}'.format(entry.get_novice_display(), entry.get_age_display()), 'h2')],
                     ]
                 else:
                     table_data = [
