@@ -1,0 +1,72 @@
+{% extends 'entries/target_list.html' %}
+
+{% block scripts %}
+<script src="{{ STATIC_URL }}js/jquery-1.7.2.min.js"></script>
+<script src="{{ STATIC_URL }}js/ajax-csrf.js"></script>
+<script src="{{ STATIC_URL }}js/registration.js"></script>
+{% endblock scripts %}
+
+{% block moduleclass %}registration{% endblock %}
+{% block title %}Registration{% endblock %}
+
+{% block main %}
+<div class="intro">
+    Sessions:
+    <ul>
+        {% for session, details in target_list.items %}
+        <li>
+        <span>{{ session.start|date:"l, jS F - f a" }}</span>
+        {% if details.entries|length %}
+        <span class="unallocated" title="Unallocated entries">{{ details.entries|length }}</span>
+        {% endif %}
+        <a class="btn" href="#session-{{ session.pk }}">Skip</a>
+        </li>
+        {% endfor %}
+    </ul>
+</div>
+
+{% for session, details in target_list.items %}
+<div class="registration-board" id="session-{{ session.pk }}" rel="{{ session.archers_per_target }}">
+    <ul class="actions">
+        <select class="club-filter">
+            <option data-club="--all--">--All--</option>
+        </select>
+    </ul>
+    <div class="clear"></div>
+    <table>
+        <thead>
+            <th>Target</th>
+            <th>Name</th>
+            <th>Club</th>
+            <th>Bowstyle</th>
+            <th>Gender</th>
+            <th>Experience</th>
+            <!--th>Age</th-->
+            <th>GNAS No.</th>
+            <th>Present</th>
+        </thead>
+        {% for boss, archers in details.target_list %}
+        {% for target, archer in archers %}
+        <tr class="archer {% if not archer or archer.session_entry.present %}present{% endif %}" data-club="{{ archer.session_entry.competition_entry.club_id }}" data-clubname="{{ archer.session_entry.competition_entry.club }}">
+            <td>{{ boss }}{{ target }}</td>
+            <td>{% if archer %}<a href="{% url archer_update pk=archer.session_entry.competition_entry.archer_id %}?next={{ request.path }}">{{ archer.session_entry.competition_entry.archer }}</a>{% endif %}</td>
+            <td>{{ archer.session_entry.competition_entry.club }} {% if not archer.session_entry.competition_entry.club == archer.session_entry.competition_entry.archer.club %}({{ archer.session_entry.competition_entry.archer.club.name }}){% endif %}</td>
+            <td>{{ archer.session_entry.competition_entry.bowstyle }}</td>
+            <td>{{ archer.session_entry.competition_entry.archer.get_gender_display }}</td>
+            <td>{{ archer.session_entry.competition_entry.archer.get_novice_display }}</td>
+            <!--td>{{ archer.session_entry.competition_entry.get_age_display }}</td-->
+            <td>{{ archer.session_entry.competition_entry.archer.gnas_no }}</td>
+            <td>
+                {% if archer %}
+                <a href="#present" class="present" data-pk="{{ archer.session_entry.pk }}">Not Present</a>
+                <a href="#not-present" class="not-present" data-pk="{{ archer.session_entry.pk }}">Present</a>
+                {% endif %}
+            </td>
+        </tr>
+        {% endfor %}
+        {% endfor %}
+    </table>
+</div>
+{% endfor %}
+
+{% endblock %}

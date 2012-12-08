@@ -1,0 +1,44 @@
+{% extends 'base.html' %}
+
+{% block extrastyles %}
+<link rel="stylesheet" href="{{ STATIC_URL }}css/competition.css">
+{% endblock %}
+
+{% block bodyclass %}leaderboard-big-screen{% endblock %}
+
+{% block nav_links %}
+{% endblock %}
+
+{% block content %}
+<h1>{{ competition }} - Leaderboard</h1>
+{% for session, round, results in scores %}
+    <h2>{{ round.shot_round }}</h2>
+    {% for category, scores in results %}
+    {% if scores|length > 2 %}
+    <div class="module">
+        <h3>{{ category }}</h3>
+        <table>
+            {% for score in scores %}
+            {% if forloop.counter < 6 %}
+            <tr>
+                <td>{{ forloop.counter }}</td>
+                <td>{{ score.target.session_entry.competition_entry.archer }}</td>
+                <td>{{ score.target.session_entry.competition_entry.club}}</td>
+                <td>{{ score.score }}</td>
+                <!--td>{{ score.hits }}</td>
+                <td>{{ score.golds }}</td>
+                <td>{{ score.xs }}</td-->
+            </tr>
+            {% endif %}
+            {% endfor %}
+        </table>
+    </div>
+    {% if forloop.counter == 3 or forloop.last %}
+    <div class="clear"></div>
+    {% endif %}
+    {% endif %}
+    {% endfor %}
+{% endfor %}
+<div class="clear"></div>
+{% endblock %}
+
