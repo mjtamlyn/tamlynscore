@@ -1,12 +1,14 @@
+import json
+
 from django.db import models
 from django.template.defaultfilters import slugify
 
-import json
 
 DISTANCE_UNITS = (
     ('m', 'metres'),
     ('y', 'yards'),
 )
+
 
 SCORING_TYPES = (
     ('F', 'Five Zone Imperial'),
@@ -15,20 +17,24 @@ SCORING_TYPES = (
     ('W', 'Worcester'),
 )
 
+
 GENDER_CHOICES = (
     ('G', 'Gent'),
     ('L', 'Lady'),
 )
+
 
 NOVICE_CHOICES = (
     ('N', 'Novice'),
     ('E', 'Experienced'),
 )
 
+
 AGE_CHOICES = (
     ('J', 'Junior'),
     ('S', 'Senior'),
 )
+
 
 class Subround(models.Model):
     arrows = models.PositiveIntegerField()
@@ -64,11 +70,13 @@ class Round(models.Model):
                 return subround
         raise Exception('There aren\'t that many dozens in that round!')
 
+
 class Bowstyle(models.Model):
     name = models.CharField(max_length=50, unique=True)
 
     def __unicode__(self):
         return self.name
+
 
 class Country(models.Model):
     name = models.CharField(max_length=50, unique=True)
@@ -79,12 +87,14 @@ class Country(models.Model):
     def __unicode__(self):
         return self.name
 
+
 class Region(models.Model):
     name = models.CharField(max_length=50, unique=True)
     country = models.ForeignKey(Country)
 
     def __unicode__(self):
         return self.name
+
 
 class County(models.Model):
     name = models.CharField(max_length=50, unique=True)
@@ -95,6 +105,7 @@ class County(models.Model):
     
     def __unicode__(self):
         return self.name
+
 
 class Club(models.Model):
     name = models.CharField(max_length=500, unique=True)
@@ -121,6 +132,7 @@ class Club(models.Model):
             'name': self.name,
             'short_name': self.short_name,
         })
+
 
 class Archer(models.Model):
     name = models.CharField(max_length=200)
