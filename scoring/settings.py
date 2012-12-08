@@ -72,7 +72,7 @@ INSTALLED_APPS = (
     'debug_toolbar',
 )
 
-TEST_RUNNER = 'discover_runner.DiscoverRunner'
+TEST_RUNNER = 'tests.runner.ScoringRunner'
 
 LOGIN_REDIRECT_URL = '/'
 
