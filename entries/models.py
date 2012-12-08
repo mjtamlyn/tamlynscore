@@ -1,19 +1,20 @@
+import math
+
 from django.db import models
 from django.template.defaultfilters import slugify
 
 from core.models import Archer, Bowstyle, Club, Round, AGE_CHOICES, NOVICE_CHOICES
 
-import math
 
 SCORING_FULL = 'F'
 SCORING_DOZENS = 'D'
 SCORING_TOTALS = 'T'
-
 SCORING_SYSTEMS = (
     (SCORING_FULL, 'Full running slips'),
     (SCORING_DOZENS, 'Dozen running slips'),
     (SCORING_TOTALS, 'Totals only'),
 )
+
 
 class Tournament(models.Model):
     full_name = models.CharField(max_length=300, unique=True)
@@ -67,6 +68,7 @@ class Competition(models.Model):
     class Meta:
         unique_together = ('date', 'tournament')
 
+
 class Session(models.Model):
     competition = models.ForeignKey(Competition)
     start = models.DateTimeField()
@@ -90,6 +92,7 @@ class Session(models.Model):
             SCORING_DOZENS: 'input_dozens',
             SCORING_TOTALS: 'input_arrows', #FIXME
         }[self.scoring_system]
+
 
 class SessionRound(models.Model):
     session = models.ForeignKey(Session)
@@ -156,6 +159,7 @@ class SessionRound(models.Model):
     def __unicode__(self):
         return u'{0}, {1}'.format(self.session, self.shot_round)
 
+
 class CompetitionEntry(models.Model):
     competition = models.ForeignKey(Competition)
 
@@ -181,6 +185,7 @@ class CompetitionEntry(models.Model):
     def category(self):
         return u'{2}{0} {1}'.format(self.archer.get_gender_display(), self.bowstyle, 'Junior ' if self.age == 'J' else '')
 
+
 class SessionEntry(models.Model):
     competition_entry = models.ForeignKey(CompetitionEntry)
     session_round = models.ForeignKey(SessionRound)
@@ -192,6 +197,7 @@ class SessionEntry(models.Model):
 
     class Meta:
         verbose_name_plural = 'session entries'
+
 
 class TargetAllocation(models.Model):
     session_entry = models.ForeignKey(SessionEntry)
