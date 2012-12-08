@@ -15,8 +15,6 @@ from reportlab.rl_config import defaultPageSize
 from reportlab.lib import colors
 from reportlab.lib.units import inch
 
-from core.models import GENDER_CHOICES
-
 from entries.forms import new_entry_form_for_competition
 from entries.models import *
 
