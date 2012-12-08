@@ -51,8 +51,9 @@ class ScoreManager(models.Manager):
             bosses.append((boss, list(entries)))
         return bosses
 
+
 class Score(models.Model):
-    target = models.ForeignKey(TargetAllocation)
+    target = models.ForeignKey(TargetAllocation, unique=True)
 
     score = models.PositiveIntegerField(default=0, db_index=True)
     hits = models.PositiveIntegerField(default=0)
