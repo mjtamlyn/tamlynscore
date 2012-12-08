@@ -72,6 +72,8 @@ INSTALLED_APPS = (
     'debug_toolbar',
 )
 
+TEST_RUNNER = 'discover_runner.DiscoverRunner'
+
 LOGIN_REDIRECT_URL = '/'
 
 LOGGING = {
