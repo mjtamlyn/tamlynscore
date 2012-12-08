@@ -23,15 +23,17 @@ Elements.from = function(text, excludeScripts){
 </script>
 <script>
     window.addEvent('domready', function () {
-        var archer, club, bowstyle, gender, age, novice, gnas_no, session0, session1;
+        var archer, club, bowstyle, gender, age, novice, gnas_no, sessions;
+        sessions = [];
         var reset = function () {
             club.reset();
             bowstyle.reset();
             gender.reset();
             age.reset();
             novice.reset();
-            session0.reset();
-            //session1.reset();
+            for (var i=0; i < sessions.length; i++) {
+                sessions[i].reset();
+            }
             gnas_no.set('value', '');
             $$('.show-more-details').removeClass('selected');
             $$('.more-details').removeClass('shown');
@@ -67,8 +69,12 @@ Elements.from = function(text, excludeScripts){
         gender = new ButtonWidget($('gender-widget'));
         age = new ButtonWidget($('age-widget'));
         novice = new ButtonWidget($('novice-widget'));
-        session0 = new ButtonWidget($('session-0-widget'));
-        //session1 = new ButtonWidget($('session-1-widget'));
+        for (var i=0; i < 10; i++) {
+            var field = $('session-' + i + '-widget');
+            if (field) {
+                sessions.push(new ButtonWidget(field));
+            }
+        }
         gnas_no = $('id_gnas_no');
         $$('.show-more-details').addEvent('click', function () {
             $$('.more-details').toggleClass('shown');
