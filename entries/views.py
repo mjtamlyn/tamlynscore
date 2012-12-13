@@ -7,6 +7,7 @@ from django.db.models import Count
 from django.http import HttpResponse, HttpResponseBadRequest
 from django.utils.datastructures import SortedDict
 from django.views.generic import View, DetailView, ListView
+from django.views.generic.edit import FormMixin
 from django.shortcuts import render, get_object_or_404
 
 from reportlab.platypus import SimpleDocTemplate, Paragraph, Spacer, Table, PageBreak, TableStyle, KeepTogether
@@ -15,7 +16,7 @@ from reportlab.rl_config import defaultPageSize
 from reportlab.lib import colors
 from reportlab.lib.units import inch
 
-from entries.forms import new_entry_form_for_competition
+from entries.forms import NewEntryForm
 from entries.models import Competition, CompetitionEntry, SessionEntry, TargetAllocation
 
 from scoring.utils import class_view_decorator
@@ -36,8 +37,9 @@ class CompetitionDetail(DetailView):
 
 
 @class_view_decorator(login_required)
-class EntryList(ListView):
+class EntryList(FormMixin, ListView):
     model = SessionEntry
+    form_class = NewEntryForm
     template_name = 'entries/entry_list.html'
 
     def get_queryset(self):
@@ -53,12 +55,14 @@ class EntryList(ListView):
         context.update({
             'competition': self.competition,
             'stats': self.get_stats(),
-            'form': self.get_form_class()(),
+            'form': self.get_form_class()(**self.get_form_kwargs()),
         })
         return context
 
-    def get_form_class(self):
-        return new_entry_form_for_competition(self.competition)
+    def get_form_kwargs(self):
+        kwargs = super(EntryList, self).get_form_kwargs()
+        kwargs.update({'competition': self.competition})
+        return kwargs
 
     def get_stats(self):
         competition = self.competition
@@ -93,7 +97,8 @@ class EntryList(ListView):
             return self.delete(request, slug)
         self.competition = Competition.objects.get(slug=slug)
         instance = CompetitionEntry(competition=self.competition)
-        form = self.get_form_class()(request.POST, instance=instance)
+        form = self.get_form_class()(**self.get_form_kwargs())
+        form.instance = instance
         if form.is_valid():
             entry = form.save()
             return render(request, 'includes/entry_row.html', {
