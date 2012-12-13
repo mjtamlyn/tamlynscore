@@ -96,7 +96,11 @@ class EntryList(ListView):
         form = self.get_form_class()(request.POST, instance=instance)
         if form.is_valid():
             entry = form.save()
-            return render(request, 'includes/entry_row.html', locals())
+            return render(request, 'includes/entry_row.html', {
+                'entry': entry,
+                'competition': Competition.objects.get(slug=self.kwargs['slug']),
+                'rounds_entered': entry.sessionentry_set.all(),
+            })
         else:
             errors = json.dumps(form.errors)
         return HttpResponseBadRequest(errors)
