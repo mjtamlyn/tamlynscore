@@ -21,21 +21,20 @@
             }
         });
 
-        $('table .field').click(function (e) {
+        $('table .field').live('touchstart', function (e) {
             $('table .active').removeClass('active');
             $(this).addClass('active');
         });
 
-        $('.input-buttons input').click(function (e) {
+        $('.input-buttons .input').live('touchstart', function (e) {
             e.preventDefault();
             var input = $('table .active input');
             if (!input.length) {
                 return;
             }
-            input.attr('value', $(this).val());
+            input.attr('value', $(this).attr('data-value'));
             var fake = input.next();
-            fake.html($(this).val());
-            console.log($(this).val());
+            fake.html($(this).attr('data-value'));
             arrows.updateTotals();
             input.parent().removeClass('active');
             var inputs = $('table input');
@@ -96,17 +95,17 @@
             {% endfor %}
         </table>
         <div class="input-buttons">
-            <input type="submit" value="10">
-            <input type="submit" value="9">
-            <input type="submit" value="8">
-            <input type="submit" value="7">
-            <input type="submit" value="6">
-            <input type="submit" value="5">
-            <input type="submit" value="4">
-            <input type="submit" value="3">
-            <input type="submit" value="2">
-            <input type="submit" value="1">
-            <input type="submit" value="M">
+            <div class="input" data-value="10">10</div>
+            <div class="input" data-value="9">9</div>
+            <div class="input" data-value="8">8</div>
+            <div class="input" data-value="7">7</div>
+            <div class="input" data-value="6">6</div>
+            <div class="input" data-value="5">5</div>
+            <div class="input" data-value="4">4</div>
+            <div class="input" data-value="3">3</div>
+            <div class="input" data-value="2">2</div>
+            <div class="input" data-value="1">1</div>
+            <div class="input" data-value="M">M</div>
         </div>
         <div class="save">
             <input type="submit" value="Save" />
