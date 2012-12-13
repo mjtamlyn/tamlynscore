@@ -172,6 +172,7 @@ var ButtonWidget = new Class({
 
     initialize: function (widget) {
         this.widget = widget
+        this.defaultValue = this.widget.getElement('option[selected=selected]').value;
         widget.getElements('.button').addEvent('click', function () {
             if (!this.hasClass('selected')) {
                 widget.getElements('.button').removeClass('selected');
@@ -187,7 +188,10 @@ var ButtonWidget = new Class({
 
     reset: function () {
         this.widget.getElements('.button').removeClass('selected');
-        this.widget.getElement('option[value=]').set('selected', 'selected');
+        if (this.defaultValue) {
+            this.widget.getElement('.button[rel=' + this.defaultValue + ']').addClass('selected');
+        }
+        this.widget.getElement('option[value=' + this.defaultValue + ']').set('selected', 'selected');
     },
 
     setValue: function (value) {
