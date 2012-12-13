@@ -14,7 +14,7 @@ from django.views.generic import View, ListView
 
 from reportlab.lib import colors
 from reportlab.lib.units import inch
-from reportlab.platypus import PageBreak, Spacer, Table, TableStyle
+from reportlab.platypus import Spacer, Table, TableStyle
 
 from entries.models import Competition, SessionRound, SCORING_TOTALS, SCORING_DOZENS, SCORING_FULL
 from entries.views import HeadedPdfView, BetterTargetList
@@ -525,8 +525,6 @@ class ResultsPdf(HeadedPdfView, LeaderboardSummary):
                 elements.append(table)
 
             elements.append(Spacer(self.PAGE_WIDTH, 0.25*inch))
-            
-            #elements.append(PageBreak())
 
         return elements
 
