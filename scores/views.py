@@ -221,6 +221,7 @@ class LeaderboardCombined(ListView):
         scores = Score.objects.filter(target__session_entry__competition_entry__competition__slug=self.kwargs['slug']).select_related().order_by(
                 'target__session_entry__competition_entry__bowstyle',
                 'target__session_entry__competition_entry__archer__gender',
+                'target__session_entry__competition_entry__archer__age',
                 'disqualified',
                 '-score', 
                 '-golds', 
@@ -298,6 +299,7 @@ class LeaderboardTeams(ListView):
             total_golds = sum([s.golds for s in team])
             club_results[club] = {'team': team, 'total': total, 'total_golds': total_golds, 'club': club}
         club_results = sorted(club_results.values(), key=lambda s: (s['total'], s['total_golds']), reverse=True)
+        club_results = filter(lambda t: len(t['team']) == max_per_team, club_results)
         return club_results
 
     def get_context_data(self, **kwargs):
@@ -310,7 +312,7 @@ class LeaderboardTeams(ListView):
         context['competition'] = competition
         context['title'] = 'Leaderboard'
 
-        exp_scores = scores.filter(target__session_entry__competition_entry__novice='E')
+        exp_scores = scores#.filter(target__session_entry__competition_entry__novice='E')
         context['club_results'] = self.get_club_results(exp_scores)
         novice_scores = scores.filter(target__session_entry__competition_entry__novice='N')
         context['novice_results'] = self.get_club_results(novice_scores, 3)
@@ -379,7 +381,7 @@ class ResultsView(LeaderboardView):
 results = login_required(ResultsView.as_view())
 
 class ResultsPdf(HeadedPdfView, LeaderboardSummary):
-    title = 'Results' # because ResultsView is a mixin, its attrs are not used.
+    title = 'Results'
 
     def setMargins(self, doc):
         doc.topMargin = 1.2*inch
@@ -391,6 +393,7 @@ class ResultsPdf(HeadedPdfView, LeaderboardSummary):
 
     def get_results(self, qs=None):
         session_rounds = SessionRound.objects.filter(session__competition=self.competition).order_by('session__start')
+        return [[session_rounds[0].session, session_rounds[0], Score.objects.results(qs=qs)]]
         scores = [
             (
                 session_round.session,
@@ -458,10 +461,8 @@ class ResultsPdf(HeadedPdfView, LeaderboardSummary):
         scores = self.get_queryset().exclude(score=0)
         nov_scores = scores.filter(target__session_entry__competition_entry__novice='N')
 
-        nov_scores = False
-
         if nov_scores:
-            exp_scores = scores.filter(target__session_entry__competition_entry__novice='E')
+            exp_scores = scores
             elements.append(self.Para('Experienced Results', 'h1'))
         else:
             exp_scores = scores
@@ -473,7 +474,7 @@ class ResultsPdf(HeadedPdfView, LeaderboardSummary):
         # Teams - FIXME assume not needed if there aren't novices (hacky way of getting student shoots)
         if nov_scores:
             scores = scores.exclude(target__session_entry__competition_entry__bowstyle__name='Compound').exclude(retired=True)
-            exp_scores = scores.filter(target__session_entry__competition_entry__novice='E')
+            exp_scores = scores
             nov_scores = scores.filter(target__session_entry__competition_entry__novice='N')
             club_results = self.get_club_results(exp_scores)
             elements.append(self.Para('Experienced Teams', 'h1'))
