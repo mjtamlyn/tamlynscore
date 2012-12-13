@@ -1,7 +1,7 @@
 from django import forms
 from django.utils.safestring import mark_safe
 
-from core.models import Club, Archer, GENDER_CHOICES
+from core.models import Club, Archer, GENDER_CHOICES, NOVICE_CHOICES, AGE_CHOICES
 from entries.models import CompetitionEntry, SessionEntry
 
 GENDER_CHOICES = (('', ''),) + GENDER_CHOICES
@@ -103,6 +103,8 @@ def new_entry_form_for_competition(competition):
         club = JsonChoiceField(queryset=Club.objects, widget=SelectWidget(attrs={'placeholder': 'Club'}))
 
         gender = forms.ChoiceField(choices=GENDER_CHOICES, widget=ButtonWidget)
+        novice = forms.ChoiceField(choices=NOVICE_CHOICES, widget=ButtonWidget, initial='E')
+        age = forms.ChoiceField(choices=AGE_CHOICES, widget=ButtonWidget, initial='S')
         gnas_no = forms.IntegerField(widget=forms.widgets.TextInput(attrs={'placeholder': 'GNAS number'}), required=False)
 
         class Meta:
