@@ -9,14 +9,14 @@ from django.utils.datastructures import SortedDict
 from django.views.generic import View, DetailView, ListView
 from django.shortcuts import render, get_object_or_404
 
-from reportlab.platypus import SimpleDocTemplate, Paragraph, Spacer, Table, PageBreak, TableStyle, KeepTogether, Image
+from reportlab.platypus import SimpleDocTemplate, Paragraph, Spacer, Table, PageBreak, TableStyle, KeepTogether
 from reportlab.lib.styles import getSampleStyleSheet
 from reportlab.rl_config import defaultPageSize
 from reportlab.lib import colors
 from reportlab.lib.units import inch
 
 from entries.forms import new_entry_form_for_competition
-from entries.models import *
+from entries.models import Competition, CompetitionEntry, SessionEntry, TargetAllocation
 
 from scoring.utils import class_view_decorator
 
