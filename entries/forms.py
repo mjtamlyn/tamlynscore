@@ -125,7 +125,6 @@ def new_entry_form_for_competition(competition):
             sessions = competition.sessions_with_rounds()
             self.session_fields = {}
             for i in range(len(sessions)):
-                session = sessions[i]
                 field = SessionChoiceField(sessions[i], required=False)
                 self.fields['session-{0}'.format(i)] = field
                 self.session_fields['session-{0}'.format(i)] = field
