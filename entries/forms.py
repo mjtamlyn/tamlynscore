@@ -14,10 +14,14 @@ class ButtonWidget(forms.widgets.Select):
                         </div>
                         """
         for choice in self.choices:
+            if choice[0] == value:
+                klass = 'button selected'
+            else:
+                klass = 'button'
             if choice[0]:
-                response += u"""<div class="button" rel="{0}">
+                response += u"""<div class="{klass}" rel="{0}">
                                 {1}
-                            </div>""".format(*choice)
+                            </div>""".format(klass=klass, *choice)
         response += u'</div>'
         select = super(ButtonWidget, self).render(name, value, attrs=attrs)
         response = response.format(name=name, select=select)
