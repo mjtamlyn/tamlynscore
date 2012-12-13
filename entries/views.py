@@ -103,7 +103,7 @@ class EntryList(FormMixin, ListView):
             entry = form.save()
             return render(request, 'includes/entry_row.html', {
                 'entry': entry,
-                'competition': Competition.objects.get(slug=self.kwargs['slug']),
+                'competition': self.competition,
                 'rounds_entered': entry.sessionentry_set.all(),
             })
         else:
