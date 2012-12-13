@@ -47,6 +47,10 @@ class Competition(models.Model):
 
     sponsors = models.ManyToManyField(Sponsor, blank=True)
 
+    has_novices = models.BooleanField(default=False)
+    has_teams = models.BooleanField(default=False)
+    novices_in_experienced_teams = models.BooleanField(default=False)
+
     class Meta:
         unique_together = ('date', 'tournament')
 
