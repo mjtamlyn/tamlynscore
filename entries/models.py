@@ -47,6 +47,12 @@ class Competition(models.Model):
 
     sponsors = models.ManyToManyField(Sponsor, blank=True)
 
+    class Meta:
+        unique_together = ('date', 'tournament')
+
+    def __unicode__(self):
+        return u'{0} {1}'.format(self.tournament, self.date.year)
+
     def clean(self, *args, **kwargs):
         if self.end_date is None:
             self.end_date = self.date
@@ -61,12 +67,6 @@ class Competition(models.Model):
                     count__gt=0).order_by('start')
             self._sessions_with_rounds = sessions
             return sessions
-
-    def __unicode__(self):
-        return u'{0} {1}'.format(self.tournament, self.date.year)
-
-    class Meta:
-        unique_together = ('date', 'tournament')
 
 
 class Session(models.Model):
