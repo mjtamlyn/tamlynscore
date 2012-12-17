@@ -36,25 +36,30 @@ class CompetitionDetail(DetailView):
     object_name = 'competition'
 
 
+class CompetitionMixin(object):
+    def dispatch(self, request, *args, **kwargs):
+        self.competition = get_object_or_404(Competition.objects.select_related('tournament'), slug=kwargs['slug'])
+        return super(CompetitionMixin, self).dispatch(request, *args, **kwargs)
+
+    def get_context_data(self, **kwargs):
+        return super(CompetitionMixin, self).get_context_data(competition=self.competition, **kwargs)
+
+
 @class_view_decorator(login_required)
-class EntryList(FormMixin, ListView):
+class EntryList(CompetitionMixin, FormMixin, ListView):
     model = SessionEntry
     form_class = NewEntryForm
     template_name = 'entries/entry_list.html'
 
     def get_queryset(self):
-        return self.model.objects.filter(competition_entry__competition__slug=self.kwargs['slug']).select_related('competition_entry__competition', 'competition_entry__club', 'competition_entry__bowstyle', 'competition_entry__archer', 'session_round__session', 'session_round__shot_round').order_by('-competition_entry')
+        return self.model.objects.filter(competition_entry__competition=self.competition).select_related('competition_entry__competition', 'competition_entry__club', 'competition_entry__bowstyle', 'competition_entry__archer', 'session_round__session', 'session_round__shot_round').order_by('-competition_entry')
 
     def get_context_data(self, **kwargs):
         context = super(EntryList, self).get_context_data(**kwargs)
-        self.entries = context['object_list']
-        if self.entries:
-            self.competition = self.entries[0].competition_entry.competition
-        else:
-            self.competition = Competition.objects.get(slug=self.kwargs['slug'])
         context.update({
-            'competition': self.competition,
-            'stats': self.get_stats(),
+            'stats': [
+                ('Total Entries', len(context['object_list'])),
+            ],
             'form': self.get_form_class()(**self.get_form_kwargs()),
         })
         return context
@@ -64,38 +69,9 @@ class EntryList(FormMixin, ListView):
         kwargs.update({'competition': self.competition})
         return kwargs
 
-    def get_stats(self):
-        competition = self.competition
-        entries = self.entries
-        stats = []
-        stats.append(
-            ('Total Entries', len(entries)),
-        )
-        # TODO: Make all the stats much better. These ones are rubbish.
-        #sessions = competition.sessions_with_rounds()
-        #for session in sessions:
-        #    stats.append((
-        #        'Entries for {0}'.format(session.start.strftime('%A')),
-        #        competition.competitionentry_set.filter(sessionentry__session_round__session=session).count(),
-        #    ))
-        #    for session_round in session.sessionround_set.all():
-        #        stats.append((
-        #            'Entries for {0}'.format(session_round.shot_round),
-        #            competition.competitionentry_set.filter(sessionentry__session_round=session_round).count(),
-        #        ))
-        #for session in sessions:
-        #    for session_round in session.sessionround_set.all():
-        #        for gender_code, gender in GENDER_CHOICES:
-        #            stats.append((
-        #                '{0} entries for {1}'.format(gender, session_round.shot_round),
-        #                entries.filter(sessionentry__session_round=session_round, archer__gender=gender_code).count(),
-        #            ))
-        return stats
-
     def post(self, request, slug):
         if '_method' in request.POST and request.POST['_method'] == 'delete':
             return self.delete(request, slug)
-        self.competition = Competition.objects.get(slug=slug)
         instance = CompetitionEntry(competition=self.competition)
         form = self.get_form_class()(**self.get_form_kwargs())
         form.instance = instance
