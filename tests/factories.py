@@ -25,8 +25,21 @@ class UserFactory(factory.Factory):
         return user
 
 
+class BowstyleFactory(factory.Factory):
+    FACTORY_FOR = core_models.Bowstyle
+
+
 class ClubFactory(factory.Factory):
     FACTORY_FOR = core_models.Club
+    name = factory.Sequence(lambda n: 'Name %s' % n)
+    short_name = factory.Sequence(lambda n: 'Short Name %s' % n)
+    slug = factory.Sequence(lambda n: 'name-%s' % n)
+
+
+class ArcherFactory(factory.Factory):
+    FACTORY_FOR = core_models.Archer
+    club = factory.SubFactory(ClubFactory)
+    bowstyle = factory.SubFactory(BowstyleFactory)
 
 
 class TournamentFactory(factory.Factory):
