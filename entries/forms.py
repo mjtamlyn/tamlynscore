@@ -119,8 +119,9 @@ class NewEntryForm(forms.ModelForm):
             'age': ButtonWidget,
         }
 
-    def __init__(self, competition=None, *args, **kwargs):
+    def __init__(self, competition, *args, **kwargs):
         super(NewEntryForm, self).__init__(*args, **kwargs)
+        self.competition = competition
         sessions = competition.sessions_with_rounds()
         self.session_fields = {}
         for i in range(len(sessions)):
@@ -145,6 +146,7 @@ class NewEntryForm(forms.ModelForm):
             archer.gender = self.cleaned_data['gender']
             archer.save()
         entry = super(NewEntryForm, self).save(commit=False, *args, **kwargs)
+        entry.competition = self.competition
         entry.archer = archer
         entry.club = club
         entry.save()

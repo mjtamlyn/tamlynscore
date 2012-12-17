@@ -72,9 +72,7 @@ class EntryList(CompetitionMixin, FormMixin, ListView):
     def post(self, request, slug):
         if '_method' in request.POST and request.POST['_method'] == 'delete':
             return self.delete(request, slug)
-        instance = CompetitionEntry(competition=self.competition)
         form = self.get_form_class()(**self.get_form_kwargs())
-        form.instance = instance
         if form.is_valid():
             entry = form.save()
             return render(request, 'includes/entry_row.html', {
