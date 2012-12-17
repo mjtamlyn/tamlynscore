@@ -1,11 +1,12 @@
 import datetime
 
-from django.test import TestCase
+from django.test import TestCase, RequestFactory
 from django.utils import timezone
 
 from core import models as core_models
 from entries.forms import NewEntryForm
 from entries import models as entries_models
+from entries.views import EntryList
 
 from . import factories
 
@@ -137,3 +138,13 @@ class TestNewEntryForm(TestCase):
         #   new club
         self.assertEqual(core_models.Club.objects.count(), 3)
         core_models.Club.objects.get(name='OA')
+
+
+class TestEntryView(TestCase):
+    def test_getting_view(self):
+        competition = factories.CompetitionFactory.create()
+        request = RequestFactory().get('/')
+        request.user = factories.UserFactory.create()
+        view = EntryList.as_view()
+        response = view(request, slug=competition.slug)
+        self.assertEqual(response.status_code, 200)
