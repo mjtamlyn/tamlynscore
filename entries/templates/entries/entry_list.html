@@ -188,7 +188,7 @@ Elements.from = function(text, excludeScripts){
             <thead>
                 <th colspan="4">Archer</th>
                 {% for session in competition.sessions_with_rounds %}
-                <th>{{ session.start|date:"l j/n H:M" }}</th>
+                <th>{{ session.start|date:"l j/n H:i" }}</th>
                 {% endfor %}
             </thead>
             {% regroup object_list by competition_entry as entries %}
