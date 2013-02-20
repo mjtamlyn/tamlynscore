@@ -173,12 +173,15 @@ var ButtonWidget = new Class({
     initialize: function (widget) {
         this.widget = widget
         this.defaultValue = this.widget.getElement('option[selected=selected]').value;
+        var defaultValue = this.defaultValue;
         widget.getElements('.button').addEvent('click', function () {
             if (!this.hasClass('selected')) {
                 widget.getElements('.button').removeClass('selected');
             };
-            this.toggleClass('selected');
             var value = this.get('rel');
+            if (!(value === defaultValue && this.hasClass('selected'))) {
+                this.toggleClass('selected');
+            }
             if (!this.hasClass('selected')) {
                 value = '';
             }
