@@ -17,7 +17,7 @@ from reportlab.lib import colors
 from reportlab.lib.units import inch
 
 from entries.forms import NewEntryForm
-from entries.models import Competition, CompetitionEntry, SessionEntry, TargetAllocation
+from entries.models import Competition, SessionRound, CompetitionEntry, SessionEntry, TargetAllocation
 
 from scoring.utils import class_view_decorator
 
