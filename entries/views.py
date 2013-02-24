@@ -485,8 +485,9 @@ class RunningSlipsPdf(ScoreSheetsPdf):
     def get_running_slip_elements(self, target, entries):
         dozens = self.session_round.shot_round.arrows / 12
         elements = []
+        headings = self.session_round.shot_round.score_sheet_headings
         for dozen in range(1, dozens + 1):
-            table_data = [['Dozen {0}'.format(dozen)] + [None] * 6 + ['ET'] + [None] * 6 + ['ET', 'S', '10+X', 'X', 'RT' if dozen > 1 else 'Inits.']]
+            table_data = [['Dozen {0}'.format(dozen)] + [None] * 6 + ['ET'] + [None] * 6 + ['ET', 'S'] + headings + ['RT' if dozen > 1 else 'Inits.']]
             for entry in entries:
                 table_data.append([entry[0]] + [None for i in range(self.total_cols)])
             table = Table(table_data, [self.box_size] + self.col_widths, (len(entries) + 1)*[self.box_size])
