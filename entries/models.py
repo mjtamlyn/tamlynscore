@@ -211,4 +211,3 @@ class TargetAllocation(models.Model):
     def __unicode__(self):
         return u'{0}{1} - {2}'.format(self.boss, self.target, self.session_entry)
 
-
