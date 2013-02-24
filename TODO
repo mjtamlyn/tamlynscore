@@ -8,8 +8,10 @@ Other stuff
 ===========
 Transfer script
 Think about created/modified
+Uniqueness of target allocations (maybe be collapsing the model onto SessionEntry?)
 
 
 Testing
 =======
 Everything!
+
