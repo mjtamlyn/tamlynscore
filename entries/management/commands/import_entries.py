@@ -29,6 +29,12 @@ class Command(BaseCommand):
             default=False,
             help='Don\'t actually create anything'
         ),
+        make_option('--clear',
+            action='store_true',
+            dest='clear',
+            default=False,
+            help='Clear the entire entries for this competition'
+        ),
     )
 
     class ImportException(Exception):
@@ -92,8 +98,15 @@ class Command(BaseCommand):
         self.session = self.make_selection(session_rounds, 'Choose a session: ')
         self.success('Session is %s' % self.session)
 
+        if self.kwargs['clear']:
+            self.competition.competitionentry_set.all().delete()
+            self.session.sessionentry_set.all().delete()
+
     def process_entry(self, entry):
         self.info('Importing archer %s' % entry['name'])
+
+        if not entry['club']:
+            return
 
         # Check the club
         club = None
@@ -106,8 +119,8 @@ class Command(BaseCommand):
                 try:
                     club = Club.objects.get(name__icontains=entry['club'])
                 except Club.DoesNotExist:
-                    #TODO
-                    self.error('Could not find club')
+                    clubs = Club.objects.filter(name__icontains=entry['club'].replace('University of ', '').replace('University', ''))
+                    club = self.make_selection(clubs, 'Choose a club: ')
                 except Club.MultipleObjectsReturned:
                     clubs = Club.objects.filter(name__icontains=entry['club'])
                     club = self.make_selection(clubs, 'Choose a club: ')
@@ -115,12 +128,21 @@ class Command(BaseCommand):
             self.clubs[entry['club']] = club
         self.info('Club is %s' % club)
 
+        bowstyle = Bowstyle.objects.get(name=entry['bowstyle'])
+        gender = 'G' if entry['gender'].lower() == 'm' else 'L'
+        age = entry.get('age', 'S')
+        novice = entry.get('experience', 'E')
+
         # Try to find the archer
+        entry['name'] = entry['name'].replace('  ', ' ').strip()
         try:
             archer = club.archer_set.get(name=entry['name'])
+            if not archer.gender == gender:
+                archer.gender = gender
+                archer.save()
         except Archer.DoesNotExist:
-            #TODO
-            self.error('Could not find archer')
+            archer = Archer(name=entry['name'], bowstyle=bowstyle, gender=gender, club=club, age=age, novice=novice)
+            archer.save()
         self.info('Archer is %s' % archer)
 
         # Check if they've entered already
@@ -132,16 +154,14 @@ class Command(BaseCommand):
         # Check archer's details
         #TODO
 
-        bowstyle = Bowstyle.objects.get(name=entry['bowstyle'])
-
         # Make the entry
         if not self.kwargs['dry_run']:
             competition_entry = self.competition.competitionentry_set.create(
                 archer=archer,
                 club=club,
                 bowstyle=bowstyle,
-                age=entry.get('age', 'S'),
-                novice=entry.get('experience', 'E'),
+                age=age,
+                novice=novice
             )
             session_entry = self.session.sessionentry_set.create(competition_entry=competition_entry)
 
