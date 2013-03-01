@@ -312,7 +312,9 @@ class LeaderboardTeams(ListView):
         context['competition'] = competition
         context['title'] = 'Leaderboard'
 
-        exp_scores = scores#.filter(target__session_entry__competition_entry__novice='E')
+        exp_scores = scores
+        if not competition.novices_in_experienced_teams:
+            exp_scores = exp_scores.filter(target__session_entry__competition_entry__novice='E')
         context['club_results'] = self.get_club_results(exp_scores)
         novice_scores = scores.filter(target__session_entry__competition_entry__novice='N')
         context['novice_results'] = self.get_club_results(novice_scores, 3)
@@ -474,7 +476,7 @@ class ResultsPdf(HeadedPdfView, LeaderboardSummary):
         # Teams - FIXME assume not needed if there aren't novices (hacky way of getting student shoots)
         if nov_scores:
             scores = scores.exclude(target__session_entry__competition_entry__bowstyle__name='Compound').exclude(retired=True)
-            exp_scores = scores
+            exp_scores = scores.filter(target__session_entry__competition_entry__novice='E')
             nov_scores = scores.filter(target__session_entry__competition_entry__novice='N')
             club_results = self.get_club_results(exp_scores)
             elements.append(self.Para('Experienced Teams', 'h1'))
