@@ -328,7 +328,7 @@ class TargetListPdf(HeadedPdfView):
         self.styles['h2'].alignment = 1
 
     def get_elements(self):
-        session_rounds = SessionRound.objects.filter(session__competition=self.competition).order_by('session', 'session__start')
+        session_rounds = SessionRound.objects.filter(session__competition=self.competition).order_by('-session__start')
 
         elements = []
         for session_round in session_rounds:
