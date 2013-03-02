@@ -12,7 +12,7 @@
 {% block content %}
 <h1>{{ competition }} - Leaderboard</h1>
 {% for session, round, results in scores %}
-    <h2>{{ round.shot_round }}</h2>
+    <h2>{{ round.shot_round }} {{ session.start|time }}</h2>
     {% for category, scores in results %}
     {% if scores|length > 2 %}
     <div class="module">

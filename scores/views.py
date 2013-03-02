@@ -184,8 +184,11 @@ class LeaderboardView(View):
     template = 'leaderboard.html'
     title = 'Leaderboard'
 
+    def get_session_rounds(self):
+        return SessionRound.objects.filter(session__competition=self.competition).order_by('session__start')
+
     def get_results(self, qs=None):
-        session_rounds = SessionRound.objects.filter(session__competition=self.competition).order_by('session__start')
+        session_rounds = self.get_session_rounds()
         scores = [
             (
                 session_round.session,
@@ -199,7 +202,7 @@ class LeaderboardView(View):
             sessions.append((key, [value[1] for value in values]))
         return session_rounds, scores, sessions
 
-    def get_context(self, request, slug):
+    def get_context(self, request, slug, **kwargs):
         competition = self.competition = get_object_or_404(Competition, slug=slug)
         session_rounds, scores, sessions = self.get_results()
         title = self.title
@@ -375,7 +378,13 @@ class LeaderboardSummary(LeaderboardCombined, LeaderboardTeams):
 class LeaderboardBigScreen(LeaderboardView):
     template = 'leaderboard_big_screen.html'
 
-leaderboard_big_screen = login_required(LeaderboardBigScreen.as_view())
+
+class LeaderboardBigScreenSession(LeaderboardView):
+    template = 'leaderboard_big_screen.html'
+
+    def get_session_rounds(self):
+        return SessionRound.objects.filter(session=self.kwargs['session_id'], session__competition__slug=self.kwargs['slug'])
+
 
 class ResultsView(LeaderboardView):
     title = 'Results'
