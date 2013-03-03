@@ -14,12 +14,11 @@
 {% for session, round, results in scores %}
     <h2>{{ round.shot_round }} {{ session.start|time }}</h2>
     {% for category, scores in results %}
-    {% if scores|length > 2 %}
     <div class="module">
         <h3>{{ category }}</h3>
         <table>
             {% for score in scores %}
-            {% if forloop.counter < 6 %}
+            {% if forloop.counter < 9 %}
             <tr>
                 <td>{{ forloop.counter }}</td>
                 <td>{{ score.target.session_entry.competition_entry.archer }}</td>
@@ -35,7 +34,6 @@
     </div>
     {% if forloop.counter == 3 or forloop.last %}
     <div class="clear"></div>
-    {% endif %}
     {% endif %}
     {% endfor %}
 {% endfor %}
