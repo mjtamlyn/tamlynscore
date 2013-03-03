@@ -409,6 +409,7 @@ results = login_required(ResultsView.as_view())
 
 class ResultsPdf(HeadedPdfView, LeaderboardSummary):
     title = 'Results'
+    include_dns = True
 
     def setMargins(self, doc):
         doc.topMargin = 1.2*inch
@@ -532,7 +533,7 @@ class ResultsPdf(HeadedPdfView, LeaderboardSummary):
                 round_scoring_type = session_round.shot_round.scoring_type
                 table_header += ['Score', '10s', 'Xs'] if round_scoring_type == 'X' else ['Score', 'Hits', 'Golds']
                 table_data = [table_header]
-                table_data += [self.row_from_entry(entries, entry, subrounds, round_scoring_type) for entry in entries]
+                table_data += filter(None, [self.row_from_entry(entries, entry, subrounds, round_scoring_type) for entry in entries])
                 if table_data:
                     gender = entries[0].target.session_entry.competition_entry.archer.gender
                     bowstyle = entries[0].target.session_entry.competition_entry.bowstyle
@@ -543,7 +544,8 @@ class ResultsPdf(HeadedPdfView, LeaderboardSummary):
                             Q(targetallocation__score=None) | Q(targetallocation__score__score=0) | Q(targetallocation=None)
                     )
                     for dns in did_not_starts:
-                        table_data.append([None, dns.competition_entry.archer.name, dns.competition_entry.club.name, 'DNS'])
+                        if self.include_dns:
+                            table_data.append([None, dns.competition_entry.archer.name, dns.competition_entry.club.name, 'DNS'])
                 else:
                     #FIXME! DNS for a category where everyone shot...
                     pass
@@ -578,6 +580,20 @@ class ResultsPdf(HeadedPdfView, LeaderboardSummary):
     ])
 
 results_pdf = login_required(ResultsPdf.as_view())
+
+
+class ResultsPdfWinners(ResultsPdf):
+    include_dns = False
+
+    def row_from_entry(self, entries, entry, subrounds, round_scoring_type):
+        if entries.index(entry) >= 5:
+            return None
+        guest = entry.target.session_entry.competition_entry.guest
+        if entry.disqualified or guest:
+            return None
+        return super(ResultsPdfWinners, self).row_from_entry(entries, entry, subrounds, round_scoring_type)
+
+results_pdf_winners = login_required(ResultsPdfWinners.as_view())
 
 
 class ResultsPdfOverall(ResultsPdf):

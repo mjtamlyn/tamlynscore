@@ -21,5 +21,6 @@ urlpatterns = patterns('scores.views',
     url(r'^(?P<slug>(\w+-?)+)/leaderboard/big-screen/(?P<session_id>\d+)/experienced/$', views.LeaderboardBigScreenSessionExperienced.as_view(), name='leaderboard_big_screen_session-experienced'),
     (r'^(?P<slug>(\w+-?)+)/results/$', 'results'),
     (r'^(?P<slug>(\w+-?)+)/results/pdf/$', 'results_pdf'),
+    (r'^(?P<slug>(\w+-?)+)/results/pdf/winners/$', 'results_pdf_winners'),
     (r'^(?P<slug>(\w+-?)+)/results/pdf/overall/$', 'results_pdf_overall'),
 )
