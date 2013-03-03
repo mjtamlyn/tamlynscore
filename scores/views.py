@@ -386,6 +386,22 @@ class LeaderboardBigScreenSession(LeaderboardView):
         return SessionRound.objects.filter(session=self.kwargs['session_id'], session__competition__slug=self.kwargs['slug'])
 
 
+class LeaderboardBigScreenSessionExperienced(LeaderboardBigScreenSession):
+    template = 'leaderboard_big_screen.html'
+
+    def get_results(self, qs=None):
+        qs = Score.objects.filter(target__session_entry__competition_entry__novice='E')
+        return super(LeaderboardBigScreenSessionExperienced, self).get_results(qs)
+
+
+class LeaderboardBigScreenSessionNovice(LeaderboardBigScreenSession):
+    template = 'leaderboard_big_screen.html'
+
+    def get_results(self, qs=None):
+        qs = Score.objects.filter(target__session_entry__competition_entry__novice='N')
+        return super(LeaderboardBigScreenSessionNovice, self).get_results(qs)
+
+
 class ResultsView(LeaderboardView):
     title = 'Results'
 
