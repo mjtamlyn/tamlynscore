@@ -300,7 +300,16 @@ class LeaderboardTeams(ListView):
             team = sorted(scores, key=lambda s: (s.score, s.hits, s.golds), reverse=True)[:max_per_team]
             total = sum([s.score for s in team])
             total_golds = sum([s.golds for s in team])
-            club_results[club] = {'team': team, 'total': total, 'total_golds': total_golds, 'club': club}
+            total_hits = sum([s.hits for s in team])
+            total_xs = sum([s.xs for s in team])
+            club_results[club] = {
+                'team': team,
+                'total': total,
+                'total_golds': total_golds,
+                'total_xs': total_xs,
+                'total_hits': total_hits,
+                'club': club,
+            }
         club_results = sorted(club_results.values(), key=lambda s: (s['total'], s['total_golds']), reverse=True)
         club_results = filter(lambda t: len(t['team']) == max_per_team, club_results)
         return club_results
@@ -501,15 +510,16 @@ class ResultsPdf(HeadedPdfView, LeaderboardSummary):
 
         # Teams - FIXME assume not needed if there aren't novices (hacky way of getting student shoots)
         if nov_scores:
+            round_scoring_type = nov_scores[0].target.session_entry.session_round.shot_round.scoring_type
             scores = scores.exclude(target__session_entry__competition_entry__bowstyle__name='Compound').exclude(retired=True)
             exp_scores = scores.filter(target__session_entry__competition_entry__novice='E')
             nov_scores = scores.filter(target__session_entry__competition_entry__novice='N')
             club_results = self.get_club_results(exp_scores)
             elements.append(self.Para('Experienced Teams', 'h1'))
-            elements += self.get_elements_for_teams(club_results)
+            elements += self.get_elements_for_teams(club_results, round_scoring_type=round_scoring_type)
             nov_club_results = self.get_club_results(nov_scores, 3)
             elements.append(self.Para('Novice Teams', 'h1'))
-            elements += self.get_elements_for_teams(nov_club_results)
+            elements += self.get_elements_for_teams(nov_club_results, round_scoring_type=round_scoring_type)
 
         return elements
 
@@ -557,19 +567,32 @@ class ResultsPdf(HeadedPdfView, LeaderboardSummary):
 
         return elements
 
-    def get_elements_for_teams(self, results):
+    def get_elements_for_teams(self, results, round_scoring_type):
         elements = []
 
         table_data = []
         for i, team in enumerate(results):
-            table_data += [[i+1, team['club'].name, team['total']]]
+            table_data += [[i+1, team['club'].name] + ([
+                team['total'],
+                team['total_golds'],
+                team['total_xs'],
+            ] if round_scoring_type == 'X' else [
+                team['total'],
+                team['total_hits'],
+                team['total_golds'],
+            ])]
             table_data += [[
                 None,
                 score.target.session_entry.competition_entry.archer.name,
+            ] + ([
                 score.score,
                 score.golds,
                 score.xs,
-            ] for score in team['team']]
+            ] if round_scoring_type == 'X' else [
+                score.score,
+                score.hits,
+                score.golds,
+            ]) for score in team['team']]
         elements.append(Table(table_data))
 
         return elements
