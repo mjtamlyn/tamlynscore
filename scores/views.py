@@ -451,7 +451,13 @@ class ResultsPdf(HeadedPdfView, LeaderboardSummary):
         if entry.disqualified or guest:
             row.append(None)
         else:
-            row.append(entries.index(entry) + 1)
+            placing = entries.index(entry) + 1
+            # this is a little naive and will only work if two archers are tied, not any more.
+            if placing > 1:
+                previous = entries[placing - 2]
+                if previous.score == entry.score and previous.golds == entry.golds and previous.hits == entry.hits and previous.xs == entry.xs:
+                    placing -= 1
+            row.append(placing)
         row.append(entry.target.session_entry.competition_entry.archer.name)
         row.append(entry.target.session_entry.competition_entry.club.name + (' (Guest)' if guest else ''))
         if len(subrounds) > 1 and not entries[0].target.session_entry.session_round.session.scoring_system == SCORING_TOTALS:
