@@ -223,6 +223,9 @@ footer {
           .competition-section .competition-content .competition-entries .top .new-entry .new-entry-form .archer-details.shown {
             visibility: visible;
             opacity: 1; }
+          .competition-section .competition-content .competition-entries .top .new-entry .new-entry-form .archer-details p {
+            margin: 0;
+            text-align: center; }
           .competition-section .competition-content .competition-entries .top .new-entry .new-entry-form .archer-details .button {
             border: 2px solid #6fb3ff;
               border-radius: 10px;

@@ -124,10 +124,13 @@ class NewEntryForm(forms.ModelForm):
         self.competition = competition
         sessions = competition.sessions_with_rounds()
         self.session_fields = {}
+        self.sessions_by_field = {}
         for i in range(len(sessions)):
             field = SessionChoiceField(sessions[i], required=False)
-            self.fields['session-{0}'.format(i)] = field
-            self.session_fields['session-{0}'.format(i)] = field
+            key = 'session-{0}'.format(i)
+            self.fields[key] = field
+            self.session_fields[key] = field
+            self.sessions_by_field[key] = sessions[i]
 
     def save(self, *args, **kwargs):
         #TODO: deal with commit=False
@@ -166,6 +169,7 @@ class NewEntryForm(forms.ModelForm):
     def sessions(self):
         response = u''
         for field in self.session_fields:
+            response += '<p>' + self.sessions_by_field[field].start.strftime('%Y-%m-%d %I:%M %p') + '</p>'
             response += unicode(self[field])
         return mark_safe(response)
 
