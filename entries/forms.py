@@ -168,7 +168,7 @@ class NewEntryForm(forms.ModelForm):
 
     def sessions(self):
         response = u''
-        for field in self.session_fields:
+        for field in sorted(self.session_fields.keys()):
             response += '<p>' + self.sessions_by_field[field].start.strftime('%Y-%m-%d %I:%M %p') + '</p>'
             response += unicode(self[field])
         return mark_safe(response)
