@@ -27,7 +27,7 @@ class CompetitionList(ListView):
     model = Competition
 
     def get_queryset(self):
-        return self.model.objects.all().select_related('tournament')
+        return self.model.objects.all().select_related('tournament').order_by('-date')
 
 
 @class_view_decorator(login_required)
