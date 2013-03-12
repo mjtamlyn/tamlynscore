@@ -33,23 +33,24 @@
 
     <div class="competition-content">
         {% block competition_content %}
-        <p><strong>Required sections:</strong></p>
-        <p>Add Entries</p>
-        <p>Do target allocations</p>
-        <p>Registration</p>
-
-        <p><strong>Printouts:</strong></p>
-        <p>Target list</p>
-        <p>Score sheets</p>
-
-        <p><strong>Long term sections:</strong></p>
-        <p>My Tournaments</p>
-        <p>Tournament admin</p>
-
-        <p><strong>Scoring sections:</strong><p>
-        <p>Add scores</p>
-        <p>Results/Leaderboard</p>
-        <p>Head to Heads</p>
+        <div class="module">
+            <h4>About this competition</h4>
+            <dl>
+                <dt>Tournament date(s)</dt>
+                <dd>{{ competition.date }}{% if not competition.end_date == competition.date %} to {{ competition.end_date }}{% endif %}</dd>
+                <dt>Hosted by</dt>
+                <dd>{{ competition.tournament.host_club }}</dd>
+                <dt>Options</dt>
+                <dd>
+                    <ul>
+                        <li>{% if competition.has_teams %}Has team awards{% else %}Does not have team awards{% endif %}</li>
+                        <li>{% if competition.has_novices %}Has a novice category{% else %}Does not have a novice category{% endif %}</li>
+                        {% if competition.has_novices %}
+                        <li>{% if competition.novices_in_experienced_teams %}Novices can be in experienced teams{% else %}Novices cannot be in experienced teams{% endif %}</li>
+                        {% endif %}
+                    </ul>
+                </dd>
+        </div>
         {% endblock %}
     </div>
 
