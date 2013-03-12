@@ -1,6 +1,7 @@
-from django.conf.urls.defaults import *
+from django.conf.urls import patterns, url
 
 from scores import views
+
 
 urlpatterns = patterns('scores.views',
     url(r'^(?P<slug>(\w+-?)+)/input-scores/$', views.InputScores.as_view(), name='input_scores'),

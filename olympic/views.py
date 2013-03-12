@@ -1,7 +1,7 @@
 from django.core.urlresolvers import reverse
 from django.contrib.auth.decorators import login_required
-from django.db.models import Min, Max
-from django.http import HttpResponse, HttpResponseRedirect
+from django.db.models import Max
+from django.http import HttpResponseRedirect
 from django.views.generic import View, TemplateView
 from django.shortcuts import render, get_object_or_404
 
