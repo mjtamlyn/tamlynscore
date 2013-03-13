@@ -147,7 +147,6 @@ class TargetList(ListView):
 
         for entry in entries:
             session = entry.session_round.session
-            session_round = entry.session_round
             target_list[session]['entries'].append(entry)
 
         for details in target_list.values():
