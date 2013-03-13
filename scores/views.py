@@ -17,7 +17,7 @@ from reportlab.lib.units import inch
 from reportlab.platypus import Spacer, Table, TableStyle
 
 from entries.models import Competition, SessionRound, SCORING_TOTALS, SCORING_DOZENS, SCORING_FULL
-from entries.views import HeadedPdfView, BetterTargetList
+from entries.views import HeadedPdfView, TargetList
 
 from scores.forms import get_arrow_formset, get_dozen_formset
 from scores.models import Score, Arrow, Dozen
@@ -26,7 +26,7 @@ from scoring.utils import class_view_decorator
 
 
 @class_view_decorator(login_required)
-class InputScores(BetterTargetList):
+class InputScores(TargetList):
     template_name = 'scores/input_scores.html'
 
     def get_queryset(self):
