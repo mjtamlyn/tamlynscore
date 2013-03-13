@@ -38,7 +38,7 @@ class CompetitionDetail(DetailView):
 
 class CompetitionMixin(object):
     def dispatch(self, request, *args, **kwargs):
-        self.competition = get_object_or_404(Competition.objects.select_related('tournament'), slug=kwargs['slug'])
+        self.competition = get_object_or_404(Competition, slug=kwargs['slug'])
         return super(CompetitionMixin, self).dispatch(request, *args, **kwargs)
 
     def get_context_data(self, **kwargs):
