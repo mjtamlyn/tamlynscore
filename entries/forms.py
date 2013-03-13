@@ -27,6 +27,7 @@ class ButtonWidget(forms.widgets.Select):
         response = response.format(name=name, select=select)
         return mark_safe(response)
 
+
 class SelectWidget(forms.widgets.MultiWidget):
     def __init__(self, attrs=None):
         widgets = [forms.widgets.Select(attrs=attrs), forms.widgets.TextInput(attrs=attrs)]
@@ -79,6 +80,7 @@ class SelectWidget(forms.widgets.MultiWidget):
         """.format(*rendered_widgets, name=name)
         return mark_safe(output)
 
+
 class JsonChoiceField(forms.ModelChoiceField):
     def label_from_instance(self, obj):
         return obj.json()
@@ -89,6 +91,7 @@ class JsonChoiceField(forms.ModelChoiceField):
             return super(JsonChoiceField, self).to_python(pk)
         elif name:
             return self.queryset.model(name=name)
+
 
 class SessionChoiceField(forms.ModelChoiceField):
     widget = ButtonWidget
