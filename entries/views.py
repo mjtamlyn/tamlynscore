@@ -91,7 +91,7 @@ class EntryList(CompetitionMixin, FormMixin, ListView):
 
 
 @class_view_decorator(login_required)
-class BetterTargetList(ListView):
+class TargetList(ListView):
     template_name = 'entries/target_list.html'
     model = TargetAllocation
 
@@ -156,7 +156,7 @@ class BetterTargetList(ListView):
             details['entries_json'] = json.dumps(data)
 
     def get_context_data(self, **kwargs):
-        context = super(BetterTargetList, self).get_context_data(**kwargs)
+        context = super(TargetList, self).get_context_data(**kwargs)
         self.allocations  = context['object_list']
 
         if self.allocations:
@@ -184,7 +184,7 @@ class BetterTargetList(ListView):
         return HttpResponseBadRequest()
 
 
-class Registration(BetterTargetList):
+class Registration(TargetList):
     template_name = 'entries/registration.html'
 
     def add_unallocated_entries(self, target_list):
@@ -195,37 +195,6 @@ class Registration(BetterTargetList):
         entry.present = json.loads(request.POST['present'])
         entry.save()
         return HttpResponse('ok')
-
-
-@class_view_decorator(login_required)
-class TargetList(View):
-    template = 'target_list.html'
-
-    def get_target_list(self, session_round):
-        return session_round.target_list()
-
-    def get(self, request, slug):
-        competition = get_object_or_404(Competition, slug=slug)
-        session_rounds = SessionRound.objects.filter(session__competition=competition).order_by('session__start')
-        target_list = [(
-            session_round.session, # session
-            session_round, # round
-            self.get_target_list(session_round),
-            session_round.sessionentry_set.annotate(entered=Count('targetallocation')).filter(entered=0), # entries
-            ) for session_round in session_rounds]
-        sessions = []
-        for key, values in groupby(target_list, lambda x: x[0]):
-            sessions.append((key, [value[1] for value in values]))
-        return render(request, self.template, locals())
-
-    def post(self, request, slug):
-        targets = json.loads(request.POST['targets'])
-        for target in targets:
-            TargetAllocation.objects.filter(session_entry__pk=target['entry']).delete()
-            entry = SessionEntry.objects.get(pk=target['entry'])
-            new_allocation = TargetAllocation(session_entry=entry, boss=target['target'][:-1], target=target['target'][-1])
-            new_allocation.save()
-        return HttpResponse()
 
 
 @class_view_decorator(login_required)
