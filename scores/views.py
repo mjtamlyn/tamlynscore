@@ -179,7 +179,7 @@ class InputDozens(View):
         return render(request, self.template, locals())
 
 
-
+@class_view_decorator(login_required)
 class LeaderboardView(View):
     template = 'leaderboard.html'
     title = 'Leaderboard'
@@ -211,8 +211,6 @@ class LeaderboardView(View):
     def get(self, request, *args, **kwargs):
         context = self.get_context(request, *args, **kwargs)
         return render(request, self.template, context)
-
-leaderboard = login_required(LeaderboardView.as_view())
 
 
 @class_view_decorator(login_required)
