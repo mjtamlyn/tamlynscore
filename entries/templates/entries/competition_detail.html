@@ -16,7 +16,7 @@
         <ul>
             <a href="{% url registration slug=competition.slug %}"><li>Registration</li></a>
             <a href="{% url input_scores slug=competition.slug %}"><li>Input scores</li></a>
-            <a href="{% url scores.views.leaderboard slug=competition.slug %}"><li>Leaderboard (by session)</li></a>
+            <a href="{% url leaderboard slug=competition.slug %}"><li>Leaderboard (by session)</li></a>
             <a href="{% url leaderboard_combined slug=competition.slug %}"><li>Leaderboard (Combined)</li></a>
             <a href="{% url leaderboard_combined_experienced slug=competition.slug %}"><li>Leaderboard (Experienced)</li></a>
             <a href="{% url leaderboard_combined_novice slug=competition.slug %}"><li>Leaderboard (Novice)</li></a>
