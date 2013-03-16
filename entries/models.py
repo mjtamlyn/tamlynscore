@@ -195,6 +195,16 @@ class SessionEntry(models.Model):
     session_round = models.ForeignKey(SessionRound)
 
     present = models.BooleanField(default=False)
+    index = models.PositiveIntegerField(default=1)
+
+    def save(self, *args, **kwargs):
+        if not self.pk:
+            super(SessionEntry, self).save(*args, **kwargs)
+        entries = self.competition_entry.sessionentry_set.order_by('session_round__session__start')
+        if len(entries) > 2:
+            print len(entries)
+        self.index = list(entries).index(self)
+        return super(SessionEntry, self).save(*args, **kwargs)
 
     def __unicode__(self):
         return u'{0} - {1}'.format(self.competition_entry, self.session_round.shot_round)
