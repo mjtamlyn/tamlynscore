@@ -1,9 +1,8 @@
-from itertools import groupby
+import itertools
 import json
 import math
 
 from django.contrib.auth.decorators import login_required
-from django.db.models import Count
 from django.http import HttpResponse, HttpResponseBadRequest
 from django.utils.datastructures import SortedDict
 from django.views.generic import View, DetailView, ListView
@@ -337,7 +336,7 @@ class ScoreSheetsPdf(HeadedPdfView):
         score_sheet_elements = self.get_score_sheet_elements()
 
         elements = []
-        for boss, entries in groupby(self.session_round.target_list(), lambda x: x[0][:-1]):
+        for boss, entries in itertools.groupby(self.session_round.target_list(), lambda x: x[0][:-1]):
             entries = list(entries)
             if not reduce(lambda e, f: e or f, map(lambda e: e[1], entries)):
                 continue
@@ -443,7 +442,7 @@ class RunningSlipsPdf(ScoreSheetsPdf):
 
     def get_elements(self):
         elements = []
-        for boss, entries in groupby(self.session_round.target_list(), lambda x: x[0][:-1]):
+        for boss, entries in itertools.groupby(self.session_round.target_list(), lambda x: x[0][:-1]):
             entries = list(entries)
             if not reduce(lambda e, f: e or f, entries):
                 continue
