@@ -30,6 +30,7 @@ class TargetAllocationAdmin(admin.ModelAdmin):
 admin.site.register(Tournament)
 admin.site.register(Sponsor)
 admin.site.register(Competition, CompetitionAdmin)
+admin.site.register(ResultsMode)
 admin.site.register(Session)
 admin.site.register(SessionRound)
 admin.site.register(CompetitionEntry, CompetitionEntryAdmin)

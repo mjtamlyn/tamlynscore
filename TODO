@@ -16,3 +16,49 @@ Testing
 =======
 Everything!
 
+
+
+New leaderboard/results code
+============================
+
+Things we need to be able to do:
+
+Pick different types of results
+Each type of results should have a leaderboard page
+Can have leaderboard pages there which aren't included in the results
+Can get any individual leaderboard page as a pdf
+Results view vs leaderboard view
+Each leaderboard page should automatically get a 'big screen' version
+
+Leaderboard pages can have subpages for each category/type, and for each output format (standard/big screen/winners html/winners pdf/full pdf/mobile html)
+Winners/summary output format (visible and pdf) (top 5 only in each category - display the number of entries)
+
+Types of results
+----------------
+By session
+Combined by round across sessions (respects exclude_later_shoots)
+Double round
+Teams
+
+Later:
+Progress (i.e. across sessions "the state after 3 dozen")
+National Series style combination results
+Aggregate results (sum the scores)
+
+Configuration options
+---------------------
+
+exclude_later_shoots
+has_juniors
+juniors_in_senior_teams
+juniors_in_senior_individual
+has_novices
+novices_in_experienced_teams
+novices_in_experienced_individual
+team_size
+has_novice_teams
+novice_team_size
+
+Later:
+Restrictions on make up of team (e.g. must include one lady or junior)
+

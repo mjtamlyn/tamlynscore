@@ -5,6 +5,8 @@ from django.template.defaultfilters import slugify
 
 from core.models import Archer, Bowstyle, Club, Round, AGE_CHOICES, NOVICE_CHOICES
 
+from scores.result_modes import get_result_modes
+
 
 SCORING_FULL = 'F'
 SCORING_DOZENS = 'D'
@@ -50,6 +52,10 @@ class Competition(models.Model):
     has_novices = models.BooleanField(default=False)
     has_teams = models.BooleanField(default=False)
     novices_in_experienced_teams = models.BooleanField(default=False)
+    exclude_later_shoots = models.BooleanField(default=False, help_text='Only the first session can count for results')
+
+    # Make this a field
+    team_size = 4
 
     class Meta:
         unique_together = ('date', 'tournament')
@@ -71,6 +77,18 @@ class Competition(models.Model):
                     count__gt=0).order_by('start')
             self._sessions_with_rounds = sessions
             return sessions
+
+
+class ResultsMode(models.Model):
+    competition = models.ForeignKey(Competition)
+    mode = models.CharField(max_length=31, choices=get_result_modes())
+    leaderboard_only = models.BooleanField(default=False)
+
+    class Meta:
+        unique_together = ('competition', 'mode')
+
+    def __unicode__(self):
+        return unicode(self.get_mode_display())
 
 
 class Session(models.Model):
@@ -201,9 +219,7 @@ class SessionEntry(models.Model):
         if not self.pk:
             super(SessionEntry, self).save(*args, **kwargs)
         entries = self.competition_entry.sessionentry_set.order_by('session_round__session__start')
-        if len(entries) > 2:
-            print len(entries)
-        self.index = list(entries).index(self)
+        self.index = list(entries).index(self) + 1
         return super(SessionEntry, self).save(*args, **kwargs)
 
     def __unicode__(self):

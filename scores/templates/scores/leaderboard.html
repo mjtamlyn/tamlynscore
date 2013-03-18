@@ -1,0 +1,56 @@
+{% extends 'target_list.html' %}
+
+{% block moduleclass %}leaderboard{% endblock %}
+{% block title %}Leaderboard - {{ mode }}{% endblock %}
+
+{% block main %}
+<div class="board selected">
+    <table>
+        {% for round, categories in results.items %}
+        <tr><td colspan="100%"><h4>{{ round }}</h4></td></tr>
+        {% for category, scores in categories.items %}
+            <tr><td colspan="100%"><h5>{{ category }}</h5></td></tr>
+            {% for score in scores %}
+                <tr>
+                    {% if score.disqualified %}
+                    <td></td>
+                    {% else %}
+                    <td>{{ forloop.counter }}</td>
+                    {% endif %}
+                    {% if score.team %}
+                        <th>{{ score.club }}</th>
+                    {% else %}
+                        <td>{{ score.target.session_entry.competition_entry.archer }}</td>
+                        <td>{{ score.target.session_entry.competition_entry.club}}</td>
+                        <td>{% if score.target.session_entry.competition_entry.novice == 'N' %}Novice{% endif %}</td>
+                    {% endif %}
+                    {% if score.disqualified %}
+                    <td>dsq</td>
+                    <td></td>
+                    <td></td>
+                    <td></td>
+                    {% else %}
+                    <td>{{ score.score }}</td>
+                    <td>{{ score.hits }}</td>
+                    <td>{{ score.golds }}</td>
+                    <td>{{ score.xs }}</td>
+                    {% endif %}
+                </tr>
+                {% if score.team %}
+                    {% for member in score.team %}
+                    <tr>
+                        <td></td>
+                        <td>{{ member.target.session_entry.competition_entry.archer }}</td>
+                        <td>{{ member.score }}</td>
+                        <td>{{ member.hits }}</td>
+                        <td>{{ member.golds }}</td>
+                        <td>{{ member.xs }}</td>
+                    </tr>
+                    {% endfor %}
+                {% endif %}
+            {% endfor %}
+        {% endfor %}
+        {% endfor %}
+    </table>
+</div>
+{% endblock %}
