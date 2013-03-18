@@ -7,7 +7,7 @@ from django.core.cache import cache
 from django.core.urlresolvers import reverse
 from django.db import models
 from django.db.models import Q
-from django.http import HttpResponse, HttpResponseRedirect
+from django.http import HttpResponse, HttpResponseRedirect, Http404
 from django.shortcuts import render, get_object_or_404
 from django.template.loader import render_to_string
 from django.views.generic import View, ListView
@@ -19,8 +19,9 @@ from reportlab.platypus import Spacer, Table, TableStyle
 from entries.models import Competition, SessionRound, SCORING_TOTALS, SCORING_DOZENS, SCORING_FULL
 from entries.views import HeadedPdfView, TargetList
 
-from scores.forms import get_arrow_formset, get_dozen_formset
-from scores.models import Score, Arrow, Dozen
+from .forms import get_arrow_formset, get_dozen_formset
+from .models import Score, Arrow, Dozen
+from .result_modes import get_mode
 
 from scoring.utils import class_view_decorator
 
@@ -650,3 +651,68 @@ class ResultsPdfOverall(ResultsPdf):
 
 
 results_pdf_overall = login_required(ResultsPdfOverall.as_view())
+
+
+
+
+
+class NewLeaderboard(ListView):
+    """General leaderboard/rsults generation.
+    
+    Strategy:
+     - get the competition
+     - check the mode and the format are valid
+     - get the queryset of scores
+     - arrange and aggregate using the ResultMode object
+     - render
+    """
+    def get(self, request, *args, **kwargs):
+        self.competition = self.get_competition()
+        self.mode = self.get_mode()
+        self.format = self.get_format()
+        self.object_list = self.get_queryset()
+        context = self.get_context_data(competition=self.competition, object_list=self.object_list)
+        return self.render_to_response(context)
+
+    def get_competition(self):
+        competition = get_object_or_404(Competition, slug=self.kwargs['slug'])
+        return competition
+
+    def get_mode(self):
+        mode = get_mode(self.kwargs['mode'])
+        if not mode:
+            raise Http404('No such mode')
+        mode_exists = self.competition.resultsmode_set.filter(mode=mode.slug).exists()
+        if not mode_exists:
+            raise Http404('No such mode for this competition')
+        return mode
+
+    def get_format(self):
+        format = self.kwargs['format']
+        if format not in ['html', 'pdf']:
+            raise Http404('No such format')
+        return format
+
+    def get_queryset(self):
+        # TODO: stop using blank select_related
+        scores = Score.objects.filter(
+            target__session_entry__competition_entry__competition=self.competition
+        ).select_related().order_by(
+            '-target__session_entry__competition_entry__archer__age',
+            'target__session_entry__competition_entry__bowstyle',
+            'target__session_entry__competition_entry__archer__gender',
+            'disqualified',
+            '-score', 
+            '-golds', 
+            '-xs'
+        )
+        return scores
+
+    def get_context_data(self, **kwargs):
+        kwargs['results'] = self.mode.get_results(self.competition, kwargs['object_list'])
+        kwargs['mode'] = self.mode
+        return super(NewLeaderboard, self).get_context_data(**kwargs)
+
+    def get_template_names(self, **kwargs):
+        return ['scores/leaderboard.html']
+
