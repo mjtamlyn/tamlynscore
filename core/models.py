@@ -74,6 +74,7 @@ class Round(models.Model):
     def score_sheet_headings(self):
         return ['10+X', 'X'] if self.scoring_type == 'X' else ['H', 'G']
 
+
 class Bowstyle(models.Model):
     name = models.CharField(max_length=50, unique=True)
 
