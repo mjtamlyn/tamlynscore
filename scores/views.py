@@ -735,7 +735,10 @@ class NewLeaderboard(ListView):
         self.page_width, self.page_height = defaultPageSize
         doc = SimpleDocTemplate(response, pagesize=defaultPageSize)
         self.styles = getSampleStyleSheet()
-        doc.build([Paragraph('hello', self.styles['Normal'])], onFirstPage=self.draw_title, onLaterPages=self.draw_title)
+        self.styles['h1'].alignment = 1
+        self.styles['h2'].alignment = 1
+        elements = self.get_elements(context['results'])
+        doc.build(elements, onFirstPage=self.draw_title, onLaterPages=self.draw_title)
         return response
 
     def draw_title(self, canvas, doc):
@@ -743,6 +746,117 @@ class NewLeaderboard(ListView):
         canvas.setFont('Helvetica-Bold', 18)
         canvas.drawCentredString(self.page_width/2.0, self.page_height-70, u'{0}: {1}'.format(self.competition, self.title))
         canvas.restoreState()
+
+    def get_elements(self, results):
+        elements = []
+
+        table_style = TableStyle([
+            ('LINEBELOW', (0, 0), (-1, 0), 0.5, colors.black),
+        ])
+
+        for round, categories in results.items():
+            # TODO: this could be done better from the ResultsMode object
+            round_label = unicode(round)
+            if self.mode.name == 'Double round':
+                round_label = 'Double ' + round_label
+            if self.mode.name == 'Teams':
+                round_label = round_label + ' Team'
+            elements.append(Paragraph(round_label, self.styles['h1']))
+
+            for category, scores in categories.items():
+                elements.append(Paragraph(unicode(category), self.styles['h2']))
+                # TODO: Again, mover to resultsmode object
+                if self.mode.name == 'Teams':
+                    table_header = ['Pl.', 'Club']
+                else:
+                    table_header = ['Pl.', 'Archer', 'Club', None]
+                # TODO: subrounds
+                table_header += ['Score', '10s', 'Xs'] if round.scoring_type == 'X' else ['Score', 'Hits', 'Golds']
+                table_data = [table_header]
+                for score in scores:
+                    table_data += self.rows_from_score(scores, score, round)
+                table = Table(table_data)
+                table.setStyle(table_style)
+                elements.append(table)
+
+            return elements
+
+    def rows_from_score(self, scores, score, round):
+        row = []
+        rows = [row]
+
+        placing = scores.index(score) + 1
+
+        # Placing
+        if isinstance(score, Score):
+            score = {
+                'target': score.target,
+                'score': score.score,
+                'hits': score.hits,
+                'golds': score.golds,
+                'xs': score.xs,
+                'disqualified': score.disqualified,
+                'retired': score.retired,
+            }
+
+        if 'team' in score:
+            guest = False
+        else:
+            guest = score['target'].session_entry.competition_entry.guest
+        if score['disqualified'] or guest:
+            row.append(None)
+        else:
+            # TODO: Fix, and move all position faff to the resultmode objects
+            # this is a very naive and will only work if two archers are tied, not any more.
+            #if placing > 1 and not score['score'] == 'DNS':
+            #    previous = scores[placing - 2]
+            #    if previous.score == score['score'] and previous.golds == score['golds'] and previous['hits'] == score['hits'] and previous.xs == score['xs']:
+            #        placing -= 1
+            row.append(placing)
+
+        if 'team' in score:
+            row += [score['club']]
+            for member in score['team']:
+                member = {
+                    'target': member.target,
+                    'score': member.score,
+                    'hits': member.hits,
+                    'golds': member.golds,
+                    'xs': member.xs,
+                    'disqualified': member.disqualified,
+                    'retired': member.retired,
+                }
+                rows.append([
+                    None,
+                    member['target'].session_entry.competition_entry.archer.name,
+                ] + self.score_details(member, round))
+        else:
+            row += [
+                score['target'].session_entry.competition_entry.archer.name,
+                score['target'].session_entry.competition_entry.club.name + (' (Guest)' if guest else ''),
+                'Novice' if score['target'].session_entry.competition_entry.novice == 'N' else None,
+            ]
+        row += self.score_details(score, round)
+        return rows
+
+    def score_details(self, score, round):
+        if score['disqualified']:
+            scores = ['DSQ', None, None]
+        elif score['retired']:
+            scores = [score['score'], 'Retired', None]
+        elif round.scoring_type == 'X':
+            scores = [
+                score['score'],
+                score['hits'],
+                score['xs'],
+            ]
+        else:
+            scores = [
+                score['score'],
+                score['hits'],
+                score['golds'],
+            ]
+        return scores
 
 
 class NewResults(NewLeaderboard):

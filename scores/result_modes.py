@@ -2,6 +2,9 @@ from django.core.exceptions import ImproperlyConfigured
 from django.utils.datastructures import SortedDict
 
 
+# TODO: Dicts everywhere, or nowhere
+
+
 class BaseResultMode(object):
     slug = ''
     name = ''
@@ -57,7 +60,15 @@ class ByRound(BaseResultMode):
             if category not in results:
                 results[category] = []
             if not self.leaderboard and score.score == 0:
-                score = {'target': score.target, 'score': 'DNS'}
+                score = {
+                    'target': score.target,
+                    'score': 'DNS',
+                    'hits': '',
+                    'golds': '',
+                    'xs': '',
+                    'disqualified': False,
+                    'retired': False,
+                }
             results[category].append(score)
         return results
 
@@ -112,6 +123,7 @@ class DoubleRound(BaseResultMode):
                 scores[entry] = sorted(scores[entry], key=lambda s: s.target.session_entry.session_round.session.start)[:2]
             new_scores = [{
                 'disqualified': any(s.disqualified for s in sub_scores),
+                'retired': any(s.disqualified for s in sub_scores),
                 'target': sub_scores[0].target,
                 'score': sum(s.score for s in sub_scores),
                 'hits': sum(s.hits for s in sub_scores),
@@ -138,12 +150,16 @@ class Team(BaseResultMode):
         - repeat for each team type
         """
         clubs = {}
+        # TODO: handle cross-rounds
+        round = None
         for score in scores:
             if not leaderboard and not score.score:
                 continue
             session_entry = score.target.session_entry
+            if round is None:
+                round = session_entry.session_round.shot_round
             club = session_entry.competition_entry.club
-            if session_entry.index > 1:
+            if session_entry.index > 1 or score.disqualified or score.retired:
                 continue
             if club not in clubs:
                 clubs[club] = []
@@ -151,7 +167,7 @@ class Team(BaseResultMode):
         results = SortedDict()
         for type in self.get_team_types(competition):
             results[type] = self.get_team_scores(competition, clubs, type)
-        return {'Portsmouth': results}
+        return {round: results}
 
     def get_team_types(self, competition):
         return ['Non-compound', 'Compound', 'Novice']
@@ -164,6 +180,8 @@ class Team(BaseResultMode):
             if len(club_scores) < competition.team_size:
                 continue
             team = {
+                'disqualified': False,
+                'retired': False,
                 'score': sum(s.score for s in club_scores),
                 'hits': sum(s.hits for s in club_scores),
                 'golds': sum(s.golds for s in club_scores),
