@@ -6,6 +6,7 @@
 {% block competition_nav %}
 <div class="competition-section">
     <div class="competition-nav">
+        {% with competition.result_modes.all as modes %}
         <h2>Before the shoot</h2>
         <ul>
             <a href="{% url entry_list slug=competition.slug %}"><li>Manage Entries</li></a>
@@ -16,18 +17,26 @@
         <ul>
             <a href="{% url registration slug=competition.slug %}"><li>Registration</li></a>
             <a href="{% url input_scores slug=competition.slug %}"><li>Input scores</li></a>
-            <a href="{% url leaderboard slug=competition.slug %}"><li>Leaderboard (by session)</li></a>
-            <a href="{% url leaderboard_combined slug=competition.slug %}"><li>Leaderboard (Combined)</li></a>
-            <a href="{% url leaderboard_combined_experienced slug=competition.slug %}"><li>Leaderboard (Experienced)</li></a>
-            <a href="{% url leaderboard_combined_novice slug=competition.slug %}"><li>Leaderboard (Novice)</li></a>
-            <a href="{% url leaderboard_teams slug=competition.slug %}"><li>Leaderboard (Teams)</li></a>
-            <a href="{% url leaderboard_summary slug=competition.slug %}"><li>Leaderboard (Summary)</li></a>
+            {% for mode in modes %}
+                <a href="{% url new_leaderboard slug=competition.slug mode=mode.mode format='html' %}"><li>Leaderboard {{ mode|lower }}</li></a>
+            {% endfor %}
+            {% if not modes %}
+                <a href="{% url leaderboard slug=competition.slug %}"><li>Leaderboard (by session)</li></a>
+                <a href="{% url leaderboard_combined slug=competition.slug %}"><li>Leaderboard (Combined)</li></a>
+                <a href="{% url leaderboard_combined_experienced slug=competition.slug %}"><li>Leaderboard (Experienced)</li></a>
+                <a href="{% url leaderboard_combined_novice slug=competition.slug %}"><li>Leaderboard (Novice)</li></a>
+                <a href="{% url leaderboard_teams slug=competition.slug %}"><li>Leaderboard (Teams)</li></a>
+                <a href="{% url leaderboard_summary slug=competition.slug %}"><li>Leaderboard (Summary)</li></a>
+            {% endif %}
             <a href="{% url olympic.views.olympic_index slug=competition.slug %}"><li>Head to heads panel</li></a>
         </ul>
         <h2>After the shoot</h2>
         <ul>
-            <a href="{% url scores.views.results slug=competition.slug %}"><li>Full Results</li></a>
+            {% for mode in modes %}
+                <a href="{% url new_leaderboard slug=competition.slug mode=mode.mode format='html' %}"><li>Leaderboard {{ mode|lower }}</li></a>
+            {% endfor %}
         </ul>
+        {% endwith %}
     </div>
     {% endblock %}
 

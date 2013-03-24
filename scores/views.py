@@ -682,7 +682,7 @@ class NewLeaderboard(ListView):
         mode = get_mode(self.kwargs['mode'])
         if not mode:
             raise Http404('No such mode')
-        mode_exists = self.competition.resultsmode_set.filter(mode=mode.slug).exists()
+        mode_exists = self.competition.result_modes.filter(mode=mode.slug).exists()
         if not mode_exists:
             raise Http404('No such mode for this competition')
         return mode

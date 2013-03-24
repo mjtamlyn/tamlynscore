@@ -26,5 +26,5 @@ urlpatterns = patterns('scores.views',
     (r'^(?P<slug>(\w+-?)+)/results/pdf/overall/$', 'results_pdf_overall'),
 
 
-    url(r'^(?P<slug>[\w-]+)/new-leaderboard/(?P<mode>[\w-]+)/(?P<format>[\w-]+)/', views.NewLeaderboard.as_view(), name='new-leaderboard'),
+    url(r'^(?P<slug>[\w-]+)/new-leaderboard/(?P<mode>[\w-]+)/(?P<format>[\w-]+)/', views.NewLeaderboard.as_view(), name='new_leaderboard'),
 )
