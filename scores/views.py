@@ -13,8 +13,10 @@ from django.template.loader import render_to_string
 from django.views.generic import View, ListView
 
 from reportlab.lib import colors
+from reportlab.lib.styles import getSampleStyleSheet
 from reportlab.lib.units import inch
-from reportlab.platypus import Spacer, Table, TableStyle
+from reportlab.platypus import SimpleDocTemplate, Spacer, Table, TableStyle, Paragraph
+from reportlab.rl_config import defaultPageSize
 
 from entries.models import Competition, SessionRound, SCORING_TOTALS, SCORING_DOZENS, SCORING_FULL
 from entries.views import HeadedPdfView, TargetList
@@ -720,8 +722,27 @@ class NewLeaderboard(ListView):
         kwargs['title'] = self.title
         return super(NewLeaderboard, self).get_context_data(**kwargs)
 
+    def render_to_response(self, context, **response_kwargs):
+        if self.format == 'pdf':
+            return self.render_to_pdf(context)
+        return super(NewLeaderboard, self).render_to_response(context, **response_kwargs)
+
     def get_template_names(self, **kwargs):
         return ['scores/leaderboard.html']
+
+    def render_to_pdf(self, context):
+        response = HttpResponse(mimetype='application/pdf')
+        self.page_width, self.page_height = defaultPageSize
+        doc = SimpleDocTemplate(response, pagesize=defaultPageSize)
+        self.styles = getSampleStyleSheet()
+        doc.build([Paragraph('hello', self.styles['Normal'])], onFirstPage=self.draw_title, onLaterPages=self.draw_title)
+        return response
+
+    def draw_title(self, canvas, doc):
+        canvas.saveState()
+        canvas.setFont('Helvetica-Bold', 18)
+        canvas.drawCentredString(self.page_width/2.0, self.page_height-70, u'{0}: {1}'.format(self.competition, self.title))
+        canvas.restoreState()
 
 
 class NewResults(NewLeaderboard):
