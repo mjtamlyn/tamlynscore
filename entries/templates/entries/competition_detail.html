@@ -33,7 +33,9 @@
         <h2>After the shoot</h2>
         <ul>
             {% for mode in modes %}
-                <a href="{% url new_leaderboard slug=competition.slug mode=mode.mode format='html' %}"><li>Leaderboard {{ mode|lower }}</li></a>
+            {% if not mode.leaderboard_only %}
+                <a href="{% url new_results slug=competition.slug mode=mode.mode format='html' %}"><li>Results {{ mode|lower }}</li></a>
+            {% endif %}
             {% endfor %}
         </ul>
         {% endwith %}

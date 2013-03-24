@@ -9,7 +9,7 @@ class BaseResultMode(object):
     def __unicode__(self):
         return self.name
 
-    def get_results(self, competition, scores):
+    def get_results(self, competition, scores, leaderboard=False):
         raise ImproperlyConfigured('Subclasses must implement get_results')
 
 
@@ -22,7 +22,7 @@ class ByRound(BaseResultMode):
     slug = 'by-round'
     name = 'By round'
 
-    def get_results(self, competition, scores):
+    def get_results(self, competition, scores, leaderboard=False):
         """Get the results for each category, by round.
 
         Strategy:
@@ -63,7 +63,7 @@ class DoubleRound(BaseResultMode):
     slug = 'double-round'
     name = 'Double round'
 
-    def get_results(self, competition, scores):
+    def get_results(self, competition, scores, leaderboard=False):
         """Get the results for each category, by round.
 
         Strategy:
@@ -118,12 +118,11 @@ class DoubleRound(BaseResultMode):
         return results
 
 
-
 class Team(BaseResultMode):
     slug = 'team'
     name = 'Teams'
 
-    def get_results(self, competition, scores):
+    def get_results(self, competition, scores, leaderboard=False):
         """
         Strategy:
         - split by team
