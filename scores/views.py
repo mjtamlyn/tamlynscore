@@ -655,7 +655,6 @@ results_pdf_overall = login_required(ResultsPdfOverall.as_view())
 
 
 
-
 class NewLeaderboard(ListView):
     """General leaderboard/rsults generation.
     
@@ -666,6 +665,9 @@ class NewLeaderboard(ListView):
      - arrange and aggregate using the ResultMode object
      - render
     """
+    leaderboard = True
+    url_name = 'new_leaderboard'
+
     def get(self, request, *args, **kwargs):
         self.competition = self.get_competition()
         self.mode = self.get_mode()
@@ -682,10 +684,12 @@ class NewLeaderboard(ListView):
         mode = get_mode(self.kwargs['mode'])
         if not mode:
             raise Http404('No such mode')
-        mode_exists = self.competition.result_modes.filter(mode=mode.slug).exists()
-        if not mode_exists:
+        if not self.mode_exists(mode):
             raise Http404('No such mode for this competition')
         return mode
+
+    def mode_exists(self, mode):
+        return self.competition.result_modes.filter(mode=mode.slug).exists()
 
     def get_format(self):
         format = self.kwargs['format']
@@ -709,10 +713,18 @@ class NewLeaderboard(ListView):
         return scores
 
     def get_context_data(self, **kwargs):
-        kwargs['results'] = self.mode.get_results(self.competition, kwargs['object_list'])
+        kwargs['results'] = self.mode.get_results(self.competition, kwargs['object_list'], leaderboard=self.leaderboard)
         kwargs['mode'] = self.mode
+        kwargs['url_name'] = self.url_name
         return super(NewLeaderboard, self).get_context_data(**kwargs)
 
     def get_template_names(self, **kwargs):
         return ['scores/leaderboard.html']
 
+
+class NewResults(NewLeaderboard):
+    leaderboard = False
+    url_name = 'new_results'
+
+    def mode_exists(self, mode):
+        return self.competition.result_modes.filter(mode=mode.slug, leaderboard_only=False).exists()
