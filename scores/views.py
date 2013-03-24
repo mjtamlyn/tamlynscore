@@ -666,6 +666,7 @@ class NewLeaderboard(ListView):
      - render
     """
     leaderboard = True
+    title = 'Leaderboard'
     url_name = 'new_leaderboard'
 
     def get(self, request, *args, **kwargs):
@@ -716,6 +717,7 @@ class NewLeaderboard(ListView):
         kwargs['results'] = self.mode.get_results(self.competition, kwargs['object_list'], leaderboard=self.leaderboard)
         kwargs['mode'] = self.mode
         kwargs['url_name'] = self.url_name
+        kwargs['title'] = self.title
         return super(NewLeaderboard, self).get_context_data(**kwargs)
 
     def get_template_names(self, **kwargs):
@@ -724,6 +726,7 @@ class NewLeaderboard(ListView):
 
 class NewResults(NewLeaderboard):
     leaderboard = False
+    title = 'Results'
     url_name = 'new_results'
 
     def mode_exists(self, mode):
