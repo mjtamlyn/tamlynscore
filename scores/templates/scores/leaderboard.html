@@ -3,7 +3,7 @@
 {% load url from future %}
 
 {% block moduleclass %}leaderboard{% endblock %}
-{% block title %}Leaderboard - {{ mode }}{% endblock %}
+{% block title %}{{ title }} - {{ mode }}{% endblock %}
 
 {% block main %}
 <p><a href="{% url url_name slug=competition.slug mode=mode.slug format='pdf' %}" class="btn">PDF</a></p>

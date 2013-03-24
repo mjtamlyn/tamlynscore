@@ -31,6 +31,7 @@ class ByRound(BaseResultMode):
         - go through scores, adding to each category specific sets
             - here respect competition options - novices, juniors, second rounds etc.
         """
+        self.leaderboard = leaderboard
         rounds = self.get_rounds(competition)
         return SortedDict((round, self.get_round_results(competition, round, scores)) for round in rounds)
 
@@ -55,6 +56,8 @@ class ByRound(BaseResultMode):
             category = session_entry.competition_entry.category()
             if category not in results:
                 results[category] = []
+            if not self.leaderboard and score.score == 0:
+                score = {'target': score.target, 'score': 'DNS'}
             results[category].append(score)
         return results
 
@@ -72,6 +75,7 @@ class DoubleRound(BaseResultMode):
         - go through scores, adding to each category specific sets
         - need to add a quacking score object which is the double
         """
+        self.leaderboard = leaderboard
         rounds = self.get_rounds(competition)
         return SortedDict((round, self.get_round_results(competition, round, scores)) for round in rounds)
 
@@ -114,6 +118,8 @@ class DoubleRound(BaseResultMode):
                 'golds': sum(s.golds for s in sub_scores),
                 'xs': sum(s.xs for s in sub_scores),
             } for entry, sub_scores in scores.items()]
+            if not self.leaderboard:
+                new_scores = filter(lambda s: s['score'] > 0, new_scores)
             results[category] = sorted(new_scores, key = lambda s: (s['score'], s['golds'], s['xs'], s['hits']), reverse=True)
         return results
 
@@ -133,6 +139,8 @@ class Team(BaseResultMode):
         """
         clubs = {}
         for score in scores:
+            if not leaderboard and not score.score:
+                continue
             session_entry = score.target.session_entry
             club = session_entry.competition_entry.club
             if session_entry.index > 1:
