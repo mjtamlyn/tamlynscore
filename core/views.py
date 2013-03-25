@@ -12,12 +12,18 @@ class Index(TemplateView):
     template_name = 'index.html'
 
 
+@class_view_decorator(login_required)
 class ClubList(ListView):
     model = Club
 
 
+@class_view_decorator(login_required)
 class ClubDetail(DetailView):
     model = Club
+
+    def get_context_data(self, **kwargs):
+        archers = self.object.archer_set.order_by('name')
+        return super(ClubDetail, self).get_context_data(archers=archers, **kwargs)
 
 
 @class_view_decorator(login_required)
