@@ -9,8 +9,8 @@
 <p><a href="{% url url_name slug=competition.slug mode=mode.slug format='pdf' %}" class="btn">PDF</a></p>
 <div class="board selected">
     <table>
-        {% for round, categories in results.items %}
-        <tr><td colspan="100%"><h4>{{ round }}</h4></td></tr>
+        {% for section, categories in results.items %}
+        <tr><td colspan="100%"><h4>{{ section }}</h4></td></tr>
         {% for category, scores in categories.items %}
             <tr><td colspan="100%"><h5>{{ category }}</h5></td></tr>
             {% for score in scores %}
