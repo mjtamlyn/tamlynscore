@@ -33,8 +33,12 @@
         border: 1px solid blue;
         margin: 20px;
     }
-    .basic {
+    .affiliations {
         padding: 5px;
+    }
+    .archers ul {
+        margin: 17px 25px;
+        -webkit-column-count: 4;
     }
 </style>    
 {% endblock %}
@@ -61,10 +65,10 @@
         </div>
     </div>
     <div class="clear"></div>
-    <div class="basic affiliations">
+    <div class="affiliations">
         <p>Affiliated to:</p>
         {% if club.county %}
-        <ul class="affiliations">
+        <ul>
             <li><a href="#">{{ club.county }}</a></li>
             <li><a href="#">{{ club.county.region }}</a></li>
             <li><a href="#">{{ club.county.region.country }}</a></li>
@@ -79,7 +83,16 @@
 </div>
 <div class="clear"></div> 
 
-
+{% if archers %}
+<div class="archers">
+    <h3>Archers</h3>
+    <ul>
+        {% for archer in archers %}
+        <li>{{ archer }}</li>
+        {% endfor %}
+    </ul>
+</div>
+{% endif %}
 
 {% endblock %}
 
