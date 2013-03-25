@@ -3,6 +3,7 @@ from django.utils.datastructures import SortedDict
 
 
 class ScoreMock(object):
+
     def __init__(self, **kwargs):
         kwargs.setdefault('retired', False)
         kwargs.setdefault('disqualified', False)
@@ -19,6 +20,17 @@ class ScoreMock(object):
         return bool(self.team)
 
 
+class ResultSection(object):
+
+    def __init__(self, label, round, headers):
+        self.label = label
+        self.round = round
+        self.headers = headers
+
+    def __unicode__(self):
+        return self.label
+
+
 class BaseResultMode(object):
     slug = ''
     name = ''
@@ -31,6 +43,26 @@ class BaseResultMode(object):
 
     def sort_results(self, scores):
         return sorted(scores, key=lambda s: (s.score, s.golds, s.xs, s.hits), reverse=True)
+
+    def get_section_for_round(self, round):
+        headers = ['Pl.'] + self.get_main_headers()
+        # TODO: subrounds
+        if round.scoring_type == 'X':
+            headers += ['10s', 'Xs']
+        else:
+            headers += ['Hits', 'Golds']
+        return ResultSection(
+            label=self.label_for_round(round),
+            round=round,
+            headers=headers,
+        )
+
+    def get_main_headers(self):
+        # TODO: handle novice configurations
+        return ['Archer', 'Club', None, 'Score']
+
+    def label_for_round(self, round):
+        return unicode(round)
 
 
 class BySession(BaseResultMode):
@@ -53,7 +85,10 @@ class ByRound(BaseResultMode):
         """
         self.leaderboard = leaderboard
         rounds = self.get_rounds(competition)
-        return SortedDict((round, self.get_round_results(competition, round, scores)) for round in rounds)
+        return SortedDict((
+                self.get_section_for_round(round),
+                self.get_round_results(competition, round, scores)
+            ) for round in rounds)
 
     def get_rounds(self, competition):
         from entries.models import SessionRound
@@ -105,7 +140,10 @@ class DoubleRound(BaseResultMode):
         """
         self.leaderboard = leaderboard
         rounds = self.get_rounds(competition)
-        return SortedDict((round, self.get_round_results(competition, round, scores)) for round in rounds)
+        return SortedDict((
+                self.get_section_for_round(round),
+                self.get_round_results(competition, round, scores)
+            ) for round in rounds)
 
     def get_rounds(self, competition):
         from entries.models import SessionRound
@@ -152,6 +190,9 @@ class DoubleRound(BaseResultMode):
             results[category] = self.sort_results(new_scores)
         return results
 
+    def label_for_round(self, round):
+        return 'Double %s' % unicode(round)
+
 
 class Team(BaseResultMode):
     slug = 'team'
@@ -167,7 +208,7 @@ class Team(BaseResultMode):
         - repeat for each team type
         """
         clubs = {}
-        # TODO: handle cross-rounds
+        # TODO: handle cross-rounds?
         round = None
         for score in scores:
             if not leaderboard and not score.score:
@@ -184,9 +225,10 @@ class Team(BaseResultMode):
         results = SortedDict()
         for type in self.get_team_types(competition):
             results[type] = self.get_team_scores(competition, clubs, type)
-        return {round: results}
+        return {self.get_section_for_round(round): results}
 
     def get_team_types(self, competition):
+        # TODO: support team types properly
         return ['Non-compound', 'Compound', 'Novice']
 
     def get_team_scores(self, competition, clubs, type):
@@ -214,6 +256,13 @@ class Team(BaseResultMode):
             return score.target.session_entry.competition_entry.bowstyle.name == 'Compound'
         if type == 'Novice':
             return not score.target.session_entry.competition_entry.bowstyle.name == 'Compound' and score.target.session_entry.competition_entry.novice == 'N'
+
+    def get_main_headers(self):
+        # TODO: handle novice configurations
+        return ['Club', 'Score']
+
+    def label_for_round(self, round):
+        return '%s Team' % unicode(round)
 
 
 def get_result_modes():

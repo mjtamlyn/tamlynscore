@@ -754,34 +754,21 @@ class NewLeaderboard(ListView):
             ('LINEBELOW', (0, 0), (-1, 0), 0.5, colors.black),
         ])
 
-        for round, categories in results.items():
-            # TODO: this could be done better from the ResultsMode object
-            round_label = unicode(round)
-            if self.mode.name == 'Double round':
-                round_label = 'Double ' + round_label
-            if self.mode.name == 'Teams':
-                round_label = round_label + ' Team'
-            elements.append(Paragraph(round_label, self.styles['h1']))
+        for section, categories in results.items():
+            elements.append(Paragraph(unicode(section), self.styles['h1']))
 
             for category, scores in categories.items():
                 elements.append(Paragraph(unicode(category), self.styles['h2']))
-                # TODO: Again, mover to resultsmode object
-                if self.mode.name == 'Teams':
-                    table_header = ['Pl.', 'Club']
-                else:
-                    table_header = ['Pl.', 'Archer', 'Club', None]
-                # TODO: subrounds
-                table_header += ['Score', '10s', 'Xs'] if round.scoring_type == 'X' else ['Score', 'Hits', 'Golds']
-                table_data = [table_header]
+                table_data = [section.headers]
                 for score in scores:
-                    table_data += self.rows_from_score(scores, score, round)
+                    table_data += self.rows_from_score(scores, score, section)
                 table = Table(table_data)
                 table.setStyle(table_style)
                 elements.append(table)
 
             return elements
 
-    def rows_from_score(self, scores, score, round):
+    def rows_from_score(self, scores, score, section):
         row = []
         rows = [row]
 
@@ -805,22 +792,22 @@ class NewLeaderboard(ListView):
                 rows.append([
                     None,
                     member.target.session_entry.competition_entry.archer.name,
-                ] + self.score_details(member, round))
+                ] + self.score_details(member, section))
         else:
             row += [
                 score.target.session_entry.competition_entry.archer.name,
                 score.target.session_entry.competition_entry.club.name + (' (Guest)' if score.guest else ''),
                 'Novice' if score.target.session_entry.competition_entry.novice == 'N' else None,
             ]
-        row += self.score_details(score, round)
+        row += self.score_details(score, section)
         return rows
 
-    def score_details(self, score, round):
+    def score_details(self, score, section):
         if score.disqualified:
             scores = ['DSQ', None, None]
         elif score.retired:
             scores = [score.score, 'Retired', None]
-        elif round.scoring_type == 'X':
+        elif section.round.scoring_type == 'X':
             scores = [
                 score.score,
                 score.hits,
