@@ -657,6 +657,7 @@ results_pdf_overall = login_required(ResultsPdfOverall.as_view())
 
 
 
+@class_view_decorator(login_required)
 class NewLeaderboard(ListView):
     """General leaderboard/rsults generation.
     
