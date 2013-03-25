@@ -8,7 +8,7 @@ from optparse import make_option
 from django.core.management import BaseCommand
 
 from core.models import Archer, Club, Bowstyle
-from entries.models import Competition, SessionRound
+from entries.models import Competition, SessionRound, TargetAllocation
 
 
 class Command(BaseCommand):
@@ -165,7 +165,7 @@ class Command(BaseCommand):
             )
             session_entry = self.session.sessionentry_set.create(competition_entry=competition_entry)
 
-        # Add the target allocation
+       # Add the target allocation
         boss, target = entry['target'][:-1], entry['target'][-1]
-        session_entry.targetallocation_set.create(boss=boss, target=target)
+        TargetAllocation.objects.create(boss=boss, target=target, session_entry=session_entry)
 

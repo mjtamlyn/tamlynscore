@@ -230,7 +230,7 @@ class SessionEntry(models.Model):
 
 
 class TargetAllocation(models.Model):
-    session_entry = models.ForeignKey(SessionEntry, unique=True)
+    session_entry = models.OneToOneField('SessionEntry')
     boss = models.PositiveIntegerField()
     target = models.CharField(max_length=1)
 
