@@ -1,7 +1,7 @@
 from django.db import models
 from django.utils.functional import cached_property
 
-from entries.models import TargetAllocation, SCORING_FULL, SCORING_DOZENS
+from entries.models import SCORING_FULL, SCORING_DOZENS
 
 from itertools import groupby
 
@@ -57,7 +57,7 @@ class ScoreManager(models.Manager):
 
 
 class Score(models.Model):
-    target = models.ForeignKey(TargetAllocation, unique=True)
+    target = models.OneToOneField('entries.TargetAllocation')
 
     score = models.PositiveIntegerField(default=0, db_index=True)
     hits = models.PositiveIntegerField(default=0)
