@@ -1,8 +1,10 @@
 from django.db import models
+from django.utils.functional import cached_property
 
 from entries.models import TargetAllocation, SCORING_FULL, SCORING_DOZENS
 
 from itertools import groupby
+
 
 class ScoreManager(models.Manager):
     def active(self, session_round, category=None):
@@ -69,6 +71,8 @@ class Score(models.Model):
 
     objects = ScoreManager()
 
+    is_team = False
+
     def __unicode__(self):
         return u'Score for {0}'.format(self.target)
 
@@ -99,6 +103,10 @@ class Score(models.Model):
             return self.arrow_set.filter(arrow_of_round__lte=int(dozen)*self.arrows_entered_per_end).aggregate(models.Sum('arrow_value'))['arrow_value__sum']
         elif self.target.session_entry.session_round.session.scoring_system == SCORING_DOZENS:
             return self.dozen_set.filter(dozen__lt=dozen).aggregate(total=models.Sum('total'))['total'] or 0
+
+    @cached_property
+    def guest(self):
+        return self.target.session_entry.competition_entry.guest
 
 
 class Arrow(models.Model):

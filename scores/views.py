@@ -788,22 +788,7 @@ class NewLeaderboard(ListView):
         placing = scores.index(score) + 1
 
         # Placing
-        if isinstance(score, Score):
-            score = {
-                'target': score.target,
-                'score': score.score,
-                'hits': score.hits,
-                'golds': score.golds,
-                'xs': score.xs,
-                'disqualified': score.disqualified,
-                'retired': score.retired,
-            }
-
-        if 'team' in score:
-            guest = False
-        else:
-            guest = score['target'].session_entry.competition_entry.guest
-        if score['disqualified'] or guest:
+        if score.disqualified or score.guest:
             row.append(None)
         else:
             # TODO: Fix, and move all position faff to the resultmode objects
@@ -814,47 +799,38 @@ class NewLeaderboard(ListView):
             #        placing -= 1
             row.append(placing)
 
-        if 'team' in score:
-            row += [score['club']]
-            for member in score['team']:
-                member = {
-                    'target': member.target,
-                    'score': member.score,
-                    'hits': member.hits,
-                    'golds': member.golds,
-                    'xs': member.xs,
-                    'disqualified': member.disqualified,
-                    'retired': member.retired,
-                }
+        if score.is_team:
+            row += [score.club]
+            for member in score.team:
                 rows.append([
                     None,
-                    member['target'].session_entry.competition_entry.archer.name,
+                    member.target.session_entry.competition_entry.archer.name,
                 ] + self.score_details(member, round))
         else:
             row += [
-                score['target'].session_entry.competition_entry.archer.name,
-                score['target'].session_entry.competition_entry.club.name + (' (Guest)' if guest else ''),
-                'Novice' if score['target'].session_entry.competition_entry.novice == 'N' else None,
+                score.target.session_entry.competition_entry.archer.name,
+                score.target.session_entry.competition_entry.club.name + (' (Guest)' if score.guest else ''),
+                'Novice' if score.target.session_entry.competition_entry.novice == 'N' else None,
             ]
         row += self.score_details(score, round)
         return rows
 
     def score_details(self, score, round):
-        if score['disqualified']:
+        if score.disqualified:
             scores = ['DSQ', None, None]
-        elif score['retired']:
-            scores = [score['score'], 'Retired', None]
+        elif score.retired:
+            scores = [score.score, 'Retired', None]
         elif round.scoring_type == 'X':
             scores = [
-                score['score'],
-                score['hits'],
-                score['xs'],
+                score.score,
+                score.hits,
+                score.xs,
             ]
         else:
             scores = [
-                score['score'],
-                score['hits'],
-                score['golds'],
+                score.score,
+                score.hits,
+                score.golds,
             ]
         return scores
 
