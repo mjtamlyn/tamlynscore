@@ -2,7 +2,21 @@ from django.core.exceptions import ImproperlyConfigured
 from django.utils.datastructures import SortedDict
 
 
-# TODO: Dicts everywhere, or nowhere
+class ScoreMock(object):
+    def __init__(self, **kwargs):
+        kwargs.setdefault('retired', False)
+        kwargs.setdefault('disqualified', False)
+        kwargs.setdefault('team', None)
+        for key, value in kwargs.items():
+            setattr(self, key, value)
+
+    @property
+    def guest(self):
+        return not self.team and self.target.session_entry.competition_entry.guest
+
+    @property
+    def is_team(self):
+        return bool(self.team)
 
 
 class BaseResultMode(object):
@@ -14,6 +28,9 @@ class BaseResultMode(object):
 
     def get_results(self, competition, scores, leaderboard=False):
         raise ImproperlyConfigured('Subclasses must implement get_results')
+
+    def sort_results(self, scores):
+        return sorted(scores, key=lambda s: (s.score, s.golds, s.xs, s.hits), reverse=True)
 
 
 class BySession(BaseResultMode):
@@ -60,15 +77,15 @@ class ByRound(BaseResultMode):
             if category not in results:
                 results[category] = []
             if not self.leaderboard and score.score == 0:
-                score = {
-                    'target': score.target,
-                    'score': 'DNS',
-                    'hits': '',
-                    'golds': '',
-                    'xs': '',
-                    'disqualified': False,
-                    'retired': False,
-                }
+                score = ScoreMock(
+                    target=score.target,
+                    score='DNS',
+                    hits='',
+                    golds='',
+                    xs='',
+                    disqualified=False,
+                    retired=False,
+                )
             results[category].append(score)
         return results
 
@@ -121,18 +138,18 @@ class DoubleRound(BaseResultMode):
                 continue
             for entry in scores:
                 scores[entry] = sorted(scores[entry], key=lambda s: s.target.session_entry.session_round.session.start)[:2]
-            new_scores = [{
-                'disqualified': any(s.disqualified for s in sub_scores),
-                'retired': any(s.disqualified for s in sub_scores),
-                'target': sub_scores[0].target,
-                'score': sum(s.score for s in sub_scores),
-                'hits': sum(s.hits for s in sub_scores),
-                'golds': sum(s.golds for s in sub_scores),
-                'xs': sum(s.xs for s in sub_scores),
-            } for entry, sub_scores in scores.items()]
+            new_scores = [ScoreMock(
+                    disqualified=any(s.disqualified for s in sub_scores),
+                    retired=any(s.disqualified for s in sub_scores),
+                    target=sub_scores[0].target,
+                    score=sum(s.score for s in sub_scores),
+                    hits=sum(s.hits for s in sub_scores),
+                    golds=sum(s.golds for s in sub_scores),
+                    xs=sum(s.xs for s in sub_scores),
+            ) for entry, sub_scores in scores.items()]
             if not self.leaderboard:
-                new_scores = filter(lambda s: s['score'] > 0, new_scores)
-            results[category] = sorted(new_scores, key = lambda s: (s['score'], s['golds'], s['xs'], s['hits']), reverse=True)
+                new_scores = filter(lambda s: s.score > 0, new_scores)
+            results[category] = self.sort_results(new_scores)
         return results
 
 
@@ -179,19 +196,16 @@ class Team(BaseResultMode):
             club_scores = sorted(club_scores, key = lambda s: (s.score, s.golds, s.xs, s.hits), reverse=True)[:competition.team_size]
             if len(club_scores) < competition.team_size:
                 continue
-            team = {
-                'disqualified': False,
-                'retired': False,
-                'score': sum(s.score for s in club_scores),
-                'hits': sum(s.hits for s in club_scores),
-                'golds': sum(s.golds for s in club_scores),
-                'xs': sum(s.xs for s in club_scores),
-                'club': club,
-                'team': club_scores,
-            }
+            team = ScoreMock(
+                score=sum(s.score for s in club_scores),
+                hits=sum(s.hits for s in club_scores),
+                golds=sum(s.golds for s in club_scores),
+                xs=sum(s.xs for s in club_scores),
+                club=club,
+                team=club_scores,
+            )
             club_results.append((club, team))
-        club_results = sorted(club_results, key=lambda s: (s[1]['score'], s[1]['golds'], s[1]['xs'], s[1]['hits']), reverse=True)
-        return [c[1] for c in club_results]
+        return self.sort_results([c[1] for c in club_results])
 
     def is_valid_for_type(self, score, type):
         if type == 'Non-compound':
