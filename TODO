@@ -12,9 +12,9 @@ Admin
 Transfer script (transfer an individual competition)
 Access to competition restricted by user - across all views
 Ability to edit an entry
-Ability to edit more fields on archers on the front end (club, name, etc)
 Remove "B" teams added for BUTC, and tidy up short names of clubs
 Remove any competitions I don't have data for..
+Remove Club.abbreviation - I don't think it's used anywhere
 
 
 Code tidyness

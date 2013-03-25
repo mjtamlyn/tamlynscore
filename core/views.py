@@ -2,8 +2,8 @@ from django.contrib.auth.decorators import login_required
 from django.views.generic import TemplateView, ListView, DetailView, UpdateView
 
 from scoring.utils import class_view_decorator
+from scores.models import Score
 
-from .forms import ArcherUpdateForm
 from .models import Club, Archer
 
 
@@ -27,9 +27,33 @@ class ClubDetail(DetailView):
 
 
 @class_view_decorator(login_required)
+class ClubUpdate(UpdateView):
+    model = Club
+
+
+@class_view_decorator(login_required)
+class ArcherDetail(DetailView):
+    model = Archer
+
+    def get_context_data(self, **kwargs):
+        entries = self.object.competitionentry_set.order_by('-competition__date')
+        shoots = []
+        for entry in entries:
+            scores = Score.objects.filter(target__session_entry__competition_entry=entry)
+            shoots.append({
+                'competition': entry.competition,
+                'bowstyle': entry.bowstyle,
+                'scores': [{
+                    'round': s.target.session_entry.session_round.shot_round,
+                    'score': s.score,
+                } for s in scores],
+            })
+        return super(ArcherDetail, self).get_context_data(shoots=shoots, **kwargs)
+
+
+@class_view_decorator(login_required)
 class ArcherUpdate(UpdateView):
     model = Archer
-    form_class = ArcherUpdateForm
 
     def get_success_url(self):
         return self.request.GET.get('next') or self.request.path
