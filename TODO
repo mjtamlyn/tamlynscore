@@ -28,7 +28,9 @@ Work backwards through competitions making sure each one has results configured 
 Ability to set certain pages as publicly accessible
 Easy ways to get to mobile website
 Django 1.5 and create custom User model
+Move to Braces instead of class_view_decorator
 Py3??
+Standardise url names on '-' not '_'
 
 
 Long term plan
