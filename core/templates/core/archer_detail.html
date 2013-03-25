@@ -1,0 +1,38 @@
+{% extends 'base.html' %}
+
+{% block content %}
+<h1>{{ archer.name }}</h1>
+
+<div>
+    <p><a class="btn" href="{% url archer_update pk=archer.pk %}">Edit</a></p>
+
+    <h3>Details</h3>
+    <dl>
+        <dt>Club</dt> <dd>{{ archer.club }}</dd>
+        <dt>Gender</dt> <dd>{{ archer.get_gender_display }}</dd>
+        <dt>Age</dt> <dd>{{ archer.get_age_display }}</dd>
+        <dt>Experience</dt> <dd>{{ archer.get_novice_display }}</dd>
+        <dt>Primary bowstyle</dt> <dd>{{ archer.bowstyle }}</dd>
+        <dt>GNAS number</dt> <dd>{{ archer.gnas_no|default:"Unknown" }}</dd>
+    </dl>
+
+    {% if shoots %}
+        <h3>Shoots</h3>
+        <ul>
+            {% for shoot in shoots %}
+            <li>
+                <p>{{ shoot.competition }} - {{ shoot.bowstyle }}</p>
+                <ul>
+                {% for score in shoot.scores %}
+                    <li>{{ score.round }}: {{ score.score }}</li>
+                {% empty %}
+                <p>No scores recorded</p>
+                {% endfor %}
+                </ul>
+            </li>
+            {% endfor %}
+        </ul>
+    {% endif %}
+</div>
+
+{% endblock %}

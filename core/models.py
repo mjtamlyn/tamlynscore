@@ -1,5 +1,6 @@
 import json
 
+from django.core.urlresolvers import reverse
 from django.db import models
 from django.template.defaultfilters import slugify
 
@@ -114,7 +115,7 @@ class County(models.Model):
 class Club(models.Model):
     name = models.CharField(max_length=500, unique=True)
     short_name = models.CharField(max_length=50, unique=True)
-    abbreviation = models.CharField(max_length=10)
+    abbreviation = models.CharField(max_length=10, blank=True, default='')
 
     county = models.ForeignKey(County, blank=True, null=True)
 
@@ -136,6 +137,9 @@ class Club(models.Model):
             'name': self.name,
             'short_name': self.short_name,
         })
+
+    def get_absolute_url(self):
+        return reverse('club_detail', kwargs={'slug': self.slug})
 
 
 class Archer(models.Model):
