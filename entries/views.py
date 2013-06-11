@@ -442,11 +442,19 @@ class RunningSlipsPdf(ScoreSheetsPdf):
 
     def get_elements(self):
         elements = []
-        for boss, entries in itertools.groupby(self.session_round.target_list(), lambda x: x[0][:-1]):
-            entries = list(entries)
-            if not reduce(lambda e, f: e or f, entries):
-                continue
-            elements += self.get_running_slip_elements(boss, list(entries))
+        targets = self.request.GET.get('targets', None)
+        if targets is not None:
+            archers_per_target = self.session_round.session.archers_per_target
+            for i in range(1, int(targets) + 1):
+                details = 'ABCDEFG'
+                boss_labels = ['%d%s' % (i, details[j]) for j in range(archers_per_target)]
+                elements += self.get_running_slip_elements(i, zip(boss_labels, boss_labels))
+        else:
+            for boss, entries in itertools.groupby(self.session_round.target_list(), lambda x: x[0][:-1]):
+                entries = list(entries)
+                if not reduce(lambda e, f: e or f, entries):
+                    continue
+                elements += self.get_running_slip_elements(boss, list(entries))
         return elements
 
     def get_running_slip_elements(self, target, entries):
@@ -460,7 +468,7 @@ class RunningSlipsPdf(ScoreSheetsPdf):
             table = Table(table_data, [self.box_size] + self.col_widths, (len(entries) + 1)*[self.box_size])
             table.setStyle(self.scores_table_style)
             elements.append(KeepTogether(table))
-            elements += [self.spacer] * 3
+            elements += [self.spacer]
         return elements
 
     scores_table_style = TableStyle([
