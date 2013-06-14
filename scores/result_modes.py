@@ -229,14 +229,17 @@ class Team(BaseResultMode):
 
     def get_team_types(self, competition):
         # TODO: support team types properly
-        return ['Non-compound', 'Compound', 'Novice']
+        return ['Non-compound', 'Novice']
 
     def get_team_scores(self, competition, clubs, type):
         club_results = []
         for club, club_scores in clubs.items():
-            club_scores = [s for s in club_scores if self.is_valid_for_type(s, type)]
-            club_scores = sorted(club_scores, key = lambda s: (s.score, s.golds, s.xs, s.hits), reverse=True)[:competition.team_size]
-            if len(club_scores) < competition.team_size:
+            club_scores = [s for s in club_scores if self.is_valid_for_type(s, type, competition)]
+            team_size = competition.team_size
+            if type == 'Novice' and competition.novice_team_size:
+                team_size = competition.novice_team_size
+            club_scores = sorted(club_scores, key = lambda s: (s.score, s.golds, s.xs, s.hits), reverse=True)[:team_size]
+            if len(club_scores) < team_size:
                 continue
             team = ScoreMock(
                 score=sum(s.score for s in club_scores),
@@ -249,9 +252,12 @@ class Team(BaseResultMode):
             club_results.append((club, team))
         return self.sort_results([c[1] for c in club_results])
 
-    def is_valid_for_type(self, score, type):
+    def is_valid_for_type(self, score, type, competition):
         if type == 'Non-compound':
-            return not score.target.session_entry.competition_entry.bowstyle.name == 'Compound'
+            is_non_compound = not score.target.session_entry.competition_entry.bowstyle.name == 'Compound'
+            if not competition.novices_in_experienced_teams:
+                return is_non_compound and score.target.session_entry.competition_entry.novice == 'E'
+            return is_non_compound
         if type == 'Compound':
             return score.target.session_entry.competition_entry.bowstyle.name == 'Compound'
         if type == 'Novice':
@@ -262,7 +268,7 @@ class Team(BaseResultMode):
         return ['Club', 'Score']
 
     def label_for_round(self, round):
-        return '%s Team' % unicode(round)
+        return 'Team'
 
 
 def get_result_modes():

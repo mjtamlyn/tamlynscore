@@ -56,6 +56,7 @@ class Competition(models.Model):
 
     # Make this a field
     team_size = 4
+    novice_team_size = 3
 
     class Meta:
         unique_together = ('date', 'tournament')

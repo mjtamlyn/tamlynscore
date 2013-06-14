@@ -15,7 +15,7 @@ from django.views.generic import View, ListView
 from reportlab.lib import colors
 from reportlab.lib.styles import getSampleStyleSheet
 from reportlab.lib.units import inch
-from reportlab.platypus import SimpleDocTemplate, Spacer, Table, TableStyle, Paragraph
+from reportlab.platypus import SimpleDocTemplate, Spacer, Table, TableStyle, Paragraph, PageBreak
 from reportlab.rl_config import defaultPageSize
 
 from entries.models import Competition, SessionRound, SCORING_TOTALS, SCORING_DOZENS, SCORING_FULL
@@ -766,8 +766,9 @@ class NewLeaderboard(ListView):
                 table = Table(table_data)
                 table.setStyle(table_style)
                 elements.append(table)
+            elements.append(PageBreak())
 
-            return elements
+        return elements
 
     def rows_from_score(self, scores, score, section):
         row = []
