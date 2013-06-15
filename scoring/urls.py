@@ -10,7 +10,7 @@ urlpatterns = patterns('',
     (r'', include('core.urls')),
     (r'^tournaments/', include('entries.urls')),
     (r'^tournaments/', include('scores.urls')),
-    (r'^tournaments/', include('olympic.urls')),
+    (r'^tournaments/olympic/', include('olympic.urls')),
     (r'^accounts/', include('accounts.urls')),
     (r'^admin/', include(admin.site.urls)),
 )

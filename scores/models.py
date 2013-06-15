@@ -1,14 +1,14 @@
 from django.db import models
 from django.utils.functional import cached_property
 
-from entries.models import SCORING_FULL, SCORING_DOZENS
+from entries.models import SCORING_FULL, SCORING_DOZENS, TargetAllocation
 
 from itertools import groupby
 
 
 class ScoreManager(models.Manager):
     def active(self, session_round, category=None):
-        active_targets = TargetAllocation.objects.filter(session_entry__session_round=session_round).filter(session_entry__present=True)
+        active_targets = TargetAllocation.objects.filter(session_entry__session_round=session_round)
         active_scores = self.filter(target__in=active_targets).select_related()
         targets_with_scores = [score.target for score in active_scores]
         for target in active_targets:
@@ -17,7 +17,9 @@ class ScoreManager(models.Manager):
                 score.save()
         active_scores = self.filter(target__in=active_targets).select_related().order_by('target__boss')
         if category:
-            active_scores = active_scores.filter(target__session_entry__competition_entry__bowstyle__in=category.bowstyles.all(), target__session_entry__competition_entry__archer__gender=category.gender)
+            active_scores = active_scores.filter(target__session_entry__competition_entry__bowstyle__in=category.bowstyles.all())
+            if category.gender:
+                active_scores = active_scores.filter(target__session_entry__competition_entry__archer__gender=category.gender)
         return active_scores
 
     def results(self, session_round=None, category=None, qs=None):
@@ -25,10 +27,13 @@ class ScoreManager(models.Manager):
             scores = qs
             if session_round:
                 scores = scores.filter(target__session_entry__session_round=session_round)
-            if category:
-                scores = scores.filter(target__session_entry__competition_entry__bowstyle__in=category.bowstyles.all(), target__session_entry__competition_entry__archer__gender=category.gender)
         else:
             scores = self.active(session_round, category=category)
+        scores = scores.select_related()
+        if category:
+            scores = scores.filter(target__session_entry__competition_entry__bowstyle__in=category.bowstyles.all())
+            if category.gender:
+                scores = scores.filter(target__session_entry__competition_entry__archer__gender=category.gender)
         scores = scores.select_related()
         scores = scores.order_by(
                 'target__session_entry__competition_entry__bowstyle',
