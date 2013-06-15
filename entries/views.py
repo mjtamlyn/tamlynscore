@@ -322,8 +322,8 @@ class ScoreSheetsPdf(HeadedPdfView):
 
     box_size = 0.32*inch
     wide_box = box_size*1.35
-    total_cols = 12 + 2 + 4
-    col_widths = 6*[box_size] + [wide_box] + 6*[box_size] + 6*[wide_box]
+    total_cols = 1 + 12 + 2 + 4
+    col_widths = 7*[box_size] + [wide_box] + 6*[box_size] + 6*[wide_box]
 
     def setMargins(self, doc):
         doc.topMargin = 1.1*inch
@@ -371,7 +371,7 @@ class ScoreSheetsPdf(HeadedPdfView):
             extra = subround.arrows % 12
             total_rows = dozens + 2
             scoring_labels = ['ET', 'S', '10+X', 'X', 'RT'] if self.session_round.shot_round.scoring_type == 'X' else ['ET', 'S', 'H', 'G', 'RT']
-            table_data = [[subround_title] + [None] * 5 + ['ET'] + [None] * 6 + scoring_labels]
+            table_data = [['J', subround_title] + [None] * 5 + ['ET'] + [None] * 6 + scoring_labels]
             table_data += [[None for i in range(self.total_cols)] for j in range(total_rows - 1)]
             if extra is 6:
                 total_rows += 1
@@ -400,6 +400,7 @@ class ScoreSheetsPdf(HeadedPdfView):
         signing_table.setStyle(self.signing_table_style)
         score_sheet_elements += [self.spacer, signing_table]
 
+        print dir(colors), colors.lightgrey
         return score_sheet_elements
 
     scores_table_style = TableStyle([
@@ -408,13 +409,17 @@ class ScoreSheetsPdf(HeadedPdfView):
         ('VALIGN', (0, 0), (-1, -1), 'MIDDLE'),
 
         # arrows grid
-        ('BOX', (0, 1), (6, -2), 2, colors.black),
-        ['BOX', (7, 1), (-1, -2), 2, colors.black],
+        ('BOX', (1, 1), (7, -2), 2, colors.black),
+        ['BOX', (8, 1), (-1, -2), 2, colors.black],
         ['INNERGRID', (0, 1), (-1, -2), 0.25, colors.black],
 
+        # judges column
+        ['BOX', (0, 1), (0, -2), 0.25, colors.black],
+        ['BACKGROUND', (0, 1), (0, -2), colors.lightgrey],
+
         # end totals columns
-        ('BOX', (6, 0), (6, -2), 2, colors.black),
-        ['BOX', (13, 0), (13, -2), 2, colors.black],
+        ('BOX', (7, 0), (7, -2), 2, colors.black),
+        ['BOX', (14, 0), (14, -2), 2, colors.black],
 
         # totals grid
         ('BOX', (14, 0), (-1, -2), 2, colors.black),
