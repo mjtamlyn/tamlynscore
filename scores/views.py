@@ -812,7 +812,7 @@ class NewLeaderboard(ListView):
         elif section.round.scoring_type == 'X':
             scores = [
                 score.score,
-                score.hits,
+                score.golds,
                 score.xs,
             ]
         else:
