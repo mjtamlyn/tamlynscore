@@ -50,15 +50,15 @@ class InputScores(TargetList):
             if cache.get('bosses_cache_%d' % session.pk):
                 allocations = allocations.exclude(session_entry__session_round__session=session)
 
-        arrows = Arrow.objects.filter(score__target__in=allocations).select_related('score__target', 'score__target__session_entry__session_round__session')
+        arrows = Arrow.objects.filter(score__target__in=allocations).values('arrow_of_round', 'score__target_id', 'score__target__session_entry__session_round__session__arrows_entered_per_end')
         dozens = Dozen.objects.filter(score__target__in=allocations).select_related('score__target', 'score__target__session_entry__session_round__session')
         target_lookup = {}
         for arrow in arrows:
-            target = arrow.score.target
-            session = target.session_entry.session_round.session
+            target = arrow['score__target_id']
+            entered_per_end = arrow['score__target__session_entry__session_round__session__arrows_entered_per_end']
             if target not in target_lookup:
                 target_lookup[target] = {}
-            dozen = math.floor((arrow.arrow_of_round - 1) / session.arrows_entered_per_end)
+            dozen = math.floor((arrow['arrow_of_round'] - 1) / entered_per_end)
             dozen = int(dozen)
             if dozen not in target_lookup[target]:
                 target_lookup[target][dozen] = []
@@ -78,9 +78,9 @@ class InputScores(TargetList):
                 for dozen in dozens:
                     combined_lookup[dozen] = True
                     for allocation in allocations:
-                        if (allocation not in target_lookup
-                                or dozen not in target_lookup[allocation]
-                                or not len(target_lookup[allocation][dozen]) == session_round.session.arrows_entered_per_end):
+                        if (allocation.id not in target_lookup
+                                or dozen not in target_lookup[allocation.id]
+                                or not len(target_lookup[allocation.id][dozen]) == session_round.session.arrows_entered_per_end):
                             combined_lookup[dozen] = False
                 bosses.append((boss, combined_lookup))
             combine = lambda x, y: x and y
