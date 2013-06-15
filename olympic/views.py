@@ -26,7 +26,7 @@ class OlympicIndex(View):
             session_round.session,
             session_round,
             session_round.seeding_set.all().select_related().order_by('seed'),
-            Score.objects.results(session_round.ranking_round, leaderboard=True, category=session_round.category),
+            Score.objects.results(session_round.ranking_round, category=session_round.category),
         ) for session_round in session_rounds]
         sessions = []
         for key, values in groupby(session_info, lambda x: x[0]):
@@ -40,7 +40,6 @@ class OlympicIndex(View):
         session_round = OlympicSessionRound.objects.get(pk=request.POST['form-id'].replace('confirm-seedings-', ''))
         score_ids = map(lambda s: int(s.replace('score-', '')), filter(lambda s: s.startswith('score-'), request.POST))
         scores = Score.objects.filter(pk__in=score_ids)
-        print scores
         session_round.set_seedings(scores)
         return self.get(request, slug)
 
@@ -97,6 +96,9 @@ class OlympicInput(TemplateView):
 
 
 class OlympicScoreSheet(ScoreSheetsPdf):
+    box_size = 0.35*inch
+    wide_box = box_size*1.3
+    title_position = 30
 
     match_names = [
             'Final / Bronze',
@@ -117,10 +119,11 @@ class OlympicScoreSheet(ScoreSheetsPdf):
     def update_style(self):
         super(OlympicScoreSheet, self).update_style()
         self.col_widths = 3 * [self.box_size] + 3 * [self.wide_box] + 2 * [self.box_size * 1.85]
-        self.row_heights = 8 * [self.box_size]
+        self.row_heights = 8 * [self.box_size*0.85]
 
     def setMargins(self, doc):
-        doc.bottomMargin = 0.3*inch
+        doc.topMargin = 0.4*inch
+        doc.bottomMargin = 0.2*inch
 
     def get_elements(self):
         elements = []
@@ -133,17 +136,12 @@ class OlympicScoreSheet(ScoreSheetsPdf):
                 [self.Para(u'{0} {1}'.format(entry.archer.get_gender_display(), entry.bowstyle), 'h2'), self.Para(u'Seed {0}'.format(seeding.seed), 'h2')],
             ]
 
-            header_table = Table(header_table_data, [2*inch, 4*inch])
+            header_table = Table(header_table_data, [3*inch, 4*inch])
 
             matches = Match.objects.matches_for_seed(seeding, highest_seed=highest_seed)
 
             score_sheet_elements = []
             for i in range(len(matches)):
-                # FIXME? This is a hack to only display 6 matches per archer.
-                # If you have >64 archers in a category the final is not printed
-                # for >128 the semi isn't either, etc.
-                if len(matches) >= 7 and i < len(matches) - 6:
-                    continue
                 match = matches[i]
                 match_title = self.Para(self.match_names[i], 'h3')
                 if match and i > 0:
@@ -237,7 +235,9 @@ class OlympicScoreSheet(ScoreSheetsPdf):
     big_table_style = TableStyle([
         # alignment
         ('VALIGN', (0, 0), (-1, -1), 'TOP'),
-        ('BOTTOMPADDING', (0, 0), (-1, -1), 10),
+        ('RIGHTPADDING', (0, 0), (-1, -1), 5),
+        ('LEFTPADDING', (0, 0), (-1, -1), 5),
+        ('BOTTOMPADDING', (0, 0), (-1, -1), 5),
     ])
 
 olympic_score_sheet = login_required(OlympicScoreSheet.as_view())
@@ -425,6 +425,15 @@ class OlympicTree(OlympicResults):
                     table_data[blocks[m][1] - 1][i] = results[1].seed.seed
                     table_data[blocks[m][1] - 1][i + 1] = results[1].seed.entry.archer
                     table_data[blocks[m][1] - 1][i + 2] = results[1].total
+                else:
+                    table_data[blocks[m][0]][i + 1] = 'Target: ' + str(match.target)
+                    if match.target_2:
+                        table_data[blocks[m][1] - 1][i + 1] = 'Target: ' + str(match.target_2)
+                    seeds = [match.match, (2**match.level) + 1 - match.match]
+                    if m % 2:
+                        seeds.reverse()
+                    table_data[blocks[m][0]][i] = 'Seed: ' + str(seeds[0])
+                    table_data[blocks[m][1] - 1][i] = 'Seed: ' + str(seeds[1])
 
         table = Table(table_data)
         table.setStyle(self.get_table_style())

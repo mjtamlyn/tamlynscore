@@ -18,7 +18,7 @@ class OlympicRound(models.Model):
 
 class Category(models.Model):
     bowstyles = models.ManyToManyField(Bowstyle)
-    gender = models.CharField(max_length=1, choices=GENDER_CHOICES)
+    gender = models.CharField(max_length=1, choices=GENDER_CHOICES, blank=True, null=True)
 
     class Meta:
         verbose_name_plural = 'categories'
@@ -27,11 +27,19 @@ class Category(models.Model):
         return u'Category: {0}'.format(self.name)
 
     def code(self):
-        return self.gender + u''.join([unicode(b)[0] for b in self.bowstyles.all()])
+        if self.gender:
+            code = self.gender
+        else:
+            code = ''
+        return code + u''.join([unicode(b)[0] for b in self.bowstyles.all()])
 
     @property
     def name(self):
-        return self.get_gender_display() + ' ' + u', '.join([unicode(b) for b in self.bowstyles.all()])
+        if self.gender:
+            name = self.get_gender_display() + ' '
+        else:
+            name = ''
+        return name + u', '.join([unicode(b) for b in self.bowstyles.all()])
 
 class OlympicSessionRound(models.Model):
     session = models.ForeignKey(Session)
@@ -43,7 +51,7 @@ class OlympicSessionRound(models.Model):
         return u'{0}, {1}'.format(self.session, self.shot_round)
 
     def set_seedings(self, scores):
-        scores = Score.objects.results(self.ranking_round, leaderboard=True, category=self.category).filter(pk__in=scores)
+        scores = Score.objects.results(self.ranking_round, category=self.category).filter(pk__in=scores)
         scores = sorted(scores, key=lambda s: 0 - s.score)
         for score in scores:
             seeding = Seeding(
