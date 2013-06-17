@@ -31,20 +31,28 @@ class ScoreManager(models.Manager):
             scores = self.active(session_round, category=category)
         scores = scores.select_related()
         if category:
-            scores = scores.filter(target__session_entry__competition_entry__bowstyle__in=category.bowstyles.all())
+            scores = scores.filter(target__session_entry__competition_entry__bowstyle__in=category.bowstyles.all(), target__session_entry__present=True)
             if category.gender:
                 scores = scores.filter(target__session_entry__competition_entry__archer__gender=category.gender)
         scores = scores.select_related()
-        scores = scores.order_by(
-                'target__session_entry__competition_entry__bowstyle',
-                '-target__session_entry__competition_entry__age',
-                'target__session_entry__competition_entry__archer__gender',
-                'target__session_entry__competition_entry__guest',
-                'disqualified',
-                '-score', 
-                '-golds', 
-                '-xs'
-                )
+        if category:
+            scores = scores.order_by(
+                    'disqualified',
+                    '-score', 
+                    '-golds', 
+                    '-xs'
+                    )
+        else:
+            scores = scores.order_by(
+                    'target__session_entry__competition_entry__bowstyle',
+                    '-target__session_entry__competition_entry__age',
+                    'target__session_entry__competition_entry__archer__gender',
+                    'target__session_entry__competition_entry__guest',
+                    'disqualified',
+                    '-score', 
+                    '-golds', 
+                    '-xs'
+                    )
         if category:
             results = scores
         else:

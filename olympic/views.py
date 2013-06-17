@@ -1,3 +1,5 @@
+from collections import OrderedDict
+
 from django.core.urlresolvers import reverse
 from django.contrib.auth.decorators import login_required
 from django.db.models import Max
@@ -13,6 +15,8 @@ from reportlab.rl_config import defaultPageSize
 from entries.models import Competition
 from entries.views import ScoreSheetsPdf, HeadedPdfView
 from scores.models import Score
+from scores.result_modes import BaseResultMode
+from scores.views import PDFResultsRenderer
 from olympic.models import OlympicSessionRound, Seeding, Match, Result
 from olympic.forms import ResultForm
 
@@ -44,6 +48,27 @@ class OlympicIndex(View):
         return self.get(request, slug)
 
 olympic_index = login_required(OlympicIndex.as_view())
+
+
+class OlympicSeedingsPDF(PDFResultsRenderer, View):
+    def get(self, request, slug):
+        self.competition = get_object_or_404(Competition, slug=slug)
+        self.title = 'Seedings'
+        session_rounds = OlympicSessionRound.objects.filter(session__competition=self.competition).order_by('session__start').select_related()
+        results = OrderedDict()
+        result_mode = BaseResultMode()
+        for session_round in session_rounds:
+            shot_round = session_round.ranking_round.shot_round
+            section = result_mode.get_section_for_round(shot_round)
+            if session_round not in results:
+                results[section] = {}
+            scores = list(Score.objects.results(
+                session_round.ranking_round,
+                category=session_round.category,
+            ))
+            scores = filter(lambda s: not s.target.session_entry.competition_entry.archer.name == 'Chris Skipper', scores)
+            results[section][session_round.category] = scores
+        return self.render_to_pdf({'results': results})
 
 
 class OlympicInput(TemplateView):
@@ -388,6 +413,8 @@ class OlympicTree(OlympicResults):
 
         elements = []
         self.total_levels = olympic_round.match_set.aggregate(Max('level'))['level__max']
+        seedings = olympic_round.seeding_set.select_related('entry__archer')
+        seedings_dict = {s.seed: s for s in seedings}
 
         self.rows = 2 ** self.total_levels
         self.cols = 3 * self.total_levels
@@ -432,8 +459,13 @@ class OlympicTree(OlympicResults):
                     seeds = [match.match, (2**match.level) + 1 - match.match]
                     if m % 2:
                         seeds.reverse()
-                    table_data[blocks[m][0]][i] = 'Seed: ' + str(seeds[0])
-                    table_data[blocks[m][1] - 1][i] = 'Seed: ' + str(seeds[1])
+                    table_data[blocks[m][0]][i] = str(seeds[0])
+                    table_data[blocks[m][1] - 1][i] = str(seeds[1])
+                    if level == self.total_levels:
+                        if seeds[0] in seedings_dict:
+                            table_data[blocks[m][0]][i] = '%s %s' % (seeds[0], seedings_dict[seeds[0]].entry.archer.name)
+                        if seeds[1] in seedings_dict:
+                            table_data[blocks[m][1] - 1][i] = '%s %s' % (seeds[1], seedings_dict[seeds[1]].entry.archer.name)
 
         table = Table(table_data)
         table.setStyle(self.get_table_style())
