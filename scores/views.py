@@ -656,81 +656,7 @@ results_pdf_overall = login_required(ResultsPdfOverall.as_view())
 
 
 
-
-@class_view_decorator(login_required)
-class NewLeaderboard(ListView):
-    """General leaderboard/rsults generation.
-    
-    Strategy:
-     - get the competition
-     - check the mode and the format are valid
-     - get the queryset of scores
-     - arrange and aggregate using the ResultMode object
-     - render
-    """
-    leaderboard = True
-    title = 'Leaderboard'
-    url_name = 'new_leaderboard'
-
-    def get(self, request, *args, **kwargs):
-        self.competition = self.get_competition()
-        self.mode = self.get_mode()
-        self.format = self.get_format()
-        self.object_list = self.get_queryset()
-        context = self.get_context_data(competition=self.competition, object_list=self.object_list)
-        return self.render_to_response(context)
-
-    def get_competition(self):
-        competition = get_object_or_404(Competition, slug=self.kwargs['slug'])
-        return competition
-
-    def get_mode(self):
-        mode = get_mode(self.kwargs['mode'])
-        if not mode:
-            raise Http404('No such mode')
-        if not self.mode_exists(mode):
-            raise Http404('No such mode for this competition')
-        return mode
-
-    def mode_exists(self, mode):
-        return self.competition.result_modes.filter(mode=mode.slug).exists()
-
-    def get_format(self):
-        format = self.kwargs['format']
-        if format not in ['html', 'pdf']:
-            raise Http404('No such format')
-        return format
-
-    def get_queryset(self):
-        # TODO: stop using blank select_related
-        scores = Score.objects.filter(
-            target__session_entry__competition_entry__competition=self.competition
-        ).select_related().order_by(
-            '-target__session_entry__competition_entry__archer__age',
-            'target__session_entry__competition_entry__bowstyle',
-            'target__session_entry__competition_entry__archer__gender',
-            'disqualified',
-            '-score', 
-            '-golds', 
-            '-xs'
-        )
-        return scores
-
-    def get_context_data(self, **kwargs):
-        kwargs['results'] = self.mode.get_results(self.competition, kwargs['object_list'], leaderboard=self.leaderboard)
-        kwargs['mode'] = self.mode
-        kwargs['url_name'] = self.url_name
-        kwargs['title'] = self.title
-        return super(NewLeaderboard, self).get_context_data(**kwargs)
-
-    def render_to_response(self, context, **response_kwargs):
-        if self.format == 'pdf':
-            return self.render_to_pdf(context)
-        return super(NewLeaderboard, self).render_to_response(context, **response_kwargs)
-
-    def get_template_names(self, **kwargs):
-        return ['scores/leaderboard.html']
-
+class PDFResultsRenderer(object):
     def render_to_pdf(self, context):
         response = HttpResponse(mimetype='application/pdf')
         self.page_width, self.page_height = defaultPageSize
@@ -822,6 +748,82 @@ class NewLeaderboard(ListView):
                 score.golds,
             ]
         return scores
+
+
+
+@class_view_decorator(login_required)
+class NewLeaderboard(PDFResultsRenderer, ListView):
+    """General leaderboard/rsults generation.
+    
+    Strategy:
+     - get the competition
+     - check the mode and the format are valid
+     - get the queryset of scores
+     - arrange and aggregate using the ResultMode object
+     - render
+    """
+    leaderboard = True
+    title = 'Leaderboard'
+    url_name = 'new_leaderboard'
+
+    def get(self, request, *args, **kwargs):
+        self.competition = self.get_competition()
+        self.mode = self.get_mode()
+        self.format = self.get_format()
+        self.object_list = self.get_queryset()
+        context = self.get_context_data(competition=self.competition, object_list=self.object_list)
+        return self.render_to_response(context)
+
+    def get_competition(self):
+        competition = get_object_or_404(Competition, slug=self.kwargs['slug'])
+        return competition
+
+    def get_mode(self):
+        mode = get_mode(self.kwargs['mode'])
+        if not mode:
+            raise Http404('No such mode')
+        if not self.mode_exists(mode):
+            raise Http404('No such mode for this competition')
+        return mode
+
+    def mode_exists(self, mode):
+        return self.competition.result_modes.filter(mode=mode.slug).exists()
+
+    def get_format(self):
+        format = self.kwargs['format']
+        if format not in ['html', 'pdf']:
+            raise Http404('No such format')
+        return format
+
+    def get_queryset(self):
+        # TODO: stop using blank select_related
+        scores = Score.objects.filter(
+            target__session_entry__competition_entry__competition=self.competition
+        ).select_related().order_by(
+            '-target__session_entry__competition_entry__archer__age',
+            'target__session_entry__competition_entry__bowstyle',
+            'target__session_entry__competition_entry__archer__gender',
+            'disqualified',
+            '-score', 
+            '-golds', 
+            '-xs'
+        )
+        return scores
+
+    def get_context_data(self, **kwargs):
+        kwargs['results'] = self.mode.get_results(self.competition, kwargs['object_list'], leaderboard=self.leaderboard)
+        kwargs['mode'] = self.mode
+        kwargs['url_name'] = self.url_name
+        kwargs['title'] = self.title
+        return super(NewLeaderboard, self).get_context_data(**kwargs)
+
+    def render_to_response(self, context, **response_kwargs):
+        if self.format == 'pdf':
+            return self.render_to_pdf(context)
+        return super(NewLeaderboard, self).render_to_response(context, **response_kwargs)
+
+    def get_template_names(self, **kwargs):
+        return ['scores/leaderboard.html']
 
 
 class NewResults(NewLeaderboard):
