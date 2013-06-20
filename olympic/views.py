@@ -74,7 +74,7 @@ class OlympicSeedingsPDF(PDFResultsRenderer, View):
 class OlympicInput(TemplateView):
     template_name = 'olympic/input.html'
 
-    labels = [None, 'Final', 'Semi', '1/4', '1/8', '1/16', '1/32', '1/64']
+    labels = ['Bronze', 'Final', 'Semi', '1/4', '1/8', '1/16', '1/32', '1/64']
 
     def dispatch(self, request, slug, seed_pk):
         self.competition = get_object_or_404(Competition, slug=slug)
@@ -100,6 +100,17 @@ class OlympicInput(TemplateView):
                 'match': match,
                 'label': self.labels[match.level] if match else None,
             })
+        bronze = Match.objects.get(session_round=self.seed.session_round, level=1, match=2)
+        try:
+            instance = Result.objects.get(match=bronze, seed=self.seed)
+        except Result.DoesNotExist:
+            instance = Result(match=bronze, seed=self.seed)
+        form = ResultForm(instance=instance, data=request.POST if request.method == 'POST' else None, prefix='bronze')
+        self.forms.append({
+            'form': form,
+            'match': bronze,
+            'label': self.labels[0],
+        })
         return super(OlympicInput, self).dispatch(request, slug, seed_pk)
 
     def get_context_data(self):
@@ -425,6 +436,7 @@ class OlympicTree(OlympicResults):
             level = self.total_levels - i/3
             blocks = self.match_blocks(level)
             matches = olympic_round.match_set.filter(level=level).order_by('target')
+            any_results = Result.objects.filter(match__session_round=olympic_round).exists()
             if (len(blocks) / len(matches)) == 2:
                 old_matches = matches
                 matches = []
@@ -452,7 +464,7 @@ class OlympicTree(OlympicResults):
                     table_data[blocks[m][1] - 1][i] = results[1].seed.seed
                     table_data[blocks[m][1] - 1][i + 1] = results[1].seed.entry.archer
                     table_data[blocks[m][1] - 1][i + 2] = results[1].total
-                else:
+                elif not any_results:
                     table_data[blocks[m][0]][i + 1] = 'Target: ' + str(match.target)
                     if match.target_2:
                         table_data[blocks[m][1] - 1][i + 1] = 'Target: ' + str(match.target_2)

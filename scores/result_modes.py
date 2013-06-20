@@ -1,8 +1,10 @@
 from django.core.exceptions import ImproperlyConfigured
+from django.db import models
 from django.utils.datastructures import SortedDict
 
 
 class ScoreMock(object):
+    is_mock = True
 
     def __init__(self, **kwargs):
         kwargs.setdefault('retired', False)
@@ -34,6 +36,11 @@ class ResultSection(object):
 class BaseResultMode(object):
     slug = ''
     name = ''
+    include_distance_breakdown = False
+
+    def __init__(self, **kwargs):
+        for key, value in kwargs.items():
+            setattr(self, key, value)
 
     def __unicode__(self):
         return self.name
@@ -46,7 +53,10 @@ class BaseResultMode(object):
 
     def get_section_for_round(self, round):
         headers = ['Pl.'] + self.get_main_headers()
-        # TODO: subrounds
+        if self.include_distance_breakdown:
+            for subround in round.subrounds.all():
+                headers += ['%s%s' % (subround.distance, subround.unit)]
+        headers.append('Score')
         if round.scoring_type == 'X':
             headers += ['10s', 'Xs']
         else:
@@ -59,10 +69,55 @@ class BaseResultMode(object):
 
     def get_main_headers(self):
         # TODO: handle novice configurations
-        return ['Archer', 'Club', None, 'Score']
+        return ['Archer', 'Club', None]
 
     def label_for_round(self, round):
         return unicode(round)
+
+    def score_details(self, score, section):
+        from entries.models import SCORING_TOTALS, SCORING_DOZENS, SCORING_FULL
+        scores = []
+        if score.is_team:
+            subrounds = []
+        else:
+            subrounds = score.target.session_entry.session_round.shot_round.subrounds.all()
+        if self.include_distance_breakdown and len(subrounds) > 1 and not score.target.session_entry.session_round.session.scoring_system == SCORING_TOTALS:
+            if score.disqualified or score.target.session_entry.session_round.session.scoring_system == SCORING_TOTALS or hasattr(score, 'is_mock'):
+                scores += [None] * len(subrounds)
+            else:
+                subround_scores = []
+
+                if score.target.session_entry.session_round.session.scoring_system == SCORING_FULL:
+                    # Arrow of round has been stored off by a dozen
+                    counter = 13
+                    for subround in subrounds:
+                        subround_scores.append(score.arrow_set.filter(arrow_of_round__in=range(counter, counter + subround.arrows)).aggregate(models.Sum('arrow_value'))['arrow_value__sum'])
+                        counter += subround.arrows
+
+                elif score.target.session_entry.session_round.session.scoring_system == SCORING_DOZENS:
+                    counter = 1
+                    for subround in subrounds:
+                        subround_scores.append(score.dozen_set.filter(dozen__in=range(counter, counter + subround.arrows / 12)).aggregate(models.Sum('total'))['total__sum'])
+                        counter += subround.arrows / 12
+
+                scores += subround_scores
+        if score.disqualified:
+            scores += ['DSQ', None, None]
+        elif score.retired:
+            scores += [score.score, 'Retired', None]
+        elif section.round.scoring_type == 'X':
+            scores += [
+                score.score,
+                score.golds,
+                score.xs,
+            ]
+        else:
+            scores += [
+                score.score,
+                score.hits,
+                score.golds,
+            ]
+        return scores
 
 
 class BySession(BaseResultMode):
@@ -198,6 +253,10 @@ class Team(BaseResultMode):
     slug = 'team'
     name = 'Teams'
 
+    def __init__(self, **kwargs):
+        super(Team, self).__init__(**kwargs)
+        self.include_distance_breakdown = False  # always for teams
+
     def get_results(self, competition, scores, leaderboard=False):
         """
         Strategy:
@@ -265,7 +324,7 @@ class Team(BaseResultMode):
 
     def get_main_headers(self):
         # TODO: handle novice configurations
-        return ['Club', 'Score']
+        return ['Club']
 
     def label_for_round(self, round):
         return 'Team'
@@ -276,10 +335,10 @@ def get_result_modes():
     return [(mode.slug, mode.name) for mode in modes]
 
 
-def get_mode(slug):
+def get_mode(slug, **kwargs):
     modes = BaseResultMode.__subclasses__()
     try: 
-        return [mode() for mode in modes if mode.slug == slug][0]
+        return [mode(**kwargs) for mode in modes if mode.slug == slug][0]
     except IndexError:
         return None
 

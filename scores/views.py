@@ -679,6 +679,8 @@ class PDFResultsRenderer(object):
 
         table_style = TableStyle([
             ('LINEBELOW', (0, 0), (-1, 0), 0.5, colors.black),
+            ('RIGHTPADDING', (0, 0), (-1, -1), 3.5),
+            ('LEFTPADDING', (0, 0), (-1, -1), 3.5),
         ])
 
         for section, categories in results.items():
@@ -720,35 +722,15 @@ class PDFResultsRenderer(object):
                 rows.append([
                     None,
                     member.target.session_entry.competition_entry.archer.name,
-                ] + self.score_details(member, section))
+                ] + self.mode.score_details(member, section))
         else:
             row += [
                 score.target.session_entry.competition_entry.archer.name,
                 score.target.session_entry.competition_entry.club.name + (' (Guest)' if score.guest else ''),
                 'Novice' if score.target.session_entry.competition_entry.novice == 'N' else None,
             ]
-        row += self.score_details(score, section)
+        row += self.mode.score_details(score, section)
         return rows
-
-    def score_details(self, score, section):
-        if score.disqualified:
-            scores = ['DSQ', None, None]
-        elif score.retired:
-            scores = [score.score, 'Retired', None]
-        elif section.round.scoring_type == 'X':
-            scores = [
-                score.score,
-                score.golds,
-                score.xs,
-            ]
-        else:
-            scores = [
-                score.score,
-                score.hits,
-                score.golds,
-            ]
-        return scores
-
 
 
 @class_view_decorator(login_required)
@@ -779,7 +761,7 @@ class NewLeaderboard(PDFResultsRenderer, ListView):
         return competition
 
     def get_mode(self):
-        mode = get_mode(self.kwargs['mode'])
+        mode = get_mode(self.kwargs['mode'], include_distance_breakdown=not self.leaderboard)
         if not mode:
             raise Http404('No such mode')
         if not self.mode_exists(mode):
