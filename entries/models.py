@@ -54,9 +54,10 @@ class Competition(models.Model):
     novices_in_experienced_teams = models.BooleanField(default=False)
     exclude_later_shoots = models.BooleanField(default=False, help_text='Only the first session can count for results')
 
-    # Make this a field
+    # Make these fields!
     team_size = 4
     novice_team_size = 3
+    allow_incomplete_teams = True
 
     class Meta:
         unique_together = ('date', 'tournament')
