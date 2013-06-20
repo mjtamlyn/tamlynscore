@@ -298,7 +298,9 @@ class Team(BaseResultMode):
             if type == 'Novice' and competition.novice_team_size:
                 team_size = competition.novice_team_size
             club_scores = sorted(club_scores, key = lambda s: (s.score, s.golds, s.xs, s.hits), reverse=True)[:team_size]
-            if len(club_scores) < team_size:
+            if not club_scores:
+                continue
+            if len(club_scores) < team_size and not competition.allow_incomplete_teams:
                 continue
             team = ScoreMock(
                 score=sum(s.score for s in club_scores),
