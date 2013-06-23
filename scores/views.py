@@ -15,7 +15,7 @@ from django.views.generic import View, ListView
 from reportlab.lib import colors
 from reportlab.lib.styles import getSampleStyleSheet
 from reportlab.lib.units import inch
-from reportlab.platypus import SimpleDocTemplate, Spacer, Table, TableStyle, Paragraph, PageBreak
+from reportlab.platypus import SimpleDocTemplate, Spacer, Table, TableStyle, Paragraph
 from reportlab.rl_config import defaultPageSize
 
 from entries.models import Competition, SessionRound, SCORING_TOTALS, SCORING_DOZENS, SCORING_FULL
@@ -684,6 +684,8 @@ class PDFResultsRenderer(object):
         ])
 
         for section, categories in results.items():
+            if not categories:
+                continue
             elements.append(Paragraph(unicode(section), self.styles['h1']))
 
             for category, scores in categories.items():
@@ -694,27 +696,14 @@ class PDFResultsRenderer(object):
                 table = Table(table_data)
                 table.setStyle(table_style)
                 elements.append(table)
-            elements.append(PageBreak())
+
+            elements.append(Spacer(0.25*inch, 0.25*inch))
 
         return elements
 
     def rows_from_score(self, scores, score, section):
-        row = []
+        row = [score.placing]
         rows = [row]
-
-        placing = scores.index(score) + 1
-
-        # Placing
-        if score.disqualified or score.guest:
-            row.append(None)
-        else:
-            # TODO: Fix, and move all position faff to the resultmode objects
-            # this is a very naive and will only work if two archers are tied, not any more.
-            #if placing > 1 and not score['score'] == 'DNS':
-            #    previous = scores[placing - 2]
-            #    if previous.score == score['score'] and previous.golds == score['golds'] and previous['hits'] == score['hits'] and previous.xs == score['xs']:
-            #        placing -= 1
-            row.append(placing)
 
         if score.is_team:
             row += [score.club]
@@ -761,7 +750,7 @@ class NewLeaderboard(PDFResultsRenderer, ListView):
         return competition
 
     def get_mode(self):
-        mode = get_mode(self.kwargs['mode'], include_distance_breakdown=not self.leaderboard)
+        mode = get_mode(self.kwargs['mode'], include_distance_breakdown=False)
         if not mode:
             raise Http404('No such mode')
         if not self.mode_exists(mode):

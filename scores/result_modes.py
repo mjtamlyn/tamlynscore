@@ -49,7 +49,15 @@ class BaseResultMode(object):
         raise ImproperlyConfigured('Subclasses must implement get_results')
 
     def sort_results(self, scores):
-        return sorted(scores, key=lambda s: (s.score, s.golds, s.xs, s.hits), reverse=True)
+        results = sorted(scores, key=lambda s: (s.score, s.golds, s.xs, s.hits), reverse=True)
+        placing = 1
+        for score in results:
+            if score.disqualified or score.guest:
+                score.placing = None
+            else:
+                score.placing = placing
+                placing += 1
+        return results
 
     def get_section_for_round(self, round):
         headers = ['Pl.'] + self.get_main_headers()
@@ -166,17 +174,21 @@ class ByRound(BaseResultMode):
             category = session_entry.competition_entry.category()
             if category not in results:
                 results[category] = []
-            if not self.leaderboard and score.score == 0:
-                score = ScoreMock(
-                    target=score.target,
-                    score='DNS',
-                    hits='',
-                    golds='',
-                    xs='',
-                    disqualified=False,
-                    retired=False,
-                )
             results[category].append(score)
+        for category in results:
+            results[category] = self.sort_results(results[category])
+            for i, score in enumerate(results[category]):
+                if not self.leaderboard and score.score == 0:
+                    results[category][i] = ScoreMock(
+                        target=score.target,
+                        score='DNS',
+                        hits='',
+                        golds='',
+                        xs='',
+                        disqualified=False,
+                        retired=False,
+                        placing=None,
+                    )
         return results
 
 
