@@ -299,17 +299,23 @@ class TargetListPdf(HeadedPdfView):
         session_rounds = SessionRound.objects.filter(session__competition=self.competition).order_by('-session__start')
 
         elements = []
+        by_session = self.request.GET.get('by_session', False)
         for session_round in session_rounds:
-            target_list = session_round.target_list_pdf(lunch=self.lunch)
+            target_list = session_round.target_list_pdf(lunch=self.lunch, whole_session=by_session)
             if not target_list:
                 continue
 
-            title = "Target List for {0} - {1}".format(session_round.shot_round, session_round.session.start.strftime('%A, %d %B %Y, %X'))
-            header = self.Para(title, 'h2')
+            elements = []
+            if not by_session:
+                title = "Target List for {0} - {1}".format(session_round.shot_round, session_round.session.start.strftime('%A, %d %B %Y, %X'))
+                header = self.Para(title, 'h2')
+                elements.append(header)
             table = Table(target_list)
             spacer = Spacer(self.PAGE_WIDTH, 0.25*inch)
 
-            elements = [header, spacer, table, spacer, PageBreak()] + elements
+            elements += [spacer, table, spacer, PageBreak()] + elements
+            if by_session:
+                break
         return elements
 
 target_list_pdf = login_required(TargetListPdf.as_view())
