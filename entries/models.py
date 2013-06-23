@@ -145,8 +145,11 @@ class SessionRound(models.Model):
                 targets.append((target, allocations_lookup.get(target, None)))
         return targets
 
-    def target_list_pdf(self, lunch=False):
-        current_target_allocations = TargetAllocation.objects.filter(session_entry__session_round=self).select_related()
+    def target_list_pdf(self, lunch=False, whole_session=False):
+        if whole_session:
+            current_target_allocations = TargetAllocation.objects.filter(session_entry__session_round__session=self.session).select_related()
+        else:
+            current_target_allocations = TargetAllocation.objects.filter(session_entry__session_round=self).select_related()
         minimum_boss = current_target_allocations.aggregate(models.Min('boss'))['boss__min']
         current_bosses = current_target_allocations.aggregate(models.Max('boss'))['boss__max']
         if not current_bosses:
@@ -162,6 +165,7 @@ class SessionRound(models.Model):
                 allocation = allocations_lookup.get(target, None)
                 if allocation:
                     entry = allocation.session_entry.competition_entry
+                    shot_round = allocation.session_entry.session_round.shot_round
                     allocation = (
                             entry.archer,
                             entry.club.name,
@@ -175,6 +179,8 @@ class SessionRound(models.Model):
                                 #entry.get_age_display(),
                                 entry.get_novice_display(),
                         )
+                    if whole_session:
+                        allocation += (shot_round.name,)
                     targets.append((target,) + allocation)
                 else:
                     targets.append((target, None))
