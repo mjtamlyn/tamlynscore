@@ -296,26 +296,28 @@ class TargetListPdf(HeadedPdfView):
         self.styles['h2'].alignment = 1
 
     def get_elements(self):
-        session_rounds = SessionRound.objects.filter(session__competition=self.competition).order_by('-session__start')
+        session_rounds = SessionRound.objects.filter(session__competition=self.competition).order_by('-session__start').select_related('session')
 
         elements = []
         by_session = self.request.GET.get('by_session', False)
+        if by_session:
+            rounds_by_session = {r.session: r for r in session_rounds}
+            session_rounds = rounds_by_session.values()
         for session_round in session_rounds:
             target_list = session_round.target_list_pdf(lunch=self.lunch, whole_session=by_session)
             if not target_list:
                 continue
 
-            elements = []
-            if not by_session:
+            if by_session:
+                title = "Target List - {0}".format(session_round.session.start.strftime('%A, %d %B %Y, %X'))
+            else:
                 title = "Target List for {0} - {1}".format(session_round.shot_round, session_round.session.start.strftime('%A, %d %B %Y, %X'))
-                header = self.Para(title, 'h2')
-                elements.append(header)
+            header = self.Para(title, 'h2')
+            elements.append(header)
             table = Table(target_list)
             spacer = Spacer(self.PAGE_WIDTH, 0.25*inch)
 
-            elements += [spacer, table, spacer, PageBreak()] + elements
-            if by_session:
-                break
+            elements += [spacer, table, spacer, PageBreak()]
         return elements
 
 target_list_pdf = login_required(TargetListPdf.as_view())
