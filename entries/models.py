@@ -146,6 +146,7 @@ class SessionRound(models.Model):
         return targets
 
     def target_list_pdf(self, lunch=False, whole_session=False):
+        competition = self.session.competition
         if whole_session:
             current_target_allocations = TargetAllocation.objects.filter(session_entry__session_round__session=self.session).select_related()
         else:
@@ -177,8 +178,11 @@ class SessionRound(models.Model):
                                 entry.archer.get_gender_display(),
                                 entry.bowstyle,
                                 #entry.get_age_display(),
-                                entry.get_novice_display(),
                         )
+                        if competition.has_novices:
+                            allocation += (
+                                entry.get_novice_display(),
+                            )
                     if whole_session:
                         allocation += (shot_round.name,)
                     targets.append((target,) + allocation)
