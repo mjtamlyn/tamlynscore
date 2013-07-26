@@ -430,14 +430,14 @@ class ScoreSheetsPdf(HeadedPdfView):
         ['BOX', (14, 0), (14, -2), 2, colors.black],
 
         # totals grid
-        ('BOX', (14, 0), (-1, -2), 2, colors.black),
-        ('BOX', (14, -1), (-2, -1), 2, colors.black),
-        ('LINEBEFORE', (15, 0), (-1, -1), 1.5, colors.black),
+        ('BOX', (15, 0), (-1, -2), 2, colors.black),
+        ('BOX', (15, -1), (-2, -1), 2, colors.black),
+        ('LINEBEFORE', (16, 0), (-1, -1), 1.5, colors.black),
     ])
 
     totals_table_style = TableStyle([
-        ('BOX', (14, 0), (-2, 0), 2, colors.black),
-        ('LINEBEFORE', (15, 0), (-1, -1), 1.5, colors.black),
+        ('BOX', (15, 0), (-2, 0), 2, colors.black),
+        ('LINEBEFORE', (16, 0), (-1, -1), 1.5, colors.black),
     ])
 
     signing_table_style = TableStyle([
