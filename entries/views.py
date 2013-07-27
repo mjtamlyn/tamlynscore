@@ -16,7 +16,7 @@ from reportlab.lib import colors
 from reportlab.lib.units import inch
 
 from entries.forms import NewEntryForm
-from entries.models import Competition, CompetitionEntry, SessionEntry, TargetAllocation, SessionRound
+from entries.models import Competition, CompetitionEntry, SessionEntry, TargetAllocation, SessionRound, SCORING_FULL, SCORING_DOZENS
 
 from scoring.utils import class_view_decorator
 
@@ -460,32 +460,64 @@ class RunningSlipsPdf(ScoreSheetsPdf):
     def get_elements(self):
         elements = []
         targets = self.request.GET.get('targets', None)
+        scoring_type = self.session_round.session.scoring_system
+        archers_per_target = self.session_round.session.archers_per_target
         if targets is not None:
-            archers_per_target = self.session_round.session.archers_per_target
-            for i in range(1, int(targets) + 1):
-                details = 'ABCDEFG'
-                boss_labels = ['%d%s' % (i, details[j]) for j in range(archers_per_target)]
-                elements += self.get_running_slip_elements(i, zip(boss_labels, boss_labels))
+            targets = range(1, int(targets) + 1)
+            details = 'ABCDEFG'
+            boss_labels = [['%d%s' % (i, details[j]) for j in range(archers_per_target)] for i in targets]
+            if scoring_type == SCORING_FULL:
+                elements += self.get_full_running_slip_elements(boss_labels)
+            elif scoring_type == SCORING_DOZENS:
+                elements += self.get_dozen_running_slip_elements(boss_labels)
         else:
+            all_entries = []
             for boss, entries in itertools.groupby(self.session_round.target_list(), lambda x: x[0][:-1]):
                 entries = list(entries)
-                if not reduce(lambda e, f: e or f, entries):
+                if not reduce(lambda e, f: e or f, [entry[1] for entry in entries]):
                     continue
-                elements += self.get_running_slip_elements(boss, list(entries))
+                all_entries.append(entries)
+            if scoring_type == SCORING_FULL:
+                elements += self.get_full_running_slip_elements(all_entries)
+            elif scoring_type == SCORING_DOZENS:
+                elements += self.get_dozen_running_slip_elements(all_entries)
         return elements
 
-    def get_running_slip_elements(self, target, entries):
+    def get_full_running_slip_elements(self, all_entries):
         dozens = self.session_round.shot_round.arrows / 12
         elements = []
         headings = self.session_round.shot_round.score_sheet_headings
-        for dozen in range(1, dozens + 1):
-            table_data = [['Dozen {0}'.format(dozen)] + [None] * 6 + ['ET'] + [None] * 6 + ['ET', 'S'] + headings + ['RT' if dozen > 1 else 'Inits.']]
-            for entry in entries:
-                table_data.append([entry[0]] + [None for i in range(self.total_cols)])
-            table = Table(table_data, [self.box_size] + self.col_widths, (len(entries) + 1)*[self.box_size])
-            table.setStyle(self.scores_table_style)
-            elements.append(KeepTogether(table))
-            elements += [self.spacer]
+        while all_entries:
+            entries_group, all_entries = all_entries[:6], all_entries[6:]
+            for dozen in range(1, dozens + 1):
+                for entries in entries_group:
+                    table_data = [['Dozen {0}'.format(dozen)] + [None] * 6 + ['ET'] + [None] * 6 + ['ET', 'S'] + headings + ['RT' if dozen > 1 else 'Inits.']]
+                    for entry in entries:
+                        table_data.append([entry[0]] + [None for i in range(self.total_cols - 1)])
+                    table = Table(table_data, [self.box_size] + self.col_widths, (len(entries) + 1)*[self.box_size])
+                    table.setStyle(self.scores_table_style)
+                    elements.append(KeepTogether(table))
+                    elements += [self.spacer]
+        return elements
+
+    def get_dozen_running_slip_elements(self, all_entries):
+        dozens = self.session_round.shot_round.arrows / 12
+        elements = []
+        while all_entries:
+            entries_group, all_entries = all_entries[:6], all_entries[6:]
+            for dozen in range(1, dozens):
+                for entries in entries_group:
+                    # we don't do the last dozen here
+                    table_data = [
+                        ['Dozen {0}'.format(dozen)] + [entry[0] for entry in entries],
+                        ['Score'] + [None for e in entries],
+                        ['Running Total' if dozen > 1 else 'Initials'] + [None for e in entries],
+                    ]
+                    table = Table(table_data, [self.box_size*4] * 5, [self.box_size*1.5] * 3)
+                    table.setStyle(self.dozens_table_style)
+                    elements.append(KeepTogether(table))
+                    elements += [self.spacer] * 2
+                elements.append(PageBreak())
         return elements
 
     scores_table_style = TableStyle([
@@ -510,6 +542,16 @@ class RunningSlipsPdf(ScoreSheetsPdf):
 
         # title
         ('ALIGN', (0, 0), (0, 0), 'LEFT'),
+    ])
+
+    dozens_table_style = TableStyle([
+        # alignment
+        ('ALIGN', (0, 0), (-1, -1), 'CENTER'),
+        ('VALIGN', (0, 0), (-1, -1), 'MIDDLE'),
+
+        # grid
+        ('BOX', (0, 0), (-1, -1), 2, colors.black),
+        ('INNERGRID', (0, 0), (-1, -1), 0.25, colors.black),
     ])
 
 
