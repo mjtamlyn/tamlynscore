@@ -51,7 +51,7 @@ class InputScores(TargetList):
                 allocations = allocations.exclude(session_entry__session_round__session=session)
 
         arrows = Arrow.objects.filter(score__target__in=allocations).values('arrow_of_round', 'score__target_id', 'score__target__session_entry__session_round__session__arrows_entered_per_end')
-        dozens = Dozen.objects.filter(score__target__in=allocations).select_related('score__target', 'score__target__session_entry__session_round__session')
+        dozens = Dozen.objects.filter(score__target__in=allocations).values('score__target_id', 'dozen', 'score__target__session_entry__session_round__session__arrows_entered_per_end')
         target_lookup = {}
         for arrow in arrows:
             target = arrow['score__target_id']
@@ -63,6 +63,14 @@ class InputScores(TargetList):
             if dozen not in target_lookup[target]:
                 target_lookup[target][dozen] = []
             target_lookup[target][dozen].append(arrow)
+
+        for dozen in dozens:
+            target = dozen['score__target_id']
+            entered_per_end = dozen['score__target__session_entry__session_round__session__arrows_entered_per_end']
+            if target not in target_lookup:
+                target_lookup[target] = {}
+            if dozen['dozen'] not in target_lookup[target]:
+                target_lookup[target][dozen['dozen']] = range(entered_per_end)
 
         for session, options in context['target_list'].items():
             session_round = options['rounds'][0]
@@ -148,12 +156,14 @@ class InputDozens(View):
     def get(self, request, slug, session_id, boss, dozen):
         competition = get_object_or_404(Competition, slug=slug)
         scores = Score.objects.filter(target__session_entry__session_round__session=session_id, target__boss=boss, target__session_entry__present=True, retired=False).order_by('target__target').select_related()
+        next_exists = Score.objects.filter(target__session_entry__session_round__session=session_id, target__boss=int(boss) + 1).order_by('target__target').exists()
         num_dozens = SessionRound.objects.filter(session__pk=session_id)[0].shot_round.arrows / 12
         try:
             forms = get_dozen_formset(scores, num_dozens, boss, dozen, scores[0].target.session_entry.session_round.session.arrows_entered_per_end)
         except IndexError:
             pass
         return render(request, self.template, locals())
+
 
     def post(self, request, slug, session_id, boss, dozen):
         competition = get_object_or_404(Competition, slug=slug)
@@ -178,7 +188,11 @@ class InputDozens(View):
             for score in scores:
                 score.update_score()
                 score.save(force_update=True)
-            return HttpResponseRedirect(reverse(self.next_url_name, kwargs={'slug': slug}) + '?fd={0}&ft={1}&fs={2}'.format(dozen, boss, session_id))
+            if self.request.POST.get('next'):
+                success_url = reverse('input_dozens', kwargs={'slug': slug, 'session_id': session_id, 'boss': int(boss) + 1, 'dozen': dozen})
+            else:
+                success_url = reverse(self.next_url_name, kwargs={'slug': slug}) + '?fd={0}&ft={1}&fs={2}'.format(dozen, boss, session_id)
+            return HttpResponseRedirect(success_url)
         return render(request, self.template, locals())
 
 
