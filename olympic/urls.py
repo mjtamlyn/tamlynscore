@@ -10,4 +10,5 @@ urlpatterns = patterns('olympic.views',
     (r'^(?P<slug>[\w-]+)/score-sheets/(?P<round_id>\d+)/$', 'olympic_score_sheet'),
     (r'^(?P<slug>[\w-]+)/results/$', 'olympic_results'),
     (r'^(?P<slug>[\w-]+)/tree/$', 'olympic_tree'),
+    url(r'^(?P<slug>[\w-]+)/field-plan/$', views.FieldPlan.as_view(), name='olympic_field_plan'),
 )

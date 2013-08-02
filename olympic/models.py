@@ -4,10 +4,12 @@ from core.models import Bowstyle, GENDER_CHOICES
 from entries.models import Session, SessionRound, CompetitionEntry
 from scores.models import Score
 
+
 MATCH_TYPES = (
     ('T', 'Sets'),
     ('C', 'Score'),
 )
+
 
 class OlympicRound(models.Model):
     distance = models.PositiveIntegerField()
@@ -15,6 +17,7 @@ class OlympicRound(models.Model):
 
     def __unicode__(self):
         return 'Olympic Round at {0}m ({1})'.format(self.distance, self.get_match_type_display())
+
 
 class Category(models.Model):
     bowstyles = models.ManyToManyField(Bowstyle)
@@ -33,6 +36,13 @@ class Category(models.Model):
             code = ''
         return code + u''.join([unicode(b)[0] for b in self.bowstyles.all()])
 
+    def short_code(self):
+        if self.gender:
+            code = self.gender
+        else:
+            code = ''
+        return code + unicode(self.bowstyles.all()[0])[0]
+
     @property
     def name(self):
         if self.gender:
@@ -40,6 +50,7 @@ class Category(models.Model):
         else:
             name = ''
         return name + u', '.join([unicode(b) for b in self.bowstyles.all()])
+
 
 class OlympicSessionRound(models.Model):
     session = models.ForeignKey(Session)
@@ -76,7 +87,7 @@ class OlympicSessionRound(models.Model):
         layout = self._get_match_layout(level, half_only, quarter_only)
         return [(m, layout.index(m) * (1 + int(expanded)) + start) for m in layout]
 
-    def make_matches(self, level, start=1, expanded=False, half_only=False, quarter_only=False):
+    def make_matches(self, level, start=1, expanded=False, half_only=False, quarter_only=False, timing=None):
         mapping = self._get_target_mapping(level, start, expanded, half_only, quarter_only)
         for match_id, target in mapping:
             match = Match(
@@ -84,10 +95,12 @@ class OlympicSessionRound(models.Model):
                     target=target,
                     level=level,
                     match=match_id,
+                    timing=timing,
             )
             if expanded:
                 match.target_2 = match.target + 1
             match.save()
+
 
 class Seeding(models.Model):
     entry = models.ForeignKey(CompetitionEntry)
@@ -96,6 +109,7 @@ class Seeding(models.Model):
 
     def __unicode__(self):
         return u'Seed {0} - {1} {2}'.format(self.seed, self.session_round.shot_round, self.entry)
+
 
 class MatchManager(models.Manager):
 
@@ -131,8 +145,8 @@ class MatchManager(models.Manager):
             return None
         effective_seed = self._effective_seed(seed.seed, level)
         if match.target_2 and effective_seed * 2 > 2 ** level:
-            return match.target_2
-        return match.target
+            return (match.target_2, match.timing)
+        return (match.target, match.timing)
 
     def matches_for_seed(self, seed, highest_seed=None):
         highest_level = self.filter(session_round=seed.session_round).order_by('-level')[:1]
@@ -142,10 +156,11 @@ class MatchManager(models.Manager):
         matches = []
         for level in range(1, highest_level + 1):
             if highest_seed and 2 ** level + 1 - seed.seed > highest_seed:
-                matches.append(None)
+                matches.append((None, None))
             else:
                 matches.append(self.target_for_seed(seed, level))
         return matches
+
 
 class Match(models.Model):
     session_round = models.ForeignKey(OlympicSessionRound)
@@ -154,6 +169,7 @@ class Match(models.Model):
     target_2 = models.PositiveIntegerField(blank=True, null=True)
     level = models.PositiveIntegerField()
     match = models.PositiveIntegerField()
+    timing = models.PositiveIntegerField(null=True)
 
     objects = MatchManager()
 
@@ -162,6 +178,7 @@ class Match(models.Model):
 
     def __unicode__(self):
         return u'Match {0} at level {1} on round {2}'.format(self.match, self.level, self.session_round)
+
 
 class Result(models.Model):
     match = models.ForeignKey(Match)
