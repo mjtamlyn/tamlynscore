@@ -3,7 +3,7 @@ import json
 import math
 
 from django.contrib.auth.decorators import login_required
-from django.http import HttpResponse, HttpResponseBadRequest
+from django.http import HttpResponse, HttpResponseBadRequest, Http404
 from django.utils.datastructures import SortedDict
 from django.views.generic import View, DetailView, ListView
 from django.views.generic.edit import FormMixin
@@ -189,9 +189,10 @@ class Registration(TargetList):
         pass
 
     def post(self, request, slug):
-        entry = get_object_or_404(SessionEntry, pk=request.POST['pk'])
-        entry.present = json.loads(request.POST['present'])
-        entry.save()
+        present = request.POST['present'] == 'true'
+        updated = SessionEntry.objects.filter(pk=request.POST['pk']).update(present=present)
+        if not updated:
+            raise Http404
         return HttpResponse('ok')
 
 
