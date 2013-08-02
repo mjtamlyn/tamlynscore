@@ -154,7 +154,7 @@ class OlympicScoreSheet(ScoreSheetsPdf):
 
     def update_style(self):
         super(OlympicScoreSheet, self).update_style()
-        self.col_widths = 3 * [self.box_size] + 3 * [self.wide_box] + 2 * [self.box_size * 1.85]
+        self.col_widths = 3 * [self.box_size] + 3 * [self.wide_box] + [self.box_size * 3, self.box_size]
         self.row_heights = 8 * [self.box_size*0.85]
 
     def setMargins(self, doc):
@@ -178,7 +178,7 @@ class OlympicScoreSheet(ScoreSheetsPdf):
 
             score_sheet_elements = []
             for i in range(len(matches)):
-                match = matches[i]
+                match, timing = matches[i]
                 match_title = self.Para(self.match_names[i], 'h3')
                 if match and i > 0:
                     boss = self.Para('T. {0}'.format(match), 'h3') 
@@ -186,12 +186,14 @@ class OlympicScoreSheet(ScoreSheetsPdf):
                     boss = self.Para('T. {0} / {1}'.format(match, match + 2), 'h3')
                 else:
                     boss = None
+                if timing is not None:
+                    timing = self.Para('Pass %s' % 'xABCDEFGHIJK'[timing], 'h3')
                 table_data = [
-                        [match_title, None, None, None, boss, None, self.Para('Opponent', 'h3'), None],
+                        [match_title, None, None, None, boss, None, timing, None],
                         ['Arrows' if match else self.Para('BYE', 'h3'), None, None, 'S',
                             'Pts' if self.session_round.shot_round.match_type == 'T' else 'RT',
                             'RT' if self.session_round.shot_round.match_type == 'T' else 'Opp.S',
-                            self.Para('Seed', 'h3'), None],
+                            'Opponent seed', None],
                         [None] * 6 + ['Your Signature', None],
                         [None] * 8,
                         [None] * 6 + ['Opponent Signature', None],
@@ -240,9 +242,8 @@ class OlympicScoreSheet(ScoreSheetsPdf):
         ('INNERGRID', (0, -1), (-1, -1), 2, colors.black),
 
         # details
-        ('BOX', (6, 0), (7, -2), 2, colors.black),
+        ('BOX', (6, 1), (7, -2), 2, colors.black),
         ('INNERGRID', (6, 1), (7, -2), 2, colors.black),
-        ('LINEABOVE', (7, 1), (7, 1), 2, colors.black),
 
         # spans
         ('SPAN', (0, 0), (3, 0)),
@@ -271,8 +272,8 @@ class OlympicScoreSheet(ScoreSheetsPdf):
     big_table_style = TableStyle([
         # alignment
         ('VALIGN', (0, 0), (-1, -1), 'TOP'),
-        ('RIGHTPADDING', (0, 0), (-1, -1), 5),
-        ('LEFTPADDING', (0, 0), (-1, -1), 5),
+        ('RIGHTPADDING', (0, 0), (-1, -1), 3),
+        ('LEFTPADDING', (0, 0), (-1, -1), 3),
         ('BOTTOMPADDING', (0, 0), (-1, -1), 5),
     ])
 
@@ -465,19 +466,23 @@ class OlympicTree(OlympicResults):
                     table_data[blocks[m][1] - 1][i + 1] = results[1].seed.entry.archer
                     table_data[blocks[m][1] - 1][i + 2] = results[1].total
                 elif not any_results:
-                    table_data[blocks[m][0]][i + 1] = 'Target: ' + str(match.target)
+                    table_data[blocks[m][0]][i + 1] = '              ' * 2
+                    table_data[blocks[m][0]][i + 2] = 'Target: ' + str(match.target)
                     if match.target_2:
-                        table_data[blocks[m][1] - 1][i + 1] = 'Target: ' + str(match.target_2)
+                        table_data[blocks[m][1] - 1][i + 2] = 'Target: ' + str(match.target_2)
                     seeds = [match.match, (2**match.level) + 1 - match.match]
                     if m % 2:
                         seeds.reverse()
-                    table_data[blocks[m][0]][i] = str(seeds[0])
-                    table_data[blocks[m][1] - 1][i] = str(seeds[1])
-                    if level == self.total_levels:
-                        if seeds[0] in seedings_dict:
-                            table_data[blocks[m][0]][i] = '%s %s' % (seeds[0], seedings_dict[seeds[0]].entry.archer.name)
-                        if seeds[1] in seedings_dict:
-                            table_data[blocks[m][1] - 1][i] = '%s %s' % (seeds[1], seedings_dict[seeds[1]].entry.archer.name)
+                    if seeds[0] in seedings_dict or level == self.total_levels:
+                        table_data[blocks[m][0]][i] = str(seeds[0])
+                    if seeds[1] in seedings_dict or level == self.total_levels:
+                        table_data[blocks[m][1] - 1][i] = str(seeds[1])
+                    if seeds[0] in seedings_dict:
+                        table_data[blocks[m][0]][i + 1] = seedings_dict[seeds[0]].entry.archer.name
+                        seedings_dict.pop(seeds[0])
+                    if seeds[1] in seedings_dict:
+                        table_data[blocks[m][1] - 1][i + 1] = seedings_dict[seeds[1]].entry.archer.name
+                        seedings_dict.pop(seeds[1])
 
         table = Table(table_data)
         table.setStyle(self.get_table_style())
@@ -489,3 +494,61 @@ class OlympicTree(OlympicResults):
         return elements
 
 olympic_tree = login_required(OlympicTree.as_view())
+
+class FieldPlan(HeadedPdfView):
+    title = 'Field plan'
+    PAGE_HEIGHT=defaultPageSize[0]
+    PAGE_WIDTH=defaultPageSize[1]
+
+    def setMargins(self, doc):
+        doc.bottomMargin = 0.4*inch
+
+    def get_matches(self):
+        return Match.objects.filter(session_round__session__competition=self.competition).select_related('session_round', 'session_round__category')
+
+    def get_elements(self):
+        matches = self.get_matches()
+        max_timing = (max(matches, key=lambda m: m.timing)).timing
+        max_target = (max(matches, key=lambda m: m.target)).target  # slight assumption max target will never be target 2
+        table_data = [[None for i in range(max_target + 1)] for j in range(max_timing + 1)]
+        levels = ['Finals', 'Semis', 'Quarters', '1/8', '1/16', '1/32', '1/64', '1/128']
+        passes = 'ABCDEFGHIJK'
+        for i, row in enumerate(table_data[1:]):
+            row[0] = 'Pass %s' % passes[i]
+        for i in range(max_target):
+            table_data[0][i + 1] = i + 1
+        for m in matches:
+            table_data[m.timing][m.target] = '%s\n%s' % (m.session_round.category.short_code(), levels[m.level - 1])
+            if m.target_2:
+                table_data[m.timing][m.target_2] = '%s\n%s' % (m.session_round.category.short_code(), levels[m.level - 1])
+        table = Table(table_data)
+        table.setStyle(self.get_table_style(table_data))
+        return [Spacer(0.5*inch, 0.5*inch), table]
+
+    def get_table_style(self, data):
+        table_style = [
+            ('ALIGN', (0, 0), (-1, -1), 'CENTER'),
+            ('VALIGN', (0, 0), (-1, -1), 'MIDDLE'),
+            ('SIZE', (0, 0), (-1, -1), 10),
+
+            ('LEFTPADDING', (1, 0), (-1, -1), 2),
+            ('RIGHTPADDING', (1, 0), (-1, -1), 2),
+
+            ('INNERGRID', (0, 0), (-1, -1), 0.25, colors.black),
+            ('BOX', (0, 0), (-1, -1), 1, colors.black),
+            ('BOX', (0, 0), (0, -1), 1, colors.black),
+            ('BOX', (0, 0), (-1, 0), 1, colors.black),
+        ]
+        for i, row in enumerate(data[1:], 1):
+            point = row[1]
+            start = 1
+            for j, target in enumerate(row[2:], 2):
+                if not target == point or j == len(row) - 1:
+                    if j == len(row) - 1:
+                        j = len(row)
+                    table_style.append(('SPAN', (start, i), (j - 1, i)))
+                    if point is None:
+                        table_style.append(('BACKGROUND', (start, i), (j - 1, i), colors.lightgrey))
+                    start = j
+                    point = target
+        return table_style
