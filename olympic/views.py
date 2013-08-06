@@ -56,18 +56,26 @@ class OlympicSeedingsPDF(PDFResultsRenderer, View):
         self.title = 'Seedings'
         session_rounds = OlympicSessionRound.objects.filter(session__competition=self.competition).order_by('session__start').select_related()
         results = OrderedDict()
-        result_mode = BaseResultMode()
+        self.mode = result_mode = BaseResultMode()
         for session_round in session_rounds:
             shot_round = session_round.ranking_round.shot_round
             section = result_mode.get_section_for_round(shot_round)
             if session_round not in results:
                 results[section] = {}
-            scores = list(Score.objects.results(
+            scores = Score.objects.results(
                 session_round.ranking_round,
                 category=session_round.category,
-            ))
-            scores = filter(lambda s: not s.target.session_entry.competition_entry.archer.name == 'Chris Skipper', scores)
-            results[section][session_round.category] = scores
+            ).select_related()
+            seedings = Seeding.objects.filter(entry__competition=self.competition).select_related()
+            scores_by_comp_entry = {score.target.session_entry.competition_entry_id: score for score in scores}
+            these_results = []
+            for seed in seedings:
+                score = scores_by_comp_entry.get(seed.entry_id, None)
+                if not score:
+                    continue
+                score.placing = seed.seed
+                these_results.append(score)
+            results[section][session_round.category] = sorted(these_results, key=lambda s: s.placing)
         return self.render_to_pdf({'results': results})
 
 
@@ -291,26 +299,11 @@ class OlympicResults(HeadedPdfView):
     def setMargins(self, doc):
         doc.bottomMargin = 0.3*inch
 
-    def pretty_rank(self, rank, extra_rank_info=None):
-        if rank <= 8:
-            if extra_rank_info:
-                index = rank - 5
-                last_result = list(extra_rank_info[index][1])[0]
-                if last_result.match.session_round.shot_round.match_type == 'C':
-                    while index > 0 and last_result.total == list(extra_rank_info[index - 1][1])[0].total:
-                        index -= 1
-                    rank = index + 5
-            return rank
-        real_rank = 8
-        while real_rank < rank:
-            real_rank = real_rank * 2
-        return real_rank/2 + 1
-
     def format_results(self, results, total_levels):
         results = results.reverse()
         max_level = results[0].match.level
         return ['BYE'] * (total_levels - max_level) + [result.total for result in results]
-    
+
     def get_elements(self):
         elements = []
         olympic_rounds = OlympicSessionRound.objects.filter(session__competition=self.competition).order_by('shot_round__distance', 'category')
@@ -322,30 +315,21 @@ class OlympicResults(HeadedPdfView):
 
     def get_round_elements(self, olympic_round):
 
+        results = olympic_round.get_results()
         elements = []
-        seedings = olympic_round.seeding_set.all().select_related()
-        total_levels = olympic_round.match_set.aggregate(Max('level'))['level__max']
 
-        seedings_with_results = []
-        for seeding in seedings:
-            results = seeding.result_set.order_by('match__level')
-            seedings_with_results.append((seeding, results))
-
-        seedings_with_results = sorted(seedings_with_results, key=lambda s: (s[1][0].match.level, s[1][0].match.match if s[1][0].match.level == 1 else None, -s[1][0].total, -s[1][0].win, s[0].seed))
+        total_levels = results.total_levels
 
         table_headers = ['Rank', 'Seed', 'Name'] + self.match_headers[-total_levels:]
         table_data = [table_headers]
-        for rank, (seeding, results) in enumerate(seedings_with_results):
-            rank = rank + 1
-            extra_rank_info = None
-            if rank in [6, 7, 8]:
-                extra_rank_info = seedings_with_results[4:8]
-            rank = self.pretty_rank(rank, extra_rank_info)
+
+        for seeding in results.results:
             table_data.append([
-                rank,
+                seeding.rank,
                 seeding.seed,
                 seeding.entry.archer.name,
-            ] + self.format_results(results, total_levels))
+            ] + self.format_results(seeding.results, total_levels))
+
         table = Table(table_data)
         table.setStyle(self.table_style)
         elements.append(KeepTogether([

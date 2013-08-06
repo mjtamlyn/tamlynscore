@@ -1,0 +1,66 @@
+{% extends 'scores/leaderboard.html' %}
+
+{% block bodyclass %}leaderboard-big-screen{% endblock %}
+
+{% block nav_links %}{% endblock %}
+{% block competition_nav %}{% endblock %}
+
+{% block competition_content %}
+    {% for section, categories in results.items %}
+        {% if forloop.counter > 2 %}
+        <div style="overflow:auto;">
+        {% for category, scores in categories.items %}
+        <div class="module" style"overflow:auto;">
+        <h4>{{ section }}</h4>
+        <h5>{{ category }}</h5>
+            <table>
+            {% for score in scores %}
+            {% if forloop.counter < 9 %}
+                <tr>
+                    {% if score.disqualified %}
+                    <td></td>
+                    {% else %}
+                    <td>{{ forloop.counter }}</td>
+                    {% endif %}
+                    {% if score.team %}
+                        <th>{{ score.club }}</th>
+                    {% else %}
+                        <td>{{ score.target.session_entry.competition_entry.archer }}</td>
+                        <td>{{ score.target.session_entry.competition_entry.club}}</td>
+                        <td>{% if score.target.session_entry.competition_entry.novice == 'N' %}Novice{% endif %}</td>
+                    {% endif %}
+                    {% if score.disqualified %}
+                    <td>dsq</td>
+                    <td></td>
+                    <td></td>
+                    <td></td>
+                    {% else %}
+                    <td>{{ score.score }}</td>
+                    {% comment %}
+                    <td>{{ score.hits }}</td>
+                    <td>{{ score.golds }}</td>
+                    <td>{{ score.xs }}</td>
+                    {% endcomment %}
+                    {% endif %}
+                </tr>
+                {% if score.team %}
+                    {% for member in score.team %}
+                    <tr>
+                        <td></td>
+                        <td>{{ member.target.session_entry.competition_entry.archer }}</td>
+                        <td>{{ member.score }}</td>
+                        <td>{{ member.hits }}</td>
+                        <td>{{ member.golds }}</td>
+                        <td>{{ member.xs }}</td>
+                    </tr>
+                    {% endfor %}
+                {% endif %}
+            {% endif %}
+            {% endfor %}
+        </table>
+        </div>
+        {% endfor %}
+        </div>
+        {% endif %}
+    {% endfor %}
+{% endblock %}

@@ -86,7 +86,7 @@ class InputScores(TargetList):
                 for dozen in dozens:
                     combined_lookup[dozen] = True
                     for allocation in allocations:
-                        if (allocation.id not in target_lookup
+                        if allocation.session_entry.present and (allocation.id not in target_lookup
                                 or dozen not in target_lookup[allocation.id]
                                 or not len(target_lookup[allocation.id][dozen]) == session_round.session.arrows_entered_per_end):
                             combined_lookup[dozen] = False
@@ -750,6 +750,7 @@ class NewLeaderboard(PDFResultsRenderer, ListView):
     leaderboard = True
     title = 'Leaderboard'
     url_name = 'new_leaderboard'
+    include_distance_breakdown = False
 
     def get(self, request, *args, **kwargs):
         self.competition = self.get_competition()
@@ -764,7 +765,7 @@ class NewLeaderboard(PDFResultsRenderer, ListView):
         return competition
 
     def get_mode(self):
-        mode = get_mode(self.kwargs['mode'], include_distance_breakdown=False)
+        mode = get_mode(self.kwargs['mode'], include_distance_breakdown=self.include_distance_breakdown)
         if not mode:
             raise Http404('No such mode')
         if not self.mode_exists(mode):
@@ -776,7 +777,7 @@ class NewLeaderboard(PDFResultsRenderer, ListView):
 
     def get_format(self):
         format = self.kwargs['format']
-        if format not in ['html', 'pdf']:
+        if format not in ['html', 'pdf', 'big-screen']:
             raise Http404('No such format')
         return format
 
@@ -808,6 +809,8 @@ class NewLeaderboard(PDFResultsRenderer, ListView):
         return super(NewLeaderboard, self).render_to_response(context, **response_kwargs)
 
     def get_template_names(self, **kwargs):
+        if self.format == 'big-screen':
+            return ['scores/leaderboard_big_screen.html']
         return ['scores/leaderboard.html']
 
 
@@ -815,6 +818,7 @@ class NewResults(NewLeaderboard):
     leaderboard = False
     title = 'Results'
     url_name = 'new_results'
+    include_distance_breakdown = True
 
     def mode_exists(self, mode):
         return self.competition.result_modes.filter(mode=mode.slug, leaderboard_only=False).exists()

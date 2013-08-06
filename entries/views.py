@@ -412,7 +412,6 @@ class ScoreSheetsPdf(HeadedPdfView):
         signing_table.setStyle(self.signing_table_style)
         score_sheet_elements += [self.spacer, signing_table]
 
-        print dir(colors), colors.lightgrey
         return score_sheet_elements
 
     scores_table_style = TableStyle([
