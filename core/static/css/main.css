@@ -549,8 +549,7 @@ footer {
   .leaderboard-big-screen .wrapper .module {
     float: left;
     margin: 10px;
-    width: 577px;
-    height: 262px; }
+    width: 577px; }
     .leaderboard-big-screen .wrapper .module td {
       font-size: 18px;
       padding: 2px 15px; }

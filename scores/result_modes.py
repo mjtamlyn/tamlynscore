@@ -37,6 +37,7 @@ class BaseResultMode(object):
     slug = ''
     name = ''
     include_distance_breakdown = False
+    ignore_subrounds = False
 
     def __init__(self, **kwargs):
         for key, value in kwargs.items():
@@ -62,8 +63,10 @@ class BaseResultMode(object):
     def get_section_for_round(self, round):
         headers = ['Pl.'] + self.get_main_headers()
         if self.include_distance_breakdown:
-            for subround in round.subrounds.all():
-                headers += ['%s%s' % (subround.distance, subround.unit)]
+            subrounds = round.subrounds.all()
+            if len(subrounds) > 1:
+                for subround in round.subrounds.all():
+                    headers += ['%s%s' % (subround.distance, subround.unit)]
         headers.append('Score')
         if round.scoring_type == 'X':
             headers += ['10s', 'Xs']
@@ -85,7 +88,7 @@ class BaseResultMode(object):
     def score_details(self, score, section):
         from entries.models import SCORING_TOTALS, SCORING_DOZENS, SCORING_FULL
         scores = []
-        if score.is_team:
+        if score.is_team or self.ignore_subrounds:
             subrounds = []
         else:
             subrounds = score.target.session_entry.session_round.shot_round.subrounds.all()
@@ -113,6 +116,14 @@ class BaseResultMode(object):
             scores += ['DSQ', None, None]
         elif score.retired:
             scores += [score.score, 'Retired', None]
+        elif section.round is None:
+            # weekend mode
+            scores += [
+                score.score,
+                score.hits,
+                score.golds,
+                score.xs,
+            ]
         elif section.round.scoring_type == 'X':
             scores += [
                 score.score,
@@ -342,6 +353,121 @@ class Team(BaseResultMode):
 
     def label_for_round(self, round):
         return 'Team'
+
+
+
+class Weekend(BaseResultMode):
+    slug = 'weekend'
+    name = 'Weekend (Masters style)'
+    ignore_subrounds = True
+
+    def __init__(self, **kwargs):
+        self.init_kwargs = kwargs
+
+    def get_results(self, competition, scores, leaderboard=False):
+        """
+        Strategy:
+         - Get the results for the two rounds as if they were normal shoots
+         - Exclude dead categories?
+         - Get the results from the H2H
+         - Work out points
+         - Order, resolve ties
+         - Format!
+        """
+        from olympic.models import OlympicSessionRound
+
+        wrapped_mode = ByRound(**self.init_kwargs)
+        round_results = wrapped_mode.get_results(competition, scores, leaderboard=leaderboard)
+        h2h_categories = OlympicSessionRound.objects.filter(session__competition=competition).select_related('category')
+
+        full_results = SortedDict()
+
+        class TargetMock(object):
+            def __init__(self, seed):
+                seed.competition_entry = seed.entry
+                self.session_entry = seed
+
+        for category in h2h_categories:
+            h2h_results = category.get_results()
+            results = []
+            for round in round_results:
+                if category.category.gender == 'G' and round.round.name == 'Gents FITA':
+                    fita = round
+                    break
+                if category.category.gender == 'L' and round.round.name == 'Ladies FITA':
+                    fita = round
+                    break
+            for division in round_results[fita]:
+                if 'Compound' in unicode(category.category) and 'Compound' in division:
+                    if category.category.gender == 'G' and 'Gent' in division:
+                        fita_results = round_results[fita][division]
+                        break
+                    if category.category.gender == 'L' and 'Lady' in division:
+                        fita_results = round_results[fita][division]
+                        break
+                if 'Recurve' in unicode(category.category) and 'Recurve' in division:
+                    if category.category.gender == 'G' and 'Gent' in division:
+                        fita_results = round_results[fita][division]
+                        break
+                    if category.category.gender == 'L' and 'Lady' in division:
+                        fita_results = round_results[fita][division]
+                        break
+
+            fita_results_by_entry = {
+                result.target.session_entry.competition_entry: result for result in fita_results
+            }
+
+            for round, divisions in round_results.items():
+                for division in divisions:
+                    if 'Compound' in unicode(category.category) and '50m' in round.round.name:
+                        if category.category.gender == 'G' and 'Gent' in division:
+                            ranking_results = round_results[round][division]
+                            break
+                        if category.category.gender == 'L' and 'Lady' in division:
+                            ranking_results = round_results[round][division]
+                            break
+                    if 'Recurve' in unicode(category.category) and '70m' in round.round.name:
+                        if category.category.gender == 'G' and 'Gent' in division:
+                            ranking_results = round_results[round][division]
+                            break
+                        if category.category.gender == 'L' and 'Lady' in division:
+                            ranking_results = round_results[round][division]
+                            break
+
+            ranking_results_by_entry = {
+                result.target.session_entry.competition_entry: result for result in ranking_results
+            }
+
+            weekend_results = []
+            for seed in h2h_results.results:
+                entry = seed.entry
+                if entry not in fita_results_by_entry:
+                    continue
+                fita_result = fita_results_by_entry[entry]
+                if fita_result.retired or fita_result.score == 0 or fita_result.placing == None:
+                    continue
+                ranking_result = ranking_results_by_entry[entry]
+                if ranking_result.retired or ranking_result.score == 0 or ranking_result.placing == None:
+                    continue
+                weekend_results.append(ScoreMock(
+                    target=TargetMock(seed),
+                    score=ranking_result.placing,
+                    hits=seed.rank,
+                    golds=fita_result.placing,
+                    xs=ranking_result.placing + seed.rank + fita_result.placing,
+                    disqualified=False,
+                    retired=False,
+                    placing=seed.rank,
+                ))
+
+            results = sorted(weekend_results, key=lambda s: (s.xs, s.hits, s.golds))
+            for i, result in enumerate(results, 1):
+                result.placing = i
+            full_results[category.category.short_name] = results
+
+        headers = ['Pl.'] + self.get_main_headers() + ['720', 'H2H', 'FITA', 'Total']
+        section = ResultSection('Weekend results', None, headers)
+        return {section: full_results}
 
 
 def get_result_modes():

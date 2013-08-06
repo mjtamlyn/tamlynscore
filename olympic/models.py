@@ -51,6 +51,14 @@ class Category(models.Model):
             name = ''
         return name + u', '.join([unicode(b) for b in self.bowstyles.all()])
 
+    @property
+    def short_name(self):
+        if self.gender:
+            name = self.get_gender_display() + ' '
+        else:
+            name = ''
+        return name + unicode(self.bowstyles.all()[0])
+
 
 class OlympicSessionRound(models.Model):
     session = models.ForeignKey(Session)
@@ -100,6 +108,60 @@ class OlympicSessionRound(models.Model):
             if expanded:
                 match.target_2 = match.target + 1
             match.save()
+
+    def pretty_rank(self, rank, extra_rank_info=None):
+        if rank <= 8:
+            if extra_rank_info:
+                index = rank - 5
+                last_result = list(extra_rank_info[index][1])[0]
+                if last_result.match.session_round.shot_round.match_type == 'T':
+                    while index > 0 and last_result.total == list(extra_rank_info[index - 1][1])[0].total:
+                        if last_result.arrow_total == list(extra_rank_info[index - 1][1])[0].arrow_total:
+                            index -= 1
+                        else:
+                            # TODO: This doesn't work but it would be nice if it did
+                            last_result.total = '%s (%s)' % (last_result.total, last_result.arrow_total)
+                    rank = index + 5
+                if last_result.match.session_round.shot_round.match_type == 'C':
+                    while index > 0 and last_result.total == list(extra_rank_info[index - 1][1])[0].total:
+                        index -= 1
+                    rank = index + 5
+            return rank
+        real_rank = 8
+        while real_rank < rank:
+            real_rank = real_rank * 2
+        return real_rank/2 + 1
+
+    def get_results(self):
+
+        class OlympicResults(object):
+            def __init__(self, results, total_levels):
+                self.results = results
+                self.total_levels = total_levels
+
+
+        seedings = self.seeding_set.all().select_related().prefetch_related('result_set')
+        total_levels = self.match_set.aggregate(models.Max('level'))['level__max']
+
+        seedings_with_results = []
+        for seeding in seedings:
+            results = seeding.result_set.order_by('match__level')
+            seedings_with_results.append((seeding, results))
+
+        seedings_with_results = sorted(seedings_with_results, key=lambda s: (s[1][0].match.level, s[1][0].match.match if s[1][0].match.level == 1 else None, -s[1][0].total, -s[1][0].arrow_total, -s[1][0].win, s[0].seed))
+
+        full_results = []
+        for rank, (seeding, results) in enumerate(seedings_with_results):
+            rank = rank + 1
+            extra_rank_info = None
+            if rank in [6, 7, 8]:
+                extra_rank_info = seedings_with_results[4:8]
+            rank = self.pretty_rank(rank, extra_rank_info)
+            seeding.results = results
+            seeding.rank = rank
+            full_results.append(seeding)
+
+        return OlympicResults(full_results, total_levels)
 
 
 class Seeding(models.Model):
@@ -185,6 +247,7 @@ class Result(models.Model):
     seed = models.ForeignKey(Seeding)
 
     total = models.PositiveIntegerField()
+    arrow_total = models.PositiveIntegerField(default=0)
     win = models.BooleanField()
 
     def __unicode__(self):
