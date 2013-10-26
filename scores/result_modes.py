@@ -311,7 +311,10 @@ class Team(BaseResultMode):
 
     def get_team_types(self, competition):
         # TODO: support team types properly
-        return ['Non-compound', 'Novice']
+        team_types = ['Non-compound']
+        if competition.has_novices:
+            team_types.append('Novice')
+        return team_types
 
     def get_team_scores(self, competition, clubs, type):
         club_results = []
