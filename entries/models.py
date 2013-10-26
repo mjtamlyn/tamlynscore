@@ -53,11 +53,11 @@ class Competition(models.Model):
     has_teams = models.BooleanField(default=False)
     novices_in_experienced_teams = models.BooleanField(default=False)
     exclude_later_shoots = models.BooleanField(default=False, help_text='Only the first session can count for results')
-
-    # Make these fields!
-    team_size = 4
-    novice_team_size = 3
-    allow_incomplete_teams = True
+    strict_b_teams = models.BooleanField(default=False, help_text='e.g. BUTC')
+    strict_c_teams = models.BooleanField(default=False, help_text='e.g. BUTC')
+    allow_incomplete_teams = models.BooleanField(default=True)
+    team_size = models.PositiveIntegerField(default=4)
+    novice_team_size = models.PositiveIntegerField(default=3)
 
     class Meta:
         unique_together = ('date', 'tournament')
@@ -169,7 +169,7 @@ class SessionRound(models.Model):
                     shot_round = allocation.session_entry.session_round.shot_round
                     allocation = (
                             entry.archer,
-                            entry.club.name,
+                            entry.team_name(short_form=False),
                     )
                     if lunch:
                         allocation += (None, None, None)
@@ -204,6 +204,8 @@ class CompetitionEntry(models.Model):
     novice = models.CharField(max_length=1, choices=NOVICE_CHOICES)
 
     guest = models.BooleanField(default=False)
+    b_team = models.BooleanField(default=False)
+    c_team = models.BooleanField(default=False)
 
     def __unicode__(self):
         return u'{0} at {1}'.format(self.archer, self.competition)
@@ -218,6 +220,12 @@ class CompetitionEntry(models.Model):
 
     def category(self):
         return u'{2}{0} {1}'.format(self.archer.get_gender_display(), self.bowstyle, 'Junior ' if self.age == 'J' else '')
+
+    def team_name(self, short_form=True):
+        club = self.club.short_name if short_form else self.club.name
+        if self.b_team or self.c_team:
+            return '%s (%s)' % (club, 'B' if self.b_team else 'C')
+        return club
 
 
 class SessionEntry(models.Model):

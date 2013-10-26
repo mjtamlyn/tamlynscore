@@ -37,6 +37,12 @@ Elements.from = function(text, excludeScripts){
             gnas_no.set('value', '');
             $$('.show-more-details').removeClass('selected');
             $$('.more-details').removeClass('shown');
+            if ($('id_b_team')) {
+                $('id_b_team').set('checked', '');
+            }
+            if ($('id_c_team')) {
+                $('id_c_team').set('checked', '');
+            }
         };
         var fullReset = function () {
             reset();
@@ -162,6 +168,16 @@ Elements.from = function(text, excludeScripts){
                         {{ form.novice }}
                         {{ form.age }}
                         {{ form.gender }}
+                        <div>
+                        {% if competition.strict_b_teams %}
+                            {{ form.b_team.label }} {{ form.b_team }}
+                        {% endif %}
+                        </div>
+                        <div>
+                        {% if competition.strict_c_teams %}
+                            {{ form.c_team.label }} {{ form.c_team }}
+                        {% endif %}
+                        </div>
                         <div class="button save">
                             Save
                         </div>

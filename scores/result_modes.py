@@ -301,6 +301,12 @@ class Team(BaseResultMode):
             club = session_entry.competition_entry.club
             if session_entry.index > 1 or score.disqualified or score.retired:
                 continue
+            if competition.strict_b_teams:
+                if session_entry.competition_entry.b_team:
+                    club = '%s (B)' % club.short_name
+            if competition.strict_c_teams:
+                if session_entry.competition_entry.c_team:
+                    club = '%s (C)' % club.short_name
             if club not in clubs:
                 clubs[club] = []
             clubs[club].append(score)
