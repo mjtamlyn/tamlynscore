@@ -17,6 +17,7 @@
         <ul>
             <a href="{% url registration slug=competition.slug %}"><li>Registration</li></a>
             <a href="{% url input_scores slug=competition.slug %}"><li>Input scores</li></a>
+            <a href="{% url input_scores_mobile slug=competition.slug %}"><li>Input scores (mobile view)</li></a>
             {% for mode in modes %}
                 <a href="{% url new_leaderboard slug=competition.slug mode=mode.mode format='html' %}"><li>Leaderboard {{ mode|lower }}</li></a>
             {% endfor %}
