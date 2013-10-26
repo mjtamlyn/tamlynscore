@@ -354,7 +354,7 @@ class ScoreSheetsPdf(HeadedPdfView):
                 if entry:
                     entry = entry.session_entry.competition_entry
                     table_data = [
-                            [self.Para(target, 'h2'), self.Para(entry.archer, 'h2'), self.Para(entry.club.name, 'h2')],
+                            [self.Para(target, 'h2'), self.Para(entry.archer, 'h2'), self.Para(entry.team_name(short_form=False), 'h2')],
                             [
                                 None,
                                 self.Para(u'{0} {1}'.format(entry.archer.get_gender_display(),
