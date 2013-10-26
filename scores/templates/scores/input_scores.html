@@ -97,7 +97,7 @@
 
 <div class="input-board" id="session-{{ session.pk }}">
     {% for dozen in details.dozens %}
-    <h5>Dozen {{ dozen }}</h5>
+    <h5>{% if session.arrows_entered_per_end == 12 %}Dozen{% else %}End{% endif %} {{ dozen }}</h5>
     <div class="bosses">
         {% for boss, complete_lookup in details.bosses %}
         <a href="{% block linklocation %}{% url session.input_view_name slug=competition.slug session_id=session.pk dozen=dozen boss=boss %}{% endblock %}" class="boss-link" rel="{{ dozen }}-{{ boss }}-{{ session.pk }}">
