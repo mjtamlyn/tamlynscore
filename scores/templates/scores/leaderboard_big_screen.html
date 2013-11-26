@@ -7,7 +7,6 @@
 
 {% block competition_content %}
     {% for section, categories in results.items %}
-        {% if forloop.counter > 2 %}
         <div style="overflow:auto;">
         {% for category, scores in categories.items %}
         <div class="module" style"overflow:auto;">
@@ -15,7 +14,9 @@
         <h5>{{ category }}</h5>
             <table>
             {% for score in scores %}
-            {% if forloop.counter < 9 %}
+            {% if forloop.counter == 6 or forloop.counter == 11 %}
+            </table></div><div class="module"><table>
+            {% endif %}
                 <tr>
                     {% if score.disqualified %}
                     <td></td>
@@ -55,12 +56,10 @@
                     </tr>
                     {% endfor %}
                 {% endif %}
-            {% endif %}
             {% endfor %}
         </table>
         </div>
         {% endfor %}
         </div>
-        {% endif %}
     {% endfor %}
 {% endblock %}
