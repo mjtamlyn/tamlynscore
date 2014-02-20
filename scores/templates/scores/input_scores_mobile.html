@@ -2,4 +2,4 @@
 
 {% block bodyclass %}mobile{% endblock %}
 
-{% block linklocation %}{% url input_arrows_mobile slug=competition.slug dozen=dozen boss=boss session_id=session.pk %}{% endblock %}
+{% block linklocation %}{% url 'input_arrows_mobile' slug=competition.slug dozen=dozen boss=boss session_id=session.pk %}{% endblock %}

@@ -16,7 +16,7 @@
 
 <ul>
     {% for club in club_list %}
-    <li><a href="{% url club_detail slug=club.slug %}">{{ club }}</a></li>
+    <li><a href="{% url 'club_detail' slug=club.slug %}">{{ club }}</a></li>
     {% endfor %}
 </ul>
 

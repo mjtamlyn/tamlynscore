@@ -19,10 +19,10 @@
             {% block nav %}
             <nav>
                 {% block nav_links %}
-                <a href="{% url index %}"><div class="nav-link">Home</div></a>
-                <a href="{% url club_list %}"><div class="nav-link">Clubs</div></a>
-                <a href="{% url tournaments_list %}"><div class="nav-link">Tournaments</div></a>
-                <a href="{% url logout %}"><div class="nav-link">Log Out</div></a>
+                <a href="{% url 'index' %}"><div class="nav-link">Home</div></a>
+                <a href="{% url 'club_list' %}"><div class="nav-link">Clubs</div></a>
+                <a href="{% url 'tournaments_list' %}"><div class="nav-link">Tournaments</div></a>
+                <a href="{% url 'logout' %}"><div class="nav-link">Log Out</div></a>
                 {% endblock nav_links %}
             </nav>
             {% endblock nav %}

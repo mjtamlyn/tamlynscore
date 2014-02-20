@@ -49,7 +49,7 @@
         {% for target, archer in archers %}
         <tr class="archer {% if not archer or archer.session_entry.present %}present{% endif %}" data-club="{{ archer.session_entry.competition_entry.club_id }}" data-clubname="{{ archer.session_entry.competition_entry.club }}">
             <td>{{ boss }}{{ target }}</td>
-            <td>{% if archer %}<a href="{% url archer_update pk=archer.session_entry.competition_entry.archer_id %}?next={{ request.path }}">{{ archer.session_entry.competition_entry.archer }}</a>{% endif %}</td>
+            <td>{% if archer %}<a href="{% url 'archer_update' pk=archer.session_entry.competition_entry.archer_id %}?next={{ request.path }}">{{ archer.session_entry.competition_entry.archer }}</a>{% endif %}</td>
             <td>{{ archer.session_entry.competition_entry.club }} {% if not archer.session_entry.competition_entry.club == archer.session_entry.competition_entry.archer.club %}({{ archer.session_entry.competition_entry.archer.club.name }}){% endif %}</td>
             <td>{{ archer.session_entry.competition_entry.bowstyle }}</td>
             <td>{{ archer.session_entry.competition_entry.archer.get_gender_display }}</td>

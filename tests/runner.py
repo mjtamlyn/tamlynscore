@@ -2,7 +2,7 @@ import logging
 
 from django.conf import settings
 
-from discover_runner import DiscoverRunner
+from django.test.runner import DiscoverRunner
 
 
 class ScoringRunner(DiscoverRunner):

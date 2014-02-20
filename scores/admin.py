@@ -1,6 +1,6 @@
 from django.contrib import admin
 
-from scores.models import *
+from scores.models import Score, Arrow, Dozen
 
 
 class ArrowAdmin(admin.ModelAdmin):
@@ -13,8 +13,8 @@ class ScoreAdmin(admin.ModelAdmin):
     list_editable = ('score', 'hits', 'golds')
     list_filter = ('target__session_entry__competition_entry__competition',)
 
-    def queryset(self, request):
-        return super(ScoreAdmin, self).queryset(request).select_related()
+    def get_queryset(self, request):
+        return super(ScoreAdmin, self).get_queryset(request).select_related()
 
 
 admin.site.register(Score, ScoreAdmin)
