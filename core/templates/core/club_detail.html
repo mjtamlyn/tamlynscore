@@ -77,7 +77,7 @@
     </div>
 </div>
 <div class="logo_block right">
-    <p><a class="btn" href="{% url club_update slug=club.slug %}">Edit</a></p>
+    <p><a class="btn" href="{% url 'club_update' slug=club.slug %}">Edit</a></p>
     <div class="logo">
         (( club.logo ))
     </div>
@@ -89,7 +89,7 @@
     <h3>Archers</h3>
     <ul>
         {% for archer in archers %}
-        <li><a href="{% url archer_detail pk=archer.pk %}">{{ archer }}</a></li>
+        <li><a href="{% url 'archer_detail' pk=archer.pk %}">{{ archer }}</a></li>
         {% endfor %}
     </ul>
 </div>

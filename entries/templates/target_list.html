@@ -213,7 +213,7 @@
                     {% endfor %}
                 </div>
             </div>
-            <a href="{% url entries.views.target_list_pdf slug=competition.slug %}">Get pdf</a>
+            <a href="{% url 'entries.views.target_list_pdf' slug=competition.slug %}">Get pdf</a>
         </div>
         <div class="clear"></div>
     </div>

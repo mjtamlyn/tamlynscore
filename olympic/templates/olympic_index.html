@@ -85,15 +85,15 @@
                 <td>{{ seed.entry.archer }}</td>
                 <td>{{ seed.entry.club }}</td>
                 <td>{{ seed.entry.bowstyle }}</td>
-                <td><a class="btn" href="{% url olympic_input slug=competition.slug seed_pk=seed.pk %}">Add scores</a></td>
+                <td><a class="btn" href="{% url 'olympic_input' slug=competition.slug seed_pk=seed.pk %}">Add scores</a></td>
             </tr>
             {% endfor %}
         </table>
         <a class="remove-all" href="?remove-all={{ round.pk }}#session-{{ session.pk }}-round-{{ round.pk }}">DANGER Remove all seedings and results</a>
-        <p><a href="{% url olympic.views.olympic_score_sheet slug=competition.slug round_id=round.pk %}">Get Scoresheets</a </p>
+        <p><a href="{% url 'olympic.views.olympic_score_sheet' slug=competition.slug round_id=round.pk %}">Get Scoresheets</a </p>
         <div class="clear"></div>
         {% else %}
-        <form method="post" action="{% url olympic.views.olympic_index slug=competition.slug %}#session-{{ session.pk }}-round-{{ round.pk }}">
+        <form method="post" action="{% url 'olympic.views.olympic_index' slug=competition.slug %}#session-{{ session.pk }}-round-{{ round.pk }}">
             {% csrf_token %}
             <input type="hidden" name="form-id" value="confirm-seedings-{{ round.pk }}" >
             <table>

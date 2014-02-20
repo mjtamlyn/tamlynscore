@@ -5,7 +5,7 @@
 
 <ul>
 {% for competition in object_list %}
-<li><a href="{% url competition_detail slug=competition.slug %}">{{ competition }}</a></li>
+<li><a href="{% url 'competition_detail' slug=competition.slug %}">{{ competition }}</a></li>
 {% endfor %}
 </ul>
 

@@ -1,6 +1,6 @@
 from django.contrib import admin
 
-from entries.models import *
+from entries.models import Tournament, Sponsor, Competition, ResultsMode, Session, SessionRound, CompetitionEntry, SessionEntry, TargetAllocation
 
 
 class CompetitionAdmin(admin.ModelAdmin):
@@ -23,8 +23,8 @@ class SessionEntryAdmin(admin.ModelAdmin):
 class TargetAllocationAdmin(admin.ModelAdmin):
     raw_id_fields = ('session_entry',)
 
-    def queryset(self, request):
-        return super(TargetAllocationAdmin, self).queryset(request).select_related()
+    def get_queryset(self, request):
+        return super(TargetAllocationAdmin, self).get_queryset(request).select_related()
 
 
 admin.site.register(Tournament)
