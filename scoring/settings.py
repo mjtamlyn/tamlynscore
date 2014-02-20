@@ -1,7 +1,15 @@
+import os
+
 import dj_database_url
 
-DEBUG = True
+
+DEBUG = not os.environ.get('PRODUCTION')
 TEMPLATE_DEBUG = DEBUG
+ALLOWED_HOSTS = [
+    'archery-scoring.herokuapp.com',
+    'archery-scoring.mjtamlyn.co.uk',
+    '127.0.0.1',
+]
 
 ADMINS = (
     ('Marc Tamlyn', 'marc.tamlyn@gmail.com'),
@@ -47,7 +55,7 @@ MIDDLEWARE_CLASSES = (
     'django.middleware.csrf.CsrfViewMiddleware',
     'django.contrib.auth.middleware.AuthenticationMiddleware',
     'django.contrib.messages.middleware.MessageMiddleware',
-    'debug_toolbar.middleware.DebugToolbarMiddleware',
+    #'debug_toolbar.middleware.DebugToolbarMiddleware',
 )
 
 ROOT_URLCONF = 'scoring.urls'
@@ -69,7 +77,7 @@ INSTALLED_APPS = (
     'olympic',
     'accounts',
 
-    'debug_toolbar',
+    #'debug_toolbar',
 )
 
 TEST_RUNNER = 'tests.runner.ScoringRunner'
