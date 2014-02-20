@@ -3,6 +3,8 @@ import os
 import dj_database_url
 
 
+BASE_DIR = os.path.dirname(os.path.dirname(__file__))
+
 DEBUG = not os.environ.get('PRODUCTION')
 TEMPLATE_DEBUG = DEBUG
 ALLOWED_HOSTS = [
@@ -27,9 +29,9 @@ USE_L10N = True
 SECRET_KEY = '(0z9j8dsp!3&@tqx$=&@56&q!pr5(1&6wd0*&7@%hiwt3@k!qt'
 SITE_ID = 1
 
-MEDIA_ROOT = 'media/'
+MEDIA_ROOT = os.path.join(BASE_DIR, 'media/')
 MEDIA_URL = '/media/'
-STATIC_ROOT = ''
+STATIC_ROOT = os.path.join(BASE_DIR, 'static/')
 STATIC_URL = '/static/'
 STATICFILES_FINDERS = (
     'django.contrib.staticfiles.finders.AppDirectoriesFinder',
