@@ -177,7 +177,7 @@ class SessionRound(models.Model):
                         allocation += (
                                 entry.archer.get_gender_display(),
                                 entry.bowstyle,
-                                #entry.get_age_display(),
+                                entry.get_age_display(),
                         )
                         if competition.has_novices:
                             allocation += (
