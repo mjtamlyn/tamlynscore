@@ -39,151 +39,16 @@ $navborder: 1px solid $bluegrey
     float: left
     margin: 0 10px
     width: 758px
+    $border: 1px solid $darkbluegrey
 
     .competition-entries
+      table
+        td
+          text-align: center
 
-      .top
-        .new-entry
-          float: left
-
-          $input-width: 300px
-
-          .new-entry-form
-            padding: 5px
-
-            input
-              border: 2px solid $vlightblue
-                radius: 4px
-              font:
-                family: Verdana
-                size: 18px
-              margin: 0
-              outline: none
-              padding: 5px
-              width: $input-width
-              &:focus
-                border-color: $lightblue
-              &::webkit-input-placeholder
-                font-style: italic
-
-            .options-wrapper
-
-              $sidespacing: 0px
-              .options
-                margin: 0 $sidespacing
-                width: $input-width - 2 * $sidespacing
-
-                .option
-                  background-color: white
-                  border:
-                    left: 2px solid $vlightblue
-                    right: 2px solid $vlightblue
-                    bottom: 1px solid $vlightblue
-                  font:
-                    family: Verdana
-                  padding: 3px 5px
-                  &:last-child
-                    border-bottom-width: 2px
-                  &.selected
-                    background-color: $bluegrey
-                    color: white
-
-            #archer-widget
-              margin: 0 auto 10px
-              width: $input-width
-
-            .archer-details
-              visibility: hidden
-              opacity: 0
-              width: 450px
-              -webkit-transition: all 0.2s ease-in-out
-              &.shown
-                visibility: visible
-                opacity: 1
-
-              p
-                margin: 0
-                text-align: center
-
-              .button
-                border: 2px solid $lightblue
-                  radius: 10px
-                background-image: -webkit-linear-gradient(darken($vlightblue, 10%), $vlightblue, darken($vlightblue, 10%))
-                cursor: pointer
-                padding: 5px
-                text-align: center
-                -webkit-user-select: none
-                &.selected
-                  background-image: -webkit-linear-gradient($darkbluegrey, $bluegrey, $darkbluegrey)
-                  border-color: $darkbluegrey
-                  color: white
-
-              #club-widget
-                margin: 0 auto
-                width: $input-width
-
-              .save
-                background-image: -webkit-linear-gradient($darkbluegrey, $bluegrey, $darkbluegrey)
-                border-color: $darkbluegrey
-                color: white
-                float: right
-
-              .show-more-details
-                float: left
-                cursor: pointer
-                .pointer
-                  display: inline-block
-                  font-size: 20px
-                  line-height: 12px
-                  -webkit-transition: -webkit-transform 0.2s ease-in-out
-                &.selected
-                  .pointer
-                    -webkit-transform: rotate(90deg)
-
-
-              .more-details
-                display: none
-                padding: 10px 0
-                text-align: center
-                &.shown
-                  display: block
-
-
-        .stats
-          float: right
-
-          ul
-            margin: 0 10px 10px 10px
-
-      .entries-table
-        margin-top: 10px
-
-        table
-          border-collapse: collapse
-          width: 100%
-
-          td:last-child.delete
-            cursor: pointer
-          tr:hover
-            td:last-child.delete
-              background-color: $darkblue
-              color: white
-
-          td
-            padding: 3px
-
-          .top td
-            border-top: 1px solid $darkbluegrey
-
-          .bottom td
-            font-size: 14px
-
-          .tall
-            border-left: 1px solid $darkbluegrey
-            text-align: center
-
-
-    $border: 1px solid $darkbluegrey
+        .actions,
+        .details
+          font-size: 12px
 
     .target-list-nav
       .session-select

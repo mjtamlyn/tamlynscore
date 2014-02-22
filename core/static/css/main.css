@@ -180,111 +180,11 @@ footer {
     float: left;
     margin: 0 10px;
     width: 758px; }
-    .competition-section .competition-content .competition-entries .top .new-entry {
-      float: left; }
-      .competition-section .competition-content .competition-entries .top .new-entry .new-entry-form {
-        padding: 5px; }
-        .competition-section .competition-content .competition-entries .top .new-entry .new-entry-form input {
-          border: 2px solid #dddafa;
-            border-radius: 4px;
-          font-family: Verdana;
-          font-size: 18px;
-          margin: 0;
-          outline: none;
-          padding: 5px;
-          width: 300px; }
-          .competition-section .competition-content .competition-entries .top .new-entry .new-entry-form input:focus {
-            border-color: #6fb3ff; }
-          .competition-section .competition-content .competition-entries .top .new-entry .new-entry-form input::webkit-input-placeholder {
-            font-style: italic; }
-        .competition-section .competition-content .competition-entries .top .new-entry .new-entry-form .options-wrapper .options {
-          margin: 0 0px;
-          width: 300px; }
-          .competition-section .competition-content .competition-entries .top .new-entry .new-entry-form .options-wrapper .options .option {
-            background-color: white;
-            border-left: 2px solid #dddafa;
-            border-right: 2px solid #dddafa;
-            border-bottom: 1px solid #dddafa;
-            font-family: Verdana;
-            padding: 3px 5px; }
-            .competition-section .competition-content .competition-entries .top .new-entry .new-entry-form .options-wrapper .options .option:last-child {
-              border-bottom-width: 2px; }
-            .competition-section .competition-content .competition-entries .top .new-entry .new-entry-form .options-wrapper .options .option.selected {
-              background-color: #353345;
-              color: white; }
-        .competition-section .competition-content .competition-entries .top .new-entry .new-entry-form #archer-widget {
-          margin: 0 auto 10px;
-          width: 300px; }
-        .competition-section .competition-content .competition-entries .top .new-entry .new-entry-form .archer-details {
-          visibility: hidden;
-          opacity: 0;
-          width: 450px;
-          -webkit-transition: all 0.2s ease-in-out; }
-          .competition-section .competition-content .competition-entries .top .new-entry .new-entry-form .archer-details.shown {
-            visibility: visible;
-            opacity: 1; }
-          .competition-section .competition-content .competition-entries .top .new-entry .new-entry-form .archer-details p {
-            margin: 0;
-            text-align: center; }
-          .competition-section .competition-content .competition-entries .top .new-entry .new-entry-form .archer-details .button {
-            border: 2px solid #6fb3ff;
-              border-radius: 10px;
-            background-image: -webkit-linear-gradient(#b4adf4, #dddafa, #b4adf4);
-            cursor: pointer;
-            padding: 5px;
-            text-align: center;
-            -webkit-user-select: none; }
-            .competition-section .competition-content .competition-entries .top .new-entry .new-entry-form .archer-details .button.selected {
-              background-image: -webkit-linear-gradient(#111d2a, #353345, #111d2a);
-              border-color: #111d2a;
-              color: white; }
-          .competition-section .competition-content .competition-entries .top .new-entry .new-entry-form .archer-details #club-widget {
-            margin: 0 auto;
-            width: 300px; }
-          .competition-section .competition-content .competition-entries .top .new-entry .new-entry-form .archer-details .save {
-            background-image: -webkit-linear-gradient(#111d2a, #353345, #111d2a);
-            border-color: #111d2a;
-            color: white;
-            float: right; }
-          .competition-section .competition-content .competition-entries .top .new-entry .new-entry-form .archer-details .show-more-details {
-            float: left;
-            cursor: pointer; }
-            .competition-section .competition-content .competition-entries .top .new-entry .new-entry-form .archer-details .show-more-details .pointer {
-              display: inline-block;
-              font-size: 20px;
-              line-height: 12px;
-              -webkit-transition: -webkit-transform 0.2s ease-in-out; }
-            .competition-section .competition-content .competition-entries .top .new-entry .new-entry-form .archer-details .show-more-details.selected .pointer {
-              -webkit-transform: rotate(90deg); }
-          .competition-section .competition-content .competition-entries .top .new-entry .new-entry-form .archer-details .more-details {
-            display: none;
-            padding: 10px 0;
-            text-align: center; }
-            .competition-section .competition-content .competition-entries .top .new-entry .new-entry-form .archer-details .more-details.shown {
-              display: block; }
-    .competition-section .competition-content .competition-entries .top .stats {
-      float: right; }
-      .competition-section .competition-content .competition-entries .top .stats ul {
-        margin: 0 10px 10px 10px; }
-    .competition-section .competition-content .competition-entries .entries-table {
-      margin-top: 10px; }
-      .competition-section .competition-content .competition-entries .entries-table table {
-        border-collapse: collapse;
-        width: 100%; }
-        .competition-section .competition-content .competition-entries .entries-table table td:last-child.delete {
-          cursor: pointer; }
-        .competition-section .competition-content .competition-entries .entries-table table tr:hover td:last-child.delete {
-          background-color: #070052;
-          color: white; }
-        .competition-section .competition-content .competition-entries .entries-table table td {
-          padding: 3px; }
-        .competition-section .competition-content .competition-entries .entries-table table .top td {
-          border-top: 1px solid #111d2a; }
-        .competition-section .competition-content .competition-entries .entries-table table .bottom td {
-          font-size: 14px; }
-        .competition-section .competition-content .competition-entries .entries-table table .tall {
-          border-left: 1px solid #111d2a;
-          text-align: center; }
+    .competition-section .competition-content .competition-entries table td {
+      text-align: center; }
+    .competition-section .competition-content .competition-entries table .actions,
+    .competition-section .competition-content .competition-entries table .details {
+      font-size: 12px; }
     .competition-section .competition-content .target-list-nav .session-select {
       width: 100%; }
     .competition-section .competition-content .target-list-nav .round-select {
