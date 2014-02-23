@@ -3,9 +3,10 @@ import json
 import math
 
 from django.contrib.auth.decorators import login_required
+from django.core.urlresolvers import reverse
 from django.http import HttpResponse, HttpResponseBadRequest, Http404
 from django.utils.datastructures import SortedDict
-from django.views.generic import View, DetailView, ListView
+from django.views.generic import View, DetailView, ListView, FormView
 from django.shortcuts import get_object_or_404
 
 from reportlab.platypus import SimpleDocTemplate, Paragraph, Spacer, Table, PageBreak, TableStyle, KeepTogether
@@ -64,7 +65,7 @@ class EntryList(CompetitionMixin, ListView):
             'entries': self.format_entries(context['object_list']),
             'sessions': self.get_sessions(),
             'search_form': EntrySearchForm(),
-            'new_form': EntryCreateForm(),
+            'new_form': EntryCreateForm(competition=self.competition),
         })
         return context
 
@@ -75,11 +76,29 @@ class EntryList(CompetitionMixin, ListView):
         } for entry in entries]
 
     def get_sessions(self):
-        sessions = Session.objects.filter(competition=self.competition).prefetch_related('sessionround_set').filter(sessionround__isnull=False).distinct()
+        sessions = Session.objects.filter(competition=self.competition).order_by('start').prefetch_related('sessionround_set').filter(sessionround__isnull=False).distinct()
         return [{
             'session': session,
             'rounds': list(session.sessionround_set.all()),
         } for session in sessions]
+
+
+@class_view_decorator(login_required)
+class EntryAdd(CompetitionMixin, FormView):
+    form_class = EntryCreateForm
+    template_name = 'entries/entry_add.html'
+
+    def get_form_kwargs(self):
+        kwargs = super(EntryAdd, self).get_form_kwargs()
+        kwargs['competition'] = self.competition
+        return kwargs
+
+    def form_valid(self, form):
+        form.save()
+        return super(EntryAdd, self).form_valid(form)
+
+    def get_success_url(self):
+        return reverse('entry_list', kwargs={'slug': self.competition.slug})
 
 
 @class_view_decorator(login_required)
