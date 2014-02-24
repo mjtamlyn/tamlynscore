@@ -172,7 +172,7 @@ class TargetList(ListView):
         return context
 
     def post(self, request, slug):
-        data = json.loads(request.raw_post_data)
+        data = json.loads(request.body)
         if data['method'] == 'create':
             allocation = TargetAllocation.objects.create(session_entry_id=data['entry'], boss=data['location'][:-1], target=data['location'][-1])
             return HttpResponse(allocation.pk)
