@@ -2,6 +2,13 @@ from django import forms
 
 from scores.models import Arrow, Score, Dozen
 
+
+class RetiringForm(forms.ModelForm):
+    class Meta:
+        model = Score
+        fields = ['retired']
+
+
 class ArrowForm(forms.ModelForm):
 
     arrow_value = forms.CharField(required=False)
@@ -21,22 +28,24 @@ class ArrowForm(forms.ModelForm):
         model = Arrow
         exclude = ['score', 'arrow_of_round']
 
+
 def get_arrow_formset(scores, session_round, boss, dozen, arrows_per_end, data=None):
     forms_list = []
     for score in scores:
         target = {
-                'forms': [],
-                'archer': score.target.session_entry.competition_entry.archer,
-                'target': score.target.target,
-                'running_total': score.running_total(dozen),
+            'forms': [],
+            'archer': score.target.session_entry.competition_entry.archer,
+            'target': score.target.target,
+            'running_total': score.running_total(dozen),
         }
         for arrow in range(1, arrows_per_end + 1):
             prefix = score.target.target + str(arrow)
             try:
-                instance = Arrow.objects.get(score=score, arrow_of_round=int(dozen)*arrows_per_end + arrow)
+                instance = Arrow.objects.get(score=score, arrow_of_round=int(dozen) * arrows_per_end + arrow)
             except Arrow.DoesNotExist:
-                instance = Arrow(score=score, arrow_of_round=int(dozen)*arrows_per_end + arrow)
+                instance = Arrow(score=score, arrow_of_round=int(dozen) * arrows_per_end + arrow)
             target['forms'].append(ArrowForm(data, instance=instance, prefix=prefix))
+        target['retiring_form'] = RetiringForm(data, instance=score, prefix='retiring%s' % score.pk)
         forms_list.append(target)
     return forms_list
 
@@ -58,10 +67,10 @@ def get_dozen_formset(scores, num_dozens, boss, dozen, arrows_per_end, data=None
     dozen = int(dozen)
     for score in scores:
         target = {
-                'archer': score.target.session_entry.competition_entry.archer,
-                'target': score.target.target,
-                'running_total': score.running_total(dozen),
-                'score_form': None,
+            'archer': score.target.session_entry.competition_entry.archer,
+            'target': score.target.target,
+            'running_total': score.running_total(dozen),
+            'score_form': None,
         }
         prefix = score.target.target + str(dozen)
         try:

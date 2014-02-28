@@ -74,6 +74,23 @@ var Arrows = new Class({
                 inputs[inputs.length - 1].focus();
             }
         });
+        $$('.retiring input[type=checkbox]').addEvent('change', function (e) {
+            if (this.checked) {
+                $(this).getParent('tr').getChildren('td input[type=text]').each(function (input) {
+                    input.set('disabled', 'disabled');
+                });
+                $(this).getParent('tr').addClass('disabled');
+            } else {
+                $(this).getParent('tr').getChildren('td input[type=text]').each(function (input) {
+                    input.set('disabled', '');
+                });
+                $(this).getParent('tr').removeClass('disabled');
+            }
+        });
+        $$('.retiring input[type=checkbox]').fireEvent('change');
+        $$('form').addEvent('submit', function (e) {
+            $$('input[disabled]').set('disabled', '');
+        });
     },
 
     updateTotals: function (input) {
@@ -81,13 +98,16 @@ var Arrows = new Class({
             input = $$('.active input')[0];
         }
         var row = input.getParent('tr');
-        var inputs = row.getElements('input');
+        var inputs = row.getElements('input[type=text]');
         var ET1 = 0;
         var ET2 = 0;
         var hits = 0;
         var golds = 0;
         var xs = 0;
         var rt = parseInt(row.getElement('.rt').get('rel'));
+        if (isNaN(rt)) {
+            rt = 0;
+        }
         inputs.each(function (item, index) {
             var value = item.get('value');
             if (value == 'M' || value == '') {

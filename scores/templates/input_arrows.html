@@ -29,6 +29,7 @@
                 <th>Golds</th>
                 <th>Xs</th>
                 <th>RT</th>
+                <th>Retired</th>
             </tr>
             {% for target in forms %}
             <tr>
@@ -50,6 +51,7 @@
                 <th class="rt" rel="{{ target.running_total }}">{{ target.running_total }}</th>
                 {% endif %}
                 {% endfor %}
+                <td class="retiring">{{ target.retiring_form.retired }}</td>
             </tr>
             {% empty %}
             <tr><td colspan="10">No archers</td></tr>

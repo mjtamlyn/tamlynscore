@@ -411,6 +411,9 @@ footer {
           box-shadow: 0 0 5px #ffc600; }
     .competition-section .competition-content .input-arrows table {
       margin: 0 auto; }
+      .competition-section .competition-content .input-arrows table tr.disabled,
+      .competition-section .competition-content .input-arrows table tr.disabled input {
+        color: #cccccc; }
     .competition-section .competition-content .input-arrows input {
       border: 1px solid #6fb3ff;
       border-radius: 3px;
