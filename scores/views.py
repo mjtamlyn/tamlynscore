@@ -10,7 +10,7 @@ from django.db.models import Q
 from django.http import HttpResponse, HttpResponseRedirect, Http404
 from django.shortcuts import render, get_object_or_404
 from django.template.loader import render_to_string
-from django.views.generic import View, ListView
+from django.views.generic import View, ListView, TemplateView
 
 from reportlab.lib import colors
 from reportlab.lib.styles import getSampleStyleSheet
@@ -143,11 +143,54 @@ class InputArrowsView(View):
 
 input_arrows = login_required(InputArrowsView.as_view())
 
+
 class InputArrowsViewMobile(InputArrowsView):
     template = 'input_arrows_mobile.html'
     next_url_name = 'input_scores_mobile'
 
 input_arrows_mobile = login_required(InputArrowsViewMobile.as_view())
+
+
+class InputArrowsArcher(TemplateView):
+    template_name = 'scores/input_arrows_archer.html'
+
+    def get_context_data(self, **kwargs):
+        competition = get_object_or_404(Competition, slug=self.kwargs['slug'])
+        score = Score.objects.get(pk=self.kwargs['score_id'])
+        entry = score.target.session_entry
+        round = entry.session_round.shot_round
+        per_end = entry.session_round.session.arrows_entered_per_end
+        layout = [{
+            'scores': ['-'] * per_end,
+            'doz': 0,
+            'hits': 0,
+            'golds': 0,
+            'xs': 0,
+            'et1': 0,
+            'et2': 0,
+        } for i in range(round.arrows / per_end)]
+        arrows = score.arrow_set.all()
+        for arrow in arrows:
+            dozen = (arrow.arrow_of_round - 13) / per_end
+            point = arrow.arrow_of_round % per_end - 1
+            layout[dozen]['scores'][point] = unicode(arrow)
+            layout[dozen]['doz'] += arrow.arrow_value
+            if point < 6 and point >= 0:
+                layout[dozen]['et1'] += arrow.arrow_value
+            else:
+                layout[dozen]['et2'] += arrow.arrow_value
+            if arrow.arrow_value:
+                layout[dozen]['hits'] += 1
+            if arrow.arrow_value == 10:
+                layout[dozen]['golds'] += 1
+            if arrow.is_x:
+                layout[dozen]['xs'] += 1
+        return {
+            'competition': competition,
+            'entry': entry,
+            'layout': layout,
+            'score': score,
+        }
 
 
 class InputDozens(View):
@@ -164,7 +207,6 @@ class InputDozens(View):
         except IndexError:
             pass
         return render(request, self.template, locals())
-
 
     def post(self, request, slug, session_id, boss, dozen):
         competition = get_object_or_404(Competition, slug=slug)

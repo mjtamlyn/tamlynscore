@@ -1,0 +1,47 @@
+{% extends 'entries/competition_detail.html' %}
+
+{% block competition_content %}
+<div class="module input-arrows">
+    <h4>Scoresheet for {{ entry }} - {{ score.target.boss }}{{ score.target.target }}</h4>
+    <table class="target">
+
+        <tr>
+            <td colspan="{% if layout.0.scores|length > 6 %}6{% else %}{{ forms.0.forms|length }}{% endif %}"></td>
+            {% if forms.0.forms|length > 6 %}
+            <th>ET</th>
+            <td colspan="6"></td>
+            <th>ET</th>
+            {% endif %}
+            <th>Doz</th>
+            <th>Hits</th>
+            <th>Golds</th>
+            <th>Xs</th>
+            <td></td>
+        </tr>
+        {% for dozen in layout %}
+        <tr>
+            {% for arrow in dozen.scores %}
+                <td>{{ arrow }}</td>
+                {% if forloop.counter == 6 %}
+                <th>{{ dozen.et1 }}</th>
+                {% endif %}
+            {% endfor %}
+            <th>{{ dozen.et2 }}</th>
+            <th>{{ dozen.doz }}</th>
+            <th>{{ dozen.hits }}</th>
+            <th>{{ dozen.golds }}</th>
+            <th>{{ dozen.xs }}</th>
+            <td><small><a href="{% url 'input_arrows' slug=competition.slug session_id=entry.session_round.session_id dozen=forloop.counter boss=score.target.boss %}">Edit</a></small></td>
+        </tr>
+        {% endfor %}
+        <tr>
+            <td colspan="{{ layout.0.scores|length }}"></td>
+            <th colspan="2">Totals</th>
+            <th>{{ score.score }}</th>
+            <th>{{ score.hits }}</th>
+            <th>{{ score.golds }}</th>
+            <th>{{ score.xs }}</th>
+        </tr>
+    </table>
+</div>
+{% endblock %}

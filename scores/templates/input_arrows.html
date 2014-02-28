@@ -34,7 +34,7 @@
             {% for target in forms %}
             <tr>
                 <td>{{ target.target }}</td>
-                <td>{{ target.archer }}</td>
+                <td><a href="{% url 'input_arrows_archer' slug=competition.slug score_id=target.score.pk %}">{{ target.archer }}</a></td>
                 {% for form in target.forms %}
                 <td>{{ form.arrow_value }}<span class="hidden">{{ form.is_x.value }}</span></td>
                 {% if target.forms|length > 6 and forloop.counter == 6 %}
