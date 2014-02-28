@@ -50,6 +50,7 @@ class Competition(models.Model):
     sponsors = models.ManyToManyField(Sponsor, blank=True)
 
     has_novices = models.BooleanField(default=False)
+    has_juniors = models.BooleanField(default=False)
     has_teams = models.BooleanField(default=False)
     novices_in_experienced_teams = models.BooleanField(default=False)
     exclude_later_shoots = models.BooleanField(default=False, help_text='Only the first session can count for results')
@@ -177,8 +178,11 @@ class SessionRound(models.Model):
                         allocation += (
                                 entry.archer.get_gender_display(),
                                 entry.bowstyle,
-                                entry.get_age_display(),
                         )
+                        if competition.has_juniors:
+                            allocation += (
+                                entry.get_age_display(),
+                            )
                         if competition.has_novices:
                             allocation += (
                                 entry.get_novice_display(),
