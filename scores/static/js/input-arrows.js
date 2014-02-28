@@ -57,6 +57,12 @@ var Arrows = new Class({
                     this.dirMap[e.key]();
                     e.stop();
                 }
+                if (e.code == 8) { // backspace
+                    item.set('value', '');
+                    this.updateTotals(item);
+                    this.dirMap['left']();
+                    e.stop();
+                }
             }.bind(this));
         }.bind(this));
         $$('input[type=text]').each(function (item) {
