@@ -34,6 +34,7 @@ def get_arrow_formset(scores, session_round, boss, dozen, arrows_per_end, data=N
     for score in scores:
         target = {
             'forms': [],
+            'score': score,
             'archer': score.target.session_entry.competition_entry.archer,
             'target': score.target.target,
             'running_total': score.running_total(dozen),
