@@ -671,14 +671,19 @@ results_pdf_overall = login_required(ResultsPdfOverall.as_view())
 
 
 class PDFResultsRenderer(object):
+    PAGE_HEIGHT=defaultPageSize[1]
+    PAGE_WIDTH=defaultPageSize[0]
+
     def render_to_pdf(self, context):
-        response = HttpResponse(mimetype='application/pdf')
+        response = HttpResponse(content_type='application/pdf')
         self.page_width, self.page_height = defaultPageSize
         doc = SimpleDocTemplate(response, pagesize=defaultPageSize)
         self.styles = getSampleStyleSheet()
         self.styles['h1'].alignment = 1
         self.styles['h2'].alignment = 1
         elements = self.get_elements(context['results'])
+        if self.competition.sponsors.exists():
+            doc.bottomMargin = 2.3 * inch
         doc.build(elements, onFirstPage=self.draw_title, onLaterPages=self.draw_title)
         return response
 
@@ -686,6 +691,9 @@ class PDFResultsRenderer(object):
         canvas.saveState()
         canvas.setFont('Helvetica-Bold', 18)
         canvas.drawCentredString(self.page_width/2.0, self.page_height-70, u'{0}: {1}'.format(self.competition, self.title))
+        sponsors = self.competition.sponsors.all()
+        if sponsors:
+            canvas.drawImage(sponsors[0].logo.path, 50, 0, width=self.PAGE_WIDTH - 100, preserveAspectRatio=True, anchor='nw')
         canvas.restoreState()
 
     def get_elements(self, results):
