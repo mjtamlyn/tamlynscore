@@ -112,7 +112,7 @@ class InputArrowsView(View):
 
     def get(self, request, slug, session_id, boss, dozen):
         competition = get_object_or_404(Competition, slug=slug)
-        scores = Score.objects.filter(target__session_entry__session_round__session=session_id, target__boss=boss, target__session_entry__present=True, retired=False).order_by('target__target').select_related()
+        scores = Score.objects.filter(target__session_entry__session_round__session=session_id, target__boss=boss, target__session_entry__present=True).order_by('target__target').select_related()
         try:
             forms = get_arrow_formset(scores, session_id, boss, dozen, scores[0].target.session_entry.session_round.session.arrows_entered_per_end)
         except IndexError:
@@ -126,6 +126,7 @@ class InputArrowsView(View):
         arrows = []
         failed = False
         for score in forms:
+            score['retiring_form'].save()
             for form in score['forms']:
                 if form.is_valid():
                     arrows.append(form.save(commit=False))
