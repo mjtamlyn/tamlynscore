@@ -241,7 +241,7 @@ class PdfView(View):
         pass
 
     def response(self, elements):
-        response = HttpResponse(mimetype='application/pdf')
+        response = HttpResponse(content_type='application/pdf')
         doc = self.get_doc(response)
         self.setMargins(doc)
         doc.build(elements)
@@ -269,17 +269,16 @@ class HeadedPdfView(PdfView):
         sponsors = self.competition.sponsors.all()
 
         positions = (
-            (30, self.PAGE_HEIGHT-240),
-            (self.PAGE_WIDTH-140, self.PAGE_HEIGHT-120),
+            (50, 0),
         )
         for i, sponsor in enumerate(sponsors):
-            canvas.drawImage(sponsors[i].logo.path, positions[i][0], positions[i][1], width=100, preserveAspectRatio=True, anchor='nw')
+            canvas.drawImage(sponsors[i].logo.path, positions[i][0], positions[i][1], width=self.PAGE_WIDTH - 100, preserveAspectRatio=True, anchor='nw')
             pass
 
         canvas.restoreState()
 
     def response(self, elements):
-        response = HttpResponse(mimetype='application/pdf')
+        response = HttpResponse(content_type='application/pdf')
         doc = self.get_doc(response)
         self.setMargins(doc)
         doc.build(elements, onFirstPage=self.draw_title, onLaterPages=self.draw_title)
@@ -291,7 +290,8 @@ class TargetListPdf(HeadedPdfView):
 
     def setMargins(self, doc):
         doc.topMargin = 1.1*inch
-        doc.bottomMargin = 0.5*inch
+        if self.competition.sponsors.exists():
+            doc.bottomMargin = 2.3*inch
 
     def update_style(self):
         self.styles['h2'].alignment = 1
