@@ -795,6 +795,7 @@ class NewLeaderboard(PDFResultsRenderer, ListView):
             target__session_entry__competition_entry__competition=self.competition
         ).select_related().order_by(
             '-target__session_entry__competition_entry__archer__age',
+            'target__session_entry__competition_entry__novice',
             'target__session_entry__competition_entry__bowstyle',
             'target__session_entry__competition_entry__archer__gender',
             'disqualified',

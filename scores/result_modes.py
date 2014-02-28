@@ -1,6 +1,7 @@
+from collections import OrderedDict
+
 from django.core.exceptions import ImproperlyConfigured
 from django.db import models
-from django.utils.datastructures import SortedDict
 
 
 class ScoreMock(object):
@@ -24,7 +25,7 @@ class ScoreMock(object):
 
 class ResultSection(object):
 
-    def __init__(self, label, round, headers):
+    def __init__(self, label, round=None, headers=None):
         self.label = label
         self.round = round
         self.headers = headers
@@ -143,6 +144,52 @@ class BySession(BaseResultMode):
     slug = 'by-session'
     name = 'By session'
 
+    def get_results(self, competition, scores, leaderboard=False):
+        """Get the results for each session, assuming the same round across sessions.
+
+        Strategy:
+        - find all sessions
+        - go through scores, adding to each category specific sets
+            - here respect competition options - novices, juniors, second rounds etc.
+        """
+        self.leaderboard = leaderboard
+        sessions = self.get_sessions(competition)
+        return OrderedDict((
+            ResultSection(session.start.strftime('%Y/%m/%d %I:%M %p')),
+            self.get_session_results(competition, session, scores),
+        ) for session in sessions)
+
+    def get_sessions(self, competition):
+        return competition.session_set.all()
+
+    def get_session_results(self, competition, session, scores):
+        results = OrderedDict()
+        for score in scores:
+            session_entry = score.target.session_entry
+            if session_entry.session_round.session_id is not session.id:
+                continue
+            if competition.exclude_later_shoots and session_entry.index > 1:
+                continue
+            category = session_entry.competition_entry.category()
+            if category not in results:
+                results[category] = []
+            results[category].append(score)
+        for category in results:
+            results[category] = self.sort_results(results[category])
+            for i, score in enumerate(results[category]):
+                if not self.leaderboard and score.score == 0:
+                    results[category][i] = ScoreMock(
+                        target=score.target,
+                        score='DNS',
+                        hits='',
+                        golds='',
+                        xs='',
+                        disqualified=False,
+                        retired=False,
+                        placing=None,
+                    )
+        return results
+
 
 class ByRound(BaseResultMode):
     slug = 'by-round'
@@ -159,10 +206,10 @@ class ByRound(BaseResultMode):
         """
         self.leaderboard = leaderboard
         rounds = self.get_rounds(competition)
-        return SortedDict((
-                self.get_section_for_round(round),
-                self.get_round_results(competition, round, scores)
-            ) for round in rounds)
+        return OrderedDict((
+            self.get_section_for_round(round),
+            self.get_round_results(competition, round, scores)
+        ) for round in rounds)
 
     def get_rounds(self, competition):
         from entries.models import SessionRound
@@ -175,7 +222,7 @@ class ByRound(BaseResultMode):
         return rounds
 
     def get_round_results(self, competition, round, scores):
-        results = SortedDict()
+        results = OrderedDict()
         for score in scores:
             session_entry = score.target.session_entry
             if session_entry.session_round.shot_round.id is not round.id:
@@ -218,10 +265,10 @@ class DoubleRound(BaseResultMode):
         """
         self.leaderboard = leaderboard
         rounds = self.get_rounds(competition)
-        return SortedDict((
-                self.get_section_for_round(round),
-                self.get_round_results(competition, round, scores)
-            ) for round in rounds)
+        return OrderedDict((
+            self.get_section_for_round(round),
+            self.get_round_results(competition, round, scores)
+        ) for round in rounds)
 
     def get_rounds(self, competition):
         from entries.models import SessionRound
@@ -234,7 +281,7 @@ class DoubleRound(BaseResultMode):
         return rounds
 
     def get_round_results(self, competition, round, scores):
-        results = SortedDict()
+        results = OrderedDict()
         for score in scores:
             session_entry = score.target.session_entry
             if session_entry.session_round.shot_round.id is not round.id:
@@ -255,13 +302,13 @@ class DoubleRound(BaseResultMode):
             for entry in scores:
                 scores[entry] = sorted(scores[entry], key=lambda s: s.target.session_entry.session_round.session.start)[:2]
             new_scores = [ScoreMock(
-                    disqualified=any(s.disqualified for s in sub_scores),
-                    retired=any(s.disqualified for s in sub_scores),
-                    target=sub_scores[0].target,
-                    score=sum(s.score for s in sub_scores),
-                    hits=sum(s.hits for s in sub_scores),
-                    golds=sum(s.golds for s in sub_scores),
-                    xs=sum(s.xs for s in sub_scores),
+                disqualified=any(s.disqualified for s in sub_scores),
+                retired=any(s.disqualified for s in sub_scores),
+                target=sub_scores[0].target,
+                score=sum(s.score for s in sub_scores),
+                hits=sum(s.hits for s in sub_scores),
+                golds=sum(s.golds for s in sub_scores),
+                xs=sum(s.xs for s in sub_scores),
             ) for entry, sub_scores in scores.items()]
             if not self.leaderboard:
                 new_scores = filter(lambda s: s.score > 0, new_scores)
@@ -310,7 +357,7 @@ class Team(BaseResultMode):
             if club not in clubs:
                 clubs[club] = []
             clubs[club].append(score)
-        results = SortedDict()
+        results = OrderedDict()
         for type in self.get_team_types(competition):
             results[type] = self.get_team_scores(competition, clubs, type)
         return {self.get_section_for_round(round): results}
@@ -329,7 +376,7 @@ class Team(BaseResultMode):
             team_size = competition.team_size
             if type == 'Novice' and competition.novice_team_size:
                 team_size = competition.novice_team_size
-            club_scores = sorted(club_scores, key = lambda s: (s.score, s.golds, s.xs, s.hits), reverse=True)[:team_size]
+            club_scores = sorted(club_scores, key=lambda s: (s.score, s.golds, s.xs, s.hits), reverse=True)[:team_size]
             if not club_scores:
                 continue
             if len(club_scores) < team_size and not competition.allow_incomplete_teams:
@@ -364,7 +411,6 @@ class Team(BaseResultMode):
         return 'Team'
 
 
-
 class Weekend(BaseResultMode):
     slug = 'weekend'
     name = 'Weekend (Masters style)'
@@ -389,7 +435,7 @@ class Weekend(BaseResultMode):
         round_results = wrapped_mode.get_results(competition, scores, leaderboard=leaderboard)
         h2h_categories = OlympicSessionRound.objects.filter(session__competition=competition).select_related('category')
 
-        full_results = SortedDict()
+        full_results = OrderedDict()
 
         class TargetMock(object):
             def __init__(self, seed):
@@ -453,10 +499,10 @@ class Weekend(BaseResultMode):
                 if entry not in fita_results_by_entry:
                     continue
                 fita_result = fita_results_by_entry[entry]
-                if fita_result.retired or fita_result.score == 0 or fita_result.placing == None:
+                if fita_result.retired or fita_result.score == 0 or fita_result.placing is None:
                     continue
                 ranking_result = ranking_results_by_entry[entry]
-                if ranking_result.retired or ranking_result.score == 0 or ranking_result.placing == None:
+                if ranking_result.retired or ranking_result.score == 0 or ranking_result.placing is None:
                     continue
                 weekend_results.append(ScoreMock(
                     target=TargetMock(seed),
@@ -486,8 +532,7 @@ def get_result_modes():
 
 def get_mode(slug, **kwargs):
     modes = BaseResultMode.__subclasses__()
-    try: 
+    try:
         return [mode(**kwargs) for mode in modes if mode.slug == slug][0]
     except IndexError:
         return None
-
