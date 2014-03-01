@@ -52,13 +52,21 @@ class BaseResultMode(object):
 
     def sort_results(self, scores):
         results = sorted(scores, key=lambda s: (s.score, s.golds, s.xs, s.hits), reverse=True)
-        placing = 1
+        placing = 0
+        current_score = None
+        placing_counter = 1
         for score in results:
             if score.disqualified or score.guest:
                 score.placing = None
             else:
+                score_repr = (score.score, score.golds, score.xs, score.hits)
+                if score_repr == current_score:
+                    placing_counter += 1
+                else:
+                    current_score = score_repr
+                    placing += placing_counter
+                    placing_counter = 1
                 score.placing = placing
-                placing += 1
         return results
 
     def get_section_for_round(self, round):
