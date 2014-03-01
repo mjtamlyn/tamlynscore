@@ -11,6 +11,8 @@ ALLOWED_HOSTS = [
     'archery-scoring.herokuapp.com',
     'archery-scoring.mjtamlyn.co.uk',
     '127.0.0.1',
+    'localhost',
+    '192.168.1.100',
 ]
 
 ADMINS = (
@@ -29,9 +31,9 @@ USE_L10N = True
 SECRET_KEY = '(0z9j8dsp!3&@tqx$=&@56&q!pr5(1&6wd0*&7@%hiwt3@k!qt'
 SITE_ID = 1
 
-MEDIA_ROOT = os.path.join(BASE_DIR, 'media/')
+MEDIA_ROOT = os.path.join(BASE_DIR, 'media')
 MEDIA_URL = '/media/'
-STATIC_ROOT = os.path.join(BASE_DIR, 'static/')
+STATIC_ROOT = os.path.join(BASE_DIR, 'static')
 STATIC_URL = '/static/'
 STATICFILES_FINDERS = (
     'django.contrib.staticfiles.finders.AppDirectoriesFinder',
