@@ -12,7 +12,7 @@ ALLOWED_HOSTS = [
     'archery-scoring.mjtamlyn.co.uk',
     '127.0.0.1',
     'localhost',
-    '192.168.1.100',
+    '192.168.1.101',
 ]
 
 ADMINS = (
@@ -59,7 +59,7 @@ MIDDLEWARE_CLASSES = (
     'django.middleware.csrf.CsrfViewMiddleware',
     'django.contrib.auth.middleware.AuthenticationMiddleware',
     'django.contrib.messages.middleware.MessageMiddleware',
-    #'debug_toolbar.middleware.DebugToolbarMiddleware',
+    'debug_toolbar.middleware.DebugToolbarMiddleware',
 )
 
 ROOT_URLCONF = 'scoring.urls'
@@ -81,7 +81,7 @@ INSTALLED_APPS = (
     'olympic',
     'accounts',
 
-    #'debug_toolbar',
+    'debug_toolbar',
 )
 
 TEST_RUNNER = 'tests.runner.ScoringRunner'
