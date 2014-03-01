@@ -65,15 +65,18 @@ class Round(models.Model):
     def get_subround(self, doz_no):
         arrows = int(doz_no) * 12
         subrounds = self.subrounds.order_by('-distance')
-        counter = 0
         for subround in subrounds:
             if subround.arrows >= arrows:
                 return subround
         raise Exception('There aren\'t that many dozens in that round!')
 
     @property
+    def has_xs(self):
+        return self.scoring_type == 'X'
+
+    @property
     def score_sheet_headings(self):
-        return ['10+X', 'X'] if self.scoring_type == 'X' else ['H', 'G']
+        return ['10+X', 'X'] if self.has_xs else ['H', 'G']
 
 
 class Bowstyle(models.Model):
@@ -88,7 +91,7 @@ class Country(models.Model):
 
     class Meta:
         verbose_name_plural = 'countries'
-    
+
     def __unicode__(self):
         return self.name
 
@@ -107,7 +110,7 @@ class County(models.Model):
 
     class Meta:
         verbose_name_plural = 'counties'
-    
+
     def __unicode__(self):
         return self.name
 
@@ -165,4 +168,3 @@ class Archer(models.Model):
             'novice': self.novice,
             'gnas_no': self.gnas_no,
         })
-
