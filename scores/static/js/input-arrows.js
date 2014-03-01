@@ -40,7 +40,7 @@ var Arrows = new Class({
 
     setUp: function () {
         $$('input')[0].focus();
-        $$('input').each(function (item, index, array) {
+        $$('input[type=text]').each(function (item, index, array) {
             if (item.get('type') !== 'text') {
                 return;
             }
@@ -157,11 +157,12 @@ var Arrows = new Class({
         if (!currentFocus) {
             return;
         }
+        console.log('hello?');
         var row = currentFocus.getParent('tr');
         if (dir === 'up' || dir === 'down') {
             var table = row.getParent('table');
             var currentCell = row.getChildren().indexOf(currentFocus.getParent('td'));
-            var inputs = table.getElements('td:nth-child(' + (currentCell + 1).toString() + ') input');
+            var inputs = table.getElements('td:nth-child(' + (currentCell + 1).toString() + ') input[type=text]');
             var current = inputs.indexOf(currentFocus);
             if (dir === 'down') {
                 if (inputs[current + 1]) {
@@ -175,7 +176,8 @@ var Arrows = new Class({
             }
         }
         if (dir === 'left' || dir === 'right') {
-            var inputs = row.getElements('td input')
+            var inputs = row.getElements('td input[type=text]');
+            console.log(inputs);
             var current = inputs.indexOf(currentFocus);
             if (dir === 'right' && inputs[current + 1]) {
                 inputs[current + 1].focus();
