@@ -280,10 +280,14 @@ class ByRoundProgressional(ByRound, BaseResultMode):
             partial_scores = dict(rows)
             cursor.close()
             for score in scores:
-                if partial_scores.get(score.pk) is not None:
-                    score.score = partial_scores[score.pk]
+                partial = partial_scores.get(score.pk)
+                if partial is not None:
+                    if not score.score == partial:
+                        score.golds = '(%s)' % score.score
+                    else:
+                        score.golds = ''
+                    score.score = partial
                     score.hits = ''
-                    score.golds = ''
                     score.xs = ''
         self.leaderboard = leaderboard
         rounds = self.get_rounds(competition)
