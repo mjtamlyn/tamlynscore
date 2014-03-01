@@ -13,9 +13,13 @@
             <th>ET</th>
             {% endif %}
             <th>Doz</th>
+            {% if not round.has_xs %}
             <th>Hits</th>
+            {% endif %}
             <th>Golds</th>
+            {% if round.has_xs %}
             <th>Xs</th>
+            {% endif %}
             <td></td>
         </tr>
         {% for dozen in layout %}
@@ -28,9 +32,13 @@
             {% endfor %}
             <th>{{ dozen.et2 }}</th>
             <th>{{ dozen.doz }}</th>
+            {% if not round.has_xs %}
             <th>{{ dozen.hits }}</th>
+            {% endif %}
             <th>{{ dozen.golds }}</th>
+            {% if round.has_xs %}
             <th>{{ dozen.xs }}</th>
+            {% endif %}
             <td><small><a href="{% url 'input_arrows' slug=competition.slug session_id=entry.session_round.session_id dozen=forloop.counter boss=score.target.boss %}">Edit</a></small></td>
         </tr>
         {% endfor %}
