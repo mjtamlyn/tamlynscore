@@ -124,6 +124,8 @@ class InputArrowsView(View):
             'scores': scores,
             'forms': forms,
             'round': round,
+            'dozen': dozen,
+            'boss': boss,
         })
 
     def post(self, request, slug, session_id, boss, dozen):
@@ -857,7 +859,7 @@ class NewLeaderboard(PDFResultsRenderer, ListView):
         return scores
 
     def get_context_data(self, **kwargs):
-        kwargs['results'] = self.mode.get_results(self.competition, kwargs['object_list'], leaderboard=self.leaderboard)
+        kwargs['results'] = self.mode.get_results(self.competition, kwargs['object_list'], leaderboard=self.leaderboard, request=self.request)
         kwargs['mode'] = self.mode
         kwargs['url_name'] = self.url_name
         kwargs['title'] = self.title
