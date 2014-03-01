@@ -1,7 +1,7 @@
 from collections import OrderedDict
 
 from django.core.exceptions import ImproperlyConfigured
-from django.db import models
+from django.db import models, connection
 
 
 class ScoreMock(object):
@@ -47,7 +47,7 @@ class BaseResultMode(object):
     def __unicode__(self):
         return self.name
 
-    def get_results(self, competition, scores, leaderboard=False):
+    def get_results(self, competition, scores, leaderboard=False, request=None):
         raise ImproperlyConfigured('Subclasses must implement get_results')
 
     def sort_results(self, scores):
@@ -117,6 +117,10 @@ class BaseResultMode(object):
             scores += ['DSQ', None, None]
         elif score.retired:
             scores += [score.score, 'Retired', None]
+        elif hasattr(score, 'partial_score'):
+            scores += [
+                score.score,
+            ]
         elif section.round is None:
             # weekend mode
             scores += [
@@ -144,7 +148,7 @@ class BySession(BaseResultMode):
     slug = 'by-session'
     name = 'By session'
 
-    def get_results(self, competition, scores, leaderboard=False):
+    def get_results(self, competition, scores, leaderboard=False, request=None):
         """Get the results for each session, assuming the same round across sessions.
 
         Strategy:
@@ -195,7 +199,7 @@ class ByRound(BaseResultMode):
     slug = 'by-round'
     name = 'By round'
 
-    def get_results(self, competition, scores, leaderboard=False):
+    def get_results(self, competition, scores, leaderboard=False, request=None):
         """Get the results for each category, by round.
 
         Strategy:
@@ -250,11 +254,50 @@ class ByRound(BaseResultMode):
         return results
 
 
+class ByRoundProgressional(ByRound, BaseResultMode):
+    slug = 'by-round-progressional'
+    name = 'By round (progressional)'
+
+    def get_results(self, competition, scores, leaderboard=False, request=None):
+        if request and request.GET.get('up_to') and scores:
+            arrow_of_round = (int(request.GET['up_to']) + 1) * scores[0].target.session_entry.session_round.session.arrows_entered_per_end
+            cursor = connection.cursor()
+            cursor.execute('''
+            SELECT "scores_arrow"."score_id", SUM("scores_arrow"."arrow_value")
+            FROM "scores_arrow" WHERE "scores_arrow"."score_id" IN (
+                SELECT "scores_score"."id"
+                FROM "scores_score"
+                INNER JOIN "entries_targetallocation" ON ( "scores_score"."target_id" = "entries_targetallocation"."id" )
+                INNER JOIN "entries_sessionentry" ON ( "entries_targetallocation"."session_entry_id" = "entries_sessionentry"."id" )
+                INNER JOIN "entries_competitionentry" ON ( "entries_sessionentry"."competition_entry_id" = "entries_competitionentry"."id" )
+                WHERE "entries_competitionentry"."competition_id" = %s
+            ) AND "scores_arrow"."arrow_of_round" <= %s GROUP BY "scores_arrow"."score_id";
+            ''', (
+                competition.pk,
+                arrow_of_round,
+            ))
+            rows = cursor.fetchall()
+            partial_scores = dict(rows)
+            cursor.close()
+            for score in scores:
+                if partial_scores.get(score.pk) is not None:
+                    score.score = partial_scores[score.pk]
+                    score.hits = ''
+                    score.golds = ''
+                    score.xs = ''
+        self.leaderboard = leaderboard
+        rounds = self.get_rounds(competition)
+        return OrderedDict((
+            self.get_section_for_round(round),
+            self.get_round_results(competition, round, scores)
+        ) for round in rounds)
+
+
 class DoubleRound(BaseResultMode):
     slug = 'double-round'
     name = 'Double round'
 
-    def get_results(self, competition, scores, leaderboard=False):
+    def get_results(self, competition, scores, leaderboard=False, request=None):
         """Get the results for each category, by round.
 
         Strategy:
@@ -327,7 +370,7 @@ class Team(BaseResultMode):
         super(Team, self).__init__(**kwargs)
         self.include_distance_breakdown = False  # always for teams
 
-    def get_results(self, competition, scores, leaderboard=False):
+    def get_results(self, competition, scores, leaderboard=False, request=None):
         """
         Strategy:
         - split by team
@@ -419,7 +462,7 @@ class Weekend(BaseResultMode):
     def __init__(self, **kwargs):
         self.init_kwargs = kwargs
 
-    def get_results(self, competition, scores, leaderboard=False):
+    def get_results(self, competition, scores, leaderboard=False, request=None):
         """
         Strategy:
          - Get the results for the two rounds as if they were normal shoots
@@ -432,7 +475,7 @@ class Weekend(BaseResultMode):
         from olympic.models import OlympicSessionRound
 
         wrapped_mode = ByRound(**self.init_kwargs)
-        round_results = wrapped_mode.get_results(competition, scores, leaderboard=leaderboard)
+        round_results = wrapped_mode.get_results(competition, scores, leaderboard=leaderboard, request=request)
         h2h_categories = OlympicSessionRound.objects.filter(session__competition=competition).select_related('category')
 
         full_results = OrderedDict()
