@@ -188,6 +188,16 @@ class Registration(TargetList):
     def add_unallocated_entries(self, target_list):
         pass
 
+    def get_target_list(self):
+        target_list = super(Registration, self).get_target_list()
+        for session, entries in target_list.items():
+            unregistered = 0
+            for target in target_list[session]['targets']:
+                if not target.session_entry.present:
+                    unregistered += 1
+            target_list[session]['unregistered'] = unregistered
+        return target_list
+
     def post(self, request, slug):
         present = request.POST['present'] == 'true'
         updated = SessionEntry.objects.filter(pk=request.POST['pk']).update(present=present)

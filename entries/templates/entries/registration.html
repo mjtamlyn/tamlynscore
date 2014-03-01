@@ -20,6 +20,7 @@
         <span class="unallocated" title="Unallocated entries">{{ details.entries|length }}</span>
         {% endif %}
         <a class="btn" href="#session-{{ session.pk }}">Skip</a>
+        <small title="Unregistered entries">{{ details.unregistered }} Unregistered</small>
         </li>
         {% endfor %}
     </ul>
@@ -40,8 +41,12 @@
             <th>Club</th>
             <th>Bowstyle</th>
             <th>Gender</th>
+            {% if competition.has_novices %}
             <th>Experience</th>
-            <!--th>Age</th-->
+            {% endif %}
+            {% if competition.has_juniors %}
+            <th>Age</th>
+            {% endif %}
             <th>GNAS No.</th>
             <th>Present</th>
         </thead>
@@ -53,8 +58,12 @@
             <td>{{ archer.session_entry.competition_entry.club }} {% if not archer.session_entry.competition_entry.club == archer.session_entry.competition_entry.archer.club %}({{ archer.session_entry.competition_entry.archer.club.name }}){% endif %}</td>
             <td>{{ archer.session_entry.competition_entry.bowstyle }}</td>
             <td>{{ archer.session_entry.competition_entry.archer.get_gender_display }}</td>
+            {% if competition.has_novices %}
             <td>{{ archer.session_entry.competition_entry.archer.get_novice_display }}</td>
-            <!--td>{{ archer.session_entry.competition_entry.get_age_display }}</td-->
+            {% endif %}
+            {% if competition.has_juniors %}
+            <td>{{ archer.session_entry.competition_entry.get_age_display }}</td>
+            {% endif %}
             <td>{{ archer.session_entry.competition_entry.archer.gnas_no }}</td>
             <td>
                 {% if archer %}
