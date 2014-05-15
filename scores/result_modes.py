@@ -51,7 +51,7 @@ class BaseResultMode(object):
         raise ImproperlyConfigured('Subclasses must implement get_results')
 
     def sort_results(self, scores):
-        results = sorted(scores, key=lambda s: (s.score, s.golds, s.xs, s.hits), reverse=True)
+        results = sorted(scores, key=lambda s: (s.score, s.hits, s.golds, s.xs), reverse=True)
         placing = 0
         current_score = None
         placing_counter = 1
@@ -59,7 +59,7 @@ class BaseResultMode(object):
             if score.disqualified or score.guest:
                 score.placing = None
             else:
-                score_repr = (score.score, score.golds, score.xs, score.hits)
+                score_repr = (score.score, score.hits, score.golds, score.xs)
                 if score_repr == current_score:
                     placing_counter += 1
                 else:
@@ -431,7 +431,7 @@ class Team(BaseResultMode):
             team_size = competition.team_size
             if type == 'Novice' and competition.novice_team_size:
                 team_size = competition.novice_team_size
-            club_scores = sorted(club_scores, key=lambda s: (s.score, s.golds, s.xs, s.hits), reverse=True)[:team_size]
+            club_scores = sorted(club_scores, key=lambda s: (s.score, s.hits, s.golds, s.xs), reverse=True)[:team_size]
             if not club_scores:
                 continue
             if len(club_scores) < team_size and not competition.allow_incomplete_teams:

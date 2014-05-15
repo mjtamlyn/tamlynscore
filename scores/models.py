@@ -91,6 +91,7 @@ class Score(models.Model):
 
     def update_score(self):
         if self.target.session_entry.session_round.session.scoring_system == SCORING_FULL:
+            scoring_type = self.target.session_entry.session_round.shot_round.scoring_type
             arrows = self.arrow_set.all()
             self.score = self.alteration
             self.hits = 0
@@ -98,11 +99,13 @@ class Score(models.Model):
             self.xs = 0
             for arrow in arrows:
                 self.score += arrow.arrow_value
-                if arrow.arrow_value > 0:
+                if scoring_type in ['F', 'T', 'W'] and arrow.arrow_value > 0:
                     self.hits += 1
-                if arrow.arrow_value == 10:
+                if ((scoring_type in ['T', 'X', 'I'] and arrow.arrow_value == 10) or
+                    (scoring_type == 'F' and arrow.arrow_value == 9) or
+                    (scoring_type == 'W' and arrow.arrow_value == 5)):
                     self.golds += 1
-                if arrow.is_x:
+                if scoring_type == 'X' and arrow.is_x:
                     self.xs += 1
         elif self.target.session_entry.session_round.session.scoring_system == SCORING_DOZENS:
             self.score = self.dozen_set.aggregate(total=models.Sum('total'))['total'] or 0 + self.alteration

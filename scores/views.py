@@ -365,7 +365,7 @@ class LeaderboardTeams(ListView):
                 club_results[club] = []
             club_results[club].append(score)
         for club, scores in club_results.iteritems():
-            team = sorted(scores, key=lambda s: (s.score, s.hits, s.golds), reverse=True)[:max_per_team]
+            team = sorted(scores, key=lambda s: (s.score, s.hits, s.golds, s.xs), reverse=True)[:max_per_team]
             total = sum([s.score for s in team])
             total_golds = sum([s.golds for s in team])
             total_hits = sum([s.hits for s in team])
@@ -378,7 +378,7 @@ class LeaderboardTeams(ListView):
                 'total_hits': total_hits,
                 'club': club,
             }
-        club_results = sorted(club_results.values(), key=lambda s: (s['total'], s['total_golds']), reverse=True)
+        club_results = sorted(club_results.values(), key=lambda s: (s['total'], ['total_hits'], s['total_golds'], s['total_xs']), reverse=True)
         club_results = filter(lambda t: len(t['team']) == max_per_team, club_results)
         return club_results
 
