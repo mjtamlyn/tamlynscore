@@ -13,6 +13,10 @@ class CompetitionEntryAdmin(admin.ModelAdmin):
     raw_id_fields = ('archer',)
 
 
+class ResultModeAdmin(admin.ModelAdmin):
+    list_display = ('competition', 'mode')
+
+
 class SessionEntryAdmin(admin.ModelAdmin):
     list_display = ('competition_entry', 'session_round')
     list_filter = ('session_round',)
@@ -30,7 +34,7 @@ class TargetAllocationAdmin(admin.ModelAdmin):
 admin.site.register(Tournament)
 admin.site.register(Sponsor)
 admin.site.register(Competition, CompetitionAdmin)
-admin.site.register(ResultsMode)
+admin.site.register(ResultsMode, ResultModeAdmin)
 admin.site.register(Session)
 admin.site.register(SessionRound)
 admin.site.register(CompetitionEntry, CompetitionEntryAdmin)
