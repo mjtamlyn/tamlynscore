@@ -13,8 +13,9 @@ DISTANCE_UNITS = (
 
 SCORING_TYPES = (
     ('F', 'Five Zone Imperial'),
-    ('T', 'Ten Zone'),
-    ('X', 'Ten Zone (with Xs)'),
+    ('T', 'AGB Indoor - Ten Zone, no Xs, with hits'),
+    ('X', 'WA Outdoor - Ten Zone, with Xs, no hits'),
+    ('I', 'WA Indoor - Ten Zone, no Xs, no hits'),
     ('W', 'Worcester'),
 )
 
