@@ -3,7 +3,7 @@ Pillow==1.7.8
 South==0.8.4
 dj-database-url==0.2.1
 -e git+git://github.com/kennethreitz/dj-static.git#egg=dj-static
-django-debug-toolbar==1.0.1
+django-debug-toolbar==1.2.1
 factory-boy==1.2.0
 gunicorn==18.0
 psycopg2==2.5.1
