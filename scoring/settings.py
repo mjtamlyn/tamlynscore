@@ -75,6 +75,7 @@ INSTALLED_APPS = (
     'south',
     'gunicorn',
 
+    'scoring',
     'core',
     'entries',
     'scores',
