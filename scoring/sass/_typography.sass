@@ -1,19 +1,29 @@
 @import _fonts.sass
 
 $font-header: "MuseoSlab", serif
-$font-serif: "Museo", serif
-$font-sans-serif: "MuseoSans", sans-serif
+$font-serif: Georgia
+$highlight-serif: "Museo", serif
+$font-sans-serif: "Trebuchet MS", Helvetica, sans-serif
+$highlight-sans-serif: "MuseoSans", sans-serif
 
 body
   font-family: $font-sans-serif
+  margin: 0
 
 h1, h2, h3, h4, h5, h6
   font-family: $font-header
-  font-weight: normal
-  background: -webkit-linear-gradient(lighten($darkbluegrey, 10%), $darkbluegrey, $darkbluegrey, lighten($darkbluegrey, 10%))
-  background: -moz-linear-gradient(lighten($darkbluegrey, 10%), $darkbluegrey, $darkbluegrey, lighten($darkbluegrey, 10%))
-  color: white
-  text-shadow: 0 0 1px $bg
-  margin: 5px 0px
-  padding: 5px
+  color: $darkbluegrey
+  margin: 8px 0 10px
   text-align: center
+
+a
+  color: $dark
+  text-decoration: none
+
+ul
+  list-style-type: none
+  margin: 0
+  padding: 0
+
+li
+  display: block

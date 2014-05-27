@@ -1,0 +1,19 @@
+ul.link-list
+  border-top: 1px solid $bg
+
+  li
+    border-bottom: 1px solid $bg
+    p
+      padding: 10px
+      margin: 0
+
+    a
+      padding: 10px
+      display: block
+      &:hover
+        background: $bg
+        cursor: pointer
+      &:before
+        content: ">"
+        color: $borders
+        margin-right: 5px

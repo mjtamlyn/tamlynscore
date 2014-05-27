@@ -8,6 +8,7 @@ from django.utils.datastructures import SortedDict
 from django.views.generic import View, DetailView, ListView
 from django.views.generic.edit import FormMixin
 from django.shortcuts import render, get_object_or_404
+from django.utils import timezone
 
 from reportlab.platypus import SimpleDocTemplate, Paragraph, Spacer, Table, PageBreak, TableStyle, KeepTogether
 from reportlab.lib.styles import getSampleStyleSheet
@@ -26,7 +27,16 @@ class CompetitionList(ListView):
     model = Competition
 
     def get_queryset(self):
-        return self.model.objects.all().select_related('tournament').order_by('-date')
+        qs = super(CompetitionList, self).get_queryset()
+        return qs.select_related('tournament').order_by('-date')
+
+    def get_context_data(self):
+        context = super(CompetitionList, self).get_context_data()
+        today = timezone.now().date
+        context['upcoming'] = context['object_list'].filter(date__gt=today)
+        context['current'] = context['object_list'].filter(date__lte=today, end_date__gte=today)
+        context['past'] = context['object_list'].filter(end_date__lt=today)
+        return context
 
 
 @class_view_decorator(login_required)

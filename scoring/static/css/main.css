@@ -1,3 +1,79 @@
+/* line 4, ../../sass/_layout.sass */
+* {
+  box-sizing: border-box;
+}
+
+/* line 7, ../../sass/_layout.sass */
+header {
+  margin: 0 auto;
+}
+/* line 9, ../../sass/_layout.sass */
+header h1 {
+  border-bottom: 1px solid #cccccc;
+  padding-bottom: 2px;
+}
+
+/* line 13, ../../sass/_layout.sass */
+footer {
+  font-size: 10px;
+  padding: 5px 0;
+  margin: 5px auto 0;
+  text-align: center;
+}
+/* line 18, ../../sass/_layout.sass */
+footer p {
+  margin: 0;
+}
+
+/* line 21, ../../sass/_layout.sass */
+.container {
+  width: 1170px;
+  margin: 0 auto;
+  padding: 0 15px;
+}
+
+/* line 26, ../../sass/_layout.sass */
+.row {
+  overflow: hidden;
+  *zoom: 1;
+  margin-left: -15px;
+  margin-right: -15px;
+  margin-bottom: 10px;
+}
+
+/* line 32, ../../sass/_layout.sass */
+.col3, .col6 {
+  float: left;
+  padding: 0 15px;
+}
+
+/* line 36, ../../sass/_layout.sass */
+.col6 {
+  width: 100%;
+}
+
+/* line 39, ../../sass/_layout.sass */
+.col3 {
+  width: 50%;
+}
+
+@media (max-width: 1200px) {
+  /* line 43, ../../sass/_layout.sass */
+  .container {
+    width: 910px;
+  }
+}
+@media (max-width: 950px) {
+  /* line 47, ../../sass/_layout.sass */
+  .container {
+    width: 100%;
+  }
+
+  /* line 50, ../../sass/_layout.sass */
+  .col3 {
+    width: 100%;
+  }
+}
 @font-face {
   font-family: "Museo";
   src: url("../fonts/Museo500-Regular-webfont.eot");
@@ -30,122 +106,109 @@
   font-style: italic;
 }
 
-/* line 7, ../../sass/_typography.sass */
+/* line 9, ../../sass/_typography.sass */
 body {
-  font-family: "MuseoSans", sans-serif;
+  font-family: "Trebuchet MS", Helvetica, sans-serif;
+  margin: 0;
 }
 
-/* line 10, ../../sass/_typography.sass */
+/* line 13, ../../sass/_typography.sass */
 h1, h2, h3, h4, h5, h6 {
   font-family: "MuseoSlab", serif;
-  font-weight: normal;
-  background: -webkit-linear-gradient(#20364e, #111d2a, #111d2a, #20364e);
-  background: -moz-linear-gradient(#20364e, #111d2a, #111d2a, #20364e);
-  color: white;
-  text-shadow: 0 0 1px #fbeedb;
-  margin: 5px 0px;
-  padding: 5px;
+  color: #111d2a;
+  margin: 8px 0 10px;
   text-align: center;
 }
 
-/* line 6, ../../sass/main.sass */
-body {
-  background-color: #002147;
-  font-family: Georgia;
-}
-
-/* line 10, ../../sass/main.sass */
-h1, h2, h3, h4, h5, h6 {
-  background: #111d2a;
-  background-image: -webkit-linear-gradient(#20364e, #111d2a, #111d2a, #20364e);
-  color: white;
-  margin: 5px 0px;
-  padding: 5px;
-  text-align: center;
-}
-
-/* line 18, ../../sass/main.sass */
+/* line 19, ../../sass/_typography.sass */
 a {
   color: #000f1f;
   text-decoration: none;
 }
 
-/* line 22, ../../sass/main.sass */
+/* line 23, ../../sass/_typography.sass */
 ul {
   list-style-type: none;
   margin: 0;
   padding: 0;
 }
 
-/* line 27, ../../sass/main.sass */
+/* line 28, ../../sass/_typography.sass */
 li {
   display: block;
 }
 
-/* line 30, ../../sass/main.sass */
-.clear {
-  clear: both;
+/* line 1, ../../sass/components/_link_list.sass */
+ul.link-list {
+  border-top: 1px solid #f0f0f0;
+}
+/* line 4, ../../sass/components/_link_list.sass */
+ul.link-list li {
+  border-bottom: 1px solid #f0f0f0;
+}
+/* line 6, ../../sass/components/_link_list.sass */
+ul.link-list li p {
+  padding: 10px;
+  margin: 0;
+}
+/* line 10, ../../sass/components/_link_list.sass */
+ul.link-list li a {
+  padding: 10px;
+  display: block;
+}
+/* line 13, ../../sass/components/_link_list.sass */
+ul.link-list li a:hover {
+  background: #f0f0f0;
+  cursor: pointer;
+}
+/* line 16, ../../sass/components/_link_list.sass */
+ul.link-list li a:before {
+  content: ">";
+  color: #cccccc;
+  margin-right: 5px;
 }
 
-/* line 33, ../../sass/main.sass */
+/* line 8, ../../sass/main.sass */
+.wrapper {
+  color: #000f1f;
+  width: 100%;
+}
+
+/* line 12, ../../sass/main.sass */
+nav {
+  background: #f0f0f0;
+  border-bottom: 1px solid #f0f0f0;
+  overflow: hidden;
+  text-align: center;
+  width: 100%;
+}
+/* line 18, ../../sass/main.sass */
+nav .nav-link {
+  background-color: #002147;
+  color: white;
+  display: inline-block;
+  padding: 8px 8px 8px 8px;
+  margin: 0 5px;
+}
+/* line 24, ../../sass/main.sass */
+nav .nav-link:hover {
+  background-color: #8579fa;
+}
+
+/* line 27, ../../sass/main.sass */
+.clear {
+  overflow: hidden;
+  *zoom: 1;
+}
+
+/* line 30, ../../sass/main.sass */
 .hidden {
   display: none;
 }
 
-/* line 36, ../../sass/main.sass */
+/* line 33, ../../sass/main.sass */
 .text-right {
   text-align: right;
-}
-
-/* line 39, ../../sass/main.sass */
-.wrapper {
-  background-color: #fbeedb;
-  border-radius: 15px;
-  color: #000f1f;
-  margin: 20px auto;
-  width: 1000px;
-}
-
-/* line 46, ../../sass/main.sass */
-nav {
-  background-image: -webkit-linear-gradient(#dddafa, #fbeedb);
-  border-radius: 15px 15px 0 0;
-  font-weight: bold;
-  overflow: hidden;
-  padding-bottom: 10px;
-  text-align: center;
-  width: 100%;
-}
-/* line 54, ../../sass/main.sass */
-nav .nav-link {
-  background-color: #002147;
-  border-radius: 0 0 5px 5px;
-  box-shadow: 0px 1px 2px #000f1f;
-  color: white;
-  display: inline-block;
-  padding: 8px 8px 3px 8px;
-  position: relative;
-  top: -5px;
-  -webkit-transition: all 0.15s ease-in-out;
-}
-/* line 64, ../../sass/main.sass */
-nav .nav-link:hover {
-  box-shadow: 0px 1px 3px #000f1f;
-  background-color: #8579fa;
-  position: relative;
-  top: 0px;
-}
-
-/* line 70, ../../sass/main.sass */
-footer {
-  font-size: 10px;
-  padding: 5px 0;
-  margin-top: 5px;
-  text-align: center;
-}
-/* line 75, ../../sass/main.sass */
-footer p {
-  margin: 0;
 }
 
 /* line 1, ../../sass/_accounts.sass */
@@ -198,7 +261,7 @@ footer p {
 
 /* line 3, ../../sass/_competition.sass */
 .module {
-  background-color: #fefbf7;
+  background-color: white;
   border: 1px solid #111d2a;
 }
 /* line 7, ../../sass/_competition.sass */
@@ -475,7 +538,7 @@ footer p {
 }
 /* line 224, ../../sass/_competition.sass */
 .competition-section .competition-content .target-list .target-list-gen .archer.blank {
-  background-color: #fbeedb;
+  background-color: #f0f0f0;
 }
 /* line 227, ../../sass/_competition.sass */
 .competition-section .competition-content .target-list .target-list-gen .board-wrapper {
@@ -591,7 +654,7 @@ footer p {
 }
 /* line 305, ../../sass/_competition.sass */
 .competition-section .competition-content .registration .registration-board table tr.present {
-  background-color: #fbeedb;
+  background-color: #f0f0f0;
 }
 /* line 308, ../../sass/_competition.sass */
 .competition-section .competition-content .registration .registration-board table tr.present a.present {
@@ -915,7 +978,7 @@ footer p {
 }
 /* line 559, ../../sass/_competition.sass */
 .leaderboard-butc .wrapper #leaderboard .club .title {
-  color: #fbeedb;
+  color: #f0f0f0;
   font-size: 33.6px;
   font-weight: bold;
   display: block;
@@ -1708,7 +1771,7 @@ footer p {
 
 /* line 31, ../../sass/_target_list.sass */
 .btn {
-  font-family: "MuseoSans", sans-serif;
+  font-family: "Trebuchet MS", Helvetica, sans-serif;
   border-radius: 7px;
   background-image: -webkit-linear-gradient(#b4adf4, #dddafa, #b4adf4);
   font-size: 14px;
