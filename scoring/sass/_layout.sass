@@ -1,0 +1,51 @@
+$max-page-width: 1200px
+$margin-width: 15px
+
+*
+  box-sizing: border-box
+
+header
+  margin: 0 auto
+  h1
+    border-bottom: 1px solid $borders
+    padding-bottom: 2px
+
+footer
+  font-size: 10px
+  padding: 5px 0
+  margin: 5px auto 0
+  text-align: center
+  p
+    margin: 0
+
+.container
+  width: $max-page-width - 2 * $margin-width
+  margin: 0 auto
+  padding: 0 $margin-width
+
+.row
+  @include clearfix
+  margin-left: -$margin-width
+  margin-right: -$margin-width
+  margin-bottom: 10px
+
+.col3, .col6
+  float: left
+  padding: 0 $margin-width
+
+.col6
+  width: 100%
+
+.col3
+  width: 50%
+
+@media (max-width: 1200px)
+  .container
+    width: 940px - 2 * $margin-width
+
+@media (max-width: 950px)
+  .container
+    width: 100%
+  
+  .col3
+    width: 100%
