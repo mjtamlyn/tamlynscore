@@ -1,5 +1,6 @@
 {% extends 'entries/competition_detail.html' %}
 
+<<<<<<< HEAD
 {% block page_id %}entry-list{% endblock %}
 
 {% block scripts %}
@@ -142,6 +143,8 @@ Elements.from = function(text, excludeScripts){
 </script>
 {% endblock %}
 
+=======
+>>>>>>> new-entry-system
 {% block competition_content %}
 <div class="row">
     <div class="new-entry col3">
@@ -153,6 +156,7 @@ Elements.from = function(text, excludeScripts){
                 {{ form.sessions }}
                 {{ form.bowstyle }}
 
+<<<<<<< HEAD
                 <div class="show-more-details button">
                     More options <div class="pointer">&raquo;</div>
                 </div>
@@ -238,23 +242,68 @@ Elements.from = function(text, excludeScripts){
 
 
 
-        <table>
-            <thead>
-                <th colspan="4">Archer</th>
-                {% for session in competition.sessions_with_rounds %}
-                <th>{{ session.start|date:"l j/n H:i" }}</th>
-                {% endfor %}
-            </thead>
-            {% regroup object_list by competition_entry as entries %}
-            {% for group in entries %}
-            {% with group.grouper as entry %}
-            {% with group.list as rounds_entered %}
-            {% include 'includes/entry_row.html' %}
-            {% endwith %}
-            {% endwith %}
-            {% endfor %}
-        </table>
+<div class="competition-entries">
+    <div class="module">
+        <form method="GET" action="" class="search-form">
+            <strong>Search:</strong><br>
+            {{ search_form }}
+        </form>
+        <form method="POST" action="{# url 'new_entry' slug=competition.slug #}" class="new-form">
+            {% csrf_token %}
+            <strong>Add entry:</strong><br>
+            {{ new_form }}
+        </form>
+        <div class="stats">
+            {{ entries|length }} entries
+        </div>
     </div>
+    <table class="entries">
+        <thead>
+            <tr>
+                <th></th>
+                <th>Archer</th>
+                <th>Details</th>
+                {% for session in sessions %}
+                <th>{{ session.session.start }}</th>
+                {% endfor %}
+            </tr>
+        </thead>
+        <tbody>
+            {% for entry in entries %}
+            <tr>
+                <td class="actions">
+                    <a>Edit</a>
+                    <a>Delete</a>
+                </td>
+                <td>{{ entry.entry.archer }}</td>
+                <td class="details">
+                    {{ entry.entry.club }}<br>
+                    {{ entry.entry.bowstyle }}<br>
+                    {% if competition.has_novices %}
+                        {{ entry.entry.get_novice_display }}<br>
+                    {% endif %}
+                    {% if competition.has_juniors %}
+                        {{ entry.entry.archer.get_age_display }}<br>
+                    {% endif %}
+                    {% if entry.entry.guest %}
+                        <em>Guest</em><br>
+                    {% endif %}
+                </td>
+                {% for session in sessions %}
+                <td>
+                    {% for round in session.rounds %}
+                        {% for round_pk in entry.rounds %}
+                            {% if round_pk == round.pk %}
+                                {{ round.shot_round }}
+                            {% endif %}
+                        {% endfor %}
+                    {% endfor %}
+                </td>
+                {% endfor %}
+            </tr>
+            {% endfor %}
+        </tbody>
+    </table>
 </div>
 
 {% endblock %}

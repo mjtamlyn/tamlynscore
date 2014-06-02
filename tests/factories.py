@@ -27,6 +27,7 @@ class UserFactory(factory.Factory):
 
 class BowstyleFactory(factory.Factory):
     FACTORY_FOR = core_models.Bowstyle
+    name = factory.Sequence(lambda n: 'Bowstyle %s' % n)
 
 
 class ClubFactory(factory.Factory):
@@ -44,6 +45,7 @@ class ArcherFactory(factory.Factory):
 
 class TournamentFactory(factory.Factory):
     FACTORY_FOR = entries_models.Tournament
+    short_name = factory.Sequence(lambda n: 'Tournament %s' % n)
     host_club = factory.SubFactory(ClubFactory)
 
 
@@ -51,6 +53,7 @@ class CompetitionFactory(factory.Factory):
     FACTORY_FOR = entries_models.Competition
     tournament = factory.SubFactory(TournamentFactory)
     date = timezone.now().date()
+    slug = factory.Sequence(lambda n: 'comeptition-%s' % n)
 
 
 class SessionFactory(factory.Factory):
@@ -69,3 +72,19 @@ class SessionRoundFactory(factory.Factory):
     FACTORY_FOR = entries_models.SessionRound
     session = factory.SubFactory(SessionFactory)
     shot_round = factory.SubFactory(RoundFactory)
+
+
+class CompetitionEntryFactory(factory.Factory):
+    FACTORY_FOR = entries_models.CompetitionEntry
+    competition = factory.SubFactory(CompetitionFactory)
+    archer = factory.SubFactory(ArcherFactory)
+    club = factory.SubFactory(ClubFactory)
+    bowstyle = factory.SubFactory(BowstyleFactory)
+    age = 'S'
+    novice = 'E'
+
+
+class SessionEntryFactory(factory.Factory):
+    FACTORY_FOR = entries_models.SessionEntry
+    competition_entry = factory.SubFactory(CompetitionEntryFactory)
+    session_round = factory.SubFactory(SessionRoundFactory)

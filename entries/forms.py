@@ -1,178 +1,61 @@
+from django.db import transaction
 from django import forms
-from django.utils.safestring import mark_safe
 
-from core.models import Club, Archer, GENDER_CHOICES, NOVICE_CHOICES, AGE_CHOICES
-from entries.models import CompetitionEntry, SessionEntry
-
-GENDER_CHOICES = (('', ''),) + GENDER_CHOICES
-
-class ButtonWidget(forms.widgets.Select):
-    def render(self, name, value, attrs=None):
-        response = u"""<div class="buttons-widget" id="{name}-widget">
-                        <div class="select">
-                            {select}
-                        </div>
-                        """
-        for choice in self.choices:
-            if choice[0] == value:
-                klass = 'button selected'
-            else:
-                klass = 'button'
-            if choice[0]:
-                response += u"""<div class="{klass}" rel="{0}">
-                                {1}
-                            </div>""".format(klass=klass, *choice)
-        response += u'</div>'
-        select = super(ButtonWidget, self).render(name, value, attrs=attrs)
-        response = response.format(name=name, select=select)
-        return mark_safe(response)
-
-
-class SelectWidget(forms.widgets.MultiWidget):
-    def __init__(self, attrs=None):
-        widgets = [forms.widgets.Select(attrs=attrs), forms.widgets.TextInput(attrs=attrs)]
-        super(SelectWidget, self).__init__(widgets, attrs)
-        self.choices = []
-
-    def decompress(self, value):
-        return [value, value]
-
-    def _get_choices(self):
-        return self._choices
-    def _set_choices(self, value):
-        self.widgets[0].choices = value
-        self._choices = value
-    choices = property(_get_choices, _set_choices)
-
-    def render(self, name, value, attrs=None):
-        # Hacked from the default one to allow format_output to know about name
-        if self.is_localized:
-            for widget in self.widgets:
-                widget.is_localized = self.is_localized
-        # value is a list of values, each corresponding to a widget
-        # in self.widgets.
-        if not isinstance(value, list):
-            value = self.decompress(value)
-        output = []
-        final_attrs = self.build_attrs(attrs)
-        id_ = final_attrs.get('id', None)
-        for i, widget in enumerate(self.widgets):
-            try:
-                widget_value = value[i]
-            except IndexError:
-                widget_value = None
-            if id_:
-                final_attrs = dict(final_attrs, id='%s_%s' % (id_, i))
-            output.append(widget.render(name + '_%s' % i, widget_value, final_attrs))
-        return mark_safe(self.format_output(output, name))
-
-    def format_output(self, rendered_widgets, name):
-        output = u"""
-                <div class="select-widget" id="{name}-widget">
-                    <div class="select">
-                        {0}
-                    </div>
-                    {1}
-                    <div class="options-wrapper">
-                        <ul class="options"></ul>
-                    </div>
-                </div>
-        """.format(*rendered_widgets, name=name)
-        return mark_safe(output)
-
-
-class JsonChoiceField(forms.ModelChoiceField):
-    def label_from_instance(self, obj):
-        return obj.json()
-
-    def to_python(self, value):
-        pk, name = value
-        if pk:
-            return super(JsonChoiceField, self).to_python(pk)
-        elif name:
-            return self.queryset.model(name=name)
+from core.models import Archer
+from .models import CompetitionEntry, SessionEntry
 
 
 class SessionChoiceField(forms.ModelChoiceField):
-    widget = ButtonWidget
-
-    def __init__(self, session, *args, **kwargs):
-        qs = session.sessionround_set.select_related('shot_round')
-        super(SessionChoiceField, self).__init__(qs, *args, **kwargs)
-
     def label_from_instance(self, obj):
-        return obj.shot_round
+        return unicode(obj.shot_round)
 
 
-class NewEntryForm(forms.ModelForm):
-    archer = JsonChoiceField(queryset=Archer.objects.select_related('bowstyle', 'club'), widget=SelectWidget(attrs={'placeholder': 'Add an archer...'}))
-    club = JsonChoiceField(queryset=Club.objects, widget=SelectWidget(attrs={'placeholder': 'Club'}))
+class EntrySearchForm(forms.Form):
+    pass
 
-    gender = forms.ChoiceField(choices=GENDER_CHOICES, widget=ButtonWidget)
-    novice = forms.ChoiceField(choices=NOVICE_CHOICES, widget=ButtonWidget, initial='E')
-    age = forms.ChoiceField(choices=AGE_CHOICES, widget=ButtonWidget, initial='S')
-    gnas_no = forms.IntegerField(widget=forms.widgets.TextInput(attrs={'placeholder': 'GNAS number'}), required=False)
 
-    class Meta:
-        model = CompetitionEntry
-        exclude = ['competition', 'archer', 'club']
-        widgets = {
-            'bowstyle': ButtonWidget,
-            'novice': ButtonWidget,
-            'age': ButtonWidget,
-        }
+class EntryCreateForm(forms.Form):
+    archer = forms.ModelChoiceField(Archer.objects)
+    guest = forms.BooleanField(required=False)
 
-    def __init__(self, competition, *args, **kwargs):
-        super(NewEntryForm, self).__init__(*args, **kwargs)
+    def __init__(self, competition, **kwargs):
         self.competition = competition
-        sessions = competition.sessions_with_rounds()
-        self.session_fields = {}
-        self.sessions_by_field = {}
-        for i in range(len(sessions)):
-            field = SessionChoiceField(sessions[i], required=False)
-            key = 'session-{0}'.format(i)
-            self.fields[key] = field
-            self.session_fields[key] = field
-            self.sessions_by_field[key] = sessions[i]
-
-    def save(self, *args, **kwargs):
-        #TODO: deal with commit=False
-        club = self.cleaned_data['club']
-        if not club.pk:
-            club.short_name = club.name[:50]
-            club.clean()
-            club.save()
-        archer = self.cleaned_data['archer']
-        if not archer.pk:
-            archer.club = club
-            archer.bowstyle = self.cleaned_data['bowstyle']
-            archer.novice = self.cleaned_data['novice']
-            archer.gnas_no = self.cleaned_data['gnas_no']
-            archer.age = self.cleaned_data['age']
-            archer.gender = self.cleaned_data['gender']
-            archer.save()
-        entry = super(NewEntryForm, self).save(commit=False, *args, **kwargs)
-        entry.competition = self.competition
-        entry.archer = archer
-        entry.club = club
-        entry.save()
-        for field in self.session_fields:
-            if self.cleaned_data[field]:
-                session_round = self.cleaned_data[field]
-                session_entry = SessionEntry(competition_entry=entry, session_round=session_round)
-                session_entry.save()
-        return entry
+        super(EntryCreateForm, self).__init__(**kwargs)
+        self.session_fields = []
+        for session in self.competition.session_set.order_by('start').prefetch_related('sessionround_set'):
+            field = SessionChoiceField(session.sessionround_set.all(), required=False, label=session.start)
+            field.key = 'session_%s' % session.pk
+            self.fields[field.key] = field
+            self.session_fields.append(field)
 
     def clean(self):
-        sessions = filter(None, [self.cleaned_data[field] for field in self.session_fields])
-        if not sessions:
-            raise forms.ValidationError('You should enter at least one session')
+        data = self.cleaned_data
+        if 'archer' in data:
+            archer = data['archer']
+            for field in ['bowstyle', 'club', 'age', 'novice']:
+                if field not in data:
+                    self.cleaned_data[field] = getattr(archer, field)
+        if self.session_fields:
+            if not any(data[field.key] for field in self.session_fields):
+                raise forms.ValidationError('Must enter at least one session')
         return self.cleaned_data
 
-    def sessions(self):
-        response = u''
-        for field in sorted(self.session_fields.keys()):
-            response += '<p>' + self.sessions_by_field[field].start.strftime('%Y-%m-%d %I:%M %p') + '</p>'
-            response += unicode(self[field])
-        return mark_safe(response)
-
+    def save(self):
+        data = self.cleaned_data
+        with transaction.atomic():
+            competition_entry = CompetitionEntry.objects.create(
+                competition=self.competition,
+                archer=data['archer'],
+                club=data['club'],
+                bowstyle=data['bowstyle'],
+                age=data['age'],
+                novice=data['novice'],
+                guest=data['guest'],
+            )
+            for field in self.session_fields:
+                if data[field.key]:
+                    SessionEntry.objects.create(
+                        competition_entry=competition_entry,
+                        session_round=data[field.key],
+                    )
+        return competition_entry

@@ -239,13 +239,6 @@ class SessionEntry(models.Model):
     present = models.BooleanField(default=False)
     index = models.PositiveIntegerField(default=1)
 
-    def save(self, *args, **kwargs):
-        if not self.pk:
-            super(SessionEntry, self).save(*args, **kwargs)
-        entries = self.competition_entry.sessionentry_set.order_by('session_round__session__start')
-        self.index = list(entries).index(self) + 1
-        return super(SessionEntry, self).save(*args, **kwargs)
-
     def __unicode__(self):
         return u'{0} - {1}'.format(self.competition_entry, self.session_round.shot_round)
 
