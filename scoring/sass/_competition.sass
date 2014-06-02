@@ -1,399 +1,365 @@
-$navborder: 1px solid $bluegrey
+.competition-nav
+  height: 100%
 
-.module
-  background-color: $lightbg
-  border: 1px solid $darkbluegrey
+  p
+    font-family: $highlight-sans-serif
+    font-weight: bold
 
-  h4
-    margin-top: 0
+  a
+    font-size: 0.9em
 
+#entry-list
 
-.competition-section
-  margin: 15px 10px
-
-  .competition-nav
-    border: $navborder
-      top: none
-    background-color: $vlightblue
+  .new-entry
     float: left
-    height: 100%
-    width: 200px
-    h2
-      font-size: 18px
-      margin: 0
+
+    $input-width: 300px
+
+    .new-entry-form
       padding: 5px
-    ul
-      margin: 0
-      padding: 0
-      li
-        border-bottom: $navborder
-        padding: 7px 10px
-      a
-        &:hover
-          text-decoration: none
-          li
-            background-color: $darkblue
-            color: white
-
-  .competition-content
-    float: left
-    margin: 0 10px
-    width: 758px
-
-    .competition-entries
-
-      .top
-        .new-entry
-          float: left
-
-          $input-width: 300px
-
-          .new-entry-form
-            padding: 5px
-
-            input
-              border: 2px solid $vlightblue
-                radius: 4px
-              font:
-                family: Verdana
-                size: 18px
-              margin: 0
-              outline: none
-              padding: 5px
-              width: $input-width
-              &:focus
-                border-color: $lightblue
-              &::webkit-input-placeholder
-                font-style: italic
-
-            .options-wrapper
-
-              $sidespacing: 0px
-              .options
-                margin: 0 $sidespacing
-                width: $input-width - 2 * $sidespacing
-
-                .option
-                  background-color: white
-                  border:
-                    left: 2px solid $vlightblue
-                    right: 2px solid $vlightblue
-                    bottom: 1px solid $vlightblue
-                  font:
-                    family: Verdana
-                  padding: 3px 5px
-                  &:last-child
-                    border-bottom-width: 2px
-                  &.selected
-                    background-color: $bluegrey
-                    color: white
-
-            #archer-widget
-              margin: 0 auto 10px
-              width: $input-width
-
-            .archer-details
-              visibility: hidden
-              opacity: 0
-              width: 450px
-              -webkit-transition: all 0.2s ease-in-out
-              &.shown
-                visibility: visible
-                opacity: 1
-
-              p
-                margin: 0
-                text-align: center
-
-              .button
-                border: 2px solid $lightblue
-                  radius: 10px
-                background-image: -webkit-linear-gradient(darken($vlightblue, 10%), $vlightblue, darken($vlightblue, 10%))
-                cursor: pointer
-                padding: 5px
-                text-align: center
-                -webkit-user-select: none
-                &.selected
-                  background-image: -webkit-linear-gradient($darkbluegrey, $bluegrey, $darkbluegrey)
-                  border-color: $darkbluegrey
-                  color: white
-
-              #club-widget
-                margin: 0 auto
-                width: $input-width
-
-              .save
-                background-image: -webkit-linear-gradient($darkbluegrey, $bluegrey, $darkbluegrey)
-                border-color: $darkbluegrey
-                color: white
-                float: right
-
-              .show-more-details
-                float: left
-                cursor: pointer
-                .pointer
-                  display: inline-block
-                  font-size: 20px
-                  line-height: 12px
-                  -webkit-transition: -webkit-transform 0.2s ease-in-out
-                &.selected
-                  .pointer
-                    -webkit-transform: rotate(90deg)
-
-
-              .more-details
-                display: none
-                padding: 10px 0
-                text-align: center
-                &.shown
-                  display: block
-
-
-        .stats
-          float: right
-
-          ul
-            margin: 0 10px 10px 10px
-
-      .entries-table
-        margin-top: 10px
-
-        table
-          border-collapse: collapse
-          width: 100%
-
-          td:last-child.delete
-            cursor: pointer
-          tr:hover
-            td:last-child.delete
-              background-color: $darkblue
-              color: white
-
-          td
-            padding: 3px
-
-          .top td
-            border-top: 1px solid $darkbluegrey
-
-          .bottom td
-            font-size: 14px
-
-          .tall
-            border-left: 1px solid $darkbluegrey
-            text-align: center
-
-
-    $border: 1px solid $darkbluegrey
-
-    .target-list-nav
-      .session-select
-        width: 100%
-      .round-select
-        display: none
-        &.selected
-          display: block
-        width: 100%
-      .link 
-        background-color: $vlightblue
-        float: left
-        font-weight: bold
-        text-align: center
-      .selected
-        background-color: $lightblue
-
-    .target-list
-      .target-list-gen
-        display: none
-        &.selected
-          display: block
-        width: 100%
-
-        .archer
-          background-color: $vlightblue
-          padding: 2px
-          border-bottom: $border
-          -webkit-user-select: none
-          &:not(.blank)
-            cursor: pointer
-            -webkit-user-drag: element
-          &:-webkit-drag
-            border: $border
-            opacity: 0.5
-            p:not(.name)
-              display: none
-          &.blank
-            background-color: $bg
-
-        .board-wrapper
-          float: left
-          width: 70%
-
-          .board
-            margin: 8px 0 8px 8px
-          
-            .target
-              width: 100%
-                
-              div
-                float: left
-                &.number
-                  text-align: center
-                  width: 8%
-                  p
-                    border: $border
-                    margin: 0
-                    padding: 2px 0
-                &.detail
-                  width: 92%
-                  &.drag-over
-                    .archer
-                      background-color: $lightblue
-                  .archer
-                    border: $border
-                    padding: 2px 0 2px 0
-                    width: 100%
-                    p
-                      margin: 0
-                      padding-left: 5px
-                      float: left
-                      &.club
-                        float: right
-                        padding-right: 5px
-
-        .entries-wrapper
-          float: right
-          width: 30%
-
-          .entries
-            border: $border
-            border-bottom: none
-            margin: 8px
-
-            h5
-              margin: 0
-
-            .archer
-              p
-                margin: 0
-                float: right
-                &.name
-                  float: left
-                &.club
-                  display: none
-
-    .registration
-      .registration-board
-        display: block
-
-        .actions
-          margin: 10px
-          .action
-            float: left
-            &.active
-              font-style: italic
-
-        table
-          border-collapse: collapse
-          margin-top: 10px
-          width: 100%
-          th
-            background-color: $vlightblue
-          th, td
-            border: $border
-            padding: 4px
-
-          tr.present
-            background-color: $bg
-      
-            a.present
-              display: none
-          tr:not(.present)
-            a.not-present
-              display: none
-
-    .input-scores
-      .input-board
-        display: block
-
-        $boss-size: 30px 
-        .boss
-          background-color: $vlightblue
-          border: 1px solid $lightblue
-          float: left
-          font-size: 20px
-          height: $boss-size
-          margin: 5px
-          text-align: center
-          width: $boss-size
-          &.done
-            background-color: $bluegrey
-            border-color: $darkbluegrey
-            color: white
-        .boss-link:focus
-          outline: none
-          .boss
-            border-color: $hlyellow
-            box-shadow: 0 0 5px $hlyellow
-
-    .input-arrows
-      table
-        margin: 0 auto
-
-        tr.disabled,
-        tr.disabled input
-          color: #ccc
 
       input
-        border: 1px solid $lightblue
-        border-radius: 3px
+        border: 2px solid $vlightblue
+          radius: 4px
+        font:
+          family: Verdana
+          size: 18px
+        margin: 0
         outline: none
-        text-align: center
-        width: 20px
+        padding: 5px
+        width: $input-width
         &:focus
-          box-shadow: 0 0 5px $hlyellow
+          border-color: $lightblue
+        &::webkit-input-placeholder
+          font-style: italic
 
-      .save
-        text-align: center
-        input
-          background: $vlightblue
-          background-image: -webkit-linear-gradient(darken($vlightblue, 10%), $vlightblue, darken($vlightblue, 10%))
-          border:
-            color: $lightblue
-            width: 2px
+      .options-wrapper
+
+        $sidespacing: 0px
+        .options
+          margin: 0 $sidespacing
+          width: $input-width - 2 * $sidespacing
+
+          .option
+            background-color: white
+            border:
+              left: 2px solid $vlightblue
+              right: 2px solid $vlightblue
+              bottom: 1px solid $vlightblue
+            font:
+              family: Verdana
+            padding: 3px 5px
+            &:last-child
+              border-bottom-width: 2px
+            &.selected
+              background-color: $bluegrey
+              color: white
+
+      #archer-widget
+        margin: 0 auto 10px
+        width: $input-width
+
+      .archer-details
+        visibility: hidden
+        opacity: 0
+        width: 450px
+        -webkit-transition: all 0.2s ease-in-out
+        &.shown
+          visibility: visible
+          opacity: 1
+
+        p
+          margin: 0
+          text-align: center
+
+        .button
+          border: 2px solid $lightblue
             radius: 10px
-          font:
-            family: Georgia
-            size: 16px
-          margin: 10px
-          padding: 5px 8px
-          width: auto
-          &:focus
-            border-color: $hlyellow
-            box-shadow: 0 0 5px $hlyellow
+          background-image: -webkit-linear-gradient(darken($vlightblue, 10%), $vlightblue, darken($vlightblue, 10%))
+          cursor: pointer
+          padding: 5px
+          text-align: center
+          -webkit-user-select: none
+          &.selected
+            background-image: -webkit-linear-gradient($darkbluegrey, $bluegrey, $darkbluegrey)
+            border-color: $darkbluegrey
+            color: white
 
-    .leaderboard
-      .board
-        display: none
-        &.selected
-          display: block
-        
-        table
-          width: 100%
+        #club-widget
+          margin: 0 auto
+          width: $input-width
 
-    .olympic
-      .board
-        display: none
-        &.selected
-          display: block
-
-        table
-          width: 100%
-
-        .remove-all
-          color: red
+        .save
+          background-image: -webkit-linear-gradient($darkbluegrey, $bluegrey, $darkbluegrey)
+          border-color: $darkbluegrey
+          color: white
           float: right
-          font-size: 12px
-          margin: 5px
+
+        .show-more-details
+          float: left
+          cursor: pointer
+          .pointer
+            display: inline-block
+            font-size: 20px
+            line-height: 12px
+            -webkit-transition: -webkit-transform 0.2s ease-in-out
+          &.selected
+            .pointer
+              -webkit-transform: rotate(90deg)
+
+
+        .more-details
+          display: none
+          padding: 10px 0
+          text-align: center
+          &.shown
+            display: block
+
+
+  .stats
+    float: right
+
+    ul
+      margin: 0 10px 10px 10px
+
+  .entries-table
+
+    table
+      border-collapse: collapse
+      width: 100%
+
+      td:last-child.delete
+        cursor: pointer
+      tr:hover
+        td:last-child.delete
+          background-color: $darkblue
+          color: white
+
+      td
+        padding: 3px
+
+      .top td
+        border-top: 1px solid $darkbluegrey
+
+      .bottom td
+        font-size: 14px
+
+      .tall
+        border-left: 1px solid $darkbluegrey
+        text-align: center
+
+
+$border: 1px solid $darkbluegrey
+
+.target-list-nav
+  .session-select
+    width: 100%
+  .round-select
+    display: none
+    &.selected
+      display: block
+    width: 100%
+  .link 
+    background-color: $vlightblue
+    float: left
+    font-weight: bold
+    text-align: center
+  .selected
+    background-color: $lightblue
+
+.target-list
+  .target-list-gen
+    display: none
+    &.selected
+      display: block
+    width: 100%
+
+    .archer
+      background-color: $vlightblue
+      padding: 2px
+      border-bottom: $border
+      -webkit-user-select: none
+      &:not(.blank)
+        cursor: pointer
+        -webkit-user-drag: element
+      &:-webkit-drag
+        border: $border
+        opacity: 0.5
+        p:not(.name)
+          display: none
+      &.blank
+        background-color: $bg
+
+    .board-wrapper
+      float: left
+      width: 70%
+
+      .board
+        margin: 8px 0 8px 8px
+      
+        .target
+          width: 100%
+            
+          div
+            float: left
+            &.number
+              text-align: center
+              width: 8%
+              p
+                border: $border
+                margin: 0
+                padding: 2px 0
+            &.detail
+              width: 92%
+              &.drag-over
+                .archer
+                  background-color: $lightblue
+              .archer
+                border: $border
+                padding: 2px 0 2px 0
+                width: 100%
+                p
+                  margin: 0
+                  padding-left: 5px
+                  float: left
+                  &.club
+                    float: right
+                    padding-right: 5px
+
+    .entries-wrapper
+      float: right
+      width: 30%
+
+      .entries
+        border: $border
+        border-bottom: none
+        margin: 8px
+
+        h5
+          margin: 0
+
+        .archer
+          p
+            margin: 0
+            float: right
+            &.name
+              float: left
+            &.club
+              display: none
+
+.registration
+  .registration-board
+    display: block
+
+    .actions
+      margin: 10px
+      .action
+        float: left
+        &.active
+          font-style: italic
+
+    table
+      border-collapse: collapse
+      margin-top: 10px
+      width: 100%
+      th
+        background-color: $vlightblue
+      th, td
+        border: $border
+        padding: 4px
+
+      tr.present
+        background-color: $bg
+  
+        a.present
+          display: none
+      tr:not(.present)
+        a.not-present
+          display: none
+
+.input-scores
+  .input-board
+    display: block
+
+    $boss-size: 30px 
+    .boss
+      background-color: $vlightblue
+      border: 1px solid $lightblue
+      float: left
+      font-size: 20px
+      height: $boss-size
+      margin: 5px
+      text-align: center
+      width: $boss-size
+      &.done
+        background-color: $bluegrey
+        border-color: $darkbluegrey
+        color: white
+    .boss-link:focus
+      outline: none
+      .boss
+        border-color: $hlyellow
+        box-shadow: 0 0 5px $hlyellow
+
+.input-arrows
+  table
+    margin: 0 auto
+
+    tr.disabled,
+    tr.disabled input
+      color: #ccc
+
+  input
+    border: 1px solid $lightblue
+    border-radius: 3px
+    outline: none
+    text-align: center
+    width: 20px
+    &:focus
+      box-shadow: 0 0 5px $hlyellow
+
+  .save
+    text-align: center
+    input
+      background: $vlightblue
+      background-image: -webkit-linear-gradient(darken($vlightblue, 10%), $vlightblue, darken($vlightblue, 10%))
+      border:
+        color: $lightblue
+        width: 2px
+        radius: 10px
+      font:
+        family: Georgia
+        size: 16px
+      margin: 10px
+      padding: 5px 8px
+      width: auto
+      &:focus
+        border-color: $hlyellow
+        box-shadow: 0 0 5px $hlyellow
+
+.leaderboard
+  .board
+    display: none
+    &.selected
+      display: block
+    
+    table
+      width: 100%
+
+.olympic
+  .board
+    display: none
+    &.selected
+      display: block
+
+    table
+      width: 100%
+
+    .remove-all
+      color: red
+      float: right
+      font-size: 12px
+      margin: 5px
 
 .mobile
   $mobile-width: 700px
