@@ -3,11 +3,11 @@ import json
 import math
 
 from django.contrib.auth.decorators import login_required
+from django.core.urlresolvers import reverse
 from django.http import HttpResponse, HttpResponseBadRequest, Http404
 from django.utils.datastructures import SortedDict
-from django.views.generic import View, DetailView, ListView
-from django.views.generic.edit import FormMixin
-from django.shortcuts import render, get_object_or_404
+from django.views.generic import View, DetailView, ListView, FormView
+from django.shortcuts import get_object_or_404
 from django.utils import timezone
 
 from reportlab.platypus import SimpleDocTemplate, Paragraph, Spacer, Table, PageBreak, TableStyle, KeepTogether
@@ -16,8 +16,8 @@ from reportlab.rl_config import defaultPageSize
 from reportlab.lib import colors
 from reportlab.lib.units import inch
 
-from entries.forms import NewEntryForm
-from entries.models import Competition, CompetitionEntry, SessionEntry, TargetAllocation, SessionRound, SCORING_FULL, SCORING_DOZENS
+from .forms import EntrySearchForm, EntryCreateForm
+from .models import Competition, Session, CompetitionEntry, SessionEntry, TargetAllocation, SessionRound, SCORING_FULL, SCORING_DOZENS
 
 from scoring.utils import class_view_decorator
 
@@ -55,49 +55,60 @@ class CompetitionMixin(object):
 
 
 @class_view_decorator(login_required)
-class EntryList(CompetitionMixin, FormMixin, ListView):
-    model = SessionEntry
-    form_class = NewEntryForm
+class EntryList(CompetitionMixin, ListView):
+    model = CompetitionEntry
     template_name = 'entries/entry_list.html'
 
     def get_queryset(self):
-        return self.model.objects.filter(competition_entry__competition=self.competition).select_related('competition_entry__competition', 'competition_entry__club', 'competition_entry__bowstyle', 'competition_entry__archer', 'session_round__session', 'session_round__shot_round').order_by('-competition_entry')
+        return self.model.objects.filter(
+            competition=self.competition,
+        ).select_related(
+            'competition',
+            'club',
+            'bowstyle',
+            'archer',
+        ).prefetch_related('sessionentry_set')
 
     def get_context_data(self, **kwargs):
         context = super(EntryList, self).get_context_data(**kwargs)
         context.update({
-            'entries': CompetitionEntry.objects.filter(competition=self.competition).select_related('club', 'archer', 'bowstyle'),
-            'stats': [
-                ('Total Entries', len(context['object_list'])),
-            ],
-            'form': self.get_form_class()(**self.get_form_kwargs()),
+            'entries': self.format_entries(context['object_list']),
+            'sessions': self.get_sessions(),
+            'search_form': EntrySearchForm(),
+            'new_form': EntryCreateForm(competition=self.competition),
         })
         return context
 
+    def format_entries(self, entries):
+        return [{
+            'entry': entry,
+            'rounds': [se.session_round_id for se in entry.sessionentry_set.all()],
+        } for entry in entries]
+
+    def get_sessions(self):
+        sessions = Session.objects.filter(competition=self.competition).order_by('start').prefetch_related('sessionround_set').filter(sessionround__isnull=False).distinct()
+        return [{
+            'session': session,
+            'rounds': list(session.sessionround_set.all()),
+        } for session in sessions]
+
+
+@class_view_decorator(login_required)
+class EntryAdd(CompetitionMixin, FormView):
+    form_class = EntryCreateForm
+    template_name = 'entries/entry_add.html'
+
     def get_form_kwargs(self):
-        kwargs = super(EntryList, self).get_form_kwargs()
-        kwargs.update({'competition': self.competition})
+        kwargs = super(EntryAdd, self).get_form_kwargs()
+        kwargs['competition'] = self.competition
         return kwargs
 
-    def post(self, request, slug):
-        if '_method' in request.POST and request.POST['_method'] == 'delete':
-            return self.delete(request, slug)
-        form = self.get_form_class()(**self.get_form_kwargs())
-        if form.is_valid():
-            entry = form.save()
-            return render(request, 'includes/entry_row.html', {
-                'entry': entry,
-                'competition': self.competition,
-                'rounds_entered': entry.sessionentry_set.all(),
-            })
-        else:
-            errors = json.dumps(form.errors)
-        return HttpResponseBadRequest(errors)
+    def form_valid(self, form):
+        form.save()
+        return super(EntryAdd, self).form_valid(form)
 
-    def delete(self, request, slug):
-        entry = get_object_or_404(CompetitionEntry, pk=request.POST['pk'])
-        entry.delete()
-        return HttpResponse('deleted')
+    def get_success_url(self):
+        return reverse('entry_list', kwargs={'slug': self.competition.slug})
 
 
 @class_view_decorator(login_required)
@@ -166,7 +177,7 @@ class TargetList(ListView):
 
     def get_context_data(self, **kwargs):
         context = super(TargetList, self).get_context_data(**kwargs)
-        self.allocations  = context['object_list']
+        self.allocations = context['object_list']
 
         if self.allocations:
             self.competition = self.allocations[0].session_entry.competition_entry.competition
@@ -239,8 +250,8 @@ class ScoreSheets(ListView):
 class PdfView(View):
 
     styles = getSampleStyleSheet()
-    PAGE_HEIGHT=defaultPageSize[1]
-    PAGE_WIDTH=defaultPageSize[0]
+    PAGE_HEIGHT = defaultPageSize[1]
+    PAGE_WIDTH = defaultPageSize[0]
 
     def set_options(self, slug=None, round_id=None):
         if slug:
@@ -278,6 +289,7 @@ class PdfView(View):
     def get_elements(self):
         return [self.Para('This is not done yet')]
 
+
 class HeadedPdfView(PdfView):
     title = ''
     title_position = 70
@@ -285,12 +297,13 @@ class HeadedPdfView(PdfView):
     def draw_title(self, canvas, doc):
         canvas.saveState()
         canvas.setFont('Helvetica-Bold', 18)
-        canvas.drawCentredString(self.PAGE_WIDTH/2.0, self.PAGE_HEIGHT-self.title_position, u'{0}: {1}'.format(self.competition, self.title))
+        canvas.drawCentredString(self.PAGE_WIDTH / 2.0, self.PAGE_HEIGHT - self.title_position, u'{0}: {1}'.format(self.competition, self.title))
 
         sponsors = self.competition.sponsors.all()
 
         positions = (
-            (50, 0),
+            (30, self.PAGE_HEIGHT - 240),
+            (self.PAGE_WIDTH - 140, self.PAGE_HEIGHT - 120),
         )
         for i, sponsor in enumerate(sponsors):
             canvas.drawImage(sponsors[i].logo.path, positions[i][0], positions[i][1], width=self.PAGE_WIDTH - 100, preserveAspectRatio=True, anchor='nw')
@@ -305,14 +318,15 @@ class HeadedPdfView(PdfView):
         doc.build(elements, onFirstPage=self.draw_title, onLaterPages=self.draw_title)
         return response
 
+
 class TargetListPdf(HeadedPdfView):
     title = 'Target List'
     lunch = False
 
     def setMargins(self, doc):
-        doc.topMargin = 1.1*inch
+        doc.topMargin = 1.1 * inch
         if self.competition.sponsors.exists():
-            doc.bottomMargin = 2.3*inch
+            doc.bottomMargin = 2.3 * inch
 
     def update_style(self):
         self.styles['h2'].alignment = 1
@@ -337,30 +351,32 @@ class TargetListPdf(HeadedPdfView):
             header = self.Para(title, 'h2')
             elements.append(header)
             table = Table(target_list)
-            spacer = Spacer(self.PAGE_WIDTH, 0.25*inch)
+            spacer = Spacer(self.PAGE_WIDTH, 0.25 * inch)
 
             elements += [spacer, table, spacer, PageBreak()]
         return elements
 
 target_list_pdf = login_required(TargetListPdf.as_view())
 
+
 class TargetListLunch(TargetListPdf):
     lunch = True
 target_list_lunch = login_required(TargetListLunch.as_view())
 
+
 class ScoreSheetsPdf(HeadedPdfView):
 
-    box_size = 0.32*inch
-    wide_box = box_size*1.35
+    box_size = 0.32 * inch
+    wide_box = box_size * 1.35
     total_cols = 1 + 12 + 2 + 4
-    col_widths = 7*[box_size] + [wide_box] + 6*[box_size] + 6*[wide_box]
+    col_widths = 7 * [box_size] + [wide_box] + 6 * [box_size] + 6 * [wide_box]
 
     def setMargins(self, doc):
-        doc.topMargin = 1.1*inch
+        doc.topMargin = 1.1 * inch
 
     def update_style(self):
         self.title = self.session_round.shot_round
-        self.spacer = Spacer(self.PAGE_WIDTH, self.box_size*0.5)
+        self.spacer = Spacer(self.PAGE_WIDTH, self.box_size * 0.5)
 
     def get_elements(self):
 
@@ -375,20 +391,20 @@ class ScoreSheetsPdf(HeadedPdfView):
                 if entry:
                     entry = entry.session_entry.competition_entry
                     table_data = [
-                            [self.Para(target, 'h2'), self.Para(entry.archer, 'h2'), self.Para(entry.team_name(short_form=False), 'h2')],
-                            [
-                                None,
-                                self.Para(u'{0} {1}'.format(entry.archer.get_gender_display(),
-                                    entry.bowstyle), 'h2'),
-                                self.Para(entry.get_novice_display(), 'h2') if self.competition.has_novices else None,
-                            ],
+                        [self.Para(target, 'h2'), self.Para(entry.archer, 'h2'), self.Para(entry.team_name(short_form=False), 'h2')],
+                        [
+                            None,
+                            self.Para(u'{0} {1}'.format(entry.archer.get_gender_display(),
+                                entry.bowstyle), 'h2'),
+                            self.Para(entry.get_novice_display(), 'h2') if self.competition.has_novices else None,
+                        ],
                     ]
                 else:
                     table_data = [
-                            [self.Para(target, 'h2'), None, None],
-                            [],
+                        [self.Para(target, 'h2'), None, None],
+                        [],
                     ]
-                header_table = Table(table_data, [0.4*inch, 2.5*inch, 4*inch])
+                header_table = Table(table_data, [0.4 * inch, 2.5 * inch, 4 * inch])
                 elements.append(KeepTogether([self.spacer, header_table, self.spacer] + score_sheet_elements))
             elements.append(PageBreak())
 
@@ -416,20 +432,20 @@ class ScoreSheetsPdf(HeadedPdfView):
                 self.scores_table_style._cmds[4][2] = (-1, -3)
                 self.scores_table_style._cmds[6][2] = (-1, -3)
 
-            table = Table(table_data, self.col_widths, total_rows*[self.box_size])
+            table = Table(table_data, self.col_widths, total_rows * [self.box_size])
             table.setStyle(self.scores_table_style)
 
             score_sheet_elements += [table, self.spacer]
 
         compound_round = bool(subrounds.count() - 1)
         if compound_round:
-            totals_table = Table([[None]*self.total_cols], self.col_widths, [self.box_size])
+            totals_table = Table([[None] * self.total_cols], self.col_widths, [self.box_size])
             totals_table.setStyle(self.totals_table_style)
 
             score_sheet_elements += [totals_table, self.spacer]
 
-        signing_table_widths = [0.7*inch, 2*inch]
-        signing_table = Table([[self.Para('Archer', 'h3'), None, None, self.Para('Scorer', 'h3'), '']], signing_table_widths + [0.5*inch] + signing_table_widths)
+        signing_table_widths = [0.7 * inch, 2 * inch]
+        signing_table = Table([[self.Para('Archer', 'h3'), None, None, self.Para('Scorer', 'h3'), '']], signing_table_widths + [0.5 * inch] + signing_table_widths)
         signing_table.setStyle(self.signing_table_style)
         score_sheet_elements += [self.spacer, signing_table]
 
@@ -471,12 +487,13 @@ class ScoreSheetsPdf(HeadedPdfView):
 
 score_sheets_pdf = login_required(ScoreSheetsPdf.as_view())
 
+
 class RunningSlipsPdf(ScoreSheetsPdf):
     def draw_title(self, canvas, doc):
         pass
 
     def setMargins(self, doc):
-        doc.topMargin = doc.bottomMargin = 0.3*inch
+        doc.topMargin = doc.bottomMargin = 0.3 * inch
 
     def get_elements(self):
         elements = []
@@ -515,7 +532,7 @@ class RunningSlipsPdf(ScoreSheetsPdf):
                     table_data = [['Dozen {0}'.format(dozen)] + [None] * 6 + ['ET'] + [None] * 6 + ['ET', 'S'] + headings + ['RT' if dozen > 1 else 'Inits.']]
                     for entry in entries:
                         table_data.append([entry[0]] + [None for i in range(self.total_cols - 1)])
-                    table = Table(table_data, [self.box_size] + self.col_widths, (len(entries) + 1)*[self.box_size])
+                    table = Table(table_data, [self.box_size] + self.col_widths, (len(entries) + 1) * [self.box_size])
                     table.setStyle(self.scores_table_style)
                     elements.append(KeepTogether(table))
                     elements += [self.spacer]
@@ -534,7 +551,7 @@ class RunningSlipsPdf(ScoreSheetsPdf):
                         ['Score'] + [None for e in entries],
                         ['Running Total' if dozen > 1 else 'Initials'] + [None for e in entries],
                     ]
-                    table = Table(table_data, [self.box_size*4] * 5, [self.box_size*1.5] * 3)
+                    table = Table(table_data, [self.box_size * 4] * 5, [self.box_size * 1.5] * 3)
                     table.setStyle(self.dozens_table_style)
                     elements.append(KeepTogether(table))
                     elements += [self.spacer] * 2
