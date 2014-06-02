@@ -66,6 +66,7 @@ class EntryList(CompetitionMixin, FormMixin, ListView):
     def get_context_data(self, **kwargs):
         context = super(EntryList, self).get_context_data(**kwargs)
         context.update({
+            'entries': CompetitionEntry.objects.filter(competition=self.competition).select_related('club', 'archer', 'bowstyle'),
             'stats': [
                 ('Total Entries', len(context['object_list'])),
             ],

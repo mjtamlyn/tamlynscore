@@ -1,5 +1,7 @@
 {% extends 'entries/competition_detail.html' %}
 
+{% block page_id %}entry-list{% endblock %}
+
 {% block scripts %}
 <script src="{{ STATIC_URL }}js/mootools-core-1.3.js"></script>
 <script src="{{ STATIC_URL }}js/competition_entries.js"></script>
@@ -141,65 +143,101 @@ Elements.from = function(text, excludeScripts){
 {% endblock %}
 
 {% block competition_content %}
+<div class="row">
+    <div class="new-entry col3">
+        <h4>New Entry</h4>
+        <div class="new-entry-form">
+            {% csrf_token %}
+            {{ form.archer }}
+            <div class="archer-details">
+                {{ form.sessions }}
+                {{ form.bowstyle }}
 
-<div class="competition-entries">
-    <div class="top">
+                <div class="show-more-details button">
+                    More options <div class="pointer">&raquo;</div>
+                </div>
+                <div class="button save">
+                    Save
+                </div>
+                <div class="clear"></div>
 
-        <div class="new-entry module">
-            <h4>New Entry</h4>
-            <div class="new-entry-form">
-                {% csrf_token %}
-                {{ form.archer }}
-                <div class="archer-details">
-                    {{ form.sessions }}
-                    {{ form.bowstyle }}
-
-                    <div class="show-more-details button">
-                        More options <div class="pointer">&raquo;</div>
+                <div class="more-details">
+                    {{ form.club }}
+                    {{ form.gnas_no }}
+                    {{ form.novice }}
+                    {{ form.age }}
+                    {{ form.gender }}
+                    <div>
+                    {% if competition.strict_b_teams %}
+                        {{ form.b_team.label }} {{ form.b_team }}
+                    {% endif %}
+                    </div>
+                    <div>
+                    {% if competition.strict_c_teams %}
+                        {{ form.c_team.label }} {{ form.c_team }}
+                    {% endif %}
                     </div>
                     <div class="button save">
                         Save
                     </div>
                     <div class="clear"></div>
-
-                    <div class="more-details">
-                        {{ form.club }}
-                        {{ form.gnas_no }}
-                        {{ form.novice }}
-                        {{ form.age }}
-                        {{ form.gender }}
-                        <div>
-                        {% if competition.strict_b_teams %}
-                            {{ form.b_team.label }} {{ form.b_team }}
-                        {% endif %}
-                        </div>
-                        <div>
-                        {% if competition.strict_c_teams %}
-                            {{ form.c_team.label }} {{ form.c_team }}
-                        {% endif %}
-                        </div>
-                        <div class="button save">
-                            Save
-                        </div>
-                        <div class="clear"></div>
-                    </div>
                 </div>
             </div>
         </div>
-
-        <div class="stats module">
-            <h4>Entries Summary</h4>
-            <ul>
-                {% for stat, value in stats %}
-                <li>{{ stat }}: {{ value }}</li>
-                {% endfor %}
-            </ul>
-        </div>
-        <div class="clear"></div>
     </div>
 
-    <div class="entries-table module">
-        <h4>Existing entries</h4>
+    <div class="stats col3">
+        <h4>Entries Summary</h4>
+        <ul>
+            {% for stat, value in stats %}
+            <li>{{ stat }}: {{ value }}</li>
+            {% endfor %}
+        </ul>
+    </div>
+    <div class="clear"></div>
+</div>
+
+<div class="row">
+    <div class="entries-table col6">
+        <h3>Existing entries</h3>
+
+
+        <div class="row">
+        {% for entry in entries %}
+        <div class="col2">
+            <div class="archer-block">
+                <div class="name">
+                    <p>{{ entry.archer }}</p>
+                </div>
+                <div class="bottom">
+                    <p>
+                        {{ entry.team_name }}
+                    </p>
+                    <p>
+                        <span class="pill bowstyle {{ entry.bowstyle|slugify }}">{{ entry.bowstyle }}</span>
+                        <span class="pill gender {{ entry.archer.get_gender_display|lower }}">{{ entry.archer.get_gender_display }}</span>
+                        {% if competition.has_novices and entry.novice == "N" %}
+                        <span class="pill novice">{{ entry.get_novice_display }}</span>
+                        {% endif %}
+                        {% if competition.has_juniors and entry.age == "J" %}
+                        <span class="pill junior">{{ entry.get_age_display }}</span>
+                        {% endif %}
+                    </p>
+                </div>
+            </div>
+        </div>
+        {% endfor %}
+        </div>
+
+
+
+
+
+
+
+
+
+
         <table>
             <thead>
                 <th colspan="4">Archer</th>
