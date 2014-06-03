@@ -6,4 +6,43 @@
     {{ form.as_p }}
     <input type="submit">
 </form>
+
+
+
+<hr>
+
+<form>
+    <p><input type="search" placeholder="Search" autofocus="true"></input></p>
+    <table>
+        <thead>
+            <tr>
+                <th>Name</th>
+                <th>Club</th>
+                <th>Bowstyle</th>
+                <th>Rounds</th>
+                <th>Age</th>
+                <th>Novice</th>
+            </tr>
+        </thead>
+        <tbody>
+            <tr>
+                <td><a class="add">New archer</a></td>
+            </tr>
+            <tr>
+                <td>Marc Tamlyn</td>
+                <td><a class="edit">Oxford Archers</a></td>
+                <td><a class="edit">Recurve</a></td>
+                <td>
+                    <ul>
+                        <li>York</li>
+                        <li>Hereford</li>
+                        <li>Bristol I</li>
+                        <li>Bristol II</li>
+                    </ul>
+                </td>
+                <td><input type="submit"></td>
+            </tr>
+        </tbody>
+    </table>
+</form>
 {% endblock %}
