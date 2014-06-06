@@ -270,20 +270,22 @@ class PdfView(View):
 class HeadedPdfView(PdfView):
     title = ''
     title_position = 70
+    do_sponsors = True
 
     def draw_title(self, canvas, doc):
         canvas.saveState()
         canvas.setFont('Helvetica-Bold', 18)
         canvas.drawCentredString(self.PAGE_WIDTH/2.0, self.PAGE_HEIGHT-self.title_position, u'{0}: {1}'.format(self.competition, self.title))
 
-        sponsors = self.competition.sponsors.all()
+        if self.do_sponsors:
+            sponsors = self.competition.sponsors.all()
 
-        positions = (
-            (50, 0),
-        )
-        for i, sponsor in enumerate(sponsors):
-            canvas.drawImage(sponsors[i].logo.path, positions[i][0], positions[i][1], width=self.PAGE_WIDTH - 100, preserveAspectRatio=True, anchor='nw')
-            pass
+            positions = (
+                (50, 0),
+            )
+            for i, sponsor in enumerate(sponsors):
+                canvas.drawImage(sponsors[i].logo.path, positions[i][0], positions[i][1], width=self.PAGE_WIDTH - 100, preserveAspectRatio=True, anchor='nw')
+                pass
 
         canvas.restoreState()
 
