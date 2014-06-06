@@ -352,6 +352,7 @@ class OlympicTree(OlympicResults):
 
     PAGE_HEIGHT=defaultPageSize[0]
     PAGE_WIDTH=defaultPageSize[1]
+    do_sponsors = False
 
     def setMargins(self, doc):
         doc.bottomMargin = 0.4*inch
@@ -483,6 +484,7 @@ class FieldPlan(HeadedPdfView):
     title = 'Field plan'
     PAGE_HEIGHT=defaultPageSize[0]
     PAGE_WIDTH=defaultPageSize[1]
+    do_sponsors = False
 
     def setMargins(self, doc):
         doc.bottomMargin = 0.4*inch
@@ -513,7 +515,7 @@ class FieldPlan(HeadedPdfView):
         table_style = [
             ('ALIGN', (0, 0), (-1, -1), 'CENTER'),
             ('VALIGN', (0, 0), (-1, -1), 'MIDDLE'),
-            ('SIZE', (0, 0), (-1, -1), 10),
+            ('SIZE', (0, 0), (-1, -1), 7),
 
             ('LEFTPADDING', (1, 0), (-1, -1), 2),
             ('RIGHTPADDING', (1, 0), (-1, -1), 2),
