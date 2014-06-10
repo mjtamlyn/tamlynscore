@@ -511,7 +511,8 @@ class FieldPlan(HeadedPdfView):
             table_data[m.timing][m.target] = '%s\n%s' % (m.session_round.category.short_code(), levels[m.level - 1])
             if m.target_2:
                 table_data[m.timing][m.target_2] = '%s\n%s' % (m.session_round.category.short_code(), levels[m.level - 1])
-        table = Table(table_data)
+        widths = [35] + [11] * (len(table_data[0]) - 1)
+        table = Table(table_data, colWidths=widths)
         table.setStyle(self.get_table_style(table_data))
         return [Spacer(0.5*inch, 0.5*inch), table]
 
@@ -519,10 +520,7 @@ class FieldPlan(HeadedPdfView):
         table_style = [
             ('ALIGN', (0, 0), (-1, -1), 'CENTER'),
             ('VALIGN', (0, 0), (-1, -1), 'MIDDLE'),
-            ('SIZE', (0, 0), (-1, -1), 7),
-
-            ('LEFTPADDING', (1, 0), (-1, -1), 2),
-            ('RIGHTPADDING', (1, 0), (-1, -1), 2),
+            ('SIZE', (0, 0), (-1, -1), 8),
 
             ('INNERGRID', (0, 0), (-1, -1), 0.25, colors.black),
             ('BOX', (0, 0), (-1, -1), 1, colors.black),
