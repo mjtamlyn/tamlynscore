@@ -177,6 +177,7 @@ class InputArrowsArcher(TemplateView):
             'xs': 0,
             'et1': 0,
             'et2': 0,
+            'rt': 0,
         } for i in range(round.arrows / per_end)]
         arrows = score.arrow_set.all()
         for arrow in arrows:
@@ -190,10 +191,14 @@ class InputArrowsArcher(TemplateView):
                 layout[dozen]['et2'] += arrow.arrow_value
             if arrow.arrow_value:
                 layout[dozen]['hits'] += 1
-            if arrow.arrow_value == 10:
+            if arrow.arrow_value == 10 or (arrow.arrow_value == 9 and round.scoring_type == 'F'):
                 layout[dozen]['golds'] += 1
             if arrow.is_x:
                 layout[dozen]['xs'] += 1
+        rt = 0
+        for dozen in layout:
+            rt += dozen['doz']
+            dozen['rt'] = rt
         return {
             'competition': competition,
             'entry': entry,

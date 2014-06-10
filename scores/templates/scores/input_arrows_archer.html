@@ -20,6 +20,7 @@
             {% if round.has_xs %}
             <th>Xs</th>
             {% endif %}
+            <th>RT<th>
             <td></td>
         </tr>
         {% for dozen in layout %}
@@ -39,6 +40,7 @@
             {% if round.has_xs %}
             <th>{{ dozen.xs }}</th>
             {% endif %}
+            <th>{{ dozen.rt }}</th>
             <td><small><a href="{% url 'input_arrows' slug=competition.slug session_id=entry.session_round.session_id dozen=forloop.counter boss=score.target.boss %}">Edit</a></small></td>
         </tr>
         {% endfor %}
@@ -46,9 +48,13 @@
             <td colspan="{{ layout.0.scores|length }}"></td>
             <th colspan="2">Totals</th>
             <th>{{ score.score }}</th>
+            {% if not round.has_xs %}
             <th>{{ score.hits }}</th>
+            {% endif %}
             <th>{{ score.golds }}</th>
+            {% if round.has_xs %}
             <th>{{ score.xs }}</th>
+            {% endif %}
         </tr>
     </table>
 </div>
