@@ -736,7 +736,7 @@ class PDFResultsRenderer(object):
         self.styles['h2'].alignment = 1
         elements = self.get_elements(context['results'])
         if self.competition.sponsors.exists():
-            doc.bottomMargin = 2.3 * inch
+            doc.bottomMargin = 1.5 * inch
         doc.build(elements, onFirstPage=self.draw_title, onLaterPages=self.draw_title)
         return response
 
@@ -746,7 +746,7 @@ class PDFResultsRenderer(object):
         canvas.drawCentredString(self.page_width/2.0, self.page_height-70, u'{0}: {1}'.format(self.competition, self.title))
         sponsors = self.competition.sponsors.all()
         if sponsors:
-            canvas.drawImage(sponsors[0].logo.path, 50, 0, width=self.PAGE_WIDTH - 100, preserveAspectRatio=True, anchor='nw')
+            canvas.drawImage(sponsors[0].logo.path, 50, -50, width=self.PAGE_WIDTH - 100, preserveAspectRatio=True, anchor='nw')
         canvas.restoreState()
 
     def get_elements(self, results):

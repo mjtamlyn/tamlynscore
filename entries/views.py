@@ -281,7 +281,7 @@ class HeadedPdfView(PdfView):
             sponsors = self.competition.sponsors.all()
 
             positions = (
-                (50, 0),
+                (50, -50),
             )
             for i, sponsor in enumerate(sponsors):
                 canvas.drawImage(sponsors[i].logo.path, positions[i][0], positions[i][1], width=self.PAGE_WIDTH - 100, preserveAspectRatio=True, anchor='nw')
@@ -303,7 +303,7 @@ class TargetListPdf(HeadedPdfView):
     def setMargins(self, doc):
         doc.topMargin = 1.1*inch
         if self.competition.sponsors.exists():
-            doc.bottomMargin = 2.3*inch
+            doc.bottomMargin = 1.5*inch
 
     def update_style(self):
         self.styles['h2'].alignment = 1
