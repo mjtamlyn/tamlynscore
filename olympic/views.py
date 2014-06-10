@@ -159,6 +159,10 @@ class OlympicScoreSheet(ScoreSheetsPdf):
             self.competition = get_object_or_404(Competition, slug=slug)
         if round_id:
             self.session_round = get_object_or_404(OlympicSessionRound, pk=round_id)
+            if self.competition.sponsors.exists():
+                highest_round = self.session_round.match_set.aggregate(highest=Max('level'))['highest']
+                if highest_round >= 7:
+                    self.do_sponsors = False
 
     def update_style(self):
         super(OlympicScoreSheet, self).update_style()
