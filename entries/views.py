@@ -506,7 +506,7 @@ class RunningSlipsPdf(ScoreSheetsPdf):
                     table_data = [['Dozen {0}'.format(dozen)] + [None] * 6 + ['ET'] + [None] * 6 + ['ET', 'S'] + headings + ['RT' if dozen > 1 else 'Inits.']]
                     for entry in entries:
                         table_data.append([entry[0]] + [None for i in range(self.total_cols - 1)])
-                    table = Table(table_data, [self.box_size] + self.col_widths, (len(entries) + 1)*[self.box_size])
+                    table = Table(table_data, [self.box_size] + self.col_widths[1:], (len(entries) + 1)*[self.box_size])
                     table.setStyle(self.scores_table_style)
                     elements.append(KeepTogether(table))
                     elements += [self.spacer]
