@@ -1,3 +1,4 @@
+import copy
 from itertools import groupby
 import json
 import math
@@ -785,8 +786,10 @@ class PDFResultsRenderer(object):
         row = [score.placing]
         rows = [row]
 
+        team_style = copy.copy(self.styles['Normal'])
+        team_style.fontName = 'Helvetica-Bold'
         if score.is_team:
-            row += [score.club]
+            row += [Paragraph(unicode(score.club), team_style)]
             for member in score.team:
                 rows.append([
                     None,
