@@ -94,6 +94,28 @@ footer p {
     width: 100%;
   }
 }
+/* line 2, ../../sass/_tables.sass */
+.table {
+  display: table;
+}
+/* line 4, ../../sass/_tables.sass */
+.table .table-row {
+  display: table-row;
+}
+/* line 6, ../../sass/_tables.sass */
+.table .table-row span {
+  display: table-cell;
+}
+/* line 9, ../../sass/_tables.sass */
+.table .table-row.header {
+  font-weight: bold;
+}
+
+/* line 13, ../../sass/_tables.sass */
+.table.full-width {
+  width: 100%;
+}
+
 @font-face {
   font-family: "Museo";
   src: url("../fonts/Museo500-Regular-webfont.eot");
@@ -228,12 +250,12 @@ ul.link-list li a:before {
   border-radius: 1em;
 }
 
-/* line 9, ../../sass/main.sass */
+/* line 11, ../../sass/main.sass */
 body {
   color: #000f1f;
 }
 
-/* line 12, ../../sass/main.sass */
+/* line 14, ../../sass/main.sass */
 nav {
   background: #f0f0f0;
   border-bottom: 1px solid #f0f0f0;
@@ -241,7 +263,7 @@ nav {
   text-align: center;
   width: 100%;
 }
-/* line 18, ../../sass/main.sass */
+/* line 20, ../../sass/main.sass */
 nav .nav-link {
   background-color: #002147;
   color: white;
@@ -249,23 +271,23 @@ nav .nav-link {
   padding: 8px 8px 8px 8px;
   margin: 0 5px;
 }
-/* line 24, ../../sass/main.sass */
+/* line 26, ../../sass/main.sass */
 nav .nav-link:hover {
   background-color: #8579fa;
 }
 
-/* line 27, ../../sass/main.sass */
+/* line 29, ../../sass/main.sass */
 .clear {
   overflow: hidden;
   *zoom: 1;
 }
 
-/* line 30, ../../sass/main.sass */
+/* line 32, ../../sass/main.sass */
 .hidden {
   display: none;
 }
 
-/* line 33, ../../sass/main.sass */
+/* line 35, ../../sass/main.sass */
 .text-right {
   text-align: right;
 }

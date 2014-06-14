@@ -51,7 +51,7 @@
                 <dt>Tournament date(s)</dt>
                 <dd>{{ competition.date }}{% if not competition.end_date == competition.date %} to {{ competition.end_date }}{% endif %}</dd>
                 <dt>Hosted by</dt>
-                <dd>{{ competition.tournament.host_club }}</dd>
+                <dd>{{ competition.tournament.host_club.name }}</dd>
                 <dt>Options</dt>
                 <dd>
                     <ul>
