@@ -36,6 +36,7 @@ l.make_matches(level=3, start=9, timing=5)
 l.make_matches(level=2, start=9, timing=6, expanded=True)
 l.make_matches(level=1, start=9, timing=7, expanded=True)
 
+c.make_matches(level=5, start=1, timing=3, half_only=True)
 c.make_matches(level=4, start=1, timing=4)
 c.make_matches(level=3, start=5, timing=5)
 c.make_matches(level=2, start=5, timing=6, expanded=True)
