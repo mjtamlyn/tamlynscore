@@ -1,6 +1,5 @@
 H2H changes
 ===========
-Drawing up the map of the field
 H2H arrow scores
 Better support for sponsors/sponsor images
 API for an app
@@ -12,7 +11,6 @@ Admin
 Transfer script (transfer an individual competition)
 Access to competition restricted by user - across all views
 Ability to edit an entry
-Remove "B" teams added for BUTC, and tidy up short names of clubs
 Remove any competitions I don't have data for..
 Remove Club.abbreviation - I don't think it's used anywhere
 
@@ -22,14 +20,13 @@ Code tidyness
 PEP8
 Tests!
 Think about created/modified
-Collapse TargetAllocation and Score onto SessionEntry - remove lots of rows, lots of joins and general complexity
+Refactor datamodel to collapse tables together
 Move hosted_by to competition not tournament (also use it!)
 Work backwards through competitions making sure each one has results configured correctly, and all features are supported, then remove old results code
 Ability to set certain pages as publicly accessible
-Easy ways to get to mobile website
-Django 1.5 and create custom User model
-Move to Braces instead of class_view_decorator
-Py3??
+Custom User model
+Move to Braces/Homebrewed solution instead of class_view_decorator
+Py3?? (check deps)
 Standardise url names on '-' not '_'
 
 
@@ -45,50 +42,25 @@ Accept entries from the front end (publicly)
 
 
 
-New leaderboard/results code
-============================
+Configuration options I can add
+===============================
 
-Things we need to be able to do:
+Results specific:
 
-Pick different types of results
-Each type of results should have a leaderboard page
-Can have leaderboard pages there which aren't included in the results
-Can get any individual leaderboard page as a pdf
-Results view vs leaderboard view
-Each leaderboard page should automatically get a 'big screen' version
-
-Leaderboard pages can have subpages for each category/type, and for each output format (standard/big screen/winners html/winners pdf/full pdf/mobile html)
-Winners/summary output format (visible and pdf) (top 5 only in each category - display the number of entries)
-
-Types of results
-----------------
-By session
-Combined by round across sessions (respects exclude_later_shoots)
-Double round
-Teams
-
-Later:
-Progress (i.e. across sessions "the state after 3 dozen")
-National Series style combination results
-Aggregate results (sum the scores)
-
-Configuration options
----------------------
-
-exclude_later_shoots
-has_juniors
+Support juniors properly (age groups)
 juniors_in_senior_teams
 juniors_in_senior_individual
-has_novices
-novices_in_experienced_teams
 novices_in_experienced_individual
-team_size
 has_novice_teams
-novice_team_size
-
-Later:
 Restrictions on make up of team (e.g. must include one lady or junior)
+Cross-round results (Masters-style)
+
+Other:
+
+Venue
+has_guests
 
 
-
+Keyboard shortcuts JS
+---------------------
 Use https://github.com/ccampbell/mousetrap
