@@ -1,10 +1,8 @@
-import unittest
-
 from django.contrib.auth.models import AnonymousUser
 from django.core.urlresolvers import reverse, resolve
 from django.test import TestCase, RequestFactory
 
-from entries.forms import EntrySearchForm, EntryCreateForm
+from entries.forms import ArcherSearchForm, EntryCreateForm
 from entries.models import CompetitionEntry, SessionEntry
 from entries.views import EntryList, EntryAdd
 
@@ -37,24 +35,11 @@ class TestEntryList(TestCase):
         response.render()
 
     def test_context(self):
-        session_round = factories.SessionRoundFactory.create(session__competition=self.competition)
-        session_entry = factories.SessionEntryFactory.create(competition_entry__competition=self.competition, session_round=session_round)
-        competition_entry = session_entry.competition_entry
         view = EntryList.as_view()
         request = self.rf.get('/')
         response = view(request, slug=self.competition.slug)
         context = response.context_data
-        self.assertEqual(context['entries'], [{
-            'entry': competition_entry,
-            'rounds': [session_entry.session_round.pk],
-        }])
         self.assertEqual(context['competition'], self.competition)
-        self.assertEqual(context['sessions'], [{
-            'session': session_round.session,
-            'rounds': [session_round],
-        }])
-        self.assertIsInstance(context['search_form'], EntrySearchForm)
-        self.assertIsInstance(context['new_form'], EntryCreateForm)
 
     def test_auth(self):
         view = EntryList.as_view()
@@ -67,17 +52,6 @@ class TestEntryList(TestCase):
         url = reverse('entry_list', kwargs={'slug': self.competition.slug})
         match = resolve(url)
         self.assertEqual(match.func.__name__, 'EntryList')
-
-    @unittest.expectedFailure
-    def test_search(self):
-        session_round = factories.SessionRoundFactory.create(session__competition=self.competition)
-        steve = factories.SessionEntryFactory.create(competition_entry__competition=self.competition, session_round=session_round, competition_entry__archer__name='steve')
-        bob = factories.SessionEntryFactory.create(competition_entry__competition=self.competition, session_round=session_round, competition_entry__archer__name='bob', competition_entry__club__name='steventon')
-        factories.SessionEntryFactory.create(competition_entry__competition=self.competition, session_round=session_round, competition_entry__archer__name='dave')
-        view = EntryList.as_view()
-        request = self.rf.get('/', {'search': 'steve'})
-        response = view(request, slug=self.competition.slug)
-        self.assertEqual(list(response.context_data['object_list']), [steve.competition_entry, bob.competition_entry])
 
 
 class TestEntryAdd(TestCase):
@@ -117,12 +91,24 @@ class TestEntryAdd(TestCase):
         session_round = factories.SessionRoundFactory.create(session__competition=self.competition)
         request = self.rf.post('/', {
             'archer': archer.pk,
+            'bowstyle': archer.bowstyle_id,
+            'club': archer.club_id,
             'session_%s' % session_round.session_id: session_round.pk,
         })
         view = EntryAdd.as_view()
         response = view(request, slug=self.competition.slug)
         self.assertEqual(response.status_code, 302)
         self.assertEqual(CompetitionEntry.objects.count(), 1)
+
+
+class TestArcherSearchForm(TestCase):
+    def test_search(self):
+        steve = factories.ArcherFactory.create(name='steve')
+        bob = factories.ArcherFactory.create(name='bob', club__name='steventon')
+        factories.ArcherFactory.create(name='dave')
+        form = ArcherSearchForm({'query': 'steve'})
+        self.assertTrue(form.is_valid())
+        self.assertEqual(list(form.get_qs()), [steve, bob])
 
 
 class TestEntryCreateForm(TestCase):
@@ -134,6 +120,8 @@ class TestEntryCreateForm(TestCase):
         session_round = factories.SessionRoundFactory.create(session__competition=self.competition)
         data = {
             'archer': archer.pk,
+            'bowstyle': archer.bowstyle_id,
+            'club': archer.club_id,
             'session_%s' % session_round.session.pk: session_round.pk,
         }
         form = EntryCreateForm(competition=self.competition, data=data)
@@ -162,6 +150,8 @@ class TestEntryCreateForm(TestCase):
         factories.SessionRoundFactory.create(session__competition=self.competition)
         data = {
             'archer': archer.pk,
+            'bowstyle': archer.bowstyle_id,
+            'club': archer.club_id,
             'session_%s' % session_round.session.pk: session_round.pk,
         }
         form = EntryCreateForm(competition=self.competition, data=data)
@@ -176,6 +166,8 @@ class TestEntryCreateForm(TestCase):
         session_round_2 = factories.SessionRoundFactory.create(session__competition=self.competition)
         data = {
             'archer': archer.pk,
+            'bowstyle': archer.bowstyle_id,
+            'club': archer.club_id,
             'session_%s' % session_round.session.pk: session_round.pk,
             'session_%s' % session_round_2.session.pk: session_round_2.pk,
         }
@@ -184,10 +176,6 @@ class TestEntryCreateForm(TestCase):
         form.save()
         self.assertEqual(CompetitionEntry.objects.count(), 1)
         self.assertEqual(SessionEntry.objects.count(), 2)
-
-    def test_fields(self):
-        form = EntryCreateForm(competition=self.competition)
-        self.assertEqual(form.fields.keys(), ['archer', 'guest'])
 
     def test_session_fields(self):
         sr1 = factories.SessionRoundFactory.create(session__competition=self.competition)

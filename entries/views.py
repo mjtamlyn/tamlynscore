@@ -16,8 +16,8 @@ from reportlab.rl_config import defaultPageSize
 from reportlab.lib import colors
 from reportlab.lib.units import inch
 
-from .forms import EntrySearchForm, EntryCreateForm
-from .models import Competition, Session, CompetitionEntry, SessionEntry, TargetAllocation, SessionRound, SCORING_FULL, SCORING_DOZENS
+from .forms import ArcherSearchForm, EntryCreateForm
+from .models import Competition, CompetitionEntry, SessionEntry, TargetAllocation, SessionRound, SCORING_FULL, SCORING_DOZENS
 
 from scoring.utils import class_view_decorator
 
@@ -69,39 +69,38 @@ class EntryList(CompetitionMixin, ListView):
             'archer',
         ).prefetch_related('sessionentry_set')
 
-    def get_context_data(self, **kwargs):
-        context = super(EntryList, self).get_context_data(**kwargs)
-        context.update({
-            'entries': self.format_entries(context['object_list']),
-            'sessions': self.get_sessions(),
-            'search_form': EntrySearchForm(),
-            'new_form': EntryCreateForm(competition=self.competition),
-        })
-        return context
-
-    def format_entries(self, entries):
-        return [{
-            'entry': entry,
-            'rounds': [se.session_round_id for se in entry.sessionentry_set.all()],
-        } for entry in entries]
-
-    def get_sessions(self):
-        sessions = Session.objects.filter(competition=self.competition).order_by('start').prefetch_related('sessionround_set').filter(sessionround__isnull=False).distinct()
-        return [{
-            'session': session,
-            'rounds': list(session.sessionround_set.all()),
-        } for session in sessions]
-
 
 @class_view_decorator(login_required)
 class EntryAdd(CompetitionMixin, FormView):
     form_class = EntryCreateForm
     template_name = 'entries/entry_add.html'
 
+    def get(self, request, *args, **kwargs):
+        search_form = ArcherSearchForm(self.request.GET)
+        form_class = self.get_form_class()
+        form = self.get_form(form_class)
+        forms = []
+        if search_form.is_valid():
+            archers = search_form.get_qs()
+            for archer in archers:
+                forms.append(self.get_archer_form(form_class, archer))
+        return self.render_to_response(self.get_context_data(search_form=search_form, forms=forms, form=form))
+
     def get_form_kwargs(self):
         kwargs = super(EntryAdd, self).get_form_kwargs()
         kwargs['competition'] = self.competition
         return kwargs
+
+    def get_archer_form(self, form_class, archer):
+        kwargs = self.get_form_kwargs()
+        kwargs['initial'] = {
+            'archer': archer,
+            'bowstyle': archer.bowstyle_id,
+            'club': archer.club_id,
+            'novice': archer.novice,
+            'age': archer.age,
+        }
+        return form_class(**kwargs)
 
     def form_valid(self, form):
         form.save()

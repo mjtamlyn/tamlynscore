@@ -76,8 +76,7 @@ class Competition(models.Model):
         try:
             return self._sessions_with_rounds
         except AttributeError:
-            sessions = self.session_set.annotate(count=models.Count('sessionround')).filter(
-                    count__gt=0).order_by('start')
+            sessions = self.session_set.order_by('start').prefetch_related('sessionround_set')
             self._sessions_with_rounds = sessions
             return sessions
 
@@ -115,7 +114,7 @@ class Session(models.Model):
         return {
             SCORING_FULL: 'input_arrows',
             SCORING_DOZENS: 'input_dozens',
-            SCORING_TOTALS: 'input_arrows', #FIXME
+            SCORING_TOTALS: 'input_arrows',  # FIXME
         }[self.scoring_system]
 
 
@@ -169,15 +168,15 @@ class SessionRound(models.Model):
                     entry = allocation.session_entry.competition_entry
                     shot_round = allocation.session_entry.session_round.shot_round
                     allocation = (
-                            entry.archer,
-                            entry.team_name(short_form=False),
+                        entry.archer,
+                        entry.team_name(short_form=False),
                     )
                     if lunch:
                         allocation += (None, None, None)
                     else:
                         allocation += (
-                                entry.archer.get_gender_display(),
-                                entry.bowstyle,
+                            entry.archer.get_gender_display(),
+                            entry.bowstyle,
                         )
                         if competition.has_juniors:
                             allocation += (
@@ -253,4 +252,3 @@ class TargetAllocation(models.Model):
 
     def __unicode__(self):
         return u'{0}{1} - {2}'.format(self.boss, self.target, self.session_entry)
-

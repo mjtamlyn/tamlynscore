@@ -1,48 +1,45 @@
 {% extends 'entries/competition_detail.html' %}
 
 {% block competition_content %}
-<form method="POST" action="">
-    {% csrf_token %}
-    {{ form.as_p }}
-    <input type="submit">
-</form>
-
-
-
-<hr>
-
-<form>
-    <p><input type="search" placeholder="Search" autofocus="true"></input></p>
-    <table>
-        <thead>
-            <tr>
-                <th>Name</th>
-                <th>Club</th>
-                <th>Bowstyle</th>
-                <th>Rounds</th>
-                <th>Age</th>
-                <th>Novice</th>
-            </tr>
-        </thead>
-        <tbody>
-            <tr>
-                <td><a class="add">New archer</a></td>
-            </tr>
-            <tr>
-                <td>Marc Tamlyn</td>
-                <td><a class="edit">Oxford Archers</a></td>
-                <td><a class="edit">Recurve</a></td>
-                <td>
-                    <ul>
-                        <li>York</li>
-                        <li>Hereford</li>
-                        <li>Bristol I</li>
-                        <li>Bristol II</li>
-                    </ul>
-                </td>
-                <td><input type="submit"></td>
-            </tr>
-        </tbody>
-    </table>
-</form>
+<p><form method="GET" action="">{{ search_form.query }}</form></p>
+<p>
+    <td><a class="add btn">Add a new archer</a></td>
+</p>
+<div class="table full-width">
+    <div class="table-row header">
+        <span>{{ form.archer.label }}</span>
+        <span>{{ form.club.label }}</span>
+        <span>{{ form.bowstyle.label }}</span>
+        {% if competition.has_juniors %}
+            <span>{{ form.age.label }}</span>
+        {% endif %}
+        {% if competition.has_novices %}
+            <span>{{ form.novice.label }}</span>
+        {% endif %}
+        {% for session_field in form.session_fields %}
+            <span>{{ session_field.label }}</span>
+        {% endfor %}
+        <span>{{ form.guest.label }}</span>
+        <span></span>
+    </div>
+    {% for archer_form in forms %}
+        <form method="POST" action="" class="table-row">
+            {% csrf_token %}
+            <span>{{ archer_form.archer }}</span>
+            <span>{{ archer_form.club }}<a class="edit"></a></span>
+            <span>{{ archer_form.bowstyle }}<a class="edit"></a></span>
+            {% if competition.has_juniors %}
+                <span>{{ archer_form.age }}<a class="edit"></a></span>
+            {% endif %}
+            {% if competition.has_novices %}
+                <span>{{ archer_form.novice }}<a class="edit"></a></span>
+            {% endif %}
+            {% for session_field in archer_form.bound_session_fields %}
+                <span>{{ session_field }}</span>
+            {% endfor %}
+            <span>{{ archer_form.guest }}</span>
+            <span><input type="submit"></span>
+        </form>
+    {% endfor %}
+</div>
 {% endblock %}
