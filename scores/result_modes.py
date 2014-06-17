@@ -226,7 +226,7 @@ class ByRound(BaseResultMode):
     def get_rounds(self, competition):
         from entries.models import SessionRound
 
-        session_rounds = SessionRound.objects.filter(session__competition=competition).order_by('session__start')
+        session_rounds = SessionRound.objects.filter(session__competition=competition, olympicsessionround__isnull=True).order_by('session__start')
         rounds = []
         for round in session_rounds:
             if round.shot_round not in rounds:
@@ -241,7 +241,7 @@ class ByRound(BaseResultMode):
                 continue
             if competition.exclude_later_shoots and session_entry.index > 1:
                 continue
-            category = session_entry.competition_entry.category()
+            category = self.get_category_for_entry(session_entry.competition_entry)
             if category not in results:
                 results[category] = []
             results[category].append(score)
@@ -260,6 +260,9 @@ class ByRound(BaseResultMode):
                         placing=None,
                     )
         return results
+
+    def get_category_for_entry(self, entry):
+        return entry.category()
 
 
 class ByRoundProgressional(ByRound, BaseResultMode):
@@ -372,6 +375,38 @@ class DoubleRound(BaseResultMode):
 
     def label_for_round(self, round):
         return 'Double %s' % unicode(round)
+
+
+class H2HSeedings(ByRound, BaseResultMode):
+    slug = 'seedings'
+    name = 'Seedings'
+
+    def get_rounds(self, competition):
+        from entries.models import SessionRound
+        from olympic.models import Category
+
+        self.categories = Category.objects.filter(olympicsessionround__session__competition=competition).prefetch_related('bowstyles')
+
+        session_rounds = SessionRound.objects.filter(session__competition=competition, olympicsessionround__isnull=False).order_by('session__start')
+        rounds = []
+        for round in session_rounds:
+            if round.shot_round not in rounds:
+                rounds.append(round.shot_round)
+        return rounds
+
+    def get_results(self, competition, scores, leaderboard=False, request=None):
+        self.leaderboard = leaderboard
+        rounds = self.get_rounds(competition)
+        return OrderedDict((
+            self.get_section_for_round(round),
+            self.get_round_results(competition, round, scores)
+        ) for round in rounds)
+
+    def get_category_for_entry(self, entry):
+        for category in self.categories:
+            if entry.bowstyle in category.bowstyles.all():
+                if category.gender is None or category.gender == entry.archer.gender:
+                    return category
 
 
 class Team(BaseResultMode):
