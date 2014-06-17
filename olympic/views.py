@@ -301,7 +301,7 @@ class OlympicResults(HeadedPdfView):
         self.styles['h2'].alignment = 1
 
     def setMargins(self, doc):
-        doc.bottomMargin = 0.3*inch
+        doc.bottomMargin = 1.5 * inch
 
     def format_results(self, results, total_levels):
         results = results.reverse()
