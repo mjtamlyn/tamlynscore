@@ -386,12 +386,14 @@ class ScoreSheetsPdf(HeadedPdfView):
     def header_table_for_entry(self, target, entry):
         if entry:
             entry = entry.session_entry.competition_entry
+            category = u'{0} {1}'.format(entry.archer.get_gender_display(), entry.bowstyle)
+            if self.competition.has_juniors and entry.age == 'J':
+                category = 'Junior ' + category
             return [
                     [self.Para(target, 'h2'), self.Para(entry.archer, 'h2'), self.Para(entry.team_name(short_form=False), 'h2')],
                     [
                         None,
-                        self.Para(u'{0} {1}'.format(entry.archer.get_gender_display(),
-                            entry.bowstyle), 'h2'),
+                        self.Para(category, 'h2'),
                         self.Para(entry.get_novice_display(), 'h2') if self.competition.has_novices else None,
                     ],
             ]
