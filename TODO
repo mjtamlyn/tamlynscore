@@ -3,7 +3,6 @@ H2H changes
 Drawing up the map of the field
 H2H arrow scores
 Better support for sponsors/sponsor images
-API for an app
 Redesign!
 
 
@@ -31,6 +30,7 @@ Django 1.5 and create custom User model
 Move to Braces instead of class_view_decorator
 Py3??
 Standardise url names on '-' not '_'
+Create a "target list" object and to decouple from presentation logic
 
 
 Long term plan
