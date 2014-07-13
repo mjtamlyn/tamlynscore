@@ -5,6 +5,7 @@
 
 {% block main %}
 <p><a href="{% url url_name slug=competition.slug mode=mode.slug format='pdf' %}" class="btn">PDF</a></p>
+<p><a href="{% url url_name slug=competition.slug mode=mode.slug format='csv' %}" class="btn">CSV</a></p>
 <div class="board selected">
     <table>
         {% for section, categories in results.items %}
