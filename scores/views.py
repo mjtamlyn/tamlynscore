@@ -1,4 +1,5 @@
 import copy
+import unicodecsv as csv
 from itertools import groupby
 import json
 import math
@@ -805,8 +806,28 @@ class PDFResultsRenderer(object):
         return rows
 
 
+class CSVResultsRenderer(object):
+    def render_to_csv(self, context):
+        response = HttpResponse(content_type='text/csv')
+        data = []
+        for section, categories in context['results'].items():
+            for category, scores in categories.items():
+                for score in scores:
+                    row = [unicode(section), unicode(category)]
+                    row += [
+                        score.target.session_entry.competition_entry.archer.name,
+                        score.target.session_entry.competition_entry.club.name + (' (Guest)' if score.guest else ''),
+                        'Novice' if score.target.session_entry.competition_entry.novice == 'N' else None,
+                    ]
+                    row += self.mode.score_details(score, section)
+                    data.append(row)
+        writer = csv.writer(response)
+        writer.writerows(data)
+        return response
+
+
 @class_view_decorator(login_required)
-class NewLeaderboard(PDFResultsRenderer, ListView):
+class NewLeaderboard(PDFResultsRenderer, CSVResultsRenderer, ListView):
     """General leaderboard/rsults generation.
     
     Strategy:
@@ -846,7 +867,7 @@ class NewLeaderboard(PDFResultsRenderer, ListView):
 
     def get_format(self):
         format = self.kwargs['format']
-        if format not in ['html', 'pdf', 'big-screen']:
+        if format not in ['html', 'pdf', 'big-screen', 'csv']:
             raise Http404('No such format')
         return format
 
@@ -876,6 +897,8 @@ class NewLeaderboard(PDFResultsRenderer, ListView):
     def render_to_response(self, context, **response_kwargs):
         if self.format == 'pdf':
             return self.render_to_pdf(context)
+        if self.format == 'csv':
+            return self.render_to_csv(context)
         return super(NewLeaderboard, self).render_to_response(context, **response_kwargs)
 
     def get_template_names(self, **kwargs):

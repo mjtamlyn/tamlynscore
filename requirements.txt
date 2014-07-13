@@ -11,4 +11,5 @@ pystache==0.5.3
 reportlab==2.6
 sqlparse==0.1.11
 static3==0.5
+unicodecsv==0.9.4
 wsgiref==0.1.2
