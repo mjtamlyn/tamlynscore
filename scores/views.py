@@ -297,13 +297,13 @@ class LeaderboardCombined(ListView):
 
     def get_queryset(self):
         scores = Score.objects.filter(target__session_entry__competition_entry__competition__slug=self.kwargs['slug']).select_related().order_by(
-                'target__session_entry__competition_entry__bowstyle',
-                'target__session_entry__competition_entry__archer__gender',
-                'target__session_entry__competition_entry__archer__age',
-                'disqualified',
-                '-score', 
-                '-golds', 
-                '-xs'
+            'target__session_entry__competition_entry__bowstyle',
+            'target__session_entry__competition_entry__archer__gender',
+            'target__session_entry__competition_entry__archer__age',
+            'disqualified',
+            '-score',
+            '-golds',
+            '-xs'
         )
         return scores
 
@@ -355,12 +355,12 @@ class LeaderboardTeams(ListView):
     def get_queryset(self):
         scores = Score.objects.filter(target__session_entry__competition_entry__competition__slug=self.kwargs['slug']).select_related().exclude(target__session_entry__competition_entry__bowstyle__name='Compound')
         scores = scores.order_by(
-                'target__session_entry__competition_entry__bowstyle',
-                'target__session_entry__competition_entry__archer__gender',
-                'disqualified',
-                '-score',
-                '-golds',
-                '-xs'
+            'target__session_entry__competition_entry__bowstyle',
+            'target__session_entry__competition_entry__archer__gender',
+            'disqualified',
+            '-score',
+            '-golds',
+            '-xs'
         )
         return scores
 
@@ -430,7 +430,7 @@ class LeaderboardBUTC(LeaderboardTeams):
             'team': [{
                 'name': a.target.session_entry.competition_entry.archer.name.split(' ')[-1],
                 'score': a.score,
-                } for a in d['team']],
+            } for a in d['team']],
             'total': d['total'],
         } for i, d in enumerate(context['club_results'][:32])])
         context['template'] = render_to_string(self.backbone_template)
@@ -491,13 +491,14 @@ class ResultsView(LeaderboardView):
 
 results = login_required(ResultsView.as_view())
 
+
 class ResultsPdf(HeadedPdfView, LeaderboardSummary):
     title = 'Results'
     include_dns = True
 
     def setMargins(self, doc):
-        doc.topMargin = 1.2*inch
-        doc.bottomMargin = 0.7*inch
+        doc.topMargin = 1.2 * inch
+        doc.bottomMargin = 0.7 * inch
 
     def update_style(self):
         self.styles['h1'].alignment = 1
@@ -518,7 +519,6 @@ class ResultsPdf(HeadedPdfView, LeaderboardSummary):
         for key, values in groupby(scores, lambda x: x[0]):
             sessions.append((key, [value[1] for value in values]))
         return scores
-
 
     def row_from_entry(self, entries, entry, subrounds, round_scoring_type):
         row = []
@@ -604,7 +604,6 @@ class ResultsPdf(HeadedPdfView, LeaderboardSummary):
 
         return elements
 
-
     def get_elements_for_results_set(self, scores):
         elements = []
 
@@ -616,7 +615,7 @@ class ResultsPdf(HeadedPdfView, LeaderboardSummary):
             for category, entries in results:
                 if not entries:
                     continue
-                elements.append(self.Para(category , 'h2'))
+                elements.append(self.Para(category, 'h2'))
                 table_header = ['Pl.', 'Archer', 'Club']
                 subrounds = session_round.shot_round.subrounds.order_by('-distance')
                 if len(subrounds) > 1 and not session_round.session.scoring_system == SCORING_TOTALS:
@@ -629,10 +628,10 @@ class ResultsPdf(HeadedPdfView, LeaderboardSummary):
                     gender = entries[0].target.session_entry.competition_entry.archer.gender
                     bowstyle = entries[0].target.session_entry.competition_entry.bowstyle
                     did_not_starts = session_round.sessionentry_set.select_related().filter(
-                            competition_entry__archer__gender=gender,
-                            competition_entry__bowstyle=bowstyle,
+                        competition_entry__archer__gender=gender,
+                        competition_entry__bowstyle=bowstyle,
                     ).filter(
-                            Q(targetallocation__score=None) | Q(targetallocation__score__score=0) | Q(targetallocation=None)
+                        Q(targetallocation__score=None) | Q(targetallocation__score__score=0) | Q(targetallocation=None)
                     )
                     for dns in did_not_starts:
                         if self.include_dns:
@@ -644,7 +643,7 @@ class ResultsPdf(HeadedPdfView, LeaderboardSummary):
                 table.setStyle(self.table_style)
                 elements.append(table)
 
-            elements.append(Spacer(self.PAGE_WIDTH, 0.25*inch))
+            elements.append(Spacer(self.PAGE_WIDTH, 0.25 * inch))
 
         return elements
 
@@ -653,7 +652,7 @@ class ResultsPdf(HeadedPdfView, LeaderboardSummary):
 
         table_data = []
         for i, team in enumerate(results):
-            table_data += [[i+1, team['club'].name] + ([
+            table_data += [[i + 1, team['club'].name] + ([
                 team['total'],
                 team['total_golds'],
                 team['total_xs'],
@@ -677,7 +676,6 @@ class ResultsPdf(HeadedPdfView, LeaderboardSummary):
         elements.append(Table(table_data))
 
         return elements
-
 
     table_style = TableStyle([
         ('LINEBELOW', (0, 0), (-1, 0), 0.5, colors.black),
@@ -708,13 +706,12 @@ class ResultsPdfOverall(ResultsPdf):
         elements = []
 
         i = 1
-        import csv
         session_rounds, scores, sessions = self.get_results()
         for session, session_round, results in scores[:2]:
             for category, entries in results:
                 if not entries or len(entries) < 2:
                     continue
-                elements.append(self.Para(category , 'h2'))
+                elements.append(self.Para(category, 'h2'))
                 with open('%s.csv' % i) as f:
                     data = csv.reader(f)
                     table_data = list(data)
@@ -729,10 +726,9 @@ class ResultsPdfOverall(ResultsPdf):
 results_pdf_overall = login_required(ResultsPdfOverall.as_view())
 
 
-
 class PDFResultsRenderer(object):
-    PAGE_HEIGHT=defaultPageSize[1]
-    PAGE_WIDTH=defaultPageSize[0]
+    PAGE_HEIGHT = defaultPageSize[1]
+    PAGE_WIDTH = defaultPageSize[0]
 
     def render_to_pdf(self, context):
         response = HttpResponse(content_type='application/pdf')
@@ -750,7 +746,7 @@ class PDFResultsRenderer(object):
     def draw_title(self, canvas, doc):
         canvas.saveState()
         canvas.setFont('Helvetica-Bold', 18)
-        canvas.drawCentredString(self.page_width/2.0, self.page_height-70, u'{0}: {1}'.format(self.competition, self.title))
+        canvas.drawCentredString(self.page_width / 2.0, self.page_height - 70, u'{0}: {1}'.format(self.competition, self.title))
         sponsors = self.competition.sponsors.all()
         if sponsors:
             canvas.drawImage(sponsors[0].logo.path, 50, -50, width=self.PAGE_WIDTH - 100, preserveAspectRatio=True, anchor='nw')
@@ -779,7 +775,7 @@ class PDFResultsRenderer(object):
                 table.setStyle(table_style)
                 elements.append(table)
 
-            elements.append(Spacer(0.25*inch, 0.25*inch))
+            elements.append(Spacer(0.25 * inch, 0.25 * inch))
 
         return elements
 
@@ -829,7 +825,7 @@ class CSVResultsRenderer(object):
 @class_view_decorator(login_required)
 class NewLeaderboard(PDFResultsRenderer, CSVResultsRenderer, ListView):
     """General leaderboard/rsults generation.
-    
+
     Strategy:
      - get the competition
      - check the mode and the format are valid
@@ -881,8 +877,8 @@ class NewLeaderboard(PDFResultsRenderer, CSVResultsRenderer, ListView):
             'target__session_entry__competition_entry__bowstyle',
             'target__session_entry__competition_entry__archer__gender',
             'disqualified',
-            '-score', 
-            '-golds', 
+            '-score',
+            '-golds',
             '-xs'
         )
         return scores
