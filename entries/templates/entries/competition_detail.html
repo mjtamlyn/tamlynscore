@@ -38,6 +38,7 @@
                 <a href="{% url 'new_results' slug=competition.slug mode=mode.mode format='html' %}"><li>Results {{ mode|lower }}</li></a>
             {% endif %}
             {% endfor %}
+            <a href="{% url 'rankings_export' slug=competition.slug %}"><li>Rankings Export (CSV)</li></a>
         </ul>
         {% endwith %}
     </div>

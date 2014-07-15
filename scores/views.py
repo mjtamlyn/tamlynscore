@@ -20,8 +20,8 @@ from reportlab.lib.units import inch
 from reportlab.platypus import SimpleDocTemplate, Spacer, Table, TableStyle, Paragraph
 from reportlab.rl_config import defaultPageSize
 
-from entries.models import Competition, SessionRound, SCORING_TOTALS, SCORING_DOZENS, SCORING_FULL
-from entries.views import HeadedPdfView, TargetList
+from entries.models import Competition, SessionRound, CompetitionEntry, SCORING_TOTALS, SCORING_DOZENS, SCORING_FULL
+from entries.views import HeadedPdfView, TargetList, CompetitionMixin
 
 from .forms import get_arrow_formset, get_dozen_formset
 from .models import Score, Arrow, Dozen
@@ -911,3 +911,68 @@ class NewResults(NewLeaderboard):
 
     def mode_exists(self, mode):
         return self.competition.result_modes.filter(mode=mode.slug, leaderboard_only=False).exists()
+
+
+class RankingsExport(CompetitionMixin, View):
+    def get(self, request, *args, **kwargs):
+        entries = self.get_entries()
+        rounds = self.get_rounds()
+        scores = self.get_scores()
+        headings = self.get_headings(rounds)
+        data = self.match_details(entries, rounds, scores)
+        response = HttpResponse(content_type='text/csv')
+        writer = csv.writer(response)
+        writer.writerow(headings)
+        writer.writerows(data)
+        return response
+
+    def get_entries(self):
+        return CompetitionEntry.objects.filter(competition=self.competition).select_related('archer', 'club', 'bowstyle')
+
+    def get_rounds(self):
+        return SessionRound.objects.filter(session__competition=self.competition).select_related('shot_round')
+
+    def get_scores(self):
+        return Score.objects.filter(
+            target__session_entry__competition_entry__competition=self.competition
+        ).select_related(
+            'target__session_entry',
+        )
+
+    def get_headings(self, rounds):
+        headings = ['Name', 'Club', 'Gender', 'Bowstyle', 'AGB number']
+        for r in rounds:
+            name = r.shot_round.name
+            headings += [
+                '%s - Score' % name,
+                '%s - 10s' % name,
+                '%s - Xs' % name,
+                '%s - Retired/DNS' % name,
+            ]
+        return headings
+
+    def match_details(self, entries, rounds, scores):
+        data = {}
+        round_indices = {}
+        for entry in entries:
+            data[entry.pk] = [
+                entry.archer.name,
+                entry.club.name,
+                entry.archer.get_gender_display(),
+                entry.bowstyle,
+                entry.archer.gnas_no,
+            ] + [''] * len(rounds) * 4
+        for i, r in enumerate(rounds):
+            round_indices[r.pk] = 5 + 4 * i
+        for score in scores:
+            entry = score.target.session_entry.competition_entry_id
+            index = round_indices[score.target.session_entry.session_round_id]
+            if score.score == 0:
+                data[entry][index + 3] = 'DNS'
+            else:
+                data[entry][index] = score.score
+                data[entry][index + 1] = score.golds
+                data[entry][index + 2] = score.xs
+                if score.retired:
+                    data[entry][index + 3] = 'Retired'
+        return data.values()
