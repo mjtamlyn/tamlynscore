@@ -29,4 +29,5 @@ urlpatterns = patterns('scores.views',
 
     url(r'^(?P<slug>[\w-]+)/new-leaderboard/(?P<mode>[\w-]+)/(?P<format>[\w-]+)/', views.NewLeaderboard.as_view(), name='new_leaderboard'),
     url(r'^(?P<slug>[\w-]+)/new-results/(?P<mode>[\w-]+)/(?P<format>[\w-]+)/', views.NewResults.as_view(), name='new_results'),
+    url(r'^(?P<slug>[\w-]+)/rankings-export.csv', views.RankingsExport.as_view(), name='rankings_export'),
 )
