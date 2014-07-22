@@ -22,12 +22,12 @@ from reportlab.rl_config import defaultPageSize
 
 from entries.models import Competition, SessionRound, CompetitionEntry, SCORING_TOTALS, SCORING_DOZENS, SCORING_FULL
 from entries.views import HeadedPdfView, TargetList, CompetitionMixin
+from olympic.models import OlympicRound, Result
+from scoring.utils import class_view_decorator
 
 from .forms import get_arrow_formset, get_dozen_formset
 from .models import Score, Arrow, Dozen
 from .result_modes import get_mode
-
-from scoring.utils import class_view_decorator
 
 
 @class_view_decorator(login_required)
@@ -917,9 +917,10 @@ class RankingsExport(CompetitionMixin, View):
     def get(self, request, *args, **kwargs):
         entries = self.get_entries()
         rounds = self.get_rounds()
+        olympic_rounds = self.get_olympic_rounds()
         scores = self.get_scores()
-        headings = self.get_headings(rounds)
-        data = self.match_details(entries, rounds, scores)
+        headings = self.get_headings(rounds, olympic_rounds)
+        data = self.match_details(entries, rounds, olympic_rounds, scores)
         response = HttpResponse(content_type='text/csv')
         writer = csv.writer(response)
         writer.writerow(headings)
@@ -932,6 +933,9 @@ class RankingsExport(CompetitionMixin, View):
     def get_rounds(self):
         return SessionRound.objects.filter(session__competition=self.competition).select_related('shot_round')
 
+    def get_olympic_rounds(self):
+        return OlympicRound.objects.filter(olympicsessionround__session__competition=self.competition).distinct()
+
     def get_scores(self):
         return Score.objects.filter(
             target__session_entry__competition_entry__competition=self.competition
@@ -939,7 +943,7 @@ class RankingsExport(CompetitionMixin, View):
             'target__session_entry',
         )
 
-    def get_headings(self, rounds):
+    def get_headings(self, rounds, olympic_rounds):
         headings = ['Name', 'Club', 'Gender', 'Bowstyle', 'AGB number']
         for r in rounds:
             name = r.shot_round.name
@@ -949,9 +953,11 @@ class RankingsExport(CompetitionMixin, View):
                 '%s - Xs' % name,
                 '%s - Retired/DNS' % name,
             ]
+        for r in olympic_rounds:
+            headings.append(r)
         return headings
 
-    def match_details(self, entries, rounds, scores):
+    def match_details(self, entries, rounds, olympic_rounds, scores):
         data = {}
         round_indices = {}
         for entry in entries:
@@ -961,7 +967,7 @@ class RankingsExport(CompetitionMixin, View):
                 entry.archer.get_gender_display(),
                 entry.bowstyle,
                 entry.archer.gnas_no,
-            ] + [''] * len(rounds) * 4
+            ] + [''] * (len(rounds) * 4 + len(olympic_rounds))
         for i, r in enumerate(rounds):
             round_indices[r.pk] = 5 + 4 * i
         for score in scores:
@@ -975,4 +981,16 @@ class RankingsExport(CompetitionMixin, View):
                 data[entry][index + 2] = score.xs
                 if score.retired:
                     data[entry][index + 3] = 'Retired'
+        for i, r in enumerate(olympic_rounds):
+            index = len(rounds) * 4 + 5 + i
+            results = Result.objects.filter(
+                seed__session_round__shot_round=r,
+                seed__entry__competition=self.competition,
+            ).order_by('total').select_related('seed__entry__bowstyle')
+            for result in results:
+                entry = result.seed.entry
+                if entry.bowstyle.name == 'Compound':
+                    data[entry.pk][index] = result.total
+                else:
+                    data[entry.pk][index] = 'Match Completed'
         return data.values()
