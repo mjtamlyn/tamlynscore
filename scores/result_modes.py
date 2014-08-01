@@ -463,10 +463,30 @@ class Team(BaseResultMode):
         club_results = []
         for club, club_scores in clubs.items():
             club_scores = [s for s in club_scores if self.is_valid_for_type(s, type, competition)]
+            club_scores = sorted(club_scores, key=lambda s: (s.score, s.hits, s.golds, s.xs), reverse=True)
             team_size = competition.team_size
             if type == 'Novice' and competition.novice_team_size:
                 team_size = competition.novice_team_size
-            club_scores = sorted(club_scores, key=lambda s: (s.score, s.hits, s.golds, s.xs), reverse=True)[:team_size]
+            if competition.force_mixed_teams:
+                gent_found = False
+                lady_found = False
+                mixed_team_found = False
+                for i, score in enumerate(club_scores):
+                    if score.target.session_entry.competition_entry.archer.gender == 'G':
+                        gent_found = True
+                    else:
+                        lady_found = True
+                    if gent_found and lady_found:
+                        if i < team_size:
+                            club_scores = club_scores[:i] + [score]
+                        else:
+                            club_scores = club_scores[:team_size]
+                        mixed_team_found = True
+                        break
+                if not mixed_team_found:
+                    club_scores = []
+            else:
+                club_scores = club_scores[:team_size]
             if not club_scores:
                 continue
             if len(club_scores) < team_size and not competition.allow_incomplete_teams:

@@ -59,6 +59,7 @@ class Competition(models.Model):
     allow_incomplete_teams = models.BooleanField(default=True)
     team_size = models.PositiveIntegerField(default=4)
     novice_team_size = models.PositiveIntegerField(default=3)
+    force_mixed_teams = models.BooleanField(default=False)
 
     class Meta:
         unique_together = ('date', 'tournament')
