@@ -232,7 +232,10 @@ class InputDozens(View):
         competition = get_object_or_404(Competition, slug=slug)
         scores = Score.objects.filter(target__session_entry__session_round__session=session_id, target__boss=boss, target__session_entry__present=True, retired=False).order_by('target__target').select_related()
         num_dozens = SessionRound.objects.filter(session__pk=session_id)[0].shot_round.arrows / 12
-        forms = get_dozen_formset(scores, num_dozens, boss, dozen, scores[0].target.session_entry.session_round.session.arrows_entered_per_end, data=request.POST)
+        try:
+            forms = get_dozen_formset(scores, num_dozens, boss, dozen, scores[0].target.session_entry.session_round.session.arrows_entered_per_end, data=request.POST)
+        except IndexError:
+            forms = []
         dozens = []
         failed = False
         for score in forms:
