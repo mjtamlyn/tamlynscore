@@ -828,7 +828,7 @@ class CSVResultsRenderer(object):
 
 @class_view_decorator(login_required)
 class NewLeaderboard(PDFResultsRenderer, CSVResultsRenderer, ListView):
-    """General leaderboard/rsults generation.
+    """General leaderboard/results generation.
 
     Strategy:
      - get the competition
@@ -899,6 +899,14 @@ class NewLeaderboard(PDFResultsRenderer, CSVResultsRenderer, ListView):
             return self.render_to_pdf(context)
         if self.format == 'csv':
             return self.render_to_csv(context)
+        results = context['results']
+        for section in results:
+            for category in results[section]:
+                for score in results[section][category]:
+                    score.details = self.mode.score_details(score, section)
+                    if hasattr(score, 'team'):
+                        for archer in score.team:
+                            archer.details = self.mode.score_details(archer, section)
         return super(NewLeaderboard, self).render_to_response(context, **response_kwargs)
 
     def get_template_names(self, **kwargs):
