@@ -38,7 +38,12 @@
             <tr>
                 <td>{{ target.target }}</td>
                 <td>{{ target.archer }}</td>
-                <th class="doz-total">{{ target.form.total }}</th>
+                <th class="doz-total">
+                    {% if target.form.total.errors %}
+                    <p class="error">{{ target.form.total.errors }}</p>
+                    {% endif %}
+                    {{ target.form.total }}
+                </th>
                 {% if target.score_form %}
                 <td><ul>{{ target.score_form.as_ul }}</ul></td>
                 {% endif %}
