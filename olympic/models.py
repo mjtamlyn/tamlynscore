@@ -80,7 +80,7 @@ class OlympicSessionRound(models.Model):
             )
             seeding.save()
 
-    def _get_match_layout(self, level, half_only=False, quarter_only=False):
+    def _get_match_layout(self, level, half_only=False, quarter_only=False, three_quarters=False):
         seedings = [1, 2]
         for m in range(2, level):
             seedings = map(lambda x: [x, 2 ** m + 1 - x] if x % 2 else [2 ** m + 1 - x, x], seedings)
@@ -89,14 +89,16 @@ class OlympicSessionRound(models.Model):
             seedings = [item for item in seedings if item > 2 ** (level - 2)]
         elif quarter_only:
             seedings = [item for item in seedings if item > 2 ** (level - 2) + 2 ** (level - 3)]
+        elif three_quarters:
+            seedings = [item for item in seedings if item > 2 ** (level - 2) - 2 ** (level - 3)]
         return seedings
 
-    def _get_target_mapping(self, level, start=1, expanded=False, half_only=False, quarter_only=False):
-        layout = self._get_match_layout(level, half_only, quarter_only)
+    def _get_target_mapping(self, level, start=1, expanded=False, half_only=False, quarter_only=False, three_quarters=False):
+        layout = self._get_match_layout(level, half_only, quarter_only, three_quarters)
         return [(m, layout.index(m) * (1 + int(expanded)) + start) for m in layout]
 
-    def make_matches(self, level, start=1, expanded=False, half_only=False, quarter_only=False, timing=None):
-        mapping = self._get_target_mapping(level, start, expanded, half_only, quarter_only)
+    def make_matches(self, level, start=1, expanded=False, half_only=False, quarter_only=False, three_quarters=False, timing=None):
+        mapping = self._get_target_mapping(level, start, expanded, half_only, quarter_only, three_quarters)
         for match_id, target in mapping:
             match = Match(
                     session_round=self,

@@ -103,7 +103,7 @@ class BaseResultMode(object):
             subrounds = score.target.session_entry.session_round.shot_round.subrounds.all()
         if self.include_distance_breakdown and len(subrounds) > 1 and not score.target.session_entry.session_round.session.scoring_system == SCORING_TOTALS:
             if score.disqualified or score.target.session_entry.session_round.session.scoring_system == SCORING_TOTALS or hasattr(score, 'is_mock'):
-                scores += [None] * len(subrounds)
+                scores += [''] * len(subrounds)
             else:
                 subround_scores = []
 
@@ -122,9 +122,9 @@ class BaseResultMode(object):
 
                 scores += subround_scores
         if score.disqualified:
-            scores += ['DSQ', None, None]
+            scores += ['DSQ', '', '']
         elif score.retired:
-            scores += [score.score, 'Retired', None]
+            scores += [score.score, 'Retired', '']
         elif hasattr(score, 'partial_score'):
             scores += [
                 score.score,
@@ -226,7 +226,7 @@ class ByRound(BaseResultMode):
     def get_rounds(self, competition):
         from entries.models import SessionRound
 
-        session_rounds = SessionRound.objects.filter(session__competition=competition).order_by('session__start')
+        session_rounds = SessionRound.objects.filter(session__competition=competition, olympicsessionround__isnull=True).order_by('session__start')
         rounds = []
         for round in session_rounds:
             if round.shot_round not in rounds:
@@ -241,7 +241,7 @@ class ByRound(BaseResultMode):
                 continue
             if competition.exclude_later_shoots and session_entry.index > 1:
                 continue
-            category = session_entry.competition_entry.category()
+            category = self.get_category_for_entry(session_entry.competition_entry)
             if category not in results:
                 results[category] = []
             results[category].append(score)
@@ -260,6 +260,9 @@ class ByRound(BaseResultMode):
                         placing=None,
                     )
         return results
+
+    def get_category_for_entry(self, entry):
+        return entry.category()
 
 
 class ByRoundProgressional(ByRound, BaseResultMode):
@@ -374,6 +377,38 @@ class DoubleRound(BaseResultMode):
         return 'Double %s' % unicode(round)
 
 
+class H2HSeedings(ByRound, BaseResultMode):
+    slug = 'seedings'
+    name = 'Seedings'
+
+    def get_rounds(self, competition):
+        from entries.models import SessionRound
+        from olympic.models import Category
+
+        self.categories = Category.objects.filter(olympicsessionround__session__competition=competition).prefetch_related('bowstyles')
+
+        session_rounds = SessionRound.objects.filter(session__competition=competition, olympicsessionround__isnull=False).order_by('session__start')
+        rounds = []
+        for round in session_rounds:
+            if round.shot_round not in rounds:
+                rounds.append(round.shot_round)
+        return rounds
+
+    def get_results(self, competition, scores, leaderboard=False, request=None):
+        self.leaderboard = leaderboard
+        rounds = self.get_rounds(competition)
+        return OrderedDict((
+            self.get_section_for_round(round),
+            self.get_round_results(competition, round, scores)
+        ) for round in rounds)
+
+    def get_category_for_entry(self, entry):
+        for category in self.categories:
+            if entry.bowstyle in category.bowstyles.all():
+                if category.gender is None or category.gender == entry.archer.gender:
+                    return category
+
+
 class Team(BaseResultMode):
     slug = 'team'
     name = 'Teams'
@@ -428,10 +463,30 @@ class Team(BaseResultMode):
         club_results = []
         for club, club_scores in clubs.items():
             club_scores = [s for s in club_scores if self.is_valid_for_type(s, type, competition)]
+            club_scores = sorted(club_scores, key=lambda s: (s.score, s.hits, s.golds, s.xs), reverse=True)
             team_size = competition.team_size
             if type == 'Novice' and competition.novice_team_size:
                 team_size = competition.novice_team_size
-            club_scores = sorted(club_scores, key=lambda s: (s.score, s.hits, s.golds, s.xs), reverse=True)[:team_size]
+            if competition.force_mixed_teams:
+                gent_found = False
+                lady_found = False
+                mixed_team_found = False
+                for i, score in enumerate(club_scores):
+                    if score.target.session_entry.competition_entry.archer.gender == 'G':
+                        gent_found = True
+                    else:
+                        lady_found = True
+                    if gent_found and lady_found:
+                        if i < team_size:
+                            club_scores = club_scores[:i] + [score]
+                        else:
+                            club_scores = club_scores[:team_size]
+                        mixed_team_found = True
+                        break
+                if not mixed_team_found:
+                    club_scores = []
+            else:
+                club_scores = club_scores[:team_size]
             if not club_scores:
                 continue
             if len(club_scores) < team_size and not competition.allow_incomplete_teams:
@@ -486,8 +541,8 @@ class Weekend(BaseResultMode):
         """
         from olympic.models import OlympicSessionRound
 
-        wrapped_mode = ByRound(**self.init_kwargs)
-        round_results = wrapped_mode.get_results(competition, scores, leaderboard=leaderboard, request=request)
+        all_fita_results = ByRound(**self.init_kwargs).get_results(competition, scores, leaderboard=leaderboard, request=request)
+        seeding_results = H2HSeedings(**self.init_kwargs).get_results(competition, scores, leaderboard=leaderboard, request=request)
         h2h_categories = OlympicSessionRound.objects.filter(session__competition=competition).select_related('category')
 
         full_results = OrderedDict()
@@ -500,48 +555,48 @@ class Weekend(BaseResultMode):
         for category in h2h_categories:
             h2h_results = category.get_results()
             results = []
-            for round in round_results:
-                if category.category.gender == 'G' and round.round.name == 'Gents FITA':
+            for round in all_fita_results:
+                if category.category.gender == 'G' and round.round.name == 'WA 1440 (Gents)':
                     fita = round
                     break
-                if category.category.gender == 'L' and round.round.name == 'Ladies FITA':
+                if category.category.gender == 'L' and round.round.name == 'WA 1440 (Ladies)':
                     fita = round
                     break
-            for division in round_results[fita]:
+            for division in all_fita_results[fita]:
                 if 'Compound' in unicode(category.category) and 'Compound' in division:
                     if category.category.gender == 'G' and 'Gent' in division:
-                        fita_results = round_results[fita][division]
+                        fita_results = all_fita_results[fita][division]
                         break
                     if category.category.gender == 'L' and 'Lady' in division:
-                        fita_results = round_results[fita][division]
+                        fita_results = all_fita_results[fita][division]
                         break
                 if 'Recurve' in unicode(category.category) and 'Recurve' in division:
                     if category.category.gender == 'G' and 'Gent' in division:
-                        fita_results = round_results[fita][division]
+                        fita_results = all_fita_results[fita][division]
                         break
                     if category.category.gender == 'L' and 'Lady' in division:
-                        fita_results = round_results[fita][division]
+                        fita_results = all_fita_results[fita][division]
                         break
 
             fita_results_by_entry = {
                 result.target.session_entry.competition_entry: result for result in fita_results
             }
 
-            for round, divisions in round_results.items():
+            for round, divisions in seeding_results.items():
                 for division in divisions:
                     if 'Compound' in unicode(category.category) and '50m' in round.round.name:
-                        if category.category.gender == 'G' and 'Gent' in division:
-                            ranking_results = round_results[round][division]
+                        if category.category.gender == 'G' and division.gender == 'G':
+                            ranking_results = seeding_results[round][division]
                             break
-                        if category.category.gender == 'L' and 'Lady' in division:
-                            ranking_results = round_results[round][division]
+                        if category.category.gender == 'L' and division.gender == 'L':
+                            ranking_results = seeding_results[round][division]
                             break
                     if 'Recurve' in unicode(category.category) and '70m' in round.round.name:
-                        if category.category.gender == 'G' and 'Gent' in division:
-                            ranking_results = round_results[round][division]
+                        if category.category.gender == 'G' and division.gender == 'G':
+                            ranking_results = seeding_results[round][division]
                             break
-                        if category.category.gender == 'L' and 'Lady' in division:
-                            ranking_results = round_results[round][division]
+                        if category.category.gender == 'L' and division.gender == 'L':
+                            ranking_results = seeding_results[round][division]
                             break
 
             ranking_results_by_entry = {
@@ -575,7 +630,7 @@ class Weekend(BaseResultMode):
                 result.placing = i
             full_results[category.category.short_name] = results
 
-        headers = ['Pl.'] + self.get_main_headers() + ['720', 'H2H', 'FITA', 'Total']
+        headers = ['Pl.'] + self.get_main_headers() + ['720', 'H2H', '1440', 'Total']
         section = ResultSection('Weekend results', None, headers)
         return {section: full_results}
 

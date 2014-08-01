@@ -951,7 +951,7 @@ nav .nav-link:hover {
 
 /* line 468, ../../sass/_competition.sass */
 .leaderboard-big-screen .wrapper {
-  width: 1800px;
+  width: 1600px;
 }
 /* line 470, ../../sass/_competition.sass */
 .leaderboard-big-screen .wrapper h1 {
@@ -972,11 +972,11 @@ nav .nav-link:hover {
 .leaderboard-big-screen .wrapper .module {
   float: left;
   margin: 10px;
-  width: 577px;
+  width: 778px;
 }
 /* line 483, ../../sass/_competition.sass */
 .leaderboard-big-screen .wrapper .module td {
-  font-size: 18px;
+  font-size: 24px;
   padding: 2px 15px;
 }
 

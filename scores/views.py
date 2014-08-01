@@ -1,3 +1,5 @@
+import copy
+import unicodecsv as csv
 from itertools import groupby
 import json
 import math
@@ -18,14 +20,14 @@ from reportlab.lib.units import inch
 from reportlab.platypus import SimpleDocTemplate, Spacer, Table, TableStyle, Paragraph
 from reportlab.rl_config import defaultPageSize
 
-from entries.models import Competition, SessionRound, SCORING_TOTALS, SCORING_DOZENS, SCORING_FULL
-from entries.views import HeadedPdfView, TargetList
+from entries.models import Competition, SessionRound, CompetitionEntry, SCORING_TOTALS, SCORING_DOZENS, SCORING_FULL
+from entries.views import HeadedPdfView, TargetList, CompetitionMixin
+from olympic.models import OlympicRound, Result
+from scoring.utils import class_view_decorator
 
 from .forms import get_arrow_formset, get_dozen_formset
 from .models import Score, Arrow, Dozen
 from .result_modes import get_mode
-
-from scoring.utils import class_view_decorator
 
 
 @class_view_decorator(login_required)
@@ -177,6 +179,7 @@ class InputArrowsArcher(TemplateView):
             'xs': 0,
             'et1': 0,
             'et2': 0,
+            'rt': 0,
         } for i in range(round.arrows / per_end)]
         arrows = score.arrow_set.all()
         for arrow in arrows:
@@ -190,10 +193,14 @@ class InputArrowsArcher(TemplateView):
                 layout[dozen]['et2'] += arrow.arrow_value
             if arrow.arrow_value:
                 layout[dozen]['hits'] += 1
-            if arrow.arrow_value == 10:
+            if arrow.arrow_value == 10 or (arrow.arrow_value == 9 and round.scoring_type == 'F'):
                 layout[dozen]['golds'] += 1
             if arrow.is_x:
                 layout[dozen]['xs'] += 1
+        rt = 0
+        for dozen in layout:
+            rt += dozen['doz']
+            dozen['rt'] = rt
         return {
             'competition': competition,
             'entry': entry,
@@ -207,10 +214,13 @@ class InputDozens(View):
     template = 'input_dozens.html'
     next_url_name = 'input_scores'
 
+    def get_next_exists(self, session_id, boss):
+        return Score.objects.filter(target__session_entry__session_round__session=session_id, target__boss=int(boss) + 1).order_by('target__target').exists()
+
     def get(self, request, slug, session_id, boss, dozen):
         competition = get_object_or_404(Competition, slug=slug)
         scores = Score.objects.filter(target__session_entry__session_round__session=session_id, target__boss=boss, target__session_entry__present=True, retired=False).order_by('target__target').select_related()
-        next_exists = Score.objects.filter(target__session_entry__session_round__session=session_id, target__boss=int(boss) + 1).order_by('target__target').exists()
+        next_exists = self.get_next_exists(session_id, boss)
         num_dozens = SessionRound.objects.filter(session__pk=session_id)[0].shot_round.arrows / 12
         try:
             forms = get_dozen_formset(scores, num_dozens, boss, dozen, scores[0].target.session_entry.session_round.session.arrows_entered_per_end)
@@ -222,7 +232,10 @@ class InputDozens(View):
         competition = get_object_or_404(Competition, slug=slug)
         scores = Score.objects.filter(target__session_entry__session_round__session=session_id, target__boss=boss, target__session_entry__present=True, retired=False).order_by('target__target').select_related()
         num_dozens = SessionRound.objects.filter(session__pk=session_id)[0].shot_round.arrows / 12
-        forms = get_dozen_formset(scores, num_dozens, boss, dozen, scores[0].target.session_entry.session_round.session.arrows_entered_per_end, data=request.POST)
+        try:
+            forms = get_dozen_formset(scores, num_dozens, boss, dozen, scores[0].target.session_entry.session_round.session.arrows_entered_per_end, data=request.POST)
+        except IndexError:
+            forms = []
         dozens = []
         failed = False
         for score in forms:
@@ -246,6 +259,7 @@ class InputDozens(View):
             else:
                 success_url = reverse(self.next_url_name, kwargs={'slug': slug}) + '?fd={0}&ft={1}&fs={2}'.format(dozen, boss, session_id)
             return HttpResponseRedirect(success_url)
+        next_exists = self.get_next_exists(session_id, boss)
         return render(request, self.template, locals())
 
 
@@ -290,13 +304,13 @@ class LeaderboardCombined(ListView):
 
     def get_queryset(self):
         scores = Score.objects.filter(target__session_entry__competition_entry__competition__slug=self.kwargs['slug']).select_related().order_by(
-                'target__session_entry__competition_entry__bowstyle',
-                'target__session_entry__competition_entry__archer__gender',
-                'target__session_entry__competition_entry__archer__age',
-                'disqualified',
-                '-score', 
-                '-golds', 
-                '-xs'
+            'target__session_entry__competition_entry__bowstyle',
+            'target__session_entry__competition_entry__archer__gender',
+            'target__session_entry__competition_entry__archer__age',
+            'disqualified',
+            '-score',
+            '-golds',
+            '-xs'
         )
         return scores
 
@@ -348,12 +362,12 @@ class LeaderboardTeams(ListView):
     def get_queryset(self):
         scores = Score.objects.filter(target__session_entry__competition_entry__competition__slug=self.kwargs['slug']).select_related().exclude(target__session_entry__competition_entry__bowstyle__name='Compound')
         scores = scores.order_by(
-                'target__session_entry__competition_entry__bowstyle',
-                'target__session_entry__competition_entry__archer__gender',
-                'disqualified',
-                '-score',
-                '-golds',
-                '-xs'
+            'target__session_entry__competition_entry__bowstyle',
+            'target__session_entry__competition_entry__archer__gender',
+            'disqualified',
+            '-score',
+            '-golds',
+            '-xs'
         )
         return scores
 
@@ -423,7 +437,7 @@ class LeaderboardBUTC(LeaderboardTeams):
             'team': [{
                 'name': a.target.session_entry.competition_entry.archer.name.split(' ')[-1],
                 'score': a.score,
-                } for a in d['team']],
+            } for a in d['team']],
             'total': d['total'],
         } for i, d in enumerate(context['club_results'][:32])])
         context['template'] = render_to_string(self.backbone_template)
@@ -484,13 +498,14 @@ class ResultsView(LeaderboardView):
 
 results = login_required(ResultsView.as_view())
 
+
 class ResultsPdf(HeadedPdfView, LeaderboardSummary):
     title = 'Results'
     include_dns = True
 
     def setMargins(self, doc):
-        doc.topMargin = 1.2*inch
-        doc.bottomMargin = 0.7*inch
+        doc.topMargin = 1.2 * inch
+        doc.bottomMargin = 0.7 * inch
 
     def update_style(self):
         self.styles['h1'].alignment = 1
@@ -511,7 +526,6 @@ class ResultsPdf(HeadedPdfView, LeaderboardSummary):
         for key, values in groupby(scores, lambda x: x[0]):
             sessions.append((key, [value[1] for value in values]))
         return scores
-
 
     def row_from_entry(self, entries, entry, subrounds, round_scoring_type):
         row = []
@@ -597,7 +611,6 @@ class ResultsPdf(HeadedPdfView, LeaderboardSummary):
 
         return elements
 
-
     def get_elements_for_results_set(self, scores):
         elements = []
 
@@ -609,7 +622,7 @@ class ResultsPdf(HeadedPdfView, LeaderboardSummary):
             for category, entries in results:
                 if not entries:
                     continue
-                elements.append(self.Para(category , 'h2'))
+                elements.append(self.Para(category, 'h2'))
                 table_header = ['Pl.', 'Archer', 'Club']
                 subrounds = session_round.shot_round.subrounds.order_by('-distance')
                 if len(subrounds) > 1 and not session_round.session.scoring_system == SCORING_TOTALS:
@@ -622,10 +635,10 @@ class ResultsPdf(HeadedPdfView, LeaderboardSummary):
                     gender = entries[0].target.session_entry.competition_entry.archer.gender
                     bowstyle = entries[0].target.session_entry.competition_entry.bowstyle
                     did_not_starts = session_round.sessionentry_set.select_related().filter(
-                            competition_entry__archer__gender=gender,
-                            competition_entry__bowstyle=bowstyle,
+                        competition_entry__archer__gender=gender,
+                        competition_entry__bowstyle=bowstyle,
                     ).filter(
-                            Q(targetallocation__score=None) | Q(targetallocation__score__score=0) | Q(targetallocation=None)
+                        Q(targetallocation__score=None) | Q(targetallocation__score__score=0) | Q(targetallocation=None)
                     )
                     for dns in did_not_starts:
                         if self.include_dns:
@@ -637,7 +650,7 @@ class ResultsPdf(HeadedPdfView, LeaderboardSummary):
                 table.setStyle(self.table_style)
                 elements.append(table)
 
-            elements.append(Spacer(self.PAGE_WIDTH, 0.25*inch))
+            elements.append(Spacer(self.PAGE_WIDTH, 0.25 * inch))
 
         return elements
 
@@ -646,7 +659,7 @@ class ResultsPdf(HeadedPdfView, LeaderboardSummary):
 
         table_data = []
         for i, team in enumerate(results):
-            table_data += [[i+1, team['club'].name] + ([
+            table_data += [[i + 1, team['club'].name] + ([
                 team['total'],
                 team['total_golds'],
                 team['total_xs'],
@@ -670,7 +683,6 @@ class ResultsPdf(HeadedPdfView, LeaderboardSummary):
         elements.append(Table(table_data))
 
         return elements
-
 
     table_style = TableStyle([
         ('LINEBELOW', (0, 0), (-1, 0), 0.5, colors.black),
@@ -701,13 +713,12 @@ class ResultsPdfOverall(ResultsPdf):
         elements = []
 
         i = 1
-        import csv
         session_rounds, scores, sessions = self.get_results()
         for session, session_round, results in scores[:2]:
             for category, entries in results:
                 if not entries or len(entries) < 2:
                     continue
-                elements.append(self.Para(category , 'h2'))
+                elements.append(self.Para(category, 'h2'))
                 with open('%s.csv' % i) as f:
                     data = csv.reader(f)
                     table_data = list(data)
@@ -722,10 +733,9 @@ class ResultsPdfOverall(ResultsPdf):
 results_pdf_overall = login_required(ResultsPdfOverall.as_view())
 
 
-
 class PDFResultsRenderer(object):
-    PAGE_HEIGHT=defaultPageSize[1]
-    PAGE_WIDTH=defaultPageSize[0]
+    PAGE_HEIGHT = defaultPageSize[1]
+    PAGE_WIDTH = defaultPageSize[0]
 
     def render_to_pdf(self, context):
         response = HttpResponse(content_type='application/pdf')
@@ -736,17 +746,17 @@ class PDFResultsRenderer(object):
         self.styles['h2'].alignment = 1
         elements = self.get_elements(context['results'])
         if self.competition.sponsors.exists():
-            doc.bottomMargin = 2.3 * inch
+            doc.bottomMargin = 1.5 * inch
         doc.build(elements, onFirstPage=self.draw_title, onLaterPages=self.draw_title)
         return response
 
     def draw_title(self, canvas, doc):
         canvas.saveState()
         canvas.setFont('Helvetica-Bold', 18)
-        canvas.drawCentredString(self.page_width/2.0, self.page_height-70, u'{0}: {1}'.format(self.competition, self.title))
+        canvas.drawCentredString(self.page_width / 2.0, self.page_height - 70, u'{0}: {1}'.format(self.competition, self.title))
         sponsors = self.competition.sponsors.all()
         if sponsors:
-            canvas.drawImage(sponsors[0].logo.path, 50, 0, width=self.PAGE_WIDTH - 100, preserveAspectRatio=True, anchor='nw')
+            canvas.drawImage(sponsors[0].logo.path, 50, -50, width=self.PAGE_WIDTH - 100, preserveAspectRatio=True, anchor='nw')
         canvas.restoreState()
 
     def get_elements(self, results):
@@ -772,7 +782,7 @@ class PDFResultsRenderer(object):
                 table.setStyle(table_style)
                 elements.append(table)
 
-            elements.append(Spacer(0.25*inch, 0.25*inch))
+            elements.append(Spacer(0.25 * inch, 0.25 * inch))
 
         return elements
 
@@ -780,8 +790,10 @@ class PDFResultsRenderer(object):
         row = [score.placing]
         rows = [row]
 
+        team_style = copy.copy(self.styles['Normal'])
+        team_style.fontName = 'Helvetica-Bold'
         if score.is_team:
-            row += [score.club]
+            row += [Paragraph(unicode(score.club), team_style)]
             for member in score.team:
                 rows.append([
                     None,
@@ -797,10 +809,30 @@ class PDFResultsRenderer(object):
         return rows
 
 
+class CSVResultsRenderer(object):
+    def render_to_csv(self, context):
+        response = HttpResponse(content_type='text/csv')
+        data = []
+        for section, categories in context['results'].items():
+            for category, scores in categories.items():
+                for score in scores:
+                    row = [unicode(section), unicode(category)]
+                    row += [
+                        score.target.session_entry.competition_entry.archer.name,
+                        score.target.session_entry.competition_entry.club.name + (' (Guest)' if score.guest else ''),
+                        'Novice' if score.target.session_entry.competition_entry.novice == 'N' else None,
+                    ]
+                    row += self.mode.score_details(score, section)
+                    data.append(row)
+        writer = csv.writer(response)
+        writer.writerows(data)
+        return response
+
+
 @class_view_decorator(login_required)
-class NewLeaderboard(PDFResultsRenderer, ListView):
-    """General leaderboard/rsults generation.
-    
+class NewLeaderboard(PDFResultsRenderer, CSVResultsRenderer, ListView):
+    """General leaderboard/results generation.
+
     Strategy:
      - get the competition
      - check the mode and the format are valid
@@ -838,7 +870,7 @@ class NewLeaderboard(PDFResultsRenderer, ListView):
 
     def get_format(self):
         format = self.kwargs['format']
-        if format not in ['html', 'pdf', 'big-screen']:
+        if format not in ['html', 'pdf', 'big-screen', 'csv']:
             raise Http404('No such format')
         return format
 
@@ -852,8 +884,8 @@ class NewLeaderboard(PDFResultsRenderer, ListView):
             'target__session_entry__competition_entry__bowstyle',
             'target__session_entry__competition_entry__archer__gender',
             'disqualified',
-            '-score', 
-            '-golds', 
+            '-score',
+            '-golds',
             '-xs'
         )
         return scores
@@ -868,6 +900,16 @@ class NewLeaderboard(PDFResultsRenderer, ListView):
     def render_to_response(self, context, **response_kwargs):
         if self.format == 'pdf':
             return self.render_to_pdf(context)
+        if self.format == 'csv':
+            return self.render_to_csv(context)
+        results = context['results']
+        for section in results:
+            for category in results[section]:
+                for score in results[section][category]:
+                    score.details = self.mode.score_details(score, section)
+                    if getattr(score, 'team', None):
+                        for archer in score.team:
+                            archer.details = self.mode.score_details(archer, section)
         return super(NewLeaderboard, self).render_to_response(context, **response_kwargs)
 
     def get_template_names(self, **kwargs):
@@ -884,3 +926,86 @@ class NewResults(NewLeaderboard):
 
     def mode_exists(self, mode):
         return self.competition.result_modes.filter(mode=mode.slug, leaderboard_only=False).exists()
+
+
+class RankingsExport(CompetitionMixin, View):
+    def get(self, request, *args, **kwargs):
+        entries = self.get_entries()
+        rounds = self.get_rounds()
+        olympic_rounds = self.get_olympic_rounds()
+        scores = self.get_scores()
+        headings = self.get_headings(rounds, olympic_rounds)
+        data = self.match_details(entries, rounds, olympic_rounds, scores)
+        response = HttpResponse(content_type='text/csv')
+        writer = csv.writer(response)
+        writer.writerow(headings)
+        writer.writerows(data)
+        return response
+
+    def get_entries(self):
+        return CompetitionEntry.objects.filter(competition=self.competition).select_related('archer', 'club', 'bowstyle')
+
+    def get_rounds(self):
+        return SessionRound.objects.filter(session__competition=self.competition).select_related('shot_round')
+
+    def get_olympic_rounds(self):
+        return OlympicRound.objects.filter(olympicsessionround__session__competition=self.competition).distinct()
+
+    def get_scores(self):
+        return Score.objects.filter(
+            target__session_entry__competition_entry__competition=self.competition
+        ).select_related(
+            'target__session_entry',
+        )
+
+    def get_headings(self, rounds, olympic_rounds):
+        headings = ['Name', 'Club', 'Gender', 'Bowstyle', 'AGB number']
+        for r in rounds:
+            name = r.shot_round.name
+            headings += [
+                '%s - Score' % name,
+                '%s - 10s' % name,
+                '%s - Xs' % name,
+                '%s - Retired/DNS' % name,
+            ]
+        for r in olympic_rounds:
+            headings.append(r)
+        return headings
+
+    def match_details(self, entries, rounds, olympic_rounds, scores):
+        data = {}
+        round_indices = {}
+        for entry in entries:
+            data[entry.pk] = [
+                entry.archer.name,
+                entry.club.name,
+                entry.archer.get_gender_display(),
+                entry.bowstyle,
+                entry.archer.gnas_no,
+            ] + [''] * (len(rounds) * 4 + len(olympic_rounds))
+        for i, r in enumerate(rounds):
+            round_indices[r.pk] = 5 + 4 * i
+        for score in scores:
+            entry = score.target.session_entry.competition_entry_id
+            index = round_indices[score.target.session_entry.session_round_id]
+            if score.score == 0:
+                data[entry][index + 3] = 'DNS'
+            else:
+                data[entry][index] = score.score
+                data[entry][index + 1] = score.golds
+                data[entry][index + 2] = score.xs
+                if score.retired:
+                    data[entry][index + 3] = 'Retired'
+        for i, r in enumerate(olympic_rounds):
+            index = len(rounds) * 4 + 5 + i
+            results = Result.objects.filter(
+                seed__session_round__shot_round=r,
+                seed__entry__competition=self.competition,
+            ).order_by('total').select_related('seed__entry__bowstyle')
+            for result in results:
+                entry = result.seed.entry
+                if entry.bowstyle.name == 'Compound':
+                    data[entry.pk][index] = result.total
+                else:
+                    data[entry.pk][index] = 'Match Completed'
+        return data.values()

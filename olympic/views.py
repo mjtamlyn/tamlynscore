@@ -159,6 +159,10 @@ class OlympicScoreSheet(ScoreSheetsPdf):
             self.competition = get_object_or_404(Competition, slug=slug)
         if round_id:
             self.session_round = get_object_or_404(OlympicSessionRound, pk=round_id)
+            if self.competition.sponsors.exists():
+                highest_round = self.session_round.match_set.aggregate(highest=Max('level'))['highest']
+                if highest_round >= 7:
+                    self.do_sponsors = False
 
     def update_style(self):
         super(OlympicScoreSheet, self).update_style()
@@ -297,7 +301,7 @@ class OlympicResults(HeadedPdfView):
         self.styles['h2'].alignment = 1
 
     def setMargins(self, doc):
-        doc.bottomMargin = 0.3*inch
+        doc.bottomMargin = 1.5 * inch
 
     def format_results(self, results, total_levels):
         results = results.reverse()
@@ -352,6 +356,7 @@ class OlympicTree(OlympicResults):
 
     PAGE_HEIGHT=defaultPageSize[0]
     PAGE_WIDTH=defaultPageSize[1]
+    do_sponsors = False
 
     def setMargins(self, doc):
         doc.bottomMargin = 0.4*inch
@@ -483,6 +488,7 @@ class FieldPlan(HeadedPdfView):
     title = 'Field plan'
     PAGE_HEIGHT=defaultPageSize[0]
     PAGE_WIDTH=defaultPageSize[1]
+    do_sponsors = False
 
     def setMargins(self, doc):
         doc.bottomMargin = 0.4*inch
@@ -505,7 +511,8 @@ class FieldPlan(HeadedPdfView):
             table_data[m.timing][m.target] = '%s\n%s' % (m.session_round.category.short_code(), levels[m.level - 1])
             if m.target_2:
                 table_data[m.timing][m.target_2] = '%s\n%s' % (m.session_round.category.short_code(), levels[m.level - 1])
-        table = Table(table_data)
+        widths = [35] + [11] * (len(table_data[0]) - 1)
+        table = Table(table_data, colWidths=widths)
         table.setStyle(self.get_table_style(table_data))
         return [Spacer(0.5*inch, 0.5*inch), table]
 
@@ -513,10 +520,7 @@ class FieldPlan(HeadedPdfView):
         table_style = [
             ('ALIGN', (0, 0), (-1, -1), 'CENTER'),
             ('VALIGN', (0, 0), (-1, -1), 'MIDDLE'),
-            ('SIZE', (0, 0), (-1, -1), 10),
-
-            ('LEFTPADDING', (1, 0), (-1, -1), 2),
-            ('RIGHTPADDING', (1, 0), (-1, -1), 2),
+            ('SIZE', (0, 0), (-1, -1), 8),
 
             ('INNERGRID', (0, 0), (-1, -1), 0.25, colors.black),
             ('BOX', (0, 0), (-1, -1), 1, colors.black),
