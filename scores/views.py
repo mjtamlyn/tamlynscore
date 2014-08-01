@@ -904,7 +904,7 @@ class NewLeaderboard(PDFResultsRenderer, CSVResultsRenderer, ListView):
             for category in results[section]:
                 for score in results[section][category]:
                     score.details = self.mode.score_details(score, section)
-                    if hasattr(score, 'team'):
+                    if getattr(score, 'team'):
                         for archer in score.team:
                             archer.details = self.mode.score_details(archer, section)
         return super(NewLeaderboard, self).render_to_response(context, **response_kwargs)

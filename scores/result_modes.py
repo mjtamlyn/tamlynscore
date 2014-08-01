@@ -521,8 +521,8 @@ class Weekend(BaseResultMode):
         """
         from olympic.models import OlympicSessionRound
 
-        wrapped_mode = ByRound(**self.init_kwargs)
-        round_results = wrapped_mode.get_results(competition, scores, leaderboard=leaderboard, request=request)
+        all_fita_results = ByRound(**self.init_kwargs).get_results(competition, scores, leaderboard=leaderboard, request=request)
+        seeding_results = H2HSeedings(**self.init_kwargs).get_results(competition, scores, leaderboard=leaderboard, request=request)
         h2h_categories = OlympicSessionRound.objects.filter(session__competition=competition).select_related('category')
 
         full_results = OrderedDict()
@@ -535,48 +535,48 @@ class Weekend(BaseResultMode):
         for category in h2h_categories:
             h2h_results = category.get_results()
             results = []
-            for round in round_results:
-                if category.category.gender == 'G' and round.round.name == 'Gents FITA':
+            for round in all_fita_results:
+                if category.category.gender == 'G' and round.round.name == 'WA 1440 (Gents)':
                     fita = round
                     break
-                if category.category.gender == 'L' and round.round.name == 'Ladies FITA':
+                if category.category.gender == 'L' and round.round.name == 'WA 1440 (Ladies)':
                     fita = round
                     break
-            for division in round_results[fita]:
+            for division in all_fita_results[fita]:
                 if 'Compound' in unicode(category.category) and 'Compound' in division:
                     if category.category.gender == 'G' and 'Gent' in division:
-                        fita_results = round_results[fita][division]
+                        fita_results = all_fita_results[fita][division]
                         break
                     if category.category.gender == 'L' and 'Lady' in division:
-                        fita_results = round_results[fita][division]
+                        fita_results = all_fita_results[fita][division]
                         break
                 if 'Recurve' in unicode(category.category) and 'Recurve' in division:
                     if category.category.gender == 'G' and 'Gent' in division:
-                        fita_results = round_results[fita][division]
+                        fita_results = all_fita_results[fita][division]
                         break
                     if category.category.gender == 'L' and 'Lady' in division:
-                        fita_results = round_results[fita][division]
+                        fita_results = all_fita_results[fita][division]
                         break
 
             fita_results_by_entry = {
                 result.target.session_entry.competition_entry: result for result in fita_results
             }
 
-            for round, divisions in round_results.items():
+            for round, divisions in seeding_results.items():
                 for division in divisions:
                     if 'Compound' in unicode(category.category) and '50m' in round.round.name:
-                        if category.category.gender == 'G' and 'Gent' in division:
-                            ranking_results = round_results[round][division]
+                        if category.category.gender == 'G' and division.gender == 'G':
+                            ranking_results = seeding_results[round][division]
                             break
-                        if category.category.gender == 'L' and 'Lady' in division:
-                            ranking_results = round_results[round][division]
+                        if category.category.gender == 'L' and division.gender == 'L':
+                            ranking_results = seeding_results[round][division]
                             break
                     if 'Recurve' in unicode(category.category) and '70m' in round.round.name:
-                        if category.category.gender == 'G' and 'Gent' in division:
-                            ranking_results = round_results[round][division]
+                        if category.category.gender == 'G' and division.gender == 'G':
+                            ranking_results = seeding_results[round][division]
                             break
-                        if category.category.gender == 'L' and 'Lady' in division:
-                            ranking_results = round_results[round][division]
+                        if category.category.gender == 'L' and division.gender == 'L':
+                            ranking_results = seeding_results[round][division]
                             break
 
             ranking_results_by_entry = {
@@ -610,7 +610,7 @@ class Weekend(BaseResultMode):
                 result.placing = i
             full_results[category.category.short_name] = results
 
-        headers = ['Pl.'] + self.get_main_headers() + ['720', 'H2H', 'FITA', 'Total']
+        headers = ['Pl.'] + self.get_main_headers() + ['720', 'H2H', '1440', 'Total']
         section = ResultSection('Weekend results', None, headers)
         return {section: full_results}
 
