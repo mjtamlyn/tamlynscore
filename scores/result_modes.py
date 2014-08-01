@@ -103,7 +103,7 @@ class BaseResultMode(object):
             subrounds = score.target.session_entry.session_round.shot_round.subrounds.all()
         if self.include_distance_breakdown and len(subrounds) > 1 and not score.target.session_entry.session_round.session.scoring_system == SCORING_TOTALS:
             if score.disqualified or score.target.session_entry.session_round.session.scoring_system == SCORING_TOTALS or hasattr(score, 'is_mock'):
-                scores += [None] * len(subrounds)
+                scores += [''] * len(subrounds)
             else:
                 subround_scores = []
 
@@ -122,9 +122,9 @@ class BaseResultMode(object):
 
                 scores += subround_scores
         if score.disqualified:
-            scores += ['DSQ', None, None]
+            scores += ['DSQ', '', '']
         elif score.retired:
-            scores += [score.score, 'Retired', None]
+            scores += [score.score, 'Retired', '']
         elif hasattr(score, 'partial_score'):
             scores += [
                 score.score,

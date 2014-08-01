@@ -26,27 +26,18 @@
                         <td>{{ score.target.session_entry.competition_entry.club}}</td>
                         <td>{% if score.target.session_entry.competition_entry.novice == 'N' %}Novice{% endif %}</td>
                     {% endif %}
-                    {% if score.disqualified %}
-                    <td>dsq</td>
-                    <td></td>
-                    <td></td>
-                    <td></td>
-                    {% else %}
-                    <td>{{ score.score }}</td>
-                    <td>{{ score.hits }}</td>
-                    <td>{{ score.golds }}</td>
-                    <td>{{ score.xs }}</td>
-                    {% endif %}
+                    {% for detail in score.details %}
+                        <td>{{ detail }}</td>
+                    {% endfor %}
                 </tr>
                 {% if score.team %}
                     {% for member in score.team %}
                     <tr>
                         <td></td>
                         <td>{{ member.target.session_entry.competition_entry.archer }}</td>
-                        <td>{{ member.score }}</td>
-                        <td>{{ member.hits }}</td>
-                        <td>{{ member.golds }}</td>
-                        <td>{{ member.xs }}</td>
+                        {% for detail in member.details %}
+                            <td>{{ detail }}</td>
+                        {% endfor %}
                     </tr>
                     {% endfor %}
                 {% endif %}
