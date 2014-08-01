@@ -2,7 +2,6 @@ H2H changes
 ===========
 H2H arrow scores
 Better support for sponsors/sponsor images
-API for an app
 Redesign!
 
 
@@ -28,6 +27,7 @@ Custom User model
 Move to Braces/Homebrewed solution instead of class_view_decorator
 Py3?? (check deps)
 Standardise url names on '-' not '_'
+Create a "target list" object and to decouple from presentation logic
 
 
 Long term plan
@@ -52,8 +52,11 @@ juniors_in_senior_teams
 juniors_in_senior_individual
 novices_in_experienced_individual
 has_novice_teams
-Restrictions on make up of team (e.g. must include one lady or junior)
-Cross-round results (Masters-style)
+
+exclude_later_shoots
+juniors_in_senior_teams
+juniors_in_senior_individual
+novices_in_experienced_individual
 
 Other:
 

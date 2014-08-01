@@ -59,6 +59,7 @@ class Competition(models.Model):
     allow_incomplete_teams = models.BooleanField(default=True)
     team_size = models.PositiveIntegerField(default=4)
     novice_team_size = models.PositiveIntegerField(default=3)
+    force_mixed_teams = models.BooleanField(default=False)
 
     class Meta:
         unique_together = ('date', 'tournament')
@@ -116,6 +117,23 @@ class Session(models.Model):
             SCORING_DOZENS: 'input_dozens',
             SCORING_TOTALS: 'input_arrows',  # FIXME
         }[self.scoring_system]
+
+    def target_list(self):
+        target_allocations = TargetAllocation.objects.filter(session_entry__session_round__session=self).select_related()
+        minimum_boss = target_allocations.aggregate(models.Min('boss'))['boss__min']
+        if not minimum_boss:
+            minimum_boss = 1
+        current_bosses = target_allocations.aggregate(models.Max('boss'))['boss__max']
+        bosses = range(minimum_boss, current_bosses + 1)
+
+        allocations_lookup = dict([('{0}{1}'.format(allocation.boss, allocation.target), allocation) for allocation in target_allocations])
+
+        targets = []
+        for boss in bosses:
+            for detail in self.details:
+                target = '{0}{1}'.format(boss, detail)
+                targets.append((target, allocations_lookup.get(target, None)))
+        return targets
 
 
 class SessionRound(models.Model):

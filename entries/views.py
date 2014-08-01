@@ -17,7 +17,7 @@ from reportlab.lib import colors
 from reportlab.lib.units import inch
 
 from .forms import ArcherSearchForm, EntryCreateForm
-from .models import Competition, CompetitionEntry, SessionEntry, TargetAllocation, SessionRound, SCORING_FULL, SCORING_DOZENS
+from .models import Competition, Session, CompetitionEntry, SessionEntry, TargetAllocation, SessionRound, SCORING_FULL, SCORING_DOZENS
 
 from scoring.utils import class_view_decorator
 
@@ -252,11 +252,19 @@ class PdfView(View):
     PAGE_HEIGHT = defaultPageSize[1]
     PAGE_WIDTH = defaultPageSize[0]
 
-    def set_options(self, slug=None, round_id=None):
+    def set_options(self, slug=None, round_id=None, session_id=None):
         if slug:
             self.competition = get_object_or_404(Competition, slug=slug)
+        else:
+            self.competition = None
         if round_id:
             self.session_round = get_object_or_404(SessionRound, pk=round_id)
+        else:
+            self.session_round = None
+        if session_id:
+            self.session = get_object_or_404(Session, pk=session_id)
+        else:
+            self.session = None
 
     def get(self, request, **kwargs):
         self.set_options(**kwargs)
@@ -292,21 +300,26 @@ class PdfView(View):
 class HeadedPdfView(PdfView):
     title = ''
     title_position = 70
+    do_sponsors = True
 
     def draw_title(self, canvas, doc):
         canvas.saveState()
         canvas.setFont('Helvetica-Bold', 18)
-        canvas.drawCentredString(self.PAGE_WIDTH / 2.0, self.PAGE_HEIGHT - self.title_position, u'{0}: {1}'.format(self.competition, self.title))
+        if self.title:
+            title = u'{0}: {1}'.format(self.competition, self.title)
+        else:
+            title = unicode(self.competition)
+        canvas.drawCentredString(self.PAGE_WIDTH / 2.0, self.PAGE_HEIGHT - self.title_position, title)
 
-        sponsors = self.competition.sponsors.all()
+        if self.do_sponsors:
+            sponsors = self.competition.sponsors.all()
 
-        positions = (
-            (30, self.PAGE_HEIGHT - 240),
-            (self.PAGE_WIDTH - 140, self.PAGE_HEIGHT - 120),
-        )
-        for i, sponsor in enumerate(sponsors):
-            canvas.drawImage(sponsors[i].logo.path, positions[i][0], positions[i][1], width=self.PAGE_WIDTH - 100, preserveAspectRatio=True, anchor='nw')
-            pass
+            positions = (
+                (50, -50),
+            )
+            for i, sponsor in enumerate(sponsors):
+                canvas.drawImage(sponsors[i].logo.path, positions[i][0], positions[i][1], width=self.PAGE_WIDTH - 100, preserveAspectRatio=True, anchor='nw')
+                pass
 
         canvas.restoreState()
 
@@ -325,7 +338,7 @@ class TargetListPdf(HeadedPdfView):
     def setMargins(self, doc):
         doc.topMargin = 1.1 * inch
         if self.competition.sponsors.exists():
-            doc.bottomMargin = 2.3 * inch
+            doc.bottomMargin = 1.5 * inch
 
     def update_style(self):
         self.styles['h2'].alignment = 1
@@ -363,6 +376,7 @@ class TargetListLunch(TargetListPdf):
 target_list_lunch = login_required(TargetListLunch.as_view())
 
 
+@class_view_decorator(login_required)
 class ScoreSheetsPdf(HeadedPdfView):
 
     box_size = 0.32 * inch
@@ -378,39 +392,44 @@ class ScoreSheetsPdf(HeadedPdfView):
         self.spacer = Spacer(self.PAGE_WIDTH, self.box_size * 0.5)
 
     def get_elements(self):
-
-        score_sheet_elements = self.get_score_sheet_elements()
+        score_sheet_elements = self.get_score_sheet_elements(self.session_round)
+        target_list = self.session_round.target_list()
 
         elements = []
-        for boss, entries in itertools.groupby(self.session_round.target_list(), lambda x: x[0][:-1]):
+        for boss, entries in itertools.groupby(target_list, lambda x: x[0][:-1]):
             entries = list(entries)
-            if not reduce(lambda e, f: e or f, map(lambda e: e[1], entries)):
+            if not any(e[1] for e in entries):
                 continue
             for target, entry in entries:
-                if entry:
-                    entry = entry.session_entry.competition_entry
-                    table_data = [
-                        [self.Para(target, 'h2'), self.Para(entry.archer, 'h2'), self.Para(entry.team_name(short_form=False), 'h2')],
-                        [
-                            None,
-                            self.Para(u'{0} {1}'.format(entry.archer.get_gender_display(),
-                                entry.bowstyle), 'h2'),
-                            self.Para(entry.get_novice_display(), 'h2') if self.competition.has_novices else None,
-                        ],
-                    ]
-                else:
-                    table_data = [
-                        [self.Para(target, 'h2'), None, None],
-                        [],
-                    ]
+                table_data = self.header_table_for_entry(target, entry)
                 header_table = Table(table_data, [0.4 * inch, 2.5 * inch, 4 * inch])
                 elements.append(KeepTogether([self.spacer, header_table, self.spacer] + score_sheet_elements))
             elements.append(PageBreak())
 
         return elements
 
-    def get_score_sheet_elements(self):
-        subrounds = self.session_round.shot_round.subrounds.order_by('-distance')
+    def header_table_for_entry(self, target, entry):
+        if entry:
+            entry = entry.session_entry.competition_entry
+            category = u'{0} {1}'.format(entry.archer.get_gender_display(), entry.bowstyle)
+            if self.competition.has_juniors and entry.age == 'J':
+                category = 'Junior ' + category
+            return [
+                [self.Para(target, 'h2'), self.Para(entry.archer, 'h2'), self.Para(entry.team_name(short_form=False), 'h2')],
+                [
+                    None,
+                    self.Para(category, 'h2'),
+                    self.Para(entry.get_novice_display(), 'h2') if self.competition.has_novices else None,
+                ],
+            ]
+        else:
+            return [
+                [self.Para(target, 'h2'), None, None],
+                [],
+            ]
+
+    def get_score_sheet_elements(self, session_round):
+        subrounds = session_round.shot_round.subrounds.order_by('-distance')
         score_sheet_elements = []
 
         for subround in subrounds:
@@ -418,7 +437,7 @@ class ScoreSheetsPdf(HeadedPdfView):
             dozens = subround.arrows / 12
             extra = subround.arrows % 12
             total_rows = dozens + 2
-            scoring_labels = ['ET', 'S', '10+X', 'X', 'RT'] if self.session_round.shot_round.scoring_type == 'X' else ['ET', 'S', 'H', 'G', 'RT']
+            scoring_labels = ['ET', 'S', '10+X', 'X', 'RT'] if session_round.shot_round.scoring_type == 'X' else ['ET', 'S', 'H', 'G', 'RT']
             table_data = [['J', subround_title] + [None] * 5 + ['ET'] + [None] * 6 + scoring_labels]
             table_data += [[None for i in range(self.total_cols)] for j in range(total_rows - 1)]
             if extra is 6:
@@ -484,7 +503,37 @@ class ScoreSheetsPdf(HeadedPdfView):
         ('LINEBELOW', (4, 0), (4, 0), 1, colors.black),
     ])
 
-score_sheets_pdf = login_required(ScoreSheetsPdf.as_view())
+
+class SessionScoreSheetsPdf(ScoreSheetsPdf):
+    def update_style(self):
+        self.title = None
+        self.spacer = Spacer(self.PAGE_WIDTH, self.box_size * 0.5)
+        self.styles['h1'].alignment = 1
+
+    def get_elements(self):
+        session_rounds = self.session.sessionround_set.all()
+        templates = {sr.shot_round: self.get_score_sheet_elements(sr) for sr in session_rounds}
+
+        target_list = self.session.target_list()
+
+        elements = []
+
+        for target, entry in target_list:
+            if not entry:
+                continue
+            shot_round = entry.session_entry.session_round.shot_round
+            table_data = self.header_table_for_entry(target, entry)
+            header_table = Table(table_data, [0.4 * inch, 2.5 * inch, 4 * inch])
+            sheet_elements = [
+                self.Para(shot_round, 'h1'),
+                self.spacer,
+                header_table,
+                self.spacer,
+            ] + templates[shot_round]
+            elements.append(KeepTogether(sheet_elements))
+        elements.append(PageBreak())
+
+        return elements
 
 
 class RunningSlipsPdf(ScoreSheetsPdf):
@@ -531,7 +580,7 @@ class RunningSlipsPdf(ScoreSheetsPdf):
                     table_data = [['Dozen {0}'.format(dozen)] + [None] * 6 + ['ET'] + [None] * 6 + ['ET', 'S'] + headings + ['RT' if dozen > 1 else 'Inits.']]
                     for entry in entries:
                         table_data.append([entry[0]] + [None for i in range(self.total_cols - 1)])
-                    table = Table(table_data, [self.box_size] + self.col_widths, (len(entries) + 1) * [self.box_size])
+                    table = Table(table_data, [self.box_size] + self.col_widths[1:], (len(entries) + 1) * [self.box_size])
                     table.setStyle(self.scores_table_style)
                     elements.append(KeepTogether(table))
                     elements += [self.spacer]
