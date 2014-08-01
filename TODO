@@ -76,15 +76,9 @@ Configuration options
 ---------------------
 
 exclude_later_shoots
-has_juniors
 juniors_in_senior_teams
 juniors_in_senior_individual
-has_novices
-novices_in_experienced_teams
 novices_in_experienced_individual
-team_size
-has_novice_teams
-novice_team_size
 
 Later:
 Restrictions on make up of team (e.g. must include one lady or junior)
