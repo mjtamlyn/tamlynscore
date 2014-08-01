@@ -214,10 +214,13 @@ class InputDozens(View):
     template = 'input_dozens.html'
     next_url_name = 'input_scores'
 
+    def get_next_exists(self, session_id, boss):
+        return Score.objects.filter(target__session_entry__session_round__session=session_id, target__boss=int(boss) + 1).order_by('target__target').exists()
+
     def get(self, request, slug, session_id, boss, dozen):
         competition = get_object_or_404(Competition, slug=slug)
         scores = Score.objects.filter(target__session_entry__session_round__session=session_id, target__boss=boss, target__session_entry__present=True, retired=False).order_by('target__target').select_related()
-        next_exists = Score.objects.filter(target__session_entry__session_round__session=session_id, target__boss=int(boss) + 1).order_by('target__target').exists()
+        next_exists = self.get_next_exists(session_id, boss)
         num_dozens = SessionRound.objects.filter(session__pk=session_id)[0].shot_round.arrows / 12
         try:
             forms = get_dozen_formset(scores, num_dozens, boss, dozen, scores[0].target.session_entry.session_round.session.arrows_entered_per_end)
@@ -253,6 +256,7 @@ class InputDozens(View):
             else:
                 success_url = reverse(self.next_url_name, kwargs={'slug': slug}) + '?fd={0}&ft={1}&fs={2}'.format(dozen, boss, session_id)
             return HttpResponseRedirect(success_url)
+        next_exists = self.get_next_exists(session_id, boss)
         return render(request, self.template, locals())
 
 
