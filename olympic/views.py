@@ -29,7 +29,7 @@ class OlympicIndex(View):
         session_info = [(
             session_round.session,
             session_round,
-            session_round.seeding_set.all().select_related().order_by('seed'),
+            session_round.seeding_set.all().select_related().order_by('seed').prefetch_related('result_set'),
             Score.objects.results(session_round.ranking_round, category=session_round.category),
         ) for session_round in session_rounds]
         sessions = []
