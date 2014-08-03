@@ -1,4 +1,5 @@
 from collections import OrderedDict
+import itertools
 
 from django.core.exceptions import ImproperlyConfigured
 from django.db import models, connection
@@ -436,7 +437,9 @@ class Team(BaseResultMode):
             if round is None:
                 round = session_entry.session_round.shot_round
             club = session_entry.competition_entry.club
-            if session_entry.index > 1 or score.disqualified or score.retired:
+            if session_entry.index > 1 and competition.exclude_later_shoots:
+                continue
+            if score.disqualified or score.retired:
                 continue
             if competition.strict_b_teams:
                 if session_entry.competition_entry.b_team:
@@ -455,18 +458,25 @@ class Team(BaseResultMode):
     def get_team_types(self, competition):
         # TODO: support team types properly
         team_types = ['Non-compound']
+        if competition.compound_team_size is not None:
+            team_types.append('Compound')
         if competition.has_novices:
             team_types.append('Novice')
         return team_types
 
     def get_team_scores(self, competition, clubs, type):
         club_results = []
+        sessions = competition.session_set.filter(sessionround__isnull=False).distinct()
         for club, club_scores in clubs.items():
             club_scores = [s for s in club_scores if self.is_valid_for_type(s, type, competition)]
+            if competition.combine_rounds_for_team_scores:
+                club_scores = self.combine_rounds(club_scores)
             club_scores = sorted(club_scores, key=lambda s: (s.score, s.hits, s.golds, s.xs), reverse=True)
             team_size = competition.team_size
             if type == 'Novice' and competition.novice_team_size:
                 team_size = competition.novice_team_size
+            if type == 'Compound' and competition.compound_team_size:
+                team_size = competition.compound_team_size
             if competition.force_mixed_teams:
                 gent_found = False
                 lady_found = False
@@ -477,8 +487,8 @@ class Team(BaseResultMode):
                     else:
                         lady_found = True
                     if gent_found and lady_found:
-                        if i < team_size:
-                            club_scores = club_scores[:i] + [score]
+                        if i >= team_size:
+                            club_scores = club_scores[:team_size - 1] + [score]
                         else:
                             club_scores = club_scores[:team_size]
                         mixed_team_found = True
@@ -490,6 +500,11 @@ class Team(BaseResultMode):
             if not club_scores:
                 continue
             if len(club_scores) < team_size and not competition.allow_incomplete_teams:
+                continue
+            if getattr(club_scores[0], 'components', None):
+                club_scores = sum((s.components for s in club_scores), [])
+                print club, len(club_scores), len(sessions), team_size
+            if competition.combine_rounds_for_team_scores and not competition.allow_incomplete_teams and len(club_scores) < (team_size * len(sessions)):
                 continue
             team = ScoreMock(
                 score=sum(s.score for s in club_scores),
@@ -519,6 +534,21 @@ class Team(BaseResultMode):
 
     def label_for_round(self, round):
         return 'Team'
+
+    def combine_rounds(self, club_scores):
+        ce_getter = lambda s: s.target.session_entry.competition_entry
+        combined_scores = []
+        for competition_entry, scores in itertools.groupby(club_scores, ce_getter):
+            scores = list(scores)
+            combined_scores.append(ScoreMock(
+                score=sum(s.score for s in scores),
+                hits=sum(s.hits for s in scores),
+                golds=sum(s.golds for s in scores),
+                xs=sum(s.xs for s in scores),
+                target=scores[0].target,
+                components=scores,
+            ))
+        return combined_scores
 
 
 class Weekend(BaseResultMode):
