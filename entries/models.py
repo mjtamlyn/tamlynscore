@@ -241,7 +241,9 @@ class CompetitionEntry(models.Model):
         return gender + bowstyle
 
     def category(self):
-        return u'{2}{3}{0} {1}'.format(self.archer.get_gender_display(), self.bowstyle, 'Junior ' if self.age == 'J' else '', 'Novice ' if self.novice == 'N' else '')
+        junior = 'Junior ' if self.competition.has_juniors and self.age == 'J' else ''
+        novice = 'Novice ' if self.competition.has_novices and self.novice == 'N' else ''
+        return u'{2}{3}{0} {1}'.format(self.archer.get_gender_display(), self.bowstyle, junior, novice)
 
     def team_name(self, short_form=True):
         club = self.club.short_name if short_form else self.club.name
