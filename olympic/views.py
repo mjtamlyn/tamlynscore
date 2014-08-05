@@ -306,7 +306,7 @@ class OlympicResults(HeadedPdfView):
     def format_results(self, results, total_levels):
         results = results.reverse()
         max_level = results[0].match.level
-        return ['BYE'] * (total_levels - max_level) + [result.total for result in results]
+        return ['BYE'] * (total_levels - max_level) + [result.display() for result in results]
 
     def get_elements(self):
         elements = []
@@ -450,10 +450,10 @@ class OlympicTree(OlympicResults):
                 if results:
                     table_data[blocks[m][0]][i] = results[0].seed.seed
                     table_data[blocks[m][0]][i + 1] = results[0].seed.entry.archer
-                    table_data[blocks[m][0]][i + 2] = results[0].total
+                    table_data[blocks[m][0]][i + 2] = results[0].display()
                     table_data[blocks[m][1] - 1][i] = results[1].seed.seed
                     table_data[blocks[m][1] - 1][i + 1] = results[1].seed.entry.archer
-                    table_data[blocks[m][1] - 1][i + 2] = results[1].total
+                    table_data[blocks[m][1] - 1][i + 2] = results[1].display()
                 elif not any_results:
                     table_data[blocks[m][0]][i + 1] = '              ' * 2
                     table_data[blocks[m][0]][i + 2] = 'Target: ' + str(match.target)
