@@ -1003,7 +1003,7 @@ class RankingsExport(CompetitionMixin, View):
             results = Result.objects.filter(
                 seed__session_round__shot_round=r,
                 seed__entry__competition=self.competition,
-            ).order_by('total').select_related('seed__entry__bowstyle')
+            ).order_by('total').select_related('seed__entry__bowstyle').exclude(dns=True)
             for result in results:
                 entry = result.seed.entry
                 if entry.bowstyle.name == 'Compound':

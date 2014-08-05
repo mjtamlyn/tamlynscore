@@ -150,7 +150,7 @@ class OlympicSessionRound(models.Model):
             results = seeding.result_set.order_by('match__level')
             seedings_with_results.append((seeding, results))
 
-        seedings_with_results = sorted(seedings_with_results, key=lambda s: (s[1][0].match.level, s[1][0].match.match if s[1][0].match.level == 1 else None, s[1][0].dns, -s[1][0].total, -s[1][0].arrow_total, -s[1][0].win, s[0].seed))
+        seedings_with_results = sorted(seedings_with_results, key=lambda s: (s[1][0].match.level, s[1][0].match.match if s[1][0].match.level == 1 else None, -s[1][0].total, -s[1][0].arrow_total, -s[1][0].win, s[0].seed))
 
         full_results = []
         for rank, (seeding, results) in enumerate(seedings_with_results):
