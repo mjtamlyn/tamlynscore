@@ -4,6 +4,41 @@
 
 {% block competition_content %}
 <div class="row">
+    <div class="col2">
+        <p>
+            <a href="{% url 'entry_add' slug=competition.slug %}" class="btn">Add entry</a>
+        </p>
+    </div>
+    <div class="col4">
+        <h3>Stats</h3>
+        <div class="row">
+            {% for session in stats %}
+            <div class="col2">
+            <strong>{{ session.session.start }}</strong><br>
+            <span class="pill">{{ session.total_entries }} entr{{ session.total_entries|pluralize:"y,ies" }}</span><br>
+            {% for sr in session.session_rounds %}
+                {{ sr.session_round.shot_round }} <span class="pill">{{ sr.total_entries }} entr{{ sr.total_entries|pluralize:"y,ies" }}</span><br>
+                {% if sr.total_entries %}
+                    {% for bowstyle, count in sr.bowstyles %}
+                    <span class="pill {{ bowstyle|slugify }}">{{ count }} {{ bowstyle }}</span>
+                    {% endfor %}<br>
+                    {% for gender, count in sr.genders %}
+                    <span class="pill {{ gender|slugify }}">{{ count }} {{ gender }}</span>
+                    {% endfor %}<br>
+                    {% if competition.has_novices %}
+                    <span class="pill novice">{{ sr.novice_count }} Novice</span><br>
+                    {% endif %}
+                    {% if competition.has_juniors %}
+                    <span class="pill junior">{{ sr.junior_count }} Junior</span><br>
+                    {% endif %}
+                {% endif %}
+            {% endfor %}
+            </div>
+            {% endfor %}
+        </div>
+    </div>
+</div>
+<div class="row">
     <div class="col6">
         <h3>Existing entries</h3>
 
@@ -18,6 +53,11 @@
                     <p>
                         {{ entry.team_name }}
                     </p>
+                    <ul>
+                        {% for session in entry.sessionentry_set.all %}
+                        <li>{{ session.session_round.session.start }} - {{ session.session_round.shot_round }}</li>
+                        {% endfor %}
+                    </ul>
                     <p>
                         <span class="pill bowstyle {{ entry.bowstyle|slugify }}">{{ entry.bowstyle }}</span>
                         <span class="pill gender {{ entry.archer.get_gender_display|lower }}">{{ entry.archer.get_gender_display }}</span>

@@ -11,26 +11,28 @@
   .bottom
     padding: 3px 10px
 
-  .pill
-    font-size: 70%
-    font-weight: bold
-    background-color: $oxford
-    color: #fff
-    padding: 0.2em 0.8em 0.3em
-    @include border-radius(0.5em)
+.pill
+  font-size: 70%
+  line-height: 2em
+  font-weight: bold
+  background-color: $oxford
+  color: #fff
+  padding: 0.2em 0.8em 0.3em
+  white-space: nowrap
+  @include border-radius(0.5em)
 
-    &.gent
-      background-color: $orange
-    &.lady
-      background-color: $pink
+  &.gent
+    background-color: $orange
+  &.lady
+    background-color: $pink
 
-    &.recurve
-      background-color: $red
-    &.compound
-      background-color: $gold
-      color: $dark
-    &.barebow
-      background-color: $lightblue
-      color: $dark
-    &.longbow
-      background-color: $dark
+  &.recurve
+    background-color: $red
+  &.compound
+    background-color: $gold
+    color: $dark
+  &.barebow
+    background-color: $lightblue
+    color: $dark
+  &.longbow
+    background-color: $dark
