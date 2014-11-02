@@ -2,7 +2,7 @@
   margin-bottom: 15px
   border: 1px solid $lightblue
   overflow: hidden
-  @include border-radius(10px)
+  @include border-radius(5px)
 
   .name
     background-color: $lightblue
@@ -14,7 +14,23 @@
   .pill
     font-size: 70%
     font-weight: bold
-    background: $oxford
+    background-color: $oxford
     color: #fff
     padding: 0.2em 0.8em 0.3em
-    @include border-radius(1em)
+    @include border-radius(0.5em)
+
+    &.gent
+      background-color: $orange
+    &.lady
+      background-color: $pink
+
+    &.recurve
+      background-color: $red
+    &.compound
+      background-color: $gold
+      color: $dark
+    &.barebow
+      background-color: $lightblue
+      color: $dark
+    &.longbow
+      background-color: $dark

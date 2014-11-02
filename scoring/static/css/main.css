@@ -221,11 +221,11 @@ ul.link-list li a:before {
   margin-bottom: 15px;
   border: 1px solid #6fb3ff;
   overflow: hidden;
-  -webkit-border-radius: 10px;
-  -moz-border-radius: 10px;
-  -ms-border-radius: 10px;
-  -o-border-radius: 10px;
-  border-radius: 10px;
+  -webkit-border-radius: 5px;
+  -moz-border-radius: 5px;
+  -ms-border-radius: 5px;
+  -o-border-radius: 5px;
+  border-radius: 5px;
 }
 /* line 7, ../../sass/components/_archer_block.sass */
 .archer-block .name {
@@ -240,14 +240,40 @@ ul.link-list li a:before {
 .archer-block .pill {
   font-size: 70%;
   font-weight: bold;
-  background: #002147;
+  background-color: #002147;
   color: white;
   padding: 0.2em 0.8em 0.3em;
-  -webkit-border-radius: 1em;
-  -moz-border-radius: 1em;
-  -ms-border-radius: 1em;
-  -o-border-radius: 1em;
-  border-radius: 1em;
+  -webkit-border-radius: 0.5em;
+  -moz-border-radius: 0.5em;
+  -ms-border-radius: 0.5em;
+  -o-border-radius: 0.5em;
+  border-radius: 0.5em;
+}
+/* line 22, ../../sass/components/_archer_block.sass */
+.archer-block .pill.gent {
+  background-color: #aa6622;
+}
+/* line 24, ../../sass/components/_archer_block.sass */
+.archer-block .pill.lady {
+  background-color: #ff5577;
+}
+/* line 27, ../../sass/components/_archer_block.sass */
+.archer-block .pill.recurve {
+  background-color: #aa2211;
+}
+/* line 29, ../../sass/components/_archer_block.sass */
+.archer-block .pill.compound {
+  background-color: #66cc44;
+  color: #000f1f;
+}
+/* line 32, ../../sass/components/_archer_block.sass */
+.archer-block .pill.barebow {
+  background-color: #6fb3ff;
+  color: #000f1f;
+}
+/* line 35, ../../sass/components/_archer_block.sass */
+.archer-block .pill.longbow {
+  background-color: #000f1f;
 }
 
 /* line 11, ../../sass/main.sass */
