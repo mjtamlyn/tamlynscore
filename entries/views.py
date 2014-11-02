@@ -1,3 +1,4 @@
+import collections
 import itertools
 import json
 import math
@@ -68,6 +69,37 @@ class EntryList(CompetitionMixin, ListView):
             'bowstyle',
             'archer',
         ).prefetch_related('sessionentry_set')
+
+    def get_stats(self):
+        stats = []
+        sessions = self.competition.session_set.prefetch_related('sessionround_set', 'sessionround_set__sessionentry_set')
+        for session in sessions:
+            session_rounds = session.sessionround_set.all()
+            session_round_stats = []
+            for sr in session_rounds:
+                bowstyles = collections.Counter(e.competition_entry.bowstyle for e in sr.sessionentry_set.all())
+                genders = collections.Counter(e.competition_entry.archer.get_gender_display() for e in sr.sessionentry_set.all())
+                novice_count = len([e for e in sr.sessionentry_set.all() if e.competition_entry.novice == 'N'])
+                junior_count = len([e for e in sr.sessionentry_set.all() if e.competition_entry.age == 'J'])
+                session_round_stats.append({
+                    'session_round': sr,
+                    'total_entries': len(sr.sessionentry_set.all()),
+                    'bowstyles': bowstyles.most_common(5),
+                    'genders': genders.most_common(2),
+                    'novice_count': novice_count,
+                    'junior_count': junior_count,
+                })
+            stats.append({
+                'session': session,
+                'total_entries': SessionEntry.objects.filter(session_round__session=session).count(),
+                'session_rounds': session_round_stats,
+            })
+        return stats
+
+    def get_context_data(self, **kwargs):
+        context = super(EntryList, self).get_context_data(**kwargs)
+        context['stats'] = self.get_stats()
+        return context
 
 
 @class_view_decorator(login_required)
