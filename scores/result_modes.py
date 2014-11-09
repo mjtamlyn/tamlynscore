@@ -518,6 +518,8 @@ class Team(BaseResultMode):
         return self.sort_results([c[1] for c in club_results])
 
     def is_valid_for_type(self, score, type, competition):
+        if score.target.session_entry.competition_entry.guest:
+            return False
         if type == 'Non-compound':
             is_non_compound = not score.target.session_entry.competition_entry.bowstyle.name == 'Compound'
             if not competition.novices_in_experienced_teams:
