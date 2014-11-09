@@ -17,7 +17,7 @@
                     {% if score.disqualified %}
                     <td></td>
                     {% else %}
-                    <td>{{ forloop.counter }}</td>
+                    <td>{% if score.placing %}{{ score.placing }}{% endif %}</td>
                     {% endif %}
                     {% if score.team %}
                         <th>{{ score.club }}</th>
