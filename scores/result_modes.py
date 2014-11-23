@@ -460,6 +460,8 @@ class Team(BaseResultMode):
         team_types = ['Non-compound']
         if competition.compound_team_size is not None:
             team_types.append('Compound')
+        if competition.junior_team_size is not None:
+            team_types.append('Junior')
         if competition.has_novices:
             team_types.append('Novice')
         return team_types
@@ -477,6 +479,8 @@ class Team(BaseResultMode):
                 team_size = competition.novice_team_size
             if type == 'Compound' and competition.compound_team_size:
                 team_size = competition.compound_team_size
+            if type == 'Junior' and competition.junior_team_size:
+                team_size = competition.junior_team_size
             if competition.force_mixed_teams:
                 gent_found = False
                 lady_found = False
@@ -529,6 +533,12 @@ class Team(BaseResultMode):
             return score.target.session_entry.competition_entry.bowstyle.name == 'Compound'
         if type == 'Novice':
             return not score.target.session_entry.competition_entry.bowstyle.name == 'Compound' and score.target.session_entry.competition_entry.novice == 'N'
+        if type == 'Junior':
+            is_junior = score.target.session_entry.competition_entry.age == 'J'
+            is_non_compound = not score.target.session_entry.competition_entry.bowstyle.name == 'Compound'
+            if not competition.novices_in_experienced_teams:
+                return is_junior and is_non_compound and score.target.session_entry.competition_entry.novice == 'E'
+            return is_junior and is_non_compound
 
     def get_main_headers(self):
         # TODO: handle novice configurations
