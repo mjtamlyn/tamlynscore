@@ -29,6 +29,7 @@ class EntryCreateForm(forms.Form):
         queryset=Club.objects,
         required=False,
     )
+    update_club = forms.BooleanField(required=False)
 
     def __init__(self, archer, competition, **kwargs):
         super(EntryCreateForm, self).__init__(**kwargs)
@@ -51,6 +52,9 @@ class EntryCreateForm(forms.Form):
                 club=club,
                 bowstyle=self.archer.bowstyle,
             )
+            if self.cleaned_data['club'] and self.cleaned_data['update_club']:
+                self.archer.club = self.cleaned_data['club']
+                self.archer.save()
             if len(self.session_rounds) == 1:
                 SessionEntry.objects.create(
                     session_round=self.session_rounds[0],

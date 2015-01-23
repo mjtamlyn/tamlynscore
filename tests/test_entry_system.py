@@ -2,6 +2,7 @@ from django.contrib.auth.models import AnonymousUser
 from django.core.urlresolvers import reverse, resolve
 from django.test import TestCase, RequestFactory
 
+from core.models import Archer
 from entries.forms import ArcherSearchForm, EntryCreateForm
 from entries.models import CompetitionEntry
 from entries.views import EntryList
@@ -230,3 +231,21 @@ class TestDifferentEntryDetails(TestCase):
         self.assertEqual(CompetitionEntry.objects.count(), 1)
         entry = CompetitionEntry.objects.get()
         self.assertEqual(entry.club, other_club)
+
+    def test_different_club_with_update(self):
+        other_club = factories.ClubFactory.create()
+        url = reverse('entry_add', kwargs={
+            'slug': self.competition.slug,
+            'archer_id': self.archer.pk,
+        })
+        data = {
+            'club': other_club.pk,
+            'update_club': True,
+        }
+        response = self.client.post(url, data)
+        self.assertEqual(response.status_code, 302)
+        self.assertEqual(CompetitionEntry.objects.count(), 1)
+        entry = CompetitionEntry.objects.get()
+        self.assertEqual(entry.club, other_club)
+        archer = Archer.objects.get()
+        self.assertEqual(archer.club, other_club)
