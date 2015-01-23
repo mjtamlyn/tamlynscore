@@ -1,45 +1,12 @@
 {% extends 'entries/competition_detail.html' %}
 
 {% block competition_content %}
-<p><form method="GET" action="">{{ search_form.query }}</form></p>
-<p>
-    <td><a class="add btn">Add a new archer</a></td>
-</p>
-<div class="table full-width">
-    <div class="table-row header">
-        <span>{{ form.archer.label }}</span>
-        <span>{{ form.club.label }}</span>
-        <span>{{ form.bowstyle.label }}</span>
-        {% if competition.has_juniors %}
-            <span>{{ form.age.label }}</span>
-        {% endif %}
-        {% if competition.has_novices %}
-            <span>{{ form.novice.label }}</span>
-        {% endif %}
-        {% for session_field in form.session_fields %}
-            <span>{{ session_field.label }}</span>
-        {% endfor %}
-        <span>{{ form.guest.label }}</span>
-        <span></span>
-    </div>
-    {% for archer_form in forms %}
-        <form method="POST" action="" class="table-row">
-            {% csrf_token %}
-            <span>{{ archer_form.archer }}</span>
-            <span>{{ archer_form.club }}<a class="edit"></a></span>
-            <span>{{ archer_form.bowstyle }}<a class="edit"></a></span>
-            {% if competition.has_juniors %}
-                <span>{{ archer_form.age }}<a class="edit"></a></span>
-            {% endif %}
-            {% if competition.has_novices %}
-                <span>{{ archer_form.novice }}<a class="edit"></a></span>
-            {% endif %}
-            {% for session_field in archer_form.bound_session_fields %}
-                <span>{{ session_field }}</span>
-            {% endfor %}
-            <span>{{ archer_form.guest }}</span>
-            <span><input type="submit"></span>
-        </form>
-    {% endfor %}
-</div>
+<h2>Create entry for {{ archer }}</h2>
+<form method="POST" action="">
+    {% csrf_token %}
+    <ul>
+        {{ form.as_ul }}
+    </ul>
+    <input type="submit" class="btn" value="Save">
+</form>
 {% endblock %}
