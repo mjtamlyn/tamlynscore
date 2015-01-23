@@ -5,9 +5,9 @@ import math
 
 from django.contrib.auth.decorators import login_required
 from django.core.urlresolvers import reverse
-from django.http import HttpResponse, HttpResponseBadRequest, Http404
+from django.http import HttpResponse, HttpResponseBadRequest, HttpResponseRedirect, Http404
 from django.utils.datastructures import SortedDict
-from django.views.generic import View, DetailView, ListView, FormView
+from django.views.generic import View, DetailView, ListView, TemplateView
 from django.shortcuts import get_object_or_404
 from django.utils import timezone
 
@@ -17,10 +17,14 @@ from reportlab.rl_config import defaultPageSize
 from reportlab.lib import colors
 from reportlab.lib.units import inch
 
-from .forms import ArcherSearchForm, EntryCreateForm
-from .models import Competition, Session, CompetitionEntry, SessionEntry, TargetAllocation, SessionRound, SCORING_FULL, SCORING_DOZENS
-
+from core.models import Archer
 from scoring.utils import class_view_decorator
+
+from .forms import ArcherSearchForm, EntryCreateForm
+from .models import (
+    Competition, Session, CompetitionEntry, SessionEntry, TargetAllocation,
+    SessionRound, SCORING_FULL, SCORING_DOZENS
+)
 
 
 @class_view_decorator(login_required)
@@ -103,40 +107,55 @@ class EntryList(CompetitionMixin, ListView):
 
 
 @class_view_decorator(login_required)
-class EntryAdd(CompetitionMixin, FormView):
-    form_class = EntryCreateForm
+class ArcherSearch(CompetitionMixin, TemplateView):
+    template_name = 'entries/archer_search.html'
+
+    def get(self, request, *args, **kwargs):
+        if self.request.GET:
+            search_form = ArcherSearchForm(self.request.GET)
+            archers = []
+            if search_form.is_valid():
+                archers = search_form.get_archers()
+        else:
+            search_form = ArcherSearchForm()
+            archers = []
+        context = self.get_context_data(
+            search_form=search_form,
+            archers=archers,
+        )
+        return self.render_to_response(context)
+
+
+@class_view_decorator(login_required)
+class EntryAdd(CompetitionMixin, DetailView):
+    model = Archer
+    pk_url_kwarg = 'archer_id'
     template_name = 'entries/entry_add.html'
 
     def get(self, request, *args, **kwargs):
-        search_form = ArcherSearchForm(self.request.GET)
-        form_class = self.get_form_class()
-        form = self.get_form(form_class)
-        forms = []
-        if search_form.is_valid():
-            archers = search_form.get_qs()
-            for archer in archers:
-                forms.append(self.get_archer_form(form_class, archer))
-        return self.render_to_response(self.get_context_data(search_form=search_form, forms=forms, form=form))
+        self.object = self.get_object()
+        form = EntryCreateForm(
+            archer=self.object,
+            competition=self.competition,
+        )
+        context = self.get_context_data(
+            form=form,
+        )
+        return self.render_to_response(context)
 
-    def get_form_kwargs(self):
-        kwargs = super(EntryAdd, self).get_form_kwargs()
-        kwargs['competition'] = self.competition
-        return kwargs
-
-    def get_archer_form(self, form_class, archer):
-        kwargs = self.get_form_kwargs()
-        kwargs['initial'] = {
-            'archer': archer,
-            'bowstyle': archer.bowstyle_id,
-            'club': archer.club_id,
-            'novice': archer.novice,
-            'age': archer.age,
-        }
-        return form_class(**kwargs)
-
-    def form_valid(self, form):
-        form.save()
-        return super(EntryAdd, self).form_valid(form)
+    def post(self, request, *args, **kwargs):
+        self.object = self.get_object()
+        form = EntryCreateForm(
+            data=self.request.POST,
+            competition=self.competition,
+            archer=self.object,
+        )
+        if form.is_valid():
+            form.save()
+            return HttpResponseRedirect(self.get_success_url())
+        else:
+            context = self.get_context_data(form=form)
+            return self.render_to_response(context)
 
     def get_success_url(self):
         return reverse('entry_list', kwargs={'slug': self.competition.slug})
