@@ -102,8 +102,8 @@ class TestExistingArcherSingleSession(TestCase):
         self.assertEqual(CompetitionEntry.objects.count(), 1)
         entry = CompetitionEntry.objects.get()
         self.assertEqual(entry.archer, self.archer)
-        self.assertEqual(entry.archer.club, self.archer.club)
-        self.assertEqual(entry.archer.bowstyle, self.archer.bowstyle)
+        self.assertEqual(entry.club, self.archer.club)
+        self.assertEqual(entry.bowstyle, self.archer.bowstyle)
         self.assertEqual(entry.sessionentry_set.get().session_round, self.session_round)
 
 
@@ -159,6 +159,7 @@ class TestMultiSession(TestCase):
         self.assertEqual(response.status_code, 200)
         self.assertEqual(response.context['archer'], self.archer)
         self.assertIsInstance(response.context['form'], EntryCreateForm)
+        self.assertTrue('sessions' in response.context['form'].fields)
 
     def test_single_session(self):
         url = reverse('entry_add', kwargs={
@@ -206,3 +207,26 @@ class TestMultiSession(TestCase):
         response = self.client.post(url)
         self.assertEqual(response.status_code, 200)
         self.assertEqual(CompetitionEntry.objects.count(), 0)
+
+
+class TestDifferentEntryDetails(TestCase):
+
+    def setUp(self):
+        self.archer = factories.ArcherFactory.create()
+        self.competition = factories.CompetitionFactory.create()
+        self.session_round = factories.SessionRoundFactory.create(session__competition=self.competition)
+        self.user = factories.UserFactory.create()
+        self.client.login(username=self.user.username, password='password')
+
+    def test_different_club(self):
+        other_club = factories.ClubFactory.create()
+        url = reverse('entry_add', kwargs={
+            'slug': self.competition.slug,
+            'archer_id': self.archer.pk,
+        })
+        data = {'club': other_club.pk}
+        response = self.client.post(url, data)
+        self.assertEqual(response.status_code, 302)
+        self.assertEqual(CompetitionEntry.objects.count(), 1)
+        entry = CompetitionEntry.objects.get()
+        self.assertEqual(entry.club, other_club)
