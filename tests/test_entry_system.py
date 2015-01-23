@@ -138,3 +138,71 @@ class TestMoreSearches(TestCase):
         self.assertEqual(response.status_code, 200)
         self.assertIsInstance(response.context['search_form'], ArcherSearchForm)
         self.assertSequenceEqual(response.context['archers'], [self.archer])
+
+
+class TestMultiSession(TestCase):
+
+    def setUp(self):
+        self.archer = factories.ArcherFactory.create()
+        self.competition = factories.CompetitionFactory.create()
+        self.session_round = factories.SessionRoundFactory.create(session__competition=self.competition)
+        self.session_round_2 = factories.SessionRoundFactory.create(session__competition=self.competition)
+        self.user = factories.UserFactory.create()
+        self.client.login(username=self.user.username, password='password')
+
+    def test_select_archer(self):
+        url = reverse('entry_add', kwargs={
+            'slug': self.competition.slug,
+            'archer_id': self.archer.pk,
+        })
+        response = self.client.get(url)
+        self.assertEqual(response.status_code, 200)
+        self.assertEqual(response.context['archer'], self.archer)
+        self.assertIsInstance(response.context['form'], EntryCreateForm)
+
+    def test_single_session(self):
+        url = reverse('entry_add', kwargs={
+            'slug': self.competition.slug,
+            'archer_id': self.archer.pk,
+        })
+        data = {
+            'sessions': [self.session_round.pk],
+        }
+        response = self.client.post(url, data=data)
+        self.assertEqual(response.status_code, 302)
+        self.assertEqual(CompetitionEntry.objects.count(), 1)
+        entry = CompetitionEntry.objects.get()
+        self.assertEqual(entry.archer, self.archer)
+        self.assertEqual(entry.archer.club, self.archer.club)
+        self.assertEqual(entry.archer.bowstyle, self.archer.bowstyle)
+        self.assertEqual(entry.sessionentry_set.get().session_round, self.session_round)
+
+    def test_both_sessions(self):
+        url = reverse('entry_add', kwargs={
+            'slug': self.competition.slug,
+            'archer_id': self.archer.pk,
+        })
+        data = {
+            'sessions': [self.session_round.pk, self.session_round_2.pk],
+        }
+        response = self.client.post(url, data=data)
+        self.assertEqual(response.status_code, 302)
+        self.assertEqual(CompetitionEntry.objects.count(), 1)
+        entry = CompetitionEntry.objects.get()
+        self.assertEqual(entry.archer, self.archer)
+        self.assertEqual(entry.archer.club, self.archer.club)
+        self.assertEqual(entry.archer.bowstyle, self.archer.bowstyle)
+        self.assertEqual(entry.sessionentry_set.count(), 2)
+        self.assertSequenceEqual(
+            entry.sessionentry_set.values_list('session_round_id', flat=True),
+            [self.session_round.pk, self.session_round_2.pk],
+        )
+
+    def test_no_sessions_fail(self):
+        url = reverse('entry_add', kwargs={
+            'slug': self.competition.slug,
+            'archer_id': self.archer.pk,
+        })
+        response = self.client.post(url)
+        self.assertEqual(response.status_code, 200)
+        self.assertEqual(CompetitionEntry.objects.count(), 0)

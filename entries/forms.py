@@ -1,3 +1,4 @@
+from django.db import transaction
 from django import forms
 
 from core.models import Archer
@@ -29,16 +30,28 @@ class EntryCreateForm(forms.Form):
         self.archer = archer
         self.competition = competition
         self.session_rounds = SessionRound.objects.filter(session__competition=competition)
+        if len(self.session_rounds) > 1:
+            self.fields['sessions'] = forms.ModelMultipleChoiceField(
+                queryset=self.session_rounds,
+                widget=forms.CheckboxSelectMultiple,
+            )
 
     def save(self):
-        entry = CompetitionEntry.objects.create(
-            competition=self.competition,
-            archer=self.archer,
-            club=self.archer.club,
-            bowstyle=self.archer.bowstyle,
-        )
-        if len(self.session_rounds) == 1:
-            SessionEntry.objects.create(
-                session_round=self.session_rounds[0],
-                competition_entry=entry
+        with transaction.atomic():
+            entry = CompetitionEntry.objects.create(
+                competition=self.competition,
+                archer=self.archer,
+                club=self.archer.club,
+                bowstyle=self.archer.bowstyle,
             )
+            if len(self.session_rounds) == 1:
+                SessionEntry.objects.create(
+                    session_round=self.session_rounds[0],
+                    competition_entry=entry
+                )
+            else:
+                for session_round in self.cleaned_data['sessions']:
+                    SessionEntry.objects.create(
+                        session_round=session_round,
+                        competition_entry=entry
+                    )
