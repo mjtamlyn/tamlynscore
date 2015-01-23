@@ -105,3 +105,20 @@ class TestExistingArcherSingleSession(TestCase):
         self.assertEqual(entry.archer.club, self.archer.club)
         self.assertEqual(entry.archer.bowstyle, self.archer.bowstyle)
         self.assertEqual(entry.sessionentry_set.get().session_round, self.session_round)
+
+
+class TestBadSpelling(TestCase):
+
+    def setUp(self):
+        self.archer = factories.ArcherFactory.create(name='David Longworth')
+        self.competition = factories.CompetitionFactory.create()
+        self.user = factories.UserFactory.create()
+        self.client.login(username=self.user.username, password='password')
+
+    def test_enter_search_term(self):
+        url = reverse('archer_search', kwargs={'slug': self.competition.slug})
+        data = {'query': 'dave lonworth'}
+        response = self.client.get(url, data=data)
+        self.assertEqual(response.status_code, 200)
+        self.assertIsInstance(response.context['search_form'], ArcherSearchForm)
+        self.assertSequenceEqual(response.context['archers'], [self.archer])

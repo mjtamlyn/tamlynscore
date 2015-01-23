@@ -8,7 +8,15 @@ class ArcherSearchForm(forms.Form):
     query = forms.CharField()
 
     def get_archers(self):
-        return Archer.objects.filter(name=self.cleaned_data['query'])
+        # One day, do this with expressions and/or contrib.postgres. Please.
+        term = self.cleaned_data['query']
+        return Archer.objects.extra(
+            select={'similarity': 'similarity("core_archer"."name", %s)'},
+            select_params=[term],
+            where=['"core_archer"."name" %% %s'],
+            params=[term],
+            order_by=['-similarity'],
+        )
 
 
 class EntryCreateForm(forms.Form):
