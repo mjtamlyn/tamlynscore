@@ -1,7 +1,7 @@
 from django.db import transaction
 from django import forms
 
-from core.models import Archer, Club
+from core.models import Archer, Bowstyle, Club
 from .models import CompetitionEntry, SessionRound, SessionEntry
 
 
@@ -30,6 +30,11 @@ class EntryCreateForm(forms.Form):
         required=False,
     )
     update_club = forms.BooleanField(required=False)
+    bowstyle = forms.ModelChoiceField(
+        queryset=Bowstyle.objects,
+        required=False,
+    )
+    update_bowstyle = forms.BooleanField(required=False)
 
     def __init__(self, archer, competition, **kwargs):
         super(EntryCreateForm, self).__init__(**kwargs)
@@ -42,18 +47,23 @@ class EntryCreateForm(forms.Form):
                 widget=forms.CheckboxSelectMultiple,
             )
         self.fields['club'].label = 'Club (%s)' % self.archer.club
+        self.fields['bowstyle'].label = 'Bowstyle (%s)' % self.archer.bowstyle
 
     def save(self):
         with transaction.atomic():
             club = self.cleaned_data['club'] or self.archer.club
+            bowstyle = self.cleaned_data['bowstyle'] or self.archer.bowstyle
             entry = CompetitionEntry.objects.create(
                 competition=self.competition,
                 archer=self.archer,
                 club=club,
-                bowstyle=self.archer.bowstyle,
+                bowstyle=bowstyle,
             )
             if self.cleaned_data['club'] and self.cleaned_data['update_club']:
                 self.archer.club = self.cleaned_data['club']
+                self.archer.save()
+            if self.cleaned_data['bowstyle'] and self.cleaned_data['update_bowstyle']:
+                self.archer.bowstyle = self.cleaned_data['bowstyle']
                 self.archer.save()
             if len(self.session_rounds) == 1:
                 SessionEntry.objects.create(
