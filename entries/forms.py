@@ -1,7 +1,7 @@
 from django.db import transaction
 from django import forms
 
-from core.models import Archer
+from core.models import Archer, Club
 from .models import CompetitionEntry, SessionRound, SessionEntry
 
 
@@ -25,6 +25,11 @@ class ArcherSearchForm(forms.Form):
 
 
 class EntryCreateForm(forms.Form):
+    club = forms.ModelChoiceField(
+        queryset=Club.objects,
+        required=False,
+    )
+
     def __init__(self, archer, competition, **kwargs):
         super(EntryCreateForm, self).__init__(**kwargs)
         self.archer = archer
@@ -35,13 +40,15 @@ class EntryCreateForm(forms.Form):
                 queryset=self.session_rounds,
                 widget=forms.CheckboxSelectMultiple,
             )
+        self.fields['club'].label = 'Club (%s)' % self.archer.club
 
     def save(self):
         with transaction.atomic():
+            club = self.cleaned_data['club'] or self.archer.club
             entry = CompetitionEntry.objects.create(
                 competition=self.competition,
                 archer=self.archer,
-                club=self.archer.club,
+                club=club,
                 bowstyle=self.archer.bowstyle,
             )
             if len(self.session_rounds) == 1:
