@@ -7,6 +7,11 @@ class ArrowAdmin(admin.ModelAdmin):
     list_display = ('arrow_value', 'score')
 
 
+class DozenAdmin(admin.ModelAdmin):
+    list_display = ('total', 'score')
+    raw_id_fields = ('score',)
+
+
 class ScoreAdmin(admin.ModelAdmin):
     raw_id_fields = ('target',)
     list_display = ('target', 'score', 'hits', 'golds')
@@ -19,4 +24,4 @@ class ScoreAdmin(admin.ModelAdmin):
 
 admin.site.register(Score, ScoreAdmin)
 admin.site.register(Arrow, ArrowAdmin)
-admin.site.register(Dozen)
+admin.site.register(Dozen, DozenAdmin)

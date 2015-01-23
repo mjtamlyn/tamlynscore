@@ -251,6 +251,15 @@ class Result(models.Model):
     total = models.PositiveIntegerField()
     arrow_total = models.PositiveIntegerField(default=0)
     win = models.BooleanField()
+    dns = models.BooleanField(default=False)
+    win_by_forfeit = models.BooleanField(default=False)
 
     def __unicode__(self):
         return u'Result of match {0}'.format(self.match)
+
+    def display(self):
+        if self.dns:
+            return 'DNS'
+        if self.win_by_forfeit:
+            return 'BYE'
+        return self.total
