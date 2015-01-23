@@ -46,7 +46,7 @@ class InputScores(TargetList):
         for allocation in self.allocations.filter(score__isnull=True):
             Score.objects.create(target=allocation)
 
-        allocations = self.allocations
+        allocations = self.allocations.select_related('score')
 
         for session in context['target_list']:
             if cache.get('bosses_cache_%d' % session.pk):
@@ -88,9 +88,11 @@ class InputScores(TargetList):
                 for dozen in dozens:
                     combined_lookup[dozen] = True
                     for allocation in allocations:
-                        if allocation.session_entry.present and (allocation.id not in target_lookup
-                                or dozen not in target_lookup[allocation.id]
-                                or not len(target_lookup[allocation.id][dozen]) == session_round.session.arrows_entered_per_end):
+                        if allocation.session_entry.present and not allocation.score.retired and (
+                            allocation.id not in target_lookup
+                            or dozen not in target_lookup[allocation.id]
+                            or not len(target_lookup[allocation.id][dozen]) == session_round.session.arrows_entered_per_end
+                        ):
                             combined_lookup[dozen] = False
                 bosses.append((boss, combined_lookup))
             combine = lambda x, y: x and y
@@ -879,7 +881,7 @@ class NewLeaderboard(PDFResultsRenderer, CSVResultsRenderer, ListView):
         scores = Score.objects.filter(
             target__session_entry__competition_entry__competition=self.competition
         ).select_related().order_by(
-            '-target__session_entry__competition_entry__archer__age',
+            '-target__session_entry__competition_entry__age',
             'target__session_entry__competition_entry__novice',
             'target__session_entry__competition_entry__bowstyle',
             'target__session_entry__competition_entry__archer__gender',
@@ -1001,7 +1003,7 @@ class RankingsExport(CompetitionMixin, View):
             results = Result.objects.filter(
                 seed__session_round__shot_round=r,
                 seed__entry__competition=self.competition,
-            ).order_by('total').select_related('seed__entry__bowstyle')
+            ).order_by('total').select_related('seed__entry__bowstyle').exclude(dns=True)
             for result in results:
                 entry = result.seed.entry
                 if entry.bowstyle.name == 'Compound':

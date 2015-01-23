@@ -56,10 +56,10 @@
             <td>{{ boss }}{{ target }}</td>
             <td>{% if archer %}<a href="{% url 'archer_update' pk=archer.session_entry.competition_entry.archer_id %}?next={{ request.path }}">{{ archer.session_entry.competition_entry.archer }}</a>{% endif %}</td>
             <td>{{ archer.session_entry.competition_entry.club }} {% if not archer.session_entry.competition_entry.club == archer.session_entry.competition_entry.archer.club %}({{ archer.session_entry.competition_entry.archer.club.name }}){% endif %}</td>
-            <td>{{ archer.session_entry.competition_entry.bowstyle }}</td>
+            <td>{{ archer.session_entry.competition_entry.bowstyle }} {% if not archer.session_entry.competition_entry.bowstyle == archer.session_entry.competition_entry.archer.bowstyle %}({{ archer.session_entry.competition_entry.archer.bowstyle }}){% endif %}</td>
             <td>{{ archer.session_entry.competition_entry.archer.get_gender_display }}</td>
             {% if competition.has_novices %}
-            <td>{{ archer.session_entry.competition_entry.archer.get_novice_display }}</td>
+            <td>{{ archer.session_entry.competition_entry.get_novice_display }} {% if not archer.session_entry.competition_entry.get_novice_display == archer.session_entry.competition_entry.archer.get_novice_display %}({{ archer.session_entry.competition_entry.archer.get_novice_display }}){% endif %}</td>
             {% endif %}
             {% if competition.has_juniors %}
             <td>{{ archer.session_entry.competition_entry.get_age_display }}</td>

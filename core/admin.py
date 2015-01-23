@@ -4,6 +4,7 @@ from core.models import Country, Region, County, Club, Archer, Bowstyle, Round, 
 
 
 class ArcherAdmin(admin.ModelAdmin):
+    search_fields = ('name',)
     list_display = ('name', 'club')
     list_filter = ('club',)
 
