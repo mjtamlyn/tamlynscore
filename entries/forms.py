@@ -10,12 +10,16 @@ class ArcherSearchForm(forms.Form):
     def get_archers(self):
         # One day, do this with expressions and/or contrib.postgres. Please.
         term = self.cleaned_data['query']
-        return Archer.objects.extra(
-            select={'similarity': 'similarity("core_archer"."name", %s)'},
-            select_params=[term],
-            where=['"core_archer"."name" %% %s'],
-            params=[term],
-            order_by=['-similarity'],
+        return Archer.objects.filter(club__name__isnull=False).extra(
+            select={
+                'similarity': 'similarity("core_archer"."name", %s)',
+                'club_similarity': 'similarity("core_club"."name", %s)',
+                'club_shortname_similarity': 'similarity("core_club"."short_name", %s)',
+            },
+            select_params=[term, term, term],
+            where=['"core_archer"."name" %% %s OR "core_club"."name" %% %s OR "core_club"."short_name" %% %s'],
+            params=[term, term, term],
+            order_by=['-similarity', '-club_similarity', '-club_shortname_similarity'],
         )
 
 

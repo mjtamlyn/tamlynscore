@@ -107,17 +107,33 @@ class TestExistingArcherSingleSession(TestCase):
         self.assertEqual(entry.sessionentry_set.get().session_round, self.session_round)
 
 
-class TestBadSpelling(TestCase):
+class TestMoreSearches(TestCase):
 
     def setUp(self):
-        self.archer = factories.ArcherFactory.create(name='David Longworth')
+        self.archer = factories.ArcherFactory.create(name='David Longworth', club__name='Oxford Archers')
         self.competition = factories.CompetitionFactory.create()
         self.user = factories.UserFactory.create()
         self.client.login(username=self.user.username, password='password')
 
-    def test_enter_search_term(self):
+    def test_bad_spelling(self):
         url = reverse('archer_search', kwargs={'slug': self.competition.slug})
         data = {'query': 'dave lonworth'}
+        response = self.client.get(url, data=data)
+        self.assertEqual(response.status_code, 200)
+        self.assertIsInstance(response.context['search_form'], ArcherSearchForm)
+        self.assertSequenceEqual(response.context['archers'], [self.archer])
+
+    def test_club_name(self):
+        url = reverse('archer_search', kwargs={'slug': self.competition.slug})
+        data = {'query': 'Oxford Archers'}
+        response = self.client.get(url, data=data)
+        self.assertEqual(response.status_code, 200)
+        self.assertIsInstance(response.context['search_form'], ArcherSearchForm)
+        self.assertSequenceEqual(response.context['archers'], [self.archer])
+
+    def test_bad_club_name(self):
+        url = reverse('archer_search', kwargs={'slug': self.competition.slug})
+        data = {'query': 'oxford archery club'}
         response = self.client.get(url, data=data)
         self.assertEqual(response.status_code, 200)
         self.assertIsInstance(response.context['search_form'], ArcherSearchForm)
