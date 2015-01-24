@@ -1,3 +1,4 @@
+from django.core.urlresolvers import reverse
 from django.contrib.auth.decorators import login_required
 from django.views.generic import TemplateView, ListView, DetailView, UpdateView, CreateView
 
@@ -65,3 +66,17 @@ class ArcherUpdate(UpdateView):
 
     def get_success_url(self):
         return self.request.GET.get('next') or self.request.path
+
+
+@class_view_decorator(login_required)
+class ArcherCreate(CreateView):
+    model = Archer
+
+    def get_success_url(self):
+        competition = self.request.GET.get('competition')
+        if competition:
+            return reverse('entry_add', kwargs={
+                'slug': competition,
+                'archer_id': self.object.pk,
+            })
+        return self.object.club.get_absolute_url()
