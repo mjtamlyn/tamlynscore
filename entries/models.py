@@ -224,8 +224,8 @@ class CompetitionEntry(models.Model):
     archer = models.ForeignKey(Archer)
     club = models.ForeignKey(Club)
     bowstyle = models.ForeignKey(Bowstyle)
-    age = models.CharField(max_length=1, choices=AGE_CHOICES)
-    novice = models.CharField(max_length=1, choices=NOVICE_CHOICES)
+    age = models.CharField(max_length=1, choices=AGE_CHOICES, default='S')
+    novice = models.CharField(max_length=1, choices=NOVICE_CHOICES, default='E')
 
     guest = models.BooleanField(default=False)
     b_team = models.BooleanField(default=False)

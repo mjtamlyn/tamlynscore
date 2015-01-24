@@ -280,3 +280,53 @@ class TestDifferentEntryDetails(TestCase):
         self.assertEqual(entry.bowstyle, other_bowstyle)
         archer = Archer.objects.get()
         self.assertEqual(archer.bowstyle, other_bowstyle)
+
+    def test_default_experience(self):
+        self.assertEqual(self.archer.novice, 'E')
+        self.assertFalse(self.competition.has_novices)
+        url = reverse('entry_add', kwargs={
+            'slug': self.competition.slug,
+            'archer_id': self.archer.pk,
+        })
+        response = self.client.get(url)
+        self.assertNotIn('novice', response.context['form'].fields)
+        response = self.client.post(url)
+        self.assertEqual(response.status_code, 302)
+        self.assertEqual(CompetitionEntry.objects.count(), 1)
+        entry = CompetitionEntry.objects.get()
+        self.assertEqual(entry.novice, 'E')
+
+    def test_change_experience(self):
+        self.assertEqual(self.archer.novice, 'E')
+        self.competition.has_novices = True
+        self.competition.save()
+        url = reverse('entry_add', kwargs={
+            'slug': self.competition.slug,
+            'archer_id': self.archer.pk,
+        })
+        data = {'novice': 'N'}
+        response = self.client.post(url, data)
+        self.assertEqual(response.status_code, 302)
+        self.assertEqual(CompetitionEntry.objects.count(), 1)
+        entry = CompetitionEntry.objects.get()
+        self.assertEqual(entry.novice, 'N')
+
+    def test_change_experience_with_update(self):
+        self.assertEqual(self.archer.novice, 'E')
+        self.competition.has_novices = True
+        self.competition.save()
+        url = reverse('entry_add', kwargs={
+            'slug': self.competition.slug,
+            'archer_id': self.archer.pk,
+        })
+        data = {
+            'novice': 'N',
+            'update_novice': True,
+        }
+        response = self.client.post(url, data)
+        self.assertEqual(response.status_code, 302)
+        self.assertEqual(CompetitionEntry.objects.count(), 1)
+        entry = CompetitionEntry.objects.get()
+        self.assertEqual(entry.novice, 'N')
+        archer = Archer.objects.get()
+        self.assertEqual(archer.novice, 'N')
