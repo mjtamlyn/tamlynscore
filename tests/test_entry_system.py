@@ -330,3 +330,53 @@ class TestDifferentEntryDetails(TestCase):
         self.assertEqual(entry.novice, 'N')
         archer = Archer.objects.get()
         self.assertEqual(archer.novice, 'N')
+
+    def test_default_age(self):
+        self.assertEqual(self.archer.age, 'S')
+        self.assertFalse(self.competition.has_juniors)
+        url = reverse('entry_add', kwargs={
+            'slug': self.competition.slug,
+            'archer_id': self.archer.pk,
+        })
+        response = self.client.get(url)
+        self.assertNotIn('age', response.context['form'].fields)
+        response = self.client.post(url)
+        self.assertEqual(response.status_code, 302)
+        self.assertEqual(CompetitionEntry.objects.count(), 1)
+        entry = CompetitionEntry.objects.get()
+        self.assertEqual(entry.age, 'S')
+
+    def test_change_age(self):
+        self.assertEqual(self.archer.age, 'S')
+        self.competition.has_juniors = True
+        self.competition.save()
+        url = reverse('entry_add', kwargs={
+            'slug': self.competition.slug,
+            'archer_id': self.archer.pk,
+        })
+        data = {'age': 'J'}
+        response = self.client.post(url, data)
+        self.assertEqual(response.status_code, 302)
+        self.assertEqual(CompetitionEntry.objects.count(), 1)
+        entry = CompetitionEntry.objects.get()
+        self.assertEqual(entry.age, 'J')
+
+    def test_change_age_with_update(self):
+        self.assertEqual(self.archer.age, 'S')
+        self.competition.has_juniors = True
+        self.competition.save()
+        url = reverse('entry_add', kwargs={
+            'slug': self.competition.slug,
+            'archer_id': self.archer.pk,
+        })
+        data = {
+            'age': 'J',
+            'update_age': True,
+        }
+        response = self.client.post(url, data)
+        self.assertEqual(response.status_code, 302)
+        self.assertEqual(CompetitionEntry.objects.count(), 1)
+        entry = CompetitionEntry.objects.get()
+        self.assertEqual(entry.age, 'J')
+        archer = Archer.objects.get()
+        self.assertEqual(archer.age, 'J')
