@@ -1,7 +1,7 @@
 from django.db import transaction
 from django import forms
 
-from core.models import Archer, Bowstyle, Club, NOVICE_CHOICES
+from core.models import Archer, Bowstyle, Club, NOVICE_CHOICES, AGE_CHOICES
 from .models import CompetitionEntry, SessionRound, SessionEntry
 
 
@@ -50,6 +50,13 @@ class EntryCreateForm(forms.Form):
                 required=False,
             )
             self.fields['update_novice'] = forms.BooleanField(required=False)
+        if self.competition.has_juniors:
+            self.fields['age'] = forms.ChoiceField(
+                label='Age (%s)' % self.archer.get_age_display(),
+                choices=(('', '---------'),) + AGE_CHOICES,
+                required=False,
+            )
+            self.fields['update_age'] = forms.BooleanField(required=False)
         if len(self.session_rounds) > 1:
             self.fields['sessions'] = forms.ModelMultipleChoiceField(
                 queryset=self.session_rounds,
@@ -58,35 +65,52 @@ class EntryCreateForm(forms.Form):
 
     def save(self):
         with transaction.atomic():
-            club = self.cleaned_data['club'] or self.archer.club
-            bowstyle = self.cleaned_data['bowstyle'] or self.archer.bowstyle
-            extra_params = {}
-            if self.competition.has_novices and self.cleaned_data['novice']:
-                extra_params['novice'] = self.cleaned_data['novice']
-            entry = CompetitionEntry.objects.create(
-                competition=self.competition,
-                archer=self.archer,
-                club=club,
-                bowstyle=bowstyle,
-                **extra_params
+            self.update_archer()
+            entry = self.create_competition_entry()
+            self.create_session_entries(entry)
+
+    def update_archer(self):
+        changed = False
+        if self.cleaned_data['club'] and self.cleaned_data['update_club']:
+            self.archer.club = self.cleaned_data['club']
+            changed = True
+        if self.cleaned_data['bowstyle'] and self.cleaned_data['update_bowstyle']:
+            self.archer.bowstyle = self.cleaned_data['bowstyle']
+            changed = True
+        if self.competition.has_novices and self.cleaned_data['novice'] and self.cleaned_data['update_novice']:
+            self.archer.novice = self.cleaned_data['novice']
+            changed = True
+        if self.competition.has_juniors and self.cleaned_data['age'] and self.cleaned_data['update_age']:
+            self.archer.age = self.cleaned_data['age']
+            changed = True
+        if changed:
+            self.archer.save()
+
+    def create_competition_entry(self):
+        club = self.cleaned_data['club'] or self.archer.club
+        bowstyle = self.cleaned_data['bowstyle'] or self.archer.bowstyle
+        extra_params = {}
+        if self.competition.has_novices and self.cleaned_data['novice']:
+            extra_params['novice'] = self.cleaned_data['novice']
+        if self.competition.has_juniors and self.cleaned_data['age']:
+            extra_params['age'] = self.cleaned_data['age']
+        return CompetitionEntry.objects.create(
+            competition=self.competition,
+            archer=self.archer,
+            club=club,
+            bowstyle=bowstyle,
+            **extra_params
+        )
+
+    def create_session_entries(self, entry):
+        if len(self.session_rounds) == 1:
+            SessionEntry.objects.create(
+                session_round=self.session_rounds[0],
+                competition_entry=entry,
             )
-            if self.cleaned_data['club'] and self.cleaned_data['update_club']:
-                self.archer.club = self.cleaned_data['club']
-                self.archer.save()
-            if self.cleaned_data['bowstyle'] and self.cleaned_data['update_bowstyle']:
-                self.archer.bowstyle = self.cleaned_data['bowstyle']
-                self.archer.save()
-            if self.competition.has_novices and self.cleaned_data['novice'] and self.cleaned_data['update_novice']:
-                self.archer.novice = self.cleaned_data['novice']
-                self.archer.save()
-            if len(self.session_rounds) == 1:
+        else:
+            for session_round in self.cleaned_data['sessions']:
                 SessionEntry.objects.create(
-                    session_round=self.session_rounds[0],
-                    competition_entry=entry
+                    session_round=session_round,
+                    competition_entry=entry,
                 )
-            else:
-                for session_round in self.cleaned_data['sessions']:
-                    SessionEntry.objects.create(
-                        session_round=session_round,
-                        competition_entry=entry
-                    )
