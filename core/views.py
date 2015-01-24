@@ -1,5 +1,5 @@
 from django.contrib.auth.decorators import login_required
-from django.views.generic import TemplateView, ListView, DetailView, UpdateView
+from django.views.generic import TemplateView, ListView, DetailView, UpdateView, CreateView
 
 from scoring.utils import class_view_decorator
 from scores.models import Score
@@ -29,6 +29,14 @@ class ClubDetail(DetailView):
 @class_view_decorator(login_required)
 class ClubUpdate(UpdateView):
     model = Club
+
+
+@class_view_decorator(login_required)
+class ClubCreate(CreateView):
+    model = Club
+
+    def get_success_url(self):
+        return self.request.GET.get('next') or super(ClubCreate, self).get_success_url()
 
 
 @class_view_decorator(login_required)
