@@ -1,7 +1,7 @@
 from django.db import transaction
 from django import forms
 
-from core.models import Archer, Bowstyle, Club
+from core.models import Archer, Bowstyle, Club, NOVICE_CHOICES
 from .models import CompetitionEntry, SessionRound, SessionEntry
 
 
@@ -41,29 +41,43 @@ class EntryCreateForm(forms.Form):
         self.archer = archer
         self.competition = competition
         self.session_rounds = SessionRound.objects.filter(session__competition=competition)
+        self.fields['club'].label = 'Club (%s)' % self.archer.club
+        self.fields['bowstyle'].label = 'Bowstyle (%s)' % self.archer.bowstyle
+        if self.competition.has_novices:
+            self.fields['novice'] = forms.ChoiceField(
+                label='Experienced/Novice (%s)' % self.archer.get_novice_display(),
+                choices=(('', '---------'),) + NOVICE_CHOICES,
+                required=False,
+            )
+            self.fields['update_novice'] = forms.BooleanField(required=False)
         if len(self.session_rounds) > 1:
             self.fields['sessions'] = forms.ModelMultipleChoiceField(
                 queryset=self.session_rounds,
                 widget=forms.CheckboxSelectMultiple,
             )
-        self.fields['club'].label = 'Club (%s)' % self.archer.club
-        self.fields['bowstyle'].label = 'Bowstyle (%s)' % self.archer.bowstyle
 
     def save(self):
         with transaction.atomic():
             club = self.cleaned_data['club'] or self.archer.club
             bowstyle = self.cleaned_data['bowstyle'] or self.archer.bowstyle
+            extra_params = {}
+            if self.competition.has_novices and self.cleaned_data['novice']:
+                extra_params['novice'] = self.cleaned_data['novice']
             entry = CompetitionEntry.objects.create(
                 competition=self.competition,
                 archer=self.archer,
                 club=club,
                 bowstyle=bowstyle,
+                **extra_params
             )
             if self.cleaned_data['club'] and self.cleaned_data['update_club']:
                 self.archer.club = self.cleaned_data['club']
                 self.archer.save()
             if self.cleaned_data['bowstyle'] and self.cleaned_data['update_bowstyle']:
                 self.archer.bowstyle = self.cleaned_data['bowstyle']
+                self.archer.save()
+            if self.competition.has_novices and self.cleaned_data['novice'] and self.cleaned_data['update_novice']:
+                self.archer.novice = self.cleaned_data['novice']
                 self.archer.save()
             if len(self.session_rounds) == 1:
                 SessionEntry.objects.create(

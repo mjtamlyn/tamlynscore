@@ -45,7 +45,12 @@ class Subround(models.Model):
     target_face = models.PositiveIntegerField()
 
     def __unicode__(self):
-        return u'{0} arrows at {1} {2} ({3}cm)'.format(self.arrows, self.distance, self.get_unit_display(), self.target_face)
+        return u'{0} arrows at {1} {2} ({3}cm)'.format(
+            self.arrows,
+            self.distance,
+            self.get_unit_display(),
+            self.target_face,
+        )
 
     class Meta:
         ordering = ('unit', '-distance', '-arrows', '-target_face')
@@ -151,8 +156,8 @@ class Archer(models.Model):
     gender = models.CharField(max_length=1, choices=GENDER_CHOICES)
     club = models.ForeignKey(Club)
     bowstyle = models.ForeignKey(Bowstyle)
-    age = models.CharField(max_length=1, choices=AGE_CHOICES)
-    novice = models.CharField(max_length=1, choices=NOVICE_CHOICES)
+    age = models.CharField(max_length=1, choices=AGE_CHOICES, default='S')
+    novice = models.CharField(max_length=1, choices=NOVICE_CHOICES, default='E')
     gnas_no = models.BigIntegerField(blank=True, null=True)
 
     def __unicode__(self):
