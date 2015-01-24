@@ -8,6 +8,8 @@
     <input type="submit" class="btn" value="Search">
 </form>
 
+<p><a href="{% url 'archer_create' %}?competition={{ competition.slug }}" class="btn">Create new archer</a></p>
+
 {% if archers %}
 <div class="row">
     {% for archer in archers %}

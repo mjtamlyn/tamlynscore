@@ -2,7 +2,7 @@ from django.conf import settings
 from django.core.urlresolvers import reverse
 from django.test import TestCase, Client
 
-from core.models import Club
+from core.models import Archer, Club
 from . import factories
 
 
@@ -74,3 +74,38 @@ class TestClubCreate(BasicPageTest, TestCase):
         response = self.post_response(url=url, data=data)
         self.assertEqual(Club.objects.count(), 1)
         self.assertRedirects(response, next_url)
+
+
+class TestArcherCreate(BasicPageTest, TestCase):
+    url_name = 'archer_create'
+
+    def setUp(self):
+        self.club = factories.ClubFactory.create()
+        self.bowstyle = factories.BowstyleFactory.create()
+
+    def get_data(self):
+        return {
+            'name': 'Test Archer',
+            'club': self.club.pk,
+            'bowstyle': self.bowstyle.pk,
+            'gender': 'L',
+            'age': 'S',
+            'novice': 'N',
+        }
+
+    def test_valid_post(self):
+        data = self.get_data()
+        response = self.post_response(data=data)
+        archer = Archer.objects.get()
+        self.assertRedirects(response, archer.club.get_absolute_url())
+
+    def test_entry_redirect(self):
+        competition = factories.CompetitionFactory.create()
+        url = '%s?competition=%s' % (self.reverse(), competition.slug)
+        data = self.get_data()
+        response = self.post_response(url=url, data=data)
+        archer = Archer.objects.get()
+        self.assertRedirects(response, reverse('entry_add', kwargs={
+            'slug': competition.slug,
+            'archer_id': archer.pk,
+        }))
