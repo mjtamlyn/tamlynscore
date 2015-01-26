@@ -1,3 +1,4 @@
+from django.core.cache import cache
 from django.db import transaction
 from django import forms
 
@@ -62,12 +63,16 @@ class EntryCreateForm(forms.Form):
                 queryset=self.session_rounds,
                 widget=forms.CheckboxSelectMultiple,
             )
+            if cache.get('entry-form:sessions'):
+                self.initial['sessions'] = cache.get('entry-form:sessions')
 
     def save(self):
         with transaction.atomic():
             self.update_archer()
             entry = self.create_competition_entry()
             self.create_session_entries(entry)
+        if len(self.session_rounds) > 1:
+            cache.set('entry-form:sessions', self.cleaned_data['sessions'])
 
     def update_archer(self):
         changed = False
