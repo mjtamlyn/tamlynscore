@@ -296,6 +296,21 @@ class TestDifferentEntryDetails(TestCase):
         entry = CompetitionEntry.objects.get()
         self.assertEqual(entry.novice, 'E')
 
+    def test_uses_archer_experience(self):
+        self.archer.novice = 'N'
+        self.archer.save()
+        self.competition.has_novices = True
+        self.competition.save()
+        url = reverse('entry_add', kwargs={
+            'slug': self.competition.slug,
+            'archer_id': self.archer.pk,
+        })
+        response = self.client.post(url)
+        self.assertEqual(response.status_code, 302)
+        self.assertEqual(CompetitionEntry.objects.count(), 1)
+        entry = CompetitionEntry.objects.get()
+        self.assertEqual(entry.novice, 'N')
+
     def test_change_experience(self):
         self.assertEqual(self.archer.novice, 'E')
         self.competition.has_novices = True
@@ -345,6 +360,21 @@ class TestDifferentEntryDetails(TestCase):
         self.assertEqual(CompetitionEntry.objects.count(), 1)
         entry = CompetitionEntry.objects.get()
         self.assertEqual(entry.age, 'S')
+
+    def test_uses_archer_age(self):
+        self.archer.age = 'J'
+        self.archer.save()
+        self.competition.has_juniors = True
+        self.competition.save()
+        url = reverse('entry_add', kwargs={
+            'slug': self.competition.slug,
+            'archer_id': self.archer.pk,
+        })
+        response = self.client.post(url)
+        self.assertEqual(response.status_code, 302)
+        self.assertEqual(CompetitionEntry.objects.count(), 1)
+        entry = CompetitionEntry.objects.get()
+        self.assertEqual(entry.age, 'J')
 
     def test_change_age(self):
         self.assertEqual(self.archer.age, 'S')
