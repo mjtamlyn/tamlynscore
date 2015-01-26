@@ -90,10 +90,10 @@ class EntryCreateForm(forms.Form):
         club = self.cleaned_data['club'] or self.archer.club
         bowstyle = self.cleaned_data['bowstyle'] or self.archer.bowstyle
         extra_params = {}
-        if self.competition.has_novices and self.cleaned_data['novice']:
-            extra_params['novice'] = self.cleaned_data['novice']
-        if self.competition.has_juniors and self.cleaned_data['age']:
-            extra_params['age'] = self.cleaned_data['age']
+        if self.competition.has_novices:
+            extra_params['novice'] = self.cleaned_data['novice'] or self.archer.novice
+        if self.competition.has_juniors:
+            extra_params['age'] = self.cleaned_data['age'] or self.archer.age
         return CompetitionEntry.objects.create(
             competition=self.competition,
             archer=self.archer,
