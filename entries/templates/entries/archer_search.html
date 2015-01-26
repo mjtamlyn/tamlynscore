@@ -1,5 +1,14 @@
 {% extends 'entries/competition_detail.html' %}
 
+{% block scripts %}
+<script src="{{ STATIC_URL }}js/jquery-1.7.2.min.js"></script>
+<script type="text/javascript">
+    $(function() {
+        $('#id_query').focus();
+    });
+</script>
+{% endblock %}
+
 {% block competition_content %}
 <h2>Select archer to enter</h2>
 <p>Enter an archer name:</p>
@@ -8,7 +17,7 @@
     <input type="submit" class="btn" value="Search">
 </form>
 
-<p><a href="{% url 'archer_create' %}?competition={{ competition.slug }}" class="btn">Create new archer</a></p>
+<p><a href="{% url 'archer_create' %}?competition={{ competition.slug }}{% if search_form.cleaned_data.query %}&name={{ search_form.cleaned_data.query|urlencode }}{% endif %}" class="btn">Create new archer</a></p>
 
 {% if archers %}
 <div class="row">

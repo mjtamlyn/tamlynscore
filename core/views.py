@@ -1,3 +1,6 @@
+import copy
+
+from django.core.cache import cache
 from django.core.urlresolvers import reverse
 from django.contrib.auth.decorators import login_required
 from django.views.generic import TemplateView, ListView, DetailView, UpdateView, CreateView
@@ -71,6 +74,22 @@ class ArcherUpdate(UpdateView):
 @class_view_decorator(login_required)
 class ArcherCreate(CreateView):
     model = Archer
+
+    def get_initial(self):
+        initial = {}
+        cached = cache.get('archer-create')
+        if cached:
+            initial = cached
+        name = self.request.GET.get('name')
+        if name:
+            initial['name'] = name
+        return initial
+
+    def form_valid(self, form):
+        cache_data = copy.copy(form.cleaned_data)
+        del cache_data['name']
+        cache.set('archer-create', cache_data)
+        return super(ArcherCreate, self).form_valid(form)
 
     def get_success_url(self):
         competition = self.request.GET.get('competition')

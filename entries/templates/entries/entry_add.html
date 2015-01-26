@@ -1,5 +1,14 @@
 {% extends 'entries/competition_detail.html' %}
 
+{% block scripts %}
+<script src="{{ STATIC_URL }}js/jquery-1.7.2.min.js"></script>
+<script type="text/javascript">
+    $(function() {
+        $('#id_club').focus();
+    });
+</script>
+{% endblock %}
+
 {% block competition_content %}
 <h2>Create entry for {{ archer }}</h2>
 <p>
