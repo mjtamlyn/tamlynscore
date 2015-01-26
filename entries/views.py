@@ -72,7 +72,7 @@ class EntryList(CompetitionMixin, ListView):
             'club',
             'bowstyle',
             'archer',
-        ).prefetch_related('sessionentry_set')
+        ).prefetch_related('sessionentry_set').order_by('-pk')
 
     def get_stats(self):
         stats = []
