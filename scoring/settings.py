@@ -74,6 +74,7 @@ INSTALLED_APPS = (
     'django.contrib.admin',
     'south',
     'gunicorn',
+    'debug_toolbar',
 
     'scoring',
     'core',

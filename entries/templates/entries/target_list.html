@@ -16,37 +16,62 @@
     <h4>{% block title %}Manage Target Lists{% endblock %}</h4>
 
     {% block main %}
-    <div class="intro">
-        Sessions:
-        <ul>
-            {% for session, details in target_list.items %}
-            <li>
-            <span>{{ session.start|date:"l, jS F - f a" }}</span>
-            {% if details.entries|length %}
-            <span class="unallocated" title="Unallocated entries">{{ details.entries|length }}</span>
-            {% endif %}
-            <a class="btn" href="#session-{{ session.pk }}">Edit</a>
-            <a class="btn" href="pdf/">View PDF</a>
-            </li>
-            {% endfor %}
-        </ul>
+    <div class="row">
+        <div class="col6">
+            Sessions:
+            <ul>
+                {% for session, details in target_list.items %}
+                <li>
+                <span>{{ session.start|date:"l, jS F - f a" }}</span>
+                {% if details.entries|length %}
+                <span class="unallocated" title="Unallocated entries">{{ details.entries|length }}</span>
+                {% endif %}
+                <a class="btn" href="#session-{{ session.pk }}">Edit</a>
+                </li>
+                {% endfor %}
+            </ul>
+            <a class="btn" href="{% url 'target_list_pdf' slug=competition.slug %}">View PDF</a>
+        </div>
     </div>
 
+    <div class="row">
     {% for session, details in target_list.items %}
-    <div class="session" id="session-{{ session.pk }}" data-archers="{{ details.entries_json }}">
-        <h5>{{ session.start|date:"l, jS F - f a" }}</h5>
+    <div class="session col{% if target_list|length == 2 %}3{% else %}2{% endif %}" id="session-{{ session.pk }}" data-archers="{{ details.entries_json }}">
+        <h4>{{ session.start|date:"l, jS F - f a" }}</h4>
         {% for boss, entries in details.target_list %}
             <div class="boss" data-boss="{{ boss }}">
-                <span class="boss-number">{{ boss }}</span>
                 <ul>
                     {% for detail, entry in entries %}
                     <li>
-                        <span class="detail">{{ detail }}:</span>
-                        {% if entry %}
-                            <span class="archer">{{ entry.session_entry.competition_entry.archer }}</span> <a class="delete" data-location="{{ boss }}{{ detail }}" data-pk="{{ entry.pk }}" data-entry-pk="{{ entry.session_entry.pk }}">X</a>
-                        {% else %}
-                            <input data-location="{{ boss }}{{ detail }}">
-                        {% endif %}
+                        <div class="archer-block">
+                            <div class="name">
+                                <div class="actions">
+                                    <a class="delete" data-location="{{ boss }}{{ detail }}" data-pk="{{ entry.pk }}" data-entry-pk="{{ entry.session_entry.pk }}">X</a>
+                                </div>
+                                <p>
+                                    <span class="detail">{{ boss }}{{ detail }}</span>
+                                {% if entry %}
+                                    {{ entry.session_entry.competition_entry.archer }}
+                                {% else %}
+                                    <input data-location="{{ boss }}{{ detail }}">
+                                {% endif %}
+                                </p>
+                            </div>
+                            {% if entry %}
+                            <div class="bottom">
+                                <p>{{ entry.session_entry.competition_entry.club }}</p>
+                                <p>
+                                    <span class="pill bowstyle {{ entry.session_entry.competition_entry.bowstyle|slugify }}">{{ entry.session_entry.competition_entry.bowstyle }}</span>
+                                    <span class="pill gender {{ entry.session_entry.competition_entry.archer.get_gender_display|lower }}">{{ entry.session_entry.competition_entry.archer.get_gender_display }}</span>
+                                    {% if competition.has_novices and entry.session_entry.competition_entry.novice == "N" %}
+                                    <span class="pill novice">{{ entry.session_entry.competition_entry.get_novice_display }}</span>
+                                    {% endif %}
+                                    {% if competition.has_juniors and entry.session_entry.competition_entry.age == "J" %}
+                                    <span class="pill junior">{{ entry.session_entry.competition_entry.get_age_display }}</span>
+                                    {% endif %}
+                                </p>
+                            </div>
+                            {% endif %}
                     </li>
                     {% endfor %}
                 </ul>
@@ -54,7 +79,17 @@
         {% endfor %}
         <ul class="unallocated">
             {% for entry in details.entries %}
-            <li data-pk="{{ entry.pk }}">{{ entry.competition_entry.archer }}</li>
+            <li data-pk="{{ entry.pk }}">
+                {{ entry.competition_entry.archer }}
+                <span class="pill bowstyle {{ entry.competition_entry.bowstyle|slugify }}">{{ entry.competition_entry.bowstyle }}</span>
+                <span class="pill gender {{ entry.competition_entry.archer.get_gender_display|lower }}">{{ entry.competition_entry.archer.get_gender_display }}</span>
+                {% if competition.has_novices and entry.competition_entry.novice == "N" %}
+                <span class="pill novice">{{ entry.competition_entry.get_novice_display }}</span>
+                {% endif %}
+                {% if competition.has_juniors and entry.competition_entry.age == "J" %}
+                <span class="pill junior">{{ entry.competition_entry.get_age_display }}</span>
+                {% endif %}
+            </li>
             {% endfor %}
         </ul>
     </div>
