@@ -30,8 +30,13 @@
                                 + item.bowstyle + '</span> ' +
                             '<span class="pill gender ' + item.gender.toLowerCase() + '">'
                                 + item.gender + '</span>'
-                        )
-                        // TODO: support competition options properly
+                        );
+                        if (item.novice) {
+                            text += ' <span class="pill novice">Novice</span>';
+                        }
+                        if (item.age) {
+                            text += ' <span class="pill junior">Junior</span>';
+                        }
                         return text;
                     },
                 });
@@ -65,14 +70,21 @@
                             });
                             unallocated.splice(index, 1);
                             originalAnchor.replaceWith('<span class="name">' + data.name + '</span>');
-                            archerBlock.find('.bottom').html(
+                            var text = (
                                 '<p>' + data.club + '</p><p>' +
                                 '<span class="pill bowstyle ' + data.bowstyle.toLowerCase() + '">'
                                     + data.bowstyle + '</span> ' +
                                 '<span class="pill gender ' + data.gender.toLowerCase() + '">'
-                                    + data.gender + '</span></p>'
-                                // TODO: don't duplicate code here
+                                    + data.gender + '</span>'
                             );
+                            if (data.novice) {
+                                text += ' <span class="pill novice">Novice</span>';
+                            }
+                            if (data.age) {
+                                text += ' <span class="pill junior">Junior</span>';
+                            }
+                            text += '</p>'
+                            archerBlock.find('.bottom').html(text);
                             archerBlock.find('.actions').append($('<a class="delete" data-pk="' + data.id + '">X</a>'));
                         }
                     );
