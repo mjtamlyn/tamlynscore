@@ -5,6 +5,7 @@ import math
 
 from django.contrib.auth.decorators import login_required
 from django.core.urlresolvers import reverse
+from django.db.models import Prefetch
 from django.http import HttpResponse, HttpResponseBadRequest, HttpResponseRedirect, Http404
 from django.utils.datastructures import SortedDict
 from django.views.generic import View, DetailView, ListView, TemplateView
@@ -72,13 +73,28 @@ class EntryList(CompetitionMixin, ListView):
             'club',
             'bowstyle',
             'archer',
-        ).prefetch_related('sessionentry_set').order_by('-pk')
+        ).prefetch_related(
+            Prefetch(
+                'sessionentry_set',
+                queryset=SessionEntry.objects.select_related(
+                    'session_round__session',
+                    'session_round__shot_round',
+                ),
+            )
+        ).order_by('-pk')
 
     def get_stats(self):
         stats = []
         sessions = self.competition.session_set.prefetch_related(
             'sessionround_set',
-            'sessionround_set__sessionentry_set',
+            Prefetch(
+                'sessionround_set__sessionentry_set',
+                queryset=SessionEntry.objects.select_related(
+                    'competition_entry',
+                    'competition_entry__bowstyle',
+                    'competition_entry__archer',
+                ),
+            )
         )
         for session in sessions:
             session_rounds = session.sessionround_set.all()
