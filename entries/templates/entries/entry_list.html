@@ -2,12 +2,22 @@
 
 {% block page_id %}entry-list{% endblock %}
 
+{% block scripts %}
+<script src="{{ STATIC_URL }}lib/jquery/jquery-2.1.3.min.js"></script>
+<script type="text/javascript">
+    $(function() {
+        $('#id_query').focus();
+    });
+</script>
+{% endblock %}
+
 {% block competition_content %}
 <div class="row">
     <div class="col2">
-        <p>
-            <a href="{% url 'archer_search' slug=competition.slug %}" class="btn">Add entry</a>
-        </p>
+        <form action="{% url 'archer_search' slug=competition.slug %}" method="GET">
+            {{ search_form.query }}
+            <input type="submit" value="Add entry" class="btn">
+        </form>
     </div>
     <div class="col4">
         <h3>Stats</h3>
