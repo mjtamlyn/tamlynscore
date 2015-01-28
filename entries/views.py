@@ -8,7 +8,7 @@ from django.core.urlresolvers import reverse
 from django.db.models import Prefetch
 from django.http import HttpResponse, HttpResponseBadRequest, HttpResponseRedirect, Http404
 from django.utils.datastructures import SortedDict
-from django.views.generic import View, DetailView, ListView, TemplateView
+from django.views.generic import View, DetailView, ListView, TemplateView, DeleteView
 from django.shortcuts import get_object_or_404
 from django.utils import timezone
 
@@ -177,6 +177,16 @@ class EntryAdd(CompetitionMixin, DetailView):
         else:
             context = self.get_context_data(form=form)
             return self.render_to_response(context)
+
+    def get_success_url(self):
+        return reverse('entry_list', kwargs={'slug': self.competition.slug})
+
+
+@class_view_decorator(login_required)
+class EntryDelete(CompetitionMixin, DeleteView):
+    model = CompetitionEntry
+    pk_url_kwarg = 'entry_id'
+    template_name = 'entries/entry_delete.html'
 
     def get_success_url(self):
         return reverse('entry_list', kwargs={'slug': self.competition.slug})

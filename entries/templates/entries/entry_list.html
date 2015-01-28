@@ -57,6 +57,9 @@
         <div class="col2">
             <div class="archer-block">
                 <div class="name">
+                    <div class="actions">
+                        <a href="{% url 'entry_delete' slug=competition.slug entry_id=entry.pk %}">X</a>
+                    </div>
                     <p>{{ entry.archer }}</p>
                 </div>
                 <div class="bottom">
