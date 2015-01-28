@@ -36,7 +36,7 @@
                             function (data) {
                                 // Replace this input with a label
                                 var archerSpan = $('<span>');
-                                archerSpan.text(ui.item.value);
+                                archerSpan.text(ui.item.value + ' ');
                                 archerSpan.addClass('archer');
                                 var link = $('<a>');
                                 link.text('X');

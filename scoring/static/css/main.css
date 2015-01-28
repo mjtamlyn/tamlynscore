@@ -233,11 +233,15 @@ ul.link-list li a:before {
   padding: 3px 10px;
 }
 /* line 11, ../../sass/components/_archer_block.sass */
+.archer-block .actions {
+  float: right;
+}
+/* line 14, ../../sass/components/_archer_block.sass */
 .archer-block .bottom {
   padding: 3px 10px;
 }
 
-/* line 14, ../../sass/components/_archer_block.sass */
+/* line 17, ../../sass/components/_archer_block.sass */
 .pill {
   font-size: 70%;
   line-height: 2em;
@@ -252,29 +256,29 @@ ul.link-list li a:before {
   -o-border-radius: 0.5em;
   border-radius: 0.5em;
 }
-/* line 24, ../../sass/components/_archer_block.sass */
+/* line 27, ../../sass/components/_archer_block.sass */
 .pill.gent {
   background-color: #aa6622;
 }
-/* line 26, ../../sass/components/_archer_block.sass */
+/* line 29, ../../sass/components/_archer_block.sass */
 .pill.lady {
   background-color: #ff5577;
 }
-/* line 29, ../../sass/components/_archer_block.sass */
+/* line 32, ../../sass/components/_archer_block.sass */
 .pill.recurve {
   background-color: #aa2211;
 }
-/* line 31, ../../sass/components/_archer_block.sass */
+/* line 34, ../../sass/components/_archer_block.sass */
 .pill.compound {
   background-color: #66cc44;
   color: #000f1f;
 }
-/* line 34, ../../sass/components/_archer_block.sass */
+/* line 37, ../../sass/components/_archer_block.sass */
 .pill.barebow {
   background-color: #6fb3ff;
   color: #000f1f;
 }
-/* line 37, ../../sass/components/_archer_block.sass */
+/* line 40, ../../sass/components/_archer_block.sass */
 .pill.longbow {
   background-color: #000f1f;
 }
@@ -1810,44 +1814,36 @@ nav .nav-link:hover {
 }
 
 /* line 2, ../../sass/_target_list.sass */
-.target-list .intro {
-  margin: 10px;
-}
-/* line 5, ../../sass/_target_list.sass */
-.target-list .intro .unallocated {
+.target-list .unallocated {
   margin-left: 10px;
   color: #d58100;
   font-weight: bold;
   cursor: help;
 }
+/* line 8, ../../sass/_target_list.sass */
+.target-list li {
+  padding: 5px 0;
+}
 /* line 11, ../../sass/_target_list.sass */
-.target-list .intro li {
-  padding: 10px 0;
+.target-list .detail {
+  font-weight: bold;
+  font-size: smaller;
 }
-/* line 14, ../../sass/_target_list.sass */
-.target-list .session {
-  float: left;
-  width: 350px;
-}
-/* line 18, ../../sass/_target_list.sass */
+/* line 15, ../../sass/_target_list.sass */
 .target-list .boss {
   padding: 5px 0;
   border-bottom: 1px solid #000f1f;
 }
-/* line 22, ../../sass/_target_list.sass */
-.target-list .boss .boss-number {
-  float: left;
-}
-/* line 25, ../../sass/_target_list.sass */
+/* line 19, ../../sass/_target_list.sass */
 .target-list .boss ul {
   margin-left: 20px;
 }
-/* line 28, ../../sass/_target_list.sass */
-.target-list .boss ul li {
-  height: 25px;
+/* line 22, ../../sass/_target_list.sass */
+.target-list .archer-block {
+  margin-bottom: 5px;
 }
 
-/* line 31, ../../sass/_target_list.sass */
+/* line 25, ../../sass/_target_list.sass */
 .btn {
   font-family: "Helvetica Neue", "Trebuchet MS", Helvetica, sans-serif;
   border-radius: 7px;
