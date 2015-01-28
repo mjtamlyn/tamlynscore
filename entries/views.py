@@ -76,13 +76,17 @@ class EntryList(CompetitionMixin, ListView):
 
     def get_stats(self):
         stats = []
-        sessions = self.competition.session_set.prefetch_related('sessionround_set', 'sessionround_set__sessionentry_set')
+        sessions = self.competition.session_set.prefetch_related(
+            'sessionround_set',
+            'sessionround_set__sessionentry_set',
+        )
         for session in sessions:
             session_rounds = session.sessionround_set.all()
             session_round_stats = []
             for sr in session_rounds:
                 bowstyles = collections.Counter(e.competition_entry.bowstyle for e in sr.sessionentry_set.all())
-                genders = collections.Counter(e.competition_entry.archer.get_gender_display() for e in sr.sessionentry_set.all())
+                genders = collections.Counter(
+                    e.competition_entry.archer.get_gender_display() for e in sr.sessionentry_set.all())
                 novice_count = len([e for e in sr.sessionentry_set.all() if e.competition_entry.novice == 'N'])
                 junior_count = len([e for e in sr.sessionentry_set.all() if e.competition_entry.age == 'J'])
                 session_round_stats.append({
@@ -167,11 +171,23 @@ class TargetList(ListView):
     model = TargetAllocation
 
     def get_queryset(self):
-        return self.model.objects.filter(session_entry__competition_entry__competition__slug=self.kwargs['slug']).select_related('session_entry__competition_entry__competition__tournament', 'session_entry__session_round__session', 'session_entry__session_round__shot_round', 'session_entry__competition_entry__bowstyle', 'session_entry__competition_entry__club', 'session_entry__competition_entry__archer', 'session_entry__competition_entry__archer__club')
+        return self.model.objects.filter(
+            session_entry__competition_entry__competition__slug=self.kwargs['slug'],
+        ).select_related(
+            'session_entry__competition_entry__competition__tournament',
+            'session_entry__session_round__session',
+            'session_entry__session_round__shot_round',
+            'session_entry__competition_entry__bowstyle',
+            'session_entry__competition_entry__club',
+            'session_entry__competition_entry__archer',
+            'session_entry__competition_entry__archer__club',
+        )
 
     def get_empty_target_list(self):
         target_list = SortedDict()
-        session_rounds = SessionRound.objects.filter(session__competition__slug=self.kwargs['slug']).select_related('session')
+        session_rounds = SessionRound.objects.filter(
+            session__competition__slug=self.kwargs['slug'],
+        ).select_related('session')
         for session_round in session_rounds:
             session = session_round.session
             if session not in target_list:
@@ -201,7 +217,9 @@ class TargetList(ListView):
             bosses = range(min_boss, max(needed_bosses, current_max_boss) + 1)
 
             # Make a lookup dictionary from the current allocations
-            allocations_lookup = dict([('{0}{1}'.format(allocation.boss, allocation.target), allocation) for allocation in allocations])
+            allocations_lookup = dict([
+                ('{0}{1}'.format(allocation.boss, allocation.target), allocation) for allocation in allocations
+            ])
 
             session_target_list = options['target_list'] = []
 
@@ -214,15 +232,32 @@ class TargetList(ListView):
         return target_list
 
     def add_unallocated_entries(self, target_list):
-        entries = SessionEntry.objects.filter(competition_entry__competition=self.competition).exclude(targetallocation__isnull=False).select_related('session_round__session', 'competition_entry__club', 'competition_entry__archer', 'competition_entry__bowstyle')
+        entries = SessionEntry.objects.filter(
+            competition_entry__competition=self.competition
+        ).exclude(targetallocation__isnull=False).select_related(
+            'session_round__session',
+            'competition_entry__club',
+            'competition_entry__archer',
+            'competition_entry__bowstyle'
+        )
 
         for entry in entries:
             session = entry.session_round.session
             target_list[session]['entries'].append(entry)
 
         for details in target_list.values():
-            details['entries'] = sorted(details['entries'], key=lambda e: e.competition_entry.archer.name)
-            data = [{'pk': e.pk, 'label': e.competition_entry.archer.name} for e in details['entries']]
+            details['entries'] = sorted(details['entries'], key=lambda e: (
+                e.session_round.shot_round_id,
+                e.competition_entry.bowstyle.name,
+                e.competition_entry.archer.gender,
+                e.competition_entry.age,
+                e.competition_entry.novice,
+                e.competition_entry.archer.name,
+            ))
+            data = [{
+                'pk': e.pk,
+                'label': e.competition_entry.archer.name
+            } for e in details['entries']]
             details['entries_json'] = json.dumps(data)
 
     def get_context_data(self, **kwargs):
@@ -246,7 +281,11 @@ class TargetList(ListView):
     def post(self, request, slug):
         data = json.loads(request.body)
         if data['method'] == 'create':
-            allocation = TargetAllocation.objects.create(session_entry_id=data['entry'], boss=data['location'][:-1], target=data['location'][-1])
+            allocation = TargetAllocation.objects.create(
+                session_entry_id=data['entry'],
+                boss=data['location'][:-1],
+                target=data['location'][-1]
+            )
             return HttpResponse(allocation.pk)
         elif data['method'] == 'delete':
             TargetAllocation.objects.get(pk=data['entry']).delete()
@@ -283,7 +322,9 @@ class ScoreSheets(ListView):
     template_name = 'entries/score_sheets.html'
 
     def get_queryset(self):
-        return SessionRound.objects.filter(session__competition__slug=self.kwargs['slug']).select_related('session', 'shot_round', 'session__competition__tournament')
+        return SessionRound.objects.filter(
+            session__competition__slug=self.kwargs['slug']
+        ).select_related('session', 'shot_round', 'session__competition__tournament')
 
     def get_context_data(self, **kwargs):
         context = super(ScoreSheets, self).get_context_data(**kwargs)
@@ -369,8 +410,14 @@ class HeadedPdfView(PdfView):
                 (50, -50),
             )
             for i, sponsor in enumerate(sponsors):
-                canvas.drawImage(sponsors[i].logo.path, positions[i][0], positions[i][1], width=self.PAGE_WIDTH - 100, preserveAspectRatio=True, anchor='nw')
-                pass
+                canvas.drawImage(
+                    sponsors[i].logo.path,
+                    positions[i][0],
+                    positions[i][1],
+                    width=self.PAGE_WIDTH - 100,
+                    preserveAspectRatio=True,
+                    anchor='nw',
+                )
 
         canvas.restoreState()
 
@@ -395,7 +442,9 @@ class TargetListPdf(HeadedPdfView):
         self.styles['h2'].alignment = 1
 
     def get_elements(self):
-        session_rounds = SessionRound.objects.filter(session__competition=self.competition).order_by('session__start').select_related('session')
+        session_rounds = SessionRound.objects.filter(
+            session__competition=self.competition,
+        ).order_by('session__start').select_related('session')
 
         elements = []
         by_session = self.request.GET.get('by_session', False)
@@ -410,7 +459,10 @@ class TargetListPdf(HeadedPdfView):
             if by_session:
                 title = "Target List - {0}".format(session_round.session.start.strftime('%A, %d %B %Y, %X'))
             else:
-                title = "Target List for {0} - {1}".format(session_round.shot_round, session_round.session.start.strftime('%A, %d %B %Y, %X'))
+                title = "Target List for {0} - {1}".format(
+                    session_round.shot_round,
+                    session_round.session.start.strftime('%A, %d %B %Y, %X'),
+                )
             header = self.Para(title, 'h2')
             elements.append(header)
             table = Table(target_list)
@@ -466,7 +518,11 @@ class ScoreSheetsPdf(HeadedPdfView):
             if self.competition.has_juniors and entry.age == 'J':
                 category = 'Junior ' + category
             return [
-                [self.Para(target, 'h2'), self.Para(entry.archer, 'h2'), self.Para(entry.team_name(short_form=False), 'h2')],
+                [
+                    self.Para(target, 'h2'),
+                    self.Para(entry.archer, 'h2'),
+                    self.Para(entry.team_name(short_form=False), 'h2'),
+                ],
                 [
                     None,
                     self.Para(category, 'h2'),
@@ -488,7 +544,10 @@ class ScoreSheetsPdf(HeadedPdfView):
             dozens = subround.arrows / 12
             extra = subround.arrows % 12
             total_rows = dozens + 2
-            scoring_labels = ['ET', 'S', '10+X', 'X', 'RT'] if session_round.shot_round.scoring_type == 'X' else ['ET', 'S', 'H', 'G', 'RT']
+            scoring_labels = (
+                ['ET', 'S', '10+X', 'X', 'RT'] if session_round.shot_round.scoring_type == 'X'
+                else ['ET', 'S', 'H', 'G', 'RT']
+            )
             table_data = [['J', subround_title] + [None] * 5 + ['ET'] + [None] * 6 + scoring_labels]
             table_data += [[None for i in range(self.total_cols)] for j in range(total_rows - 1)]
             if extra is 6:
@@ -514,7 +573,10 @@ class ScoreSheetsPdf(HeadedPdfView):
             score_sheet_elements += [totals_table, self.spacer]
 
         signing_table_widths = [0.7 * inch, 2 * inch]
-        signing_table = Table([[self.Para('Archer', 'h3'), None, None, self.Para('Scorer', 'h3'), '']], signing_table_widths + [0.5 * inch] + signing_table_widths)
+        signing_table = Table(
+            [[self.Para('Archer', 'h3'), None, None, self.Para('Scorer', 'h3'), '']],
+            signing_table_widths + [0.5 * inch] + signing_table_widths
+        )
         signing_table.setStyle(self.signing_table_style)
         score_sheet_elements += [self.spacer, signing_table]
 
@@ -628,10 +690,14 @@ class RunningSlipsPdf(ScoreSheetsPdf):
             entries_group, all_entries = all_entries[:6], all_entries[6:]
             for dozen in range(1, dozens + 1):
                 for entries in entries_group:
-                    table_data = [['Dozen {0}'.format(dozen)] + [None] * 6 + ['ET'] + [None] * 6 + ['ET', 'S'] + headings + ['RT' if dozen > 1 else 'Inits.']]
+                    table_data = [(
+                        ['Dozen {0}'.format(dozen)] + [None] * 6 + ['ET'] + [None] * 6 +
+                        ['ET', 'S'] + headings + ['RT' if dozen > 1 else 'Inits.']
+                    )]
                     for entry in entries:
                         table_data.append([entry[0]] + [None for i in range(self.total_cols - 1)])
-                    table = Table(table_data, [self.box_size] + self.col_widths[1:], (len(entries) + 1) * [self.box_size])
+                    table = Table(table_data,
+                        [self.box_size] + self.col_widths[1:], (len(entries) + 1) * [self.box_size])
                     table.setStyle(self.scores_table_style)
                     elements.append(KeepTogether(table))
                     elements += [self.spacer]
