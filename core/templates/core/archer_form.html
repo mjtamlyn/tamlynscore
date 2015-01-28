@@ -1,12 +1,21 @@
 {% extends 'base.html' %}
 
+{% block scripts %}
+<script src="{{ STATIC_URL }}lib/jquery/jquery-2.1.3.min.js"></script>
+<script type="text/javascript">
+    $(function() {
+        $('#id_name').focus();
+    });
+</script>
+{% endblock %}
+
 {% block content %}
-    <h2>{{ form.instance }}</h2>
+    <h2>{% if form.instance.name %}{{ form.instance }}{% else %}Add archer{% endif %}</h2>
     <form method="post">
         {% csrf_token %}
         <ul>
             {{ form.as_ul }}
-            <li><input type="submit" /></li>
+            <li><input type="submit" class="btn"></li>
         </ul>
     </form>
 {% endblock %}
