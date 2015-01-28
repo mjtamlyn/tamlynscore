@@ -89,7 +89,6 @@ class BaseResultMode(object):
         )
 
     def get_main_headers(self):
-        # TODO: handle novice configurations
         return ['Archer', 'Club', None]
 
     def label_for_round(self, round):
@@ -428,7 +427,6 @@ class Team(BaseResultMode):
         - repeat for each team type
         """
         clubs = {}
-        # TODO: handle cross-rounds?
         round = None
         for score in scores:
             if not leaderboard and not score.score:
@@ -541,7 +539,6 @@ class Team(BaseResultMode):
             return is_junior and is_non_compound
 
     def get_main_headers(self):
-        # TODO: handle novice configurations
         return ['Club']
 
     def label_for_round(self, round):
