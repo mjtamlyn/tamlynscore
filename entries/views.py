@@ -276,27 +276,34 @@ class TargetList(ListView):
             details['entries'] = sorted(details['entries'], key=lambda e: (
                 e.session_round.shot_round_id,
                 e.competition_entry.bowstyle.name,
+                e.competition_entry.club.short_name,
                 e.competition_entry.archer.gender,
                 e.competition_entry.age,
                 e.competition_entry.novice,
                 e.competition_entry.archer.name,
             ))
-            data = [{
-                'id': e.pk,
-                'name': e.competition_entry.archer.name,
-                'gender': e.competition_entry.archer.get_gender_display(),
-                'novice': e.competition_entry.get_novice_display(),
-                'age': e.competition_entry.get_age_display(),
-                'bowstyle': e.competition_entry.bowstyle.name,
-                'club': e.competition_entry.club.short_name,
-                'text': u'%s %s %s %s' % (
-                    e.competition_entry.archer,
-                    e.competition_entry.club,
-                    e.competition_entry.bowstyle,
-                    e.competition_entry.archer.get_gender_display(),
-                )
-            } for e in details['entries']]
+            data = [self.get_json_data(e) for e in details['entries']]
             details['entries_json'] = json.dumps(data)
+
+    def get_json_data(self, entry):
+        data = {
+            'id': entry.pk,
+            'name': entry.competition_entry.archer.name,
+            'gender': entry.competition_entry.archer.get_gender_display(),
+            'bowstyle': entry.competition_entry.bowstyle.name,
+            'club': entry.competition_entry.club.short_name,
+            'text': u'%s %s %s %s' % (
+                entry.competition_entry.archer,
+                entry.competition_entry.club,
+                entry.competition_entry.bowstyle,
+                entry.competition_entry.archer.get_gender_display(),
+            )
+        }
+        if self.competition.has_novices and entry.competition_entry.novice == 'N':
+            data['novice'] = entry.competition_entry.get_novice_display()
+        if self.competition.has_juniors and entry.competition_entry.age == 'J':
+            data['age'] = entry.competition_entry.get_age_display()
+        return data
 
     def get_context_data(self, **kwargs):
         context = super(TargetList, self).get_context_data(**kwargs)
