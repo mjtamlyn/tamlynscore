@@ -1,5 +1,9 @@
+import copy
+
+from django.core.cache import cache
+from django.core.urlresolvers import reverse
 from django.contrib.auth.decorators import login_required
-from django.views.generic import TemplateView, ListView, DetailView, UpdateView
+from django.views.generic import TemplateView, ListView, DetailView, UpdateView, CreateView
 
 from scoring.utils import class_view_decorator
 from scores.models import Score
@@ -32,6 +36,14 @@ class ClubUpdate(UpdateView):
 
 
 @class_view_decorator(login_required)
+class ClubCreate(CreateView):
+    model = Club
+
+    def get_success_url(self):
+        return self.request.GET.get('next') or super(ClubCreate, self).get_success_url()
+
+
+@class_view_decorator(login_required)
 class ArcherDetail(DetailView):
     model = Archer
 
@@ -57,3 +69,33 @@ class ArcherUpdate(UpdateView):
 
     def get_success_url(self):
         return self.request.GET.get('next') or self.request.path
+
+
+@class_view_decorator(login_required)
+class ArcherCreate(CreateView):
+    model = Archer
+
+    def get_initial(self):
+        initial = {}
+        cached = cache.get('archer-create')
+        if cached:
+            initial = cached
+        name = self.request.GET.get('name')
+        if name:
+            initial['name'] = name
+        return initial
+
+    def form_valid(self, form):
+        cache_data = copy.copy(form.cleaned_data)
+        del cache_data['name']
+        cache.set('archer-create', cache_data)
+        return super(ArcherCreate, self).form_valid(form)
+
+    def get_success_url(self):
+        competition = self.request.GET.get('competition')
+        if competition:
+            return reverse('entry_add', kwargs={
+                'slug': competition,
+                'archer_id': self.object.pk,
+            })
+        return self.object.club.get_absolute_url()

@@ -1,58 +1,58 @@
 {% extends 'base.html' %}
 
 {% block content %}
-<a href="{% url 'competition_detail' slug=competition.slug %}"><h1>{{ competition }}</h1></a>
+<header>
+    <a href="{% url 'competition_detail' slug=competition.slug %}"><h1>{{ competition }}</h1></a>
+</header>
 
-{% block competition_nav %}
-<div class="competition-section">
-    <div class="competition-nav">
-        {% with competition.result_modes.all as modes %}
-        <h2>Before the shoot</h2>
-        <ul>
-            <a href="{% url 'entry_list' slug=competition.slug %}"><li>Manage Entries</li></a>
-            <a href="{% url 'target_list' slug=competition.slug %}"><li>Target lists</li></a>
-            <a href="{% url 'score_sheets' slug=competition.slug %}"><li>Score sheets</li></a>
-        </ul>
-        <h2>On the day</h2>
-        <ul>
-            <a href="{% url 'registration' slug=competition.slug %}"><li>Registration</li></a>
-            <a href="{% url 'input_scores' slug=competition.slug %}"><li>Input scores</li></a>
-            <a href="{% url 'input_scores_mobile' slug=competition.slug %}"><li>Input scores (mobile view)</li></a>
-            {% for mode in modes %}
-                <a href="{% url 'new_leaderboard' slug=competition.slug mode=mode.mode format='html' %}"><li>Leaderboard {{ mode|lower }}</li></a>
-            {% endfor %}
-            {% if not modes %}
-                <a href="{% url 'leaderboard' slug=competition.slug %}"><li>Leaderboard (by session)</li></a>
-                <a href="{% url 'leaderboard_combined' slug=competition.slug %}"><li>Leaderboard (Combined)</li></a>
-                <a href="{% url 'leaderboard_combined_experienced' slug=competition.slug %}"><li>Leaderboard (Experienced)</li></a>
-                <a href="{% url 'leaderboard_combined_novice' slug=competition.slug %}"><li>Leaderboard (Novice)</li></a>
-                <a href="{% url 'leaderboard_teams' slug=competition.slug %}"><li>Leaderboard (Teams)</li></a>
-                <a href="{% url 'leaderboard_summary' slug=competition.slug %}"><li>Leaderboard (Summary)</li></a>
-            {% endif %}
-            <a href="{% url 'olympic_index' slug=competition.slug %}"><li>Head to heads panel</li></a>
-        </ul>
-        <h2>After the shoot</h2>
-        <ul>
-            {% for mode in modes %}
-            {% if not mode.leaderboard_only %}
-                <a href="{% url 'new_results' slug=competition.slug mode=mode.mode format='html' %}"><li>Results {{ mode|lower }}</li></a>
-            {% endif %}
-            {% endfor %}
-            <a href="{% url 'rankings_export' slug=competition.slug %}"><li>Rankings Export (CSV)</li></a>
-        </ul>
-        {% endwith %}
-    </div>
-    {% endblock %}
+<div class="row">
 
-    <div class="competition-content">
+    {% block competition_nav %}
+        <div class="competition-nav col1">
+            {% with competition.result_modes.all as modes %}
+            <ul class="link-list">
+                <li><p>Before the shoot</p></li>
+                <li><a href="{% url 'entry_list' slug=competition.slug %}">Manage Entries</a></li>
+                <li><a href="{% url 'target_list' slug=competition.slug %}">Target lists</a></li>
+                <li><a href="{% url 'score_sheets' slug=competition.slug %}">Score sheets</a></li>
+                <li><p>On the day</p></li>
+                <li><a href="{% url 'registration' slug=competition.slug %}">Registration</a></li>
+                <li><a href="{% url 'input_scores' slug=competition.slug %}">Input scores</a></li>
+                <li><a href="{% url 'input_scores_mobile' slug=competition.slug %}">Input scores (mobile view)</a></li>
+                {% for mode in modes %}
+                    <li><a href="{% url 'new_leaderboard' slug=competition.slug mode=mode.mode format='html' %}">Leaderboard {{ mode|lower }}</a></li>
+                {% endfor %}
+                {% if not modes %}
+                    <li><a href="{% url 'leaderboard' slug=competition.slug %}">Leaderboard (by session)</a></li>
+                    <li><a href="{% url 'leaderboard_combined' slug=competition.slug %}">Leaderboard (Combined)</a></li>
+                    <li><a href="{% url 'leaderboard_combined_experienced' slug=competition.slug %}">Leaderboard (Experienced)</a></li>
+                    <li><a href="{% url 'leaderboard_combined_novice' slug=competition.slug %}">Leaderboard (Novice)</a></li>
+                    <li><a href="{% url 'leaderboard_teams' slug=competition.slug %}">Leaderboard (Teams)</a></li>
+                    <li><a href="{% url 'leaderboard_summary' slug=competition.slug %}">Leaderboard (Summary)</a></li>
+                {% endif %}
+                <li><a href="{% url 'olympic_index' slug=competition.slug %}">Head to heads panel</a></li>
+
+                <li><p>After the shoot</p></li>
+                {% for mode in modes %}
+                {% if not mode.leaderboard_only %}
+                    <li><a href="{% url 'new_results' slug=competition.slug mode=mode.mode format='html' %}">Results {{ mode|lower }}</a></li>
+                {% endif %}
+                {% endfor %}
+                <li><a href="{% url 'rankings_export' slug=competition.slug %}">Rankings Export (CSV)</a></li>
+            </ul>
+            {% endwith %}
+        </div>
+        {% endblock %}
+
+    <div class="col5">
         {% block competition_content %}
         <div class="module">
-            <h4>About this competition</h4>
+            <h3>About this competition</h3>
             <dl>
                 <dt>Tournament date(s)</dt>
                 <dd>{{ competition.date }}{% if not competition.end_date == competition.date %} to {{ competition.end_date }}{% endif %}</dd>
                 <dt>Hosted by</dt>
-                <dd>{{ competition.tournament.host_club }}</dd>
+                <dd>{{ competition.tournament.host_club.name }}</dd>
                 <dt>Options</dt>
                 <dd>
                     <ul>
@@ -66,8 +66,6 @@
         </div>
         {% endblock %}
     </div>
-
-    <div class="clear"></div>
 </div>
 
 {% endblock %}

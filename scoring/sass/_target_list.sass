@@ -1,40 +1,34 @@
 .target-list
-  .intro
-    margin: 10px
+  span.unallocated
+    margin-left: 10px
+    color: $hlorange
+    font-weight: bold
+    cursor: help
 
-    .unallocated
-      margin-left: 10px
-      color: $hlorange
-      font-weight: bold
-      cursor: help
-
-    li
-      padding: 10px 0
-
-  .session
-    float: left
-    width: 350px
+  .detail
+    font-weight: bold
 
   .boss
-    padding: 5px 0
-    border-bottom: 1px solid $dark
+    margin: 10px 0
+    border-bottom: 1px solid $lightblue
 
-    .boss-number
-      float: left
+    .archer-block
+      margin-bottom: 0
+      +border-radius(0)
+      border-bottom: 0
 
-    ul
-      margin-left: 20px
+  .archer-block
 
-      li
-        height: 25px
+    .name
+      height: 28px
 
-.btn
-  font-family: $font-sans-serif
-  border-radius: 7px
-  background-image: -webkit-linear-gradient(darken($vlightblue, 10%), $vlightblue, darken($vlightblue, 10%))
-  font:
-    size: 14px
-  cursor: pointer
-  padding: 5px
-  text-align: center
-  -webkit-user-select: none
+    .bottom
+      height: 52px
+      overflow: auto
+
+    input
+      margin-top: -4px
+      outline: none
+
+  .select
+    cursor: pointer

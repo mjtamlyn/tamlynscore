@@ -1,178 +1,121 @@
+from django.core.cache import cache
+from django.db import transaction
 from django import forms
-from django.utils.safestring import mark_safe
 
-from core.models import Club, Archer, GENDER_CHOICES, NOVICE_CHOICES, AGE_CHOICES
-from entries.models import CompetitionEntry, SessionEntry
-
-GENDER_CHOICES = (('', ''),) + GENDER_CHOICES
-
-class ButtonWidget(forms.widgets.Select):
-    def render(self, name, value, attrs=None):
-        response = u"""<div class="buttons-widget" id="{name}-widget">
-                        <div class="select">
-                            {select}
-                        </div>
-                        """
-        for choice in self.choices:
-            if choice[0] == value:
-                klass = 'button selected'
-            else:
-                klass = 'button'
-            if choice[0]:
-                response += u"""<div class="{klass}" rel="{0}">
-                                {1}
-                            </div>""".format(klass=klass, *choice)
-        response += u'</div>'
-        select = super(ButtonWidget, self).render(name, value, attrs=attrs)
-        response = response.format(name=name, select=select)
-        return mark_safe(response)
+from core.models import Archer, Bowstyle, Club, NOVICE_CHOICES, AGE_CHOICES
+from .models import CompetitionEntry, SessionRound, SessionEntry
 
 
-class SelectWidget(forms.widgets.MultiWidget):
-    def __init__(self, attrs=None):
-        widgets = [forms.widgets.Select(attrs=attrs), forms.widgets.TextInput(attrs=attrs)]
-        super(SelectWidget, self).__init__(widgets, attrs)
-        self.choices = []
+class ArcherSearchForm(forms.Form):
+    query = forms.CharField()
 
-    def decompress(self, value):
-        return [value, value]
-
-    def _get_choices(self):
-        return self._choices
-    def _set_choices(self, value):
-        self.widgets[0].choices = value
-        self._choices = value
-    choices = property(_get_choices, _set_choices)
-
-    def render(self, name, value, attrs=None):
-        # Hacked from the default one to allow format_output to know about name
-        if self.is_localized:
-            for widget in self.widgets:
-                widget.is_localized = self.is_localized
-        # value is a list of values, each corresponding to a widget
-        # in self.widgets.
-        if not isinstance(value, list):
-            value = self.decompress(value)
-        output = []
-        final_attrs = self.build_attrs(attrs)
-        id_ = final_attrs.get('id', None)
-        for i, widget in enumerate(self.widgets):
-            try:
-                widget_value = value[i]
-            except IndexError:
-                widget_value = None
-            if id_:
-                final_attrs = dict(final_attrs, id='%s_%s' % (id_, i))
-            output.append(widget.render(name + '_%s' % i, widget_value, final_attrs))
-        return mark_safe(self.format_output(output, name))
-
-    def format_output(self, rendered_widgets, name):
-        output = u"""
-                <div class="select-widget" id="{name}-widget">
-                    <div class="select">
-                        {0}
-                    </div>
-                    {1}
-                    <div class="options-wrapper">
-                        <ul class="options"></ul>
-                    </div>
-                </div>
-        """.format(*rendered_widgets, name=name)
-        return mark_safe(output)
+    def get_archers(self):
+        # One day, do this with expressions and/or contrib.postgres. Please.
+        term = self.cleaned_data['query']
+        return Archer.objects.filter(club__name__isnull=False).extra(
+            select={
+                'similarity': 'similarity("core_archer"."name", %s)',
+                'club_similarity': 'similarity("core_club"."name", %s)',
+                'club_shortname_similarity': 'similarity("core_club"."short_name", %s)',
+            },
+            select_params=[term, term, term],
+            where=['"core_archer"."name" %% %s OR "core_club"."name" %% %s OR "core_club"."short_name" %% %s'],
+            params=[term, term, term],
+            order_by=['-similarity', '-club_similarity', '-club_shortname_similarity'],
+        )
 
 
-class JsonChoiceField(forms.ModelChoiceField):
-    def label_from_instance(self, obj):
-        return obj.json()
+class EntryCreateForm(forms.Form):
+    club = forms.ModelChoiceField(
+        queryset=Club.objects,
+        required=False,
+    )
+    update_club = forms.BooleanField(required=False)
+    bowstyle = forms.ModelChoiceField(
+        queryset=Bowstyle.objects,
+        required=False,
+    )
+    update_bowstyle = forms.BooleanField(required=False)
 
-    def to_python(self, value):
-        pk, name = value
-        if pk:
-            return super(JsonChoiceField, self).to_python(pk)
-        elif name:
-            return self.queryset.model(name=name)
-
-
-class SessionChoiceField(forms.ModelChoiceField):
-    widget = ButtonWidget
-
-    def __init__(self, session, *args, **kwargs):
-        qs = session.sessionround_set.select_related('shot_round')
-        super(SessionChoiceField, self).__init__(qs, *args, **kwargs)
-
-    def label_from_instance(self, obj):
-        return obj.shot_round
-
-
-class NewEntryForm(forms.ModelForm):
-    archer = JsonChoiceField(queryset=Archer.objects.select_related('bowstyle', 'club'), widget=SelectWidget(attrs={'placeholder': 'Add an archer...'}))
-    club = JsonChoiceField(queryset=Club.objects, widget=SelectWidget(attrs={'placeholder': 'Club'}))
-
-    gender = forms.ChoiceField(choices=GENDER_CHOICES, widget=ButtonWidget)
-    novice = forms.ChoiceField(choices=NOVICE_CHOICES, widget=ButtonWidget, initial='E')
-    age = forms.ChoiceField(choices=AGE_CHOICES, widget=ButtonWidget, initial='S')
-    gnas_no = forms.IntegerField(widget=forms.widgets.TextInput(attrs={'placeholder': 'GNAS number'}), required=False)
-
-    class Meta:
-        model = CompetitionEntry
-        exclude = ['competition', 'archer', 'club']
-        widgets = {
-            'bowstyle': ButtonWidget,
-            'novice': ButtonWidget,
-            'age': ButtonWidget,
-        }
-
-    def __init__(self, competition, *args, **kwargs):
-        super(NewEntryForm, self).__init__(*args, **kwargs)
+    def __init__(self, archer, competition, **kwargs):
+        super(EntryCreateForm, self).__init__(**kwargs)
+        self.archer = archer
         self.competition = competition
-        sessions = competition.sessions_with_rounds()
-        self.session_fields = {}
-        self.sessions_by_field = {}
-        for i in range(len(sessions)):
-            field = SessionChoiceField(sessions[i], required=False)
-            key = 'session-{0}'.format(i)
-            self.fields[key] = field
-            self.session_fields[key] = field
-            self.sessions_by_field[key] = sessions[i]
+        self.session_rounds = SessionRound.objects.filter(session__competition=competition)
+        self.fields['club'].label = 'Club (%s)' % self.archer.club
+        self.fields['bowstyle'].label = 'Bowstyle (%s)' % self.archer.bowstyle
+        if self.competition.has_novices:
+            self.fields['novice'] = forms.ChoiceField(
+                label='Experienced/Novice (%s)' % self.archer.get_novice_display(),
+                choices=(('', '---------'),) + NOVICE_CHOICES,
+                required=False,
+            )
+            self.fields['update_novice'] = forms.BooleanField(required=False)
+        if self.competition.has_juniors:
+            self.fields['age'] = forms.ChoiceField(
+                label='Age (%s)' % self.archer.get_age_display(),
+                choices=(('', '---------'),) + AGE_CHOICES,
+                required=False,
+            )
+            self.fields['update_age'] = forms.BooleanField(required=False)
+        if len(self.session_rounds) > 1:
+            self.fields['sessions'] = forms.ModelMultipleChoiceField(
+                queryset=self.session_rounds,
+                widget=forms.CheckboxSelectMultiple,
+            )
+            if cache.get('entry-form:sessions'):
+                self.initial['sessions'] = cache.get('entry-form:sessions')
 
-    def save(self, *args, **kwargs):
-        #TODO: deal with commit=False
-        club = self.cleaned_data['club']
-        if not club.pk:
-            club.short_name = club.name[:50]
-            club.clean()
-            club.save()
-        archer = self.cleaned_data['archer']
-        if not archer.pk:
-            archer.club = club
-            archer.bowstyle = self.cleaned_data['bowstyle']
-            archer.novice = self.cleaned_data['novice']
-            archer.gnas_no = self.cleaned_data['gnas_no']
-            archer.age = self.cleaned_data['age']
-            archer.gender = self.cleaned_data['gender']
-            archer.save()
-        entry = super(NewEntryForm, self).save(commit=False, *args, **kwargs)
-        entry.competition = self.competition
-        entry.archer = archer
-        entry.club = club
-        entry.save()
-        for field in self.session_fields:
-            if self.cleaned_data[field]:
-                session_round = self.cleaned_data[field]
-                session_entry = SessionEntry(competition_entry=entry, session_round=session_round)
-                session_entry.save()
-        return entry
+    def save(self):
+        with transaction.atomic():
+            self.update_archer()
+            entry = self.create_competition_entry()
+            self.create_session_entries(entry)
+        if len(self.session_rounds) > 1:
+            cache.set('entry-form:sessions', self.cleaned_data['sessions'])
 
-    def clean(self):
-        sessions = filter(None, [self.cleaned_data[field] for field in self.session_fields])
-        if not sessions:
-            raise forms.ValidationError('You should enter at least one session')
-        return self.cleaned_data
+    def update_archer(self):
+        changed = False
+        if self.cleaned_data['club'] and self.cleaned_data['update_club']:
+            self.archer.club = self.cleaned_data['club']
+            changed = True
+        if self.cleaned_data['bowstyle'] and self.cleaned_data['update_bowstyle']:
+            self.archer.bowstyle = self.cleaned_data['bowstyle']
+            changed = True
+        if self.competition.has_novices and self.cleaned_data['novice'] and self.cleaned_data['update_novice']:
+            self.archer.novice = self.cleaned_data['novice']
+            changed = True
+        if self.competition.has_juniors and self.cleaned_data['age'] and self.cleaned_data['update_age']:
+            self.archer.age = self.cleaned_data['age']
+            changed = True
+        if changed:
+            self.archer.save()
 
-    def sessions(self):
-        response = u''
-        for field in sorted(self.session_fields.keys()):
-            response += '<p>' + self.sessions_by_field[field].start.strftime('%Y-%m-%d %I:%M %p') + '</p>'
-            response += unicode(self[field])
-        return mark_safe(response)
+    def create_competition_entry(self):
+        club = self.cleaned_data['club'] or self.archer.club
+        bowstyle = self.cleaned_data['bowstyle'] or self.archer.bowstyle
+        extra_params = {}
+        if self.competition.has_novices:
+            extra_params['novice'] = self.cleaned_data['novice'] or self.archer.novice
+        if self.competition.has_juniors:
+            extra_params['age'] = self.cleaned_data['age'] or self.archer.age
+        return CompetitionEntry.objects.create(
+            competition=self.competition,
+            archer=self.archer,
+            club=club,
+            bowstyle=bowstyle,
+            **extra_params
+        )
 
+    def create_session_entries(self, entry):
+        if len(self.session_rounds) == 1:
+            SessionEntry.objects.create(
+                session_round=self.session_rounds[0],
+                competition_entry=entry,
+            )
+        else:
+            for session_round in self.cleaned_data['sessions']:
+                SessionEntry.objects.create(
+                    session_round=session_round,
+                    competition_entry=entry,
+                )

@@ -1,13 +1,54 @@
 {% extends 'base.html' %}
 
 {% block content %}
-<h1>Tournaments</h1>
+<header>
+    <h1>Tournaments</h1>
+</header>
 
-<ul>
-{% for competition in object_list %}
-<li><a href="{% url 'competition_detail' slug=competition.slug %}">{{ competition }}</a></li>
-{% endfor %}
-</ul>
+{% if current %}
+<div class="row">
+    <div class="col6">
+        <h3>Tournaments in progress</h3>
+        <ul class="link-list">
+            {% for competition in current %}
+            <li>
+            <a href="{% url 'competition_detail' slug=competition.slug %}">{{ competition }}</a>
+            </li>
+            {% endfor %}
+        </ul>
+    </div>
+</div>
+{% endif %}
+
+<div class="row">
+    <div class="col3">
+        <h3>Upcoming tournaments</h3>
+        <ul class="link-list">
+            {% for competition in upcoming %}
+            <li>
+            <a href="{% url 'competition_detail' slug=competition.slug %}">{{ competition }}</a>
+            </li>
+            {% empty %}
+            <li>
+                <p>No upcoming tournaments.</p>
+            </li>
+            {% endfor %}
+        </ul>
+    </div>
+
+    {% if past %}
+    <div class="col3">
+        <h3>Completed tournaments</h3>
+        <ul class="link-list">
+            {% for competition in past %}
+            <li>
+            <a href="{% url 'competition_detail' slug=competition.slug %}">{{ competition }}</a>
+            </li>
+            {% endfor %}
+        </ul>
+    </div>
+    {% endif %}
+</div>
 
 {% endblock %}
 

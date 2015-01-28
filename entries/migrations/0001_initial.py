@@ -1,202 +1,172 @@
-# encoding: utf-8
-import datetime
-from south.db import db
-from south.v2 import SchemaMigration
-from django.db import models
+# -*- coding: utf-8 -*-
+from __future__ import unicode_literals
 
-class Migration(SchemaMigration):
-
-    def forwards(self, orm):
-        
-        # Adding model 'Tournament'
-        db.create_table('entries_tournament', (
-            ('id', self.gf('django.db.models.fields.AutoField')(primary_key=True)),
-            ('full_name', self.gf('django.db.models.fields.CharField')(unique=True, max_length=300)),
-            ('short_name', self.gf('django.db.models.fields.CharField')(max_length=20)),
-            ('host_club', self.gf('django.db.models.fields.related.ForeignKey')(to=orm['core.Club'])),
-        ))
-        db.send_create_signal('entries', ['Tournament'])
-
-        # Adding model 'Competition'
-        db.create_table('entries_competition', (
-            ('id', self.gf('django.db.models.fields.AutoField')(primary_key=True)),
-            ('tournament', self.gf('django.db.models.fields.related.ForeignKey')(to=orm['entries.Tournament'])),
-            ('date', self.gf('django.db.models.fields.DateField')()),
-            ('end_date', self.gf('django.db.models.fields.DateField')(null=True, blank=True)),
-            ('slug', self.gf('django.db.models.fields.SlugField')(unique=True, max_length=50, db_index=True)),
-            ('created', self.gf('django.db.models.fields.DateTimeField')(auto_now_add=True, blank=True)),
-            ('modified', self.gf('django.db.models.fields.DateTimeField')(auto_now=True, blank=True)),
-        ))
-        db.send_create_signal('entries', ['Competition'])
-
-        # Adding unique constraint on 'Competition', fields ['date', 'tournament']
-        db.create_unique('entries_competition', ['date', 'tournament_id'])
-
-        # Adding model 'Session'
-        db.create_table('entries_session', (
-            ('id', self.gf('django.db.models.fields.AutoField')(primary_key=True)),
-            ('competition', self.gf('django.db.models.fields.related.ForeignKey')(to=orm['entries.Competition'])),
-            ('start', self.gf('django.db.models.fields.DateTimeField')()),
-            ('scoring_system', self.gf('django.db.models.fields.CharField')(max_length=1)),
-        ))
-        db.send_create_signal('entries', ['Session'])
-
-        # Adding model 'SessionRound'
-        db.create_table('entries_sessionround', (
-            ('id', self.gf('django.db.models.fields.AutoField')(primary_key=True)),
-            ('session', self.gf('django.db.models.fields.related.ForeignKey')(to=orm['entries.Session'])),
-            ('shot_round', self.gf('django.db.models.fields.related.ForeignKey')(to=orm['core.Round'])),
-        ))
-        db.send_create_signal('entries', ['SessionRound'])
-
-        # Adding model 'CompetitionEntry'
-        db.create_table('entries_competitionentry', (
-            ('id', self.gf('django.db.models.fields.AutoField')(primary_key=True)),
-            ('competition', self.gf('django.db.models.fields.related.ForeignKey')(to=orm['entries.Competition'])),
-            ('archer', self.gf('django.db.models.fields.related.ForeignKey')(to=orm['core.Archer'])),
-            ('club', self.gf('django.db.models.fields.related.ForeignKey')(to=orm['core.Club'])),
-            ('bowstyle', self.gf('django.db.models.fields.related.ForeignKey')(to=orm['core.Bowstyle'])),
-            ('age', self.gf('django.db.models.fields.CharField')(max_length=1)),
-            ('novice', self.gf('django.db.models.fields.BooleanField')(default=False)),
-        ))
-        db.send_create_signal('entries', ['CompetitionEntry'])
-
-        # Adding model 'SessionEntry'
-        db.create_table('entries_sessionentry', (
-            ('id', self.gf('django.db.models.fields.AutoField')(primary_key=True)),
-            ('competition_entry', self.gf('django.db.models.fields.related.ForeignKey')(to=orm['entries.CompetitionEntry'])),
-            ('session_round', self.gf('django.db.models.fields.related.ForeignKey')(to=orm['entries.SessionRound'])),
-        ))
-        db.send_create_signal('entries', ['SessionEntry'])
-
-        # Adding model 'TargetAllocation'
-        db.create_table('entries_targetallocation', (
-            ('id', self.gf('django.db.models.fields.AutoField')(primary_key=True)),
-            ('session_entry', self.gf('django.db.models.fields.related.ForeignKey')(to=orm['entries.SessionEntry'])),
-            ('boss', self.gf('django.db.models.fields.PositiveIntegerField')()),
-            ('target', self.gf('django.db.models.fields.CharField')(max_length=1)),
-        ))
-        db.send_create_signal('entries', ['TargetAllocation'])
+from django.db import models, migrations
 
 
-    def backwards(self, orm):
-        
-        # Removing unique constraint on 'Competition', fields ['date', 'tournament']
-        db.delete_unique('entries_competition', ['date', 'tournament_id'])
+class Migration(migrations.Migration):
 
-        # Deleting model 'Tournament'
-        db.delete_table('entries_tournament')
+    dependencies = [
+        ('core', '0001_initial'),
+    ]
 
-        # Deleting model 'Competition'
-        db.delete_table('entries_competition')
-
-        # Deleting model 'Session'
-        db.delete_table('entries_session')
-
-        # Deleting model 'SessionRound'
-        db.delete_table('entries_sessionround')
-
-        # Deleting model 'CompetitionEntry'
-        db.delete_table('entries_competitionentry')
-
-        # Deleting model 'SessionEntry'
-        db.delete_table('entries_sessionentry')
-
-        # Deleting model 'TargetAllocation'
-        db.delete_table('entries_targetallocation')
-
-
-    models = {
-        'core.archer': {
-            'Meta': {'object_name': 'Archer'},
-            'age': ('django.db.models.fields.CharField', [], {'max_length': '1'}),
-            'bowstyle': ('django.db.models.fields.related.ForeignKey', [], {'to': "orm['core.Bowstyle']"}),
-            'club': ('django.db.models.fields.related.ForeignKey', [], {'to': "orm['core.Club']"}),
-            'gender': ('django.db.models.fields.CharField', [], {'max_length': '1'}),
-            'id': ('django.db.models.fields.AutoField', [], {'primary_key': 'True'}),
-            'name': ('django.db.models.fields.CharField', [], {'max_length': '200'}),
-            'novice': ('django.db.models.fields.BooleanField', [], {'default': 'False'})
-        },
-        'core.bowstyle': {
-            'Meta': {'object_name': 'Bowstyle'},
-            'id': ('django.db.models.fields.AutoField', [], {'primary_key': 'True'}),
-            'name': ('django.db.models.fields.CharField', [], {'unique': 'True', 'max_length': '50'})
-        },
-        'core.club': {
-            'Meta': {'object_name': 'Club'},
-            'id': ('django.db.models.fields.AutoField', [], {'primary_key': 'True'}),
-            'name': ('django.db.models.fields.CharField', [], {'unique': 'True', 'max_length': '500'}),
-            'short_name': ('django.db.models.fields.CharField', [], {'unique': 'True', 'max_length': '50'}),
-            'slug': ('django.db.models.fields.SlugField', [], {'unique': 'True', 'max_length': '50', 'db_index': 'True'})
-        },
-        'core.round': {
-            'Meta': {'object_name': 'Round'},
-            'id': ('django.db.models.fields.AutoField', [], {'primary_key': 'True'}),
-            'name': ('django.db.models.fields.CharField', [], {'unique': 'True', 'max_length': '100'}),
-            'scoring_type': ('django.db.models.fields.CharField', [], {'max_length': '1'}),
-            'subrounds': ('django.db.models.fields.related.ManyToManyField', [], {'to': "orm['core.Subround']", 'symmetrical': 'False'})
-        },
-        'core.subround': {
-            'Meta': {'object_name': 'Subround'},
-            'arrows': ('django.db.models.fields.PositiveIntegerField', [], {}),
-            'distance': ('django.db.models.fields.PositiveIntegerField', [], {}),
-            'id': ('django.db.models.fields.AutoField', [], {'primary_key': 'True'}),
-            'target_face': ('django.db.models.fields.PositiveIntegerField', [], {}),
-            'unit': ('django.db.models.fields.CharField', [], {'max_length': '1'})
-        },
-        'entries.competition': {
-            'Meta': {'unique_together': "(('date', 'tournament'),)", 'object_name': 'Competition'},
-            'created': ('django.db.models.fields.DateTimeField', [], {'auto_now_add': 'True', 'blank': 'True'}),
-            'date': ('django.db.models.fields.DateField', [], {}),
-            'end_date': ('django.db.models.fields.DateField', [], {'null': 'True', 'blank': 'True'}),
-            'id': ('django.db.models.fields.AutoField', [], {'primary_key': 'True'}),
-            'modified': ('django.db.models.fields.DateTimeField', [], {'auto_now': 'True', 'blank': 'True'}),
-            'slug': ('django.db.models.fields.SlugField', [], {'unique': 'True', 'max_length': '50', 'db_index': 'True'}),
-            'tournament': ('django.db.models.fields.related.ForeignKey', [], {'to': "orm['entries.Tournament']"})
-        },
-        'entries.competitionentry': {
-            'Meta': {'object_name': 'CompetitionEntry'},
-            'age': ('django.db.models.fields.CharField', [], {'max_length': '1'}),
-            'archer': ('django.db.models.fields.related.ForeignKey', [], {'to': "orm['core.Archer']"}),
-            'bowstyle': ('django.db.models.fields.related.ForeignKey', [], {'to': "orm['core.Bowstyle']"}),
-            'club': ('django.db.models.fields.related.ForeignKey', [], {'to': "orm['core.Club']"}),
-            'competition': ('django.db.models.fields.related.ForeignKey', [], {'to': "orm['entries.Competition']"}),
-            'id': ('django.db.models.fields.AutoField', [], {'primary_key': 'True'}),
-            'novice': ('django.db.models.fields.BooleanField', [], {'default': 'False'})
-        },
-        'entries.session': {
-            'Meta': {'object_name': 'Session'},
-            'competition': ('django.db.models.fields.related.ForeignKey', [], {'to': "orm['entries.Competition']"}),
-            'id': ('django.db.models.fields.AutoField', [], {'primary_key': 'True'}),
-            'scoring_system': ('django.db.models.fields.CharField', [], {'max_length': '1'}),
-            'start': ('django.db.models.fields.DateTimeField', [], {})
-        },
-        'entries.sessionentry': {
-            'Meta': {'object_name': 'SessionEntry'},
-            'competition_entry': ('django.db.models.fields.related.ForeignKey', [], {'to': "orm['entries.CompetitionEntry']"}),
-            'id': ('django.db.models.fields.AutoField', [], {'primary_key': 'True'}),
-            'session_round': ('django.db.models.fields.related.ForeignKey', [], {'to': "orm['entries.SessionRound']"})
-        },
-        'entries.sessionround': {
-            'Meta': {'object_name': 'SessionRound'},
-            'id': ('django.db.models.fields.AutoField', [], {'primary_key': 'True'}),
-            'session': ('django.db.models.fields.related.ForeignKey', [], {'to': "orm['entries.Session']"}),
-            'shot_round': ('django.db.models.fields.related.ForeignKey', [], {'to': "orm['core.Round']"})
-        },
-        'entries.targetallocation': {
-            'Meta': {'object_name': 'TargetAllocation'},
-            'boss': ('django.db.models.fields.PositiveIntegerField', [], {}),
-            'id': ('django.db.models.fields.AutoField', [], {'primary_key': 'True'}),
-            'session_entry': ('django.db.models.fields.related.ForeignKey', [], {'to': "orm['entries.SessionEntry']"}),
-            'target': ('django.db.models.fields.CharField', [], {'max_length': '1'})
-        },
-        'entries.tournament': {
-            'Meta': {'object_name': 'Tournament'},
-            'full_name': ('django.db.models.fields.CharField', [], {'unique': 'True', 'max_length': '300'}),
-            'host_club': ('django.db.models.fields.related.ForeignKey', [], {'to': "orm['core.Club']"}),
-            'id': ('django.db.models.fields.AutoField', [], {'primary_key': 'True'}),
-            'short_name': ('django.db.models.fields.CharField', [], {'max_length': '20'})
-        }
-    }
-
-    complete_apps = ['entries']
+    operations = [
+        migrations.CreateModel(
+            name='Competition',
+            fields=[
+                ('id', models.AutoField(verbose_name='ID', serialize=False, auto_created=True, primary_key=True)),
+                ('date', models.DateField()),
+                ('end_date', models.DateField(null=True, blank=True)),
+                ('slug', models.SlugField(unique=True, editable=False)),
+                ('created', models.DateTimeField(auto_now_add=True)),
+                ('modified', models.DateTimeField(auto_now=True)),
+                ('has_novices', models.BooleanField(default=False)),
+                ('has_juniors', models.BooleanField(default=False)),
+                ('has_teams', models.BooleanField(default=False)),
+                ('novices_in_experienced_teams', models.BooleanField(default=False)),
+                ('exclude_later_shoots', models.BooleanField(default=False, help_text=b'Only the first session can count for results')),
+                ('strict_b_teams', models.BooleanField(default=False, help_text=b'e.g. BUTC')),
+                ('strict_c_teams', models.BooleanField(default=False, help_text=b'e.g. BUTC')),
+                ('allow_incomplete_teams', models.BooleanField(default=True)),
+                ('team_size', models.PositiveIntegerField(default=4)),
+                ('novice_team_size', models.PositiveIntegerField(default=3)),
+                ('compound_team_size', models.PositiveIntegerField(default=None, null=True, blank=True)),
+                ('junior_team_size', models.PositiveIntegerField(default=None, null=True, blank=True)),
+                ('force_mixed_teams', models.BooleanField(default=False)),
+                ('combine_rounds_for_team_scores', models.BooleanField(default=False)),
+            ],
+            options={
+            },
+            bases=(models.Model,),
+        ),
+        migrations.CreateModel(
+            name='CompetitionEntry',
+            fields=[
+                ('id', models.AutoField(verbose_name='ID', serialize=False, auto_created=True, primary_key=True)),
+                ('age', models.CharField(default=b'S', max_length=1, choices=[(b'J', b'Junior'), (b'S', b'Senior')])),
+                ('novice', models.CharField(default=b'E', max_length=1, choices=[(b'N', b'Novice'), (b'E', b'Experienced')])),
+                ('guest', models.BooleanField(default=False)),
+                ('b_team', models.BooleanField(default=False)),
+                ('c_team', models.BooleanField(default=False)),
+                ('archer', models.ForeignKey(to='core.Archer')),
+                ('bowstyle', models.ForeignKey(to='core.Bowstyle')),
+                ('club', models.ForeignKey(to='core.Club')),
+                ('competition', models.ForeignKey(to='entries.Competition')),
+            ],
+            options={
+                'verbose_name_plural': 'competition entries',
+            },
+            bases=(models.Model,),
+        ),
+        migrations.CreateModel(
+            name='ResultsMode',
+            fields=[
+                ('id', models.AutoField(verbose_name='ID', serialize=False, auto_created=True, primary_key=True)),
+                ('mode', models.CharField(max_length=31, choices=[(b'by-session', b'By session'), (b'by-round', b'By round'), (b'by-round-progressional', b'By round (progressional)'), (b'double-round', b'Double round'), (b'seedings', b'Seedings'), (b'team', b'Teams'), (b'weekend', b'Weekend (Masters style)')])),
+                ('leaderboard_only', models.BooleanField(default=False)),
+                ('competition', models.ForeignKey(related_name='result_modes', to='entries.Competition')),
+            ],
+            options={
+            },
+            bases=(models.Model,),
+        ),
+        migrations.CreateModel(
+            name='Session',
+            fields=[
+                ('id', models.AutoField(verbose_name='ID', serialize=False, auto_created=True, primary_key=True)),
+                ('start', models.DateTimeField()),
+                ('scoring_system', models.CharField(max_length=1, choices=[(b'F', b'Full running slips'), (b'D', b'Dozen running slips'), (b'T', b'Totals only')])),
+                ('archers_per_target', models.IntegerField()),
+                ('arrows_entered_per_end', models.IntegerField(default=12)),
+                ('competition', models.ForeignKey(to='entries.Competition')),
+            ],
+            options={
+            },
+            bases=(models.Model,),
+        ),
+        migrations.CreateModel(
+            name='SessionEntry',
+            fields=[
+                ('id', models.AutoField(verbose_name='ID', serialize=False, auto_created=True, primary_key=True)),
+                ('present', models.BooleanField(default=False)),
+                ('index', models.PositiveIntegerField(default=1)),
+                ('competition_entry', models.ForeignKey(to='entries.CompetitionEntry')),
+            ],
+            options={
+                'verbose_name_plural': 'session entries',
+            },
+            bases=(models.Model,),
+        ),
+        migrations.CreateModel(
+            name='SessionRound',
+            fields=[
+                ('id', models.AutoField(verbose_name='ID', serialize=False, auto_created=True, primary_key=True)),
+                ('session', models.ForeignKey(to='entries.Session')),
+                ('shot_round', models.ForeignKey(to='core.Round')),
+            ],
+            options={
+            },
+            bases=(models.Model,),
+        ),
+        migrations.CreateModel(
+            name='Sponsor',
+            fields=[
+                ('id', models.AutoField(verbose_name='ID', serialize=False, auto_created=True, primary_key=True)),
+                ('name', models.CharField(max_length=200)),
+                ('logo', models.ImageField(upload_to=b'sponsors')),
+            ],
+            options={
+            },
+            bases=(models.Model,),
+        ),
+        migrations.CreateModel(
+            name='TargetAllocation',
+            fields=[
+                ('id', models.AutoField(verbose_name='ID', serialize=False, auto_created=True, primary_key=True)),
+                ('boss', models.PositiveIntegerField()),
+                ('target', models.CharField(max_length=1)),
+                ('session_entry', models.OneToOneField(to='entries.SessionEntry')),
+            ],
+            options={
+            },
+            bases=(models.Model,),
+        ),
+        migrations.CreateModel(
+            name='Tournament',
+            fields=[
+                ('id', models.AutoField(verbose_name='ID', serialize=False, auto_created=True, primary_key=True)),
+                ('full_name', models.CharField(unique=True, max_length=300)),
+                ('short_name', models.CharField(max_length=20)),
+                ('host_club', models.ForeignKey(to='core.Club')),
+            ],
+            options={
+            },
+            bases=(models.Model,),
+        ),
+        migrations.AddField(
+            model_name='sessionentry',
+            name='session_round',
+            field=models.ForeignKey(to='entries.SessionRound'),
+            preserve_default=True,
+        ),
+        migrations.AlterUniqueTogether(
+            name='resultsmode',
+            unique_together=set([('competition', 'mode')]),
+        ),
+        migrations.AddField(
+            model_name='competition',
+            name='sponsors',
+            field=models.ManyToManyField(to='entries.Sponsor', blank=True),
+            preserve_default=True,
+        ),
+        migrations.AddField(
+            model_name='competition',
+            name='tournament',
+            field=models.ForeignKey(to='entries.Tournament'),
+            preserve_default=True,
+        ),
+        migrations.AlterUniqueTogether(
+            name='competition',
+            unique_together=set([('date', 'tournament')]),
+        ),
+    ]
