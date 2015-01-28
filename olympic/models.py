@@ -250,7 +250,7 @@ class Result(models.Model):
 
     total = models.PositiveIntegerField()
     arrow_total = models.PositiveIntegerField(default=0)
-    win = models.BooleanField()
+    win = models.BooleanField(default=False)
     dns = models.BooleanField(default=False)
     win_by_forfeit = models.BooleanField(default=False)
 

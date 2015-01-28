@@ -1,221 +1,76 @@
 {% extends 'entries/competition_detail.html' %}
 
-{% block scripts %}
-<script src="{{ STATIC_URL }}js/mootools-core-1.3.js"></script>
-<script src="{{ STATIC_URL }}js/competition_entries.js"></script>
-<script>
-Elements.from = function(text, excludeScripts){
-	if (excludeScripts || excludeScripts == null) text = text.stripScripts();
-
-	var container, match = text.match(/^\s*<(t[dhr]|tbody|tfoot|thead)/i);
-
-	if (match){
-		container = new Element('table');
-		var tag = match[1].toLowerCase();
-		if (['td', 'th', 'tr'].contains(tag)){
-			container = new Element('tbody').inject(container);
-			if (tag != 'tr') container = new Element('tr').inject(container);
-		}
-	}
-
-	return (container || new Element('div')).set('html', text).getChildren();
-};
-</script>
-<script>
-    window.addEvent('domready', function () {
-        var archer, club, bowstyle, gender, age, novice, gnas_no, sessions;
-        sessions = [];
-        var reset = function () {
-            club.reset();
-            bowstyle.reset();
-            gender.reset();
-            age.reset();
-            novice.reset();
-            for (var i=0; i < sessions.length; i++) {
-                sessions[i].reset();
-            }
-            gnas_no.set('value', '');
-            $$('.show-more-details').removeClass('selected');
-            $$('.more-details').removeClass('shown');
-            if ($('id_b_team')) {
-                $('id_b_team').set('checked', '');
-            }
-            if ($('id_c_team')) {
-                $('id_c_team').set('checked', '');
-            }
-        };
-        var fullReset = function () {
-            reset();
-            $$('.archer-details').removeClass('shown');
-            archer.reset();
-        };
-        archer = new SelectWidget({
-            widget: $('archer-widget'),
-            blank: 'New Archer',
-            callback: function (widget) {
-                reset();
-                $$('.archer-details').addClass('shown');
-                if (widget.is_new) {
-                    $$('.show-more-details').fireEvent('click');
-                } else {
-                    club.setValue(widget.selectedObject.club);
-                    bowstyle.setValue(widget.selectedObject.bowstyle);
-                    gender.setValue(widget.selectedObject.gender);
-                    age.setValue(widget.selectedObject.age);
-                    novice.setValue(widget.selectedObject.novice);
-                    gnas_no.set('value', widget.selectedObject.gnas_no);
-                }
-            }
-        });
-        club = new SelectWidget({
-            widget: $('club-widget'),
-            blank: 'New Club'
-        });
-        bowstyle = new ButtonWidget($('bowstyle-widget'));
-        gender = new ButtonWidget($('gender-widget'));
-        age = new ButtonWidget($('age-widget'));
-        novice = new ButtonWidget($('novice-widget'));
-        for (var i=0; i < 10; i++) {
-            var field = $('session-' + i + '-widget');
-            if (field) {
-                sessions.push(new ButtonWidget(field));
-            }
-        }
-        gnas_no = $('id_gnas_no');
-        $$('.show-more-details').addEvent('click', function () {
-            $$('.more-details').toggleClass('shown');
-            this.toggleClass('selected');
-        });
-
-        var deleteRow = function () {
-            data = {
-                'pk': this.get('rel'),
-                'csrfmiddlewaretoken': $$('input[name=csrfmiddlewaretoken]')[0].value
-            };
-            var request = new Request({
-                data: data,
-                method: 'delete',
-                onSuccess: function () {
-                    tr = this.getParent('tr');
-                    tr.getNext('tr').destroy();
-                    tr.destroy();
-                }.bind(this)
-            });
-            request.send();
-        };
-
-        $$('.save').addEvent('click', function () {
-            data = {}
-            $$('.new-entry-form input').each(function (item) {
-                data[item.name] = item.value;
-            });
-            $$('.new-entry-form select').each(function (item) {
-                data[item.name] = item.value;
-            });
-            var request = new Request({
-                data: data,
-                onSuccess: function (response) {
-                    fullReset();
-                    var row = Elements.from(response);
-                    var table = $$('.entries-table tbody');
-                    var rows = [];
-                    table.getElements('tr').each(function (tr) {
-                        rows.push(tr.dispose());
-                    });
-                    table.adopt(row);
-                    row[0].getLast('td').addEvent('click', deleteRow);
-                    rows.each(function (row) {
-                        table.adopt(row);
-                    });
-                },
-                onFailure: function (response) {
-                    console.log(JSON.decode(response.response));
-                }
-            });
-            request.send();
-        });
-
-        $$('td:last-child').addEvent('click', deleteRow);
-    });
-</script>
-{% endblock %}
+{% block page_id %}entry-list{% endblock %}
 
 {% block competition_content %}
+<div class="row">
+    <div class="col2">
+        <p>
+            <a href="{% url 'archer_search' slug=competition.slug %}" class="btn">Add entry</a>
+        </p>
+    </div>
+    <div class="col4">
+        <h3>Stats</h3>
+        <div class="row">
+            {% for session in stats %}
+            <div class="col2">
+            <strong>{{ session.session.start }}</strong><br>
+            <span class="pill">{{ session.total_entries }} entr{{ session.total_entries|pluralize:"y,ies" }}</span><br>
+            {% for sr in session.session_rounds %}
+                {{ sr.session_round.shot_round }} <span class="pill">{{ sr.total_entries }} entr{{ sr.total_entries|pluralize:"y,ies" }}</span><br>
+                {% if sr.total_entries %}
+                    {% for bowstyle, count in sr.bowstyles %}
+                    <span class="pill {{ bowstyle|slugify }}">{{ count }} {{ bowstyle }}</span>
+                    {% endfor %}<br>
+                    {% for gender, count in sr.genders %}
+                    <span class="pill {{ gender|slugify }}">{{ count }} {{ gender }}</span>
+                    {% endfor %}<br>
+                    {% if competition.has_novices %}
+                    <span class="pill novice">{{ sr.novice_count }} Novice</span><br>
+                    {% endif %}
+                    {% if competition.has_juniors %}
+                    <span class="pill junior">{{ sr.junior_count }} Junior</span><br>
+                    {% endif %}
+                {% endif %}
+            {% endfor %}
+            </div>
+            {% endfor %}
+        </div>
+    </div>
+</div>
+<div class="row">
+    <div class="col6">
+        <h3>Existing entries</h3>
 
-<div class="competition-entries">
-    <div class="top">
-
-        <div class="new-entry module">
-            <h4>New Entry</h4>
-            <div class="new-entry-form">
-                {% csrf_token %}
-                {{ form.archer }}
-                <div class="archer-details">
-                    {{ form.sessions }}
-                    {{ form.bowstyle }}
-
-                    <div class="show-more-details button">
-                        More options <div class="pointer">&raquo;</div>
-                    </div>
-                    <div class="button save">
-                        Save
-                    </div>
-                    <div class="clear"></div>
-
-                    <div class="more-details">
-                        {{ form.club }}
-                        {{ form.gnas_no }}
-                        {{ form.novice }}
-                        {{ form.age }}
-                        {{ form.gender }}
-                        <div>
-                        {% if competition.strict_b_teams %}
-                            {{ form.b_team.label }} {{ form.b_team }}
+        <div class="row">
+        {% for entry in object_list %}
+        <div class="col2">
+            <div class="archer-block">
+                <div class="name">
+                    <p>{{ entry.archer }}</p>
+                </div>
+                <div class="bottom">
+                    <p>
+                        {{ entry.team_name }}
+                    </p>
+                    {% for session in entry.sessionentry_set.all %}
+                    <p>{{ session.session_round.session.start|date:"j/n fa" }} - {{ session.session_round.shot_round }}</p>
+                    {% endfor %}
+                    <p>
+                        <span class="pill bowstyle {{ entry.bowstyle|slugify }}">{{ entry.bowstyle }}</span>
+                        <span class="pill gender {{ entry.archer.get_gender_display|lower }}">{{ entry.archer.get_gender_display }}</span>
+                        {% if competition.has_novices and entry.novice == "N" %}
+                        <span class="pill novice">{{ entry.get_novice_display }}</span>
                         {% endif %}
-                        </div>
-                        <div>
-                        {% if competition.strict_c_teams %}
-                            {{ form.c_team.label }} {{ form.c_team }}
+                        {% if competition.has_juniors and entry.age == "J" %}
+                        <span class="pill junior">{{ entry.get_age_display }}</span>
                         {% endif %}
-                        </div>
-                        <div class="button save">
-                            Save
-                        </div>
-                        <div class="clear"></div>
-                    </div>
+                    </p>
                 </div>
             </div>
         </div>
-
-        <div class="stats module">
-            <h4>Entries Summary</h4>
-            <ul>
-                {% for stat, value in stats %}
-                <li>{{ stat }}: {{ value }}</li>
-                {% endfor %}
-            </ul>
+        {% endfor %}
         </div>
-        <div class="clear"></div>
-    </div>
-
-    <div class="entries-table module">
-        <h4>Existing entries</h4>
-        <table>
-            <thead>
-                <th colspan="4">Archer</th>
-                {% for session in competition.sessions_with_rounds %}
-                <th>{{ session.start|date:"l j/n H:i" }}</th>
-                {% endfor %}
-            </thead>
-            {% regroup object_list by competition_entry as entries %}
-            {% for group in entries %}
-            {% with group.grouper as entry %}
-            {% with group.list as rounds_entered %}
-            {% include 'includes/entry_row.html' %}
-            {% endwith %}
-            {% endwith %}
-            {% endfor %}
-        </table>
     </div>
 </div>
 

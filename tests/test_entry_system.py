@@ -1,150 +1,412 @@
-import datetime
-
+from django.contrib.auth.models import AnonymousUser
+from django.core.urlresolvers import reverse, resolve
 from django.test import TestCase, RequestFactory
-from django.utils import timezone
 
-from core import models as core_models
-from entries.forms import NewEntryForm
-from entries import models as entries_models
+from core.models import Archer
+from entries.forms import ArcherSearchForm, EntryCreateForm
+from entries.models import CompetitionEntry
 from entries.views import EntryList
 
 from . import factories
 
 
-class TestNewEntryForm(TestCase):
-    def test_session_fields_exist(self):
-        session_round = factories.SessionRoundFactory.create()
-        competition = session_round.session.competition
-        form = NewEntryForm(competition=competition)
-        self.assertEqual(len(form.session_fields), 1)
-        self.assertSequenceEqual(form.fields['session-0'].queryset, [session_round])
+class LoggedInRequestFactory(RequestFactory):
 
-    def test_session_fields_grouped_correctly(self):
-        start = timezone.now()
-        session_round = factories.SessionRoundFactory.create(session__start=start)
-        competition = session_round.session.competition
-        session_round_2 = factories.SessionRoundFactory.create(session__competition=competition, session__start=start + datetime.timedelta(hours=1))
-        session_round_3 = factories.SessionRoundFactory.create(session=session_round.session)
-        form = NewEntryForm(competition=competition)
-        self.assertEqual(len(form.session_fields), 2)
-        self.assertSequenceEqual(form.fields['session-0'].queryset, [session_round, session_round_3])
-        self.assertSequenceEqual(form.fields['session-1'].queryset, [session_round_2])
+    def __init__(self, user, **kwargs):
+        self.user = user
+        return super(LoggedInRequestFactory, self).__init__(**kwargs)
 
-    def test_basic_data_validation(self):
-        session_round = factories.SessionRoundFactory.create()
-        competition = session_round.session.competition
-        club = factories.ClubFactory.create()
-        bowstyle = factories.BowstyleFactory.create()
-        data = {
-            'session-0': session_round.pk,
-            'club_0': club.pk,
-            'bowstyle': bowstyle.pk,
-            'archer_1': 'New',
-            'gender': 'G',
-            'novice': 'E',
-            'age': 'S',
-        }
-        form = NewEntryForm(data=data, competition=competition)
-        self.assertTrue(form.is_valid(), msg=dict(form.errors))
-
-    def test_no_sessions_validation_error(self):
-        session_round = factories.SessionRoundFactory.create()
-        competition = session_round.session.competition
-        club = factories.ClubFactory.create()
-        bowstyle = factories.BowstyleFactory.create()
-        data = {
-            'club_0': club.pk,
-            'bowstyle': bowstyle.pk,
-            'archer_1': 'New',
-            'gender': 'G',
-            'novice': 'E',
-            'age': 'S',
-        }
-        form = NewEntryForm(data=data, competition=competition)
-        self.assertFalse(form.is_valid())
-
-    def test_saving_existing_archer(self):
-        session_round = factories.SessionRoundFactory.create()
-        competition = session_round.session.competition
-        archer = factories.ArcherFactory.create()
-        data = {
-            'session-0': session_round.pk,
-            'club_0': archer.club.pk,
-            'bowstyle': archer.bowstyle.pk,
-            'archer_0': archer.pk,
-            'gender': 'G',
-            'novice': 'E',
-            'age': 'S',
-        }
-        form = NewEntryForm(data=data, competition=competition)
-        form.full_clean()
-        form.save()
-        self.assertEqual(entries_models.CompetitionEntry.objects.count(), 1)
-        entry = entries_models.CompetitionEntry.objects.get()
-        self.assertEqual(entry.archer, archer)
-        self.assertEqual(entries_models.SessionEntry.objects.count(), 1)
-        session_entry = entries_models.SessionEntry.objects.get()
-        self.assertEqual(session_entry.competition_entry, entry)
-
-    def test_saving_new_archer(self):
-        session_round = factories.SessionRoundFactory.create()
-        competition = session_round.session.competition
-        club = factories.ClubFactory.create()
-        bowstyle = factories.BowstyleFactory.create()
-        data = {
-            'session-0': session_round.pk,
-            'club_0': club.pk,
-            'bowstyle': bowstyle.pk,
-            'archer_1': 'bob',
-            'gender': 'G',
-            'novice': 'E',
-            'age': 'S',
-        }
-        form = NewEntryForm(data=data, competition=competition)
-        form.full_clean()
-        form.save()
-        self.assertEqual(entries_models.CompetitionEntry.objects.count(), 1)
-        entry = entries_models.CompetitionEntry.objects.get()
-        self.assertEqual(core_models.Archer.objects.count(), 1)
-        archer = core_models.Archer.objects.get()
-        self.assertEqual(entry.archer, archer)
-        self.assertEqual(archer.name, 'bob')
-        self.assertEqual(archer.club, club)
-        self.assertEqual(archer.bowstyle, bowstyle)
-        self.assertEqual(archer.gender, 'G')
-        self.assertEqual(archer.novice, 'E')
-        self.assertEqual(archer.age, 'S')
-
-    def test_saving_new_club(self):
-        session_round = factories.SessionRoundFactory.create()
-        competition = session_round.session.competition
-        archer = factories.ArcherFactory.create()
-        data = {
-            'session-0': session_round.pk,
-            'club_1': 'OA',
-            'bowstyle': archer.bowstyle.pk,
-            'archer_0': archer.pk,
-            'gender': 'G',
-            'novice': 'E',
-            'age': 'S',
-        }
-        form = NewEntryForm(data=data, competition=competition)
-        form.full_clean()
-        form.save()
-        self.assertEqual(entries_models.CompetitionEntry.objects.count(), 1)
-        # Should be 3 clubs:
-        #   host club
-        #   archer's club
-        #   new club
-        self.assertEqual(core_models.Club.objects.count(), 3)
-        core_models.Club.objects.get(name='OA')
+    def request(self, **kwargs):
+        request = super(LoggedInRequestFactory, self).request(**kwargs)
+        request.user = self.user
+        return request
 
 
-class TestEntryView(TestCase):
-    def test_getting_view(self):
-        competition = factories.CompetitionFactory.create()
-        request = RequestFactory().get('/')
-        request.user = factories.UserFactory.create()
+class TestEntryList(TestCase):
+    def setUp(self):
+        self.competition = factories.CompetitionFactory.create()
+        self.user = factories.UserFactory.create()
+        self.rf = LoggedInRequestFactory(self.user)
+
+    def test_simple(self):
         view = EntryList.as_view()
-        response = view(request, slug=competition.slug)
+        request = self.rf.get('/')
+        response = view(request, slug=self.competition.slug)
         self.assertEqual(response.status_code, 200)
+        response.render()
+
+    def test_context(self):
+        view = EntryList.as_view()
+        request = self.rf.get('/')
+        response = view(request, slug=self.competition.slug)
+        context = response.context_data
+        self.assertEqual(context['competition'], self.competition)
+
+    def test_auth(self):
+        view = EntryList.as_view()
+        request = self.rf.get('/')
+        request.user = AnonymousUser()
+        response = view(request, slug=self.competition.slug)
+        self.assertEqual(response.status_code, 302)
+
+    def test_reversal(self):
+        url = reverse('entry_list', kwargs={'slug': self.competition.slug})
+        match = resolve(url)
+        self.assertEqual(match.func.__name__, 'EntryList')
+
+
+class TestExistingArcherSingleSession(TestCase):
+    """Test the entry flow situation 1:
+
+    Entering an archer already in the system into a competition with a single
+    session entry/round, using all their default values.
+    """
+
+    def setUp(self):
+        self.archer = factories.ArcherFactory.create()
+        self.session_round = factories.SessionRoundFactory.create()
+        self.competition = self.session_round.session.competition
+        self.user = factories.UserFactory.create()
+        self.client.login(username=self.user.username, password='password')
+
+    def test_get_search_form(self):
+        url = reverse('archer_search', kwargs={'slug': self.competition.slug})
+        response = self.client.get(url)
+        self.assertEqual(response.status_code, 200)
+        self.assertIsInstance(response.context['search_form'], ArcherSearchForm)
+
+    def test_enter_search_term(self):
+        url = reverse('archer_search', kwargs={'slug': self.competition.slug})
+        data = {'query': self.archer.name}
+        response = self.client.get(url, data=data)
+        self.assertEqual(response.status_code, 200)
+        self.assertIsInstance(response.context['search_form'], ArcherSearchForm)
+        self.assertSequenceEqual(response.context['archers'], [self.archer])
+
+    def test_select_archer(self):
+        url = reverse('entry_add', kwargs={
+            'slug': self.competition.slug,
+            'archer_id': self.archer.pk,
+        })
+        response = self.client.get(url)
+        self.assertEqual(response.status_code, 200)
+        self.assertEqual(response.context['archer'], self.archer)
+        self.assertIsInstance(response.context['form'], EntryCreateForm)
+
+    def test_submit_entry(self):
+        url = reverse('entry_add', kwargs={
+            'slug': self.competition.slug,
+            'archer_id': self.archer.pk,
+        })
+        response = self.client.post(url)
+        self.assertEqual(response.status_code, 302)
+        self.assertEqual(CompetitionEntry.objects.count(), 1)
+        entry = CompetitionEntry.objects.get()
+        self.assertEqual(entry.archer, self.archer)
+        self.assertEqual(entry.club, self.archer.club)
+        self.assertEqual(entry.bowstyle, self.archer.bowstyle)
+        self.assertEqual(entry.sessionentry_set.get().session_round, self.session_round)
+
+
+class TestMoreSearches(TestCase):
+
+    def setUp(self):
+        self.archer = factories.ArcherFactory.create(name='David Longworth', club__name='Oxford Archers')
+        self.competition = factories.CompetitionFactory.create()
+        self.user = factories.UserFactory.create()
+        self.client.login(username=self.user.username, password='password')
+
+    def test_bad_spelling(self):
+        url = reverse('archer_search', kwargs={'slug': self.competition.slug})
+        data = {'query': 'dave lonworth'}
+        response = self.client.get(url, data=data)
+        self.assertEqual(response.status_code, 200)
+        self.assertIsInstance(response.context['search_form'], ArcherSearchForm)
+        self.assertSequenceEqual(response.context['archers'], [self.archer])
+
+    def test_club_name(self):
+        url = reverse('archer_search', kwargs={'slug': self.competition.slug})
+        data = {'query': 'Oxford Archers'}
+        response = self.client.get(url, data=data)
+        self.assertEqual(response.status_code, 200)
+        self.assertIsInstance(response.context['search_form'], ArcherSearchForm)
+        self.assertSequenceEqual(response.context['archers'], [self.archer])
+
+    def test_bad_club_name(self):
+        url = reverse('archer_search', kwargs={'slug': self.competition.slug})
+        data = {'query': 'oxford archery club'}
+        response = self.client.get(url, data=data)
+        self.assertEqual(response.status_code, 200)
+        self.assertIsInstance(response.context['search_form'], ArcherSearchForm)
+        self.assertSequenceEqual(response.context['archers'], [self.archer])
+
+
+class TestMultiSession(TestCase):
+
+    def setUp(self):
+        self.archer = factories.ArcherFactory.create()
+        self.competition = factories.CompetitionFactory.create()
+        self.session_round = factories.SessionRoundFactory.create(session__competition=self.competition)
+        self.session_round_2 = factories.SessionRoundFactory.create(session__competition=self.competition)
+        self.user = factories.UserFactory.create()
+        self.client.login(username=self.user.username, password='password')
+
+    def test_select_archer(self):
+        url = reverse('entry_add', kwargs={
+            'slug': self.competition.slug,
+            'archer_id': self.archer.pk,
+        })
+        response = self.client.get(url)
+        self.assertEqual(response.status_code, 200)
+        self.assertEqual(response.context['archer'], self.archer)
+        self.assertIsInstance(response.context['form'], EntryCreateForm)
+        self.assertTrue('sessions' in response.context['form'].fields)
+
+    def test_single_session(self):
+        url = reverse('entry_add', kwargs={
+            'slug': self.competition.slug,
+            'archer_id': self.archer.pk,
+        })
+        data = {
+            'sessions': [self.session_round.pk],
+        }
+        response = self.client.post(url, data=data)
+        self.assertEqual(response.status_code, 302)
+        self.assertEqual(CompetitionEntry.objects.count(), 1)
+        entry = CompetitionEntry.objects.get()
+        self.assertEqual(entry.archer, self.archer)
+        self.assertEqual(entry.archer.club, self.archer.club)
+        self.assertEqual(entry.archer.bowstyle, self.archer.bowstyle)
+        self.assertEqual(entry.sessionentry_set.get().session_round, self.session_round)
+
+    def test_both_sessions(self):
+        url = reverse('entry_add', kwargs={
+            'slug': self.competition.slug,
+            'archer_id': self.archer.pk,
+        })
+        data = {
+            'sessions': [self.session_round.pk, self.session_round_2.pk],
+        }
+        response = self.client.post(url, data=data)
+        self.assertEqual(response.status_code, 302)
+        self.assertEqual(CompetitionEntry.objects.count(), 1)
+        entry = CompetitionEntry.objects.get()
+        self.assertEqual(entry.archer, self.archer)
+        self.assertEqual(entry.archer.club, self.archer.club)
+        self.assertEqual(entry.archer.bowstyle, self.archer.bowstyle)
+        self.assertEqual(entry.sessionentry_set.count(), 2)
+        self.assertSequenceEqual(
+            entry.sessionentry_set.values_list('session_round_id', flat=True),
+            [self.session_round.pk, self.session_round_2.pk],
+        )
+
+    def test_no_sessions_fail(self):
+        url = reverse('entry_add', kwargs={
+            'slug': self.competition.slug,
+            'archer_id': self.archer.pk,
+        })
+        response = self.client.post(url)
+        self.assertEqual(response.status_code, 200)
+        self.assertEqual(CompetitionEntry.objects.count(), 0)
+
+
+class TestDifferentEntryDetails(TestCase):
+
+    def setUp(self):
+        self.archer = factories.ArcherFactory.create()
+        self.competition = factories.CompetitionFactory.create()
+        self.session_round = factories.SessionRoundFactory.create(session__competition=self.competition)
+        self.user = factories.UserFactory.create()
+        self.client.login(username=self.user.username, password='password')
+
+    def test_different_club(self):
+        other_club = factories.ClubFactory.create()
+        url = reverse('entry_add', kwargs={
+            'slug': self.competition.slug,
+            'archer_id': self.archer.pk,
+        })
+        data = {'club': other_club.pk}
+        response = self.client.post(url, data)
+        self.assertEqual(response.status_code, 302)
+        self.assertEqual(CompetitionEntry.objects.count(), 1)
+        entry = CompetitionEntry.objects.get()
+        self.assertEqual(entry.club, other_club)
+
+    def test_different_club_with_update(self):
+        other_club = factories.ClubFactory.create()
+        url = reverse('entry_add', kwargs={
+            'slug': self.competition.slug,
+            'archer_id': self.archer.pk,
+        })
+        data = {
+            'club': other_club.pk,
+            'update_club': True,
+        }
+        response = self.client.post(url, data)
+        self.assertEqual(response.status_code, 302)
+        self.assertEqual(CompetitionEntry.objects.count(), 1)
+        entry = CompetitionEntry.objects.get()
+        self.assertEqual(entry.club, other_club)
+        archer = Archer.objects.get()
+        self.assertEqual(archer.club, other_club)
+
+    def test_different_bowstyle(self):
+        other_bowstyle = factories.BowstyleFactory.create()
+        url = reverse('entry_add', kwargs={
+            'slug': self.competition.slug,
+            'archer_id': self.archer.pk,
+        })
+        data = {'bowstyle': other_bowstyle.pk}
+        response = self.client.post(url, data)
+        self.assertEqual(response.status_code, 302)
+        self.assertEqual(CompetitionEntry.objects.count(), 1)
+        entry = CompetitionEntry.objects.get()
+        self.assertEqual(entry.bowstyle, other_bowstyle)
+
+    def test_different_bowstyle_with_update(self):
+        other_bowstyle = factories.BowstyleFactory.create()
+        url = reverse('entry_add', kwargs={
+            'slug': self.competition.slug,
+            'archer_id': self.archer.pk,
+        })
+        data = {
+            'bowstyle': other_bowstyle.pk,
+            'update_bowstyle': True,
+        }
+        response = self.client.post(url, data)
+        self.assertEqual(response.status_code, 302)
+        self.assertEqual(CompetitionEntry.objects.count(), 1)
+        entry = CompetitionEntry.objects.get()
+        self.assertEqual(entry.bowstyle, other_bowstyle)
+        archer = Archer.objects.get()
+        self.assertEqual(archer.bowstyle, other_bowstyle)
+
+    def test_default_experience(self):
+        self.assertEqual(self.archer.novice, 'E')
+        self.assertFalse(self.competition.has_novices)
+        url = reverse('entry_add', kwargs={
+            'slug': self.competition.slug,
+            'archer_id': self.archer.pk,
+        })
+        response = self.client.get(url)
+        self.assertNotIn('novice', response.context['form'].fields)
+        response = self.client.post(url)
+        self.assertEqual(response.status_code, 302)
+        self.assertEqual(CompetitionEntry.objects.count(), 1)
+        entry = CompetitionEntry.objects.get()
+        self.assertEqual(entry.novice, 'E')
+
+    def test_uses_archer_experience(self):
+        self.archer.novice = 'N'
+        self.archer.save()
+        self.competition.has_novices = True
+        self.competition.save()
+        url = reverse('entry_add', kwargs={
+            'slug': self.competition.slug,
+            'archer_id': self.archer.pk,
+        })
+        response = self.client.post(url)
+        self.assertEqual(response.status_code, 302)
+        self.assertEqual(CompetitionEntry.objects.count(), 1)
+        entry = CompetitionEntry.objects.get()
+        self.assertEqual(entry.novice, 'N')
+
+    def test_change_experience(self):
+        self.assertEqual(self.archer.novice, 'E')
+        self.competition.has_novices = True
+        self.competition.save()
+        url = reverse('entry_add', kwargs={
+            'slug': self.competition.slug,
+            'archer_id': self.archer.pk,
+        })
+        data = {'novice': 'N'}
+        response = self.client.post(url, data)
+        self.assertEqual(response.status_code, 302)
+        self.assertEqual(CompetitionEntry.objects.count(), 1)
+        entry = CompetitionEntry.objects.get()
+        self.assertEqual(entry.novice, 'N')
+
+    def test_change_experience_with_update(self):
+        self.assertEqual(self.archer.novice, 'E')
+        self.competition.has_novices = True
+        self.competition.save()
+        url = reverse('entry_add', kwargs={
+            'slug': self.competition.slug,
+            'archer_id': self.archer.pk,
+        })
+        data = {
+            'novice': 'N',
+            'update_novice': True,
+        }
+        response = self.client.post(url, data)
+        self.assertEqual(response.status_code, 302)
+        self.assertEqual(CompetitionEntry.objects.count(), 1)
+        entry = CompetitionEntry.objects.get()
+        self.assertEqual(entry.novice, 'N')
+        archer = Archer.objects.get()
+        self.assertEqual(archer.novice, 'N')
+
+    def test_default_age(self):
+        self.assertEqual(self.archer.age, 'S')
+        self.assertFalse(self.competition.has_juniors)
+        url = reverse('entry_add', kwargs={
+            'slug': self.competition.slug,
+            'archer_id': self.archer.pk,
+        })
+        response = self.client.get(url)
+        self.assertNotIn('age', response.context['form'].fields)
+        response = self.client.post(url)
+        self.assertEqual(response.status_code, 302)
+        self.assertEqual(CompetitionEntry.objects.count(), 1)
+        entry = CompetitionEntry.objects.get()
+        self.assertEqual(entry.age, 'S')
+
+    def test_uses_archer_age(self):
+        self.archer.age = 'J'
+        self.archer.save()
+        self.competition.has_juniors = True
+        self.competition.save()
+        url = reverse('entry_add', kwargs={
+            'slug': self.competition.slug,
+            'archer_id': self.archer.pk,
+        })
+        response = self.client.post(url)
+        self.assertEqual(response.status_code, 302)
+        self.assertEqual(CompetitionEntry.objects.count(), 1)
+        entry = CompetitionEntry.objects.get()
+        self.assertEqual(entry.age, 'J')
+
+    def test_change_age(self):
+        self.assertEqual(self.archer.age, 'S')
+        self.competition.has_juniors = True
+        self.competition.save()
+        url = reverse('entry_add', kwargs={
+            'slug': self.competition.slug,
+            'archer_id': self.archer.pk,
+        })
+        data = {'age': 'J'}
+        response = self.client.post(url, data)
+        self.assertEqual(response.status_code, 302)
+        self.assertEqual(CompetitionEntry.objects.count(), 1)
+        entry = CompetitionEntry.objects.get()
+        self.assertEqual(entry.age, 'J')
+
+    def test_change_age_with_update(self):
+        self.assertEqual(self.archer.age, 'S')
+        self.competition.has_juniors = True
+        self.competition.save()
+        url = reverse('entry_add', kwargs={
+            'slug': self.competition.slug,
+            'archer_id': self.archer.pk,
+        })
+        data = {
+            'age': 'J',
+            'update_age': True,
+        }
+        response = self.client.post(url, data)
+        self.assertEqual(response.status_code, 302)
+        self.assertEqual(CompetitionEntry.objects.count(), 1)
+        entry = CompetitionEntry.objects.get()
+        self.assertEqual(entry.age, 'J')
+        archer = Archer.objects.get()
+        self.assertEqual(archer.age, 'J')

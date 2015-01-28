@@ -1,0 +1,24 @@
+{% extends 'entries/competition_detail.html' %}
+
+{% block scripts %}
+<script src="{{ STATIC_URL }}lib/jquery/jquery-2.1.3.min.js"></script>
+<script type="text/javascript">
+    $(function() {
+        $('#id_club').focus();
+    });
+</script>
+{% endblock %}
+
+{% block competition_content %}
+<h2>Create entry for {{ archer }}</h2>
+<p>
+    <a class="btn" href="{% url 'club_create' %}?next={{ request.path }}">Add club</a>
+</p>
+<form method="POST" action="">
+    {% csrf_token %}
+    <ul>
+        {{ form.as_ul }}
+    </ul>
+    <input type="submit" class="btn" value="Save">
+</form>
+{% endblock %}

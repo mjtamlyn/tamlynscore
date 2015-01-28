@@ -1,5 +1,6 @@
 <html>
     <head>
+        <meta name="viewport" content="width=device-width, initial-scale=1">
         {% block head %}
             {% block meta %}
             <title>{% block title %}Archery Tournaments{% endblock %}</title>
@@ -15,22 +16,26 @@
     </head>
     {# TODO: Remove bodyclass in favour of page_id #}
     <body class="{% block bodyclass %}{% endblock %}">
-        <div class="wrapper" id="{% block page_id %}{% endblock %}">
+        <div id="{% block page_id %}{% endblock %}">
             {% block nav %}
             <nav>
                 {% block nav_links %}
-                <a href="{% url 'index' %}"><div class="nav-link">Home</div></a>
-                <a href="{% url 'club_list' %}"><div class="nav-link">Clubs</div></a>
-                <a href="{% url 'tournaments_list' %}"><div class="nav-link">Tournaments</div></a>
-                <a href="{% url 'logout' %}"><div class="nav-link">Log Out</div></a>
+                <a href="{% url 'index' %}" class="nav-link">Home</a>
+                <a href="{% url 'club_list' %}" class="nav-link">Clubs</a>
+                <a href="{% url 'tournaments_list' %}" class="nav-link">Tournaments</a>
+                <a href="{% url 'logout' %}" class="nav-link">Log Out</a>
                 {% endblock nav_links %}
             </nav>
             {% endblock nav %}
-            {% block content %}
-            {% endblock %}
+            <div class="container">
+                {% block content %}
+                {% endblock %}
+            </div>
             {% block footer %}
             <footer>
-                <p>Designed, built and maintained by Emma &amp; <a href="http://twitter.com/mjtamlyn">Marc Tamlyn</a></p>
+                <div class="container">
+                    <p>Designed, built and maintained by Emma &amp; <a href="http://twitter.com/mjtamlyn">Marc Tamlyn</a></p>
+                </div>
             </footer>
             {% endblock footer %}
         </div>

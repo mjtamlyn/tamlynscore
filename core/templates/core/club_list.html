@@ -14,6 +14,8 @@
 {% block content %}
 <h1>Clubs</h1>
 
+<a href="{% url 'club_create' %}" class="btn">Add club</a>
+
 <ul>
     {% for club in club_list %}
     <li><a href="{% url 'club_detail' slug=club.slug %}">{{ club }}</a></li>
