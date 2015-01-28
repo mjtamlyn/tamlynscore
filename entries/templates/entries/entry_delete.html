@@ -1,0 +1,9 @@
+{% extends 'entries/competition_detail.html' %}
+
+{% block competition_content %}
+<h2>Confirm deleting entry {{ object }}?</h2>
+<form method="POST" action="">
+    {% csrf_token %}
+    <input type="submit" class="btn" value="Delete">
+</form>
+{% endblock %}

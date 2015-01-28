@@ -410,3 +410,26 @@ class TestDifferentEntryDetails(TestCase):
         self.assertEqual(entry.age, 'J')
         archer = Archer.objects.get()
         self.assertEqual(archer.age, 'J')
+
+
+class TestEntryDelete(TestCase):
+
+    def setUp(self):
+        self.entry = factories.CompetitionEntryFactory.create()
+        self.competition = self.entry.competition
+        self.url = reverse('entry_delete', kwargs={
+            'slug': self.competition.slug,
+            'entry_id': self.entry.pk,
+        })
+        self.user = factories.UserFactory.create()
+        self.client.login(username=self.user.username, password='password')
+
+    def test_get(self):
+        response = self.client.get(self.url)
+        self.assertEqual(response.status_code, 200)
+
+    def test_delete(self):
+        response = self.client.post(self.url)
+        success_url = reverse('entry_list', kwargs={'slug': self.competition.slug})
+        self.assertRedirects(response, success_url)
+        self.assertEqual(CompetitionEntry.objects.count(), 0)
