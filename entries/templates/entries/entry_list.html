@@ -53,11 +53,9 @@
                     <p>
                         {{ entry.team_name }}
                     </p>
-                    <ul>
-                        {% for session in entry.sessionentry_set.all %}
-                        <li>{{ session.session_round.session.start }} - {{ session.session_round.shot_round }}</li>
-                        {% endfor %}
-                    </ul>
+                    {% for session in entry.sessionentry_set.all %}
+                    <p>{{ session.session_round.session.start|date:"j/n fa" }} - {{ session.session_round.shot_round }}</p>
+                    {% endfor %}
                     <p>
                         <span class="pill bowstyle {{ entry.bowstyle|slugify }}">{{ entry.bowstyle }}</span>
                         <span class="pill gender {{ entry.archer.get_gender_display|lower }}">{{ entry.archer.get_gender_display }}</span>

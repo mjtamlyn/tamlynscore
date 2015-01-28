@@ -3,78 +3,111 @@
         $('.session').each(function (i, session) {
             session = $(session);
             var unallocated = JSON.parse(session.attr('data-archers'));
+            unallocated.unshift({
+                id: '-1',
+                text: 'Select…',
+            });
 
-            var initializeInput = function (input) {
-                input = $(input);
-                input.autocomplete({
-                    source: function (request, response) {
-                        response($.ui.autocomplete.filter(unallocated, request.term));
+            var initializeInput = function () {
+                var originalAnchor = $(this);
+                var select = $('<select>');
+                originalAnchor.replaceWith(select);
+                select.select2({
+                    data: unallocated,
+                    // TODO: Add a custom matcher to make searching easier
+                    width: '70%',
+                    templateSelection: function(item) {
+                        return item.name || item.text;
                     },
-                    delay: 0,
+                    templateResult: function(item) {
+                        if (!item.bowstyle) {
+                            return item.text;
+                        }
+                        text = (
+                            item.name + '<br>' +
+                            item.club + '<br>' +
+                            '<span class="pill bowstyle ' + item.bowstyle.toLowerCase() + '">'
+                                + item.bowstyle + '</span> ' +
+                            '<span class="pill gender ' + item.gender.toLowerCase() + '">'
+                                + item.gender + '</span>'
+                        )
+                        // TODO: support competition options properly
+                        return text;
+                    },
+                });
+                select.select2('open');
+                select.on('select2:close', function (e) {
+                    if (select.val() == '-1') {
+                        select.select2('destroy');
+                        select.replaceWith(originalAnchor);
+                    }
+                });
+                select.on('select2:select', function (e) {
+                    var archerBlock = $(this).closest('.archer-block');
+                    var loc = archerBlock.attr('data-location');
+                    var data = e.params.data;
+                    select.select2('destroy');
+                    select.replaceWith(originalAnchor);
+
+                    // Remove the name from the unallocated list
+                    archerBlock.closest('.session').find('.unallocated [data-pk=' + data.id + ']').remove();
+
+                    $.post('', JSON.stringify({
+                            method: 'create',
+                            entry: data.id,
+                            location: loc,
+                        }), function () {
+                            var index = undefined;
+                            unallocated.forEach(function(item, i) {
+                                if (item.id == data.id) {
+                                    index = i;
+                                }
+                            });
+                            unallocated.splice(index, 1);
+                            originalAnchor.replaceWith('<span class="name">' + data.name + '</span>');
+                            archerBlock.find('.bottom').html(
+                                '<p>' + data.club + '</p><p>' +
+                                '<span class="pill bowstyle ' + data.bowstyle.toLowerCase() + '">'
+                                    + data.bowstyle + '</span> ' +
+                                '<span class="pill gender ' + data.gender.toLowerCase() + '">'
+                                    + data.gender + '</span></p>'
+                                // TODO: don't duplicate code here
+                            );
+                            archerBlock.find('.actions').append($('<a class="delete" data-pk="' + data.id + '">X</a>'));
+                        }
+                    );
+                });
+                var opts = {
                     select: function (e, ui) {
-                        console.log(input.attr('data-location'), ui.item.pk);
-                        input.blur();
-                        var index = undefined;
-                        $.each(unallocated, function (i, entry) {
-                            if (entry.pk === ui.item.pk) {
-                                index = i;
-                            }
-                        });
-                        unallocated.splice(index, 1);
-                        // Remove the name from the unallocated list
-                        var el = $(this);
-                        el.closest('.session').find('.unallocated [data-pk='+ui.item.pk+']').remove();
                         // Focus the next input (wherever it is)
                         var inputs = el.closest('.session').find('input');
                         var index = inputs.index(el);
                         if (index > -1 && (index + 1) < inputs.length) {
                             inputs.eq(index + 1).focus();
                         }
-                        $.post(
-                            '',
-                            JSON.stringify({method: 'create', entry: ui.item.pk, location: input.attr('data-location')}),
-                            function (data) {
-                                // Replace this input with a label
-                                var archerSpan = $('<span>');
-                                archerSpan.text(ui.item.value + ' ');
-                                archerSpan.addClass('archer');
-                                var link = $('<a>');
-                                link.text('X');
-                                link.attr('data-entry-pk', ui.item.pk);
-                                link.attr('data-pk', data);
-                                link.addClass('delete');
-                                link.click(deleteAllocation);
-                                el.replaceWith(archerSpan);
-                                archerSpan.after(link);
-                            }
-                        );
                     }
-                });
+                };
             };
 
             var deleteAllocation = function (e) {
                 var el = $(this);
-                $.post(
-                    '',
-                    JSON.stringify({method: 'delete', entry: el.attr('data-pk')}),
-                    function () {
-                        var input = $('<input>');
-                        input.attr('data-location', el.attr('data-location'));
-                        var archer = el.siblings('.archer');
-                        unallocated.push({'pk': el.attr('data-entry-pk'), 'value': archer.text()});
-                        var li = $('<li>');
-                        li.text(archer.text());
-                        li.attr('data-pk', el.attr('data-entry-pk'));
-                        el.closest('.session').find('.unallocated').append(li);
-                        el.replaceWith(input);
-                        archer.remove();
-                        initializeInput(input);
+                var archerBlock = el.closest('.archer-block');
+                $.post('',
+                    JSON.stringify({
+                        method: 'delete',
+                        session_entry: el.attr('data-pk'),
+                    }), function () {
+                        archerBlock.find('.bottom').empty();
+                        el.remove();
+                        archerBlock.find('span.name').replaceWith('<a class="select">Select…</a>');
+                        // TODO: readd the archer block to the bottom
+                        // TODO: readd the details to the unallocated data
                     }
                 )
             };
 
-            session.find('input').each(function (i, input) {initializeInput(input)});
-            session.find('a.delete').click(deleteAllocation);
+            session.on('click', '.select', initializeInput);
+            session.on('click', '.actions .delete', deleteAllocation);
         });
     });
 })();
