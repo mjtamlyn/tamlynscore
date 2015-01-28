@@ -1,34 +1,34 @@
 .target-list
-  .unallocated
+  span.unallocated
     margin-left: 10px
     color: $hlorange
     font-weight: bold
     cursor: help
 
-  li
-    padding: 5px 0
-
   .detail
     font-weight: bold
-    font-size: smaller
 
   .boss
-    padding: 5px 0
-    border-bottom: 1px solid $dark
+    margin: 10px 0
+    border-bottom: 1px solid $lightblue
 
-    ul
-      margin-left: 20px
+    .archer-block
+      margin-bottom: 0
+      +border-radius(0)
+      border-bottom: 0
 
   .archer-block
-    margin-bottom: 5px
 
-.btn
-  font-family: $font-sans-serif
-  border-radius: 7px
-  background-image: -webkit-linear-gradient(darken($vlightblue, 10%), $vlightblue, darken($vlightblue, 10%))
-  font:
-    size: 14px
-  cursor: pointer
-  padding: 5px
-  text-align: center
-  -webkit-user-select: none
+    .name
+      height: 28px
+
+    .bottom
+      height: 52px
+      overflow: auto
+
+    input
+      margin-top: -4px
+      outline: none
+
+  .select
+    cursor: pointer

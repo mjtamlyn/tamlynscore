@@ -271,8 +271,19 @@ class TargetList(ListView):
                 e.competition_entry.archer.name,
             ))
             data = [{
-                'pk': e.pk,
-                'label': e.competition_entry.archer.name
+                'id': e.pk,
+                'name': e.competition_entry.archer.name,
+                'gender': e.competition_entry.archer.get_gender_display(),
+                'novice': e.competition_entry.get_novice_display(),
+                'age': e.competition_entry.get_age_display(),
+                'bowstyle': e.competition_entry.bowstyle.name,
+                'club': e.competition_entry.club.short_name,
+                'text': u'%s %s %s %s' % (
+                    e.competition_entry.archer,
+                    e.competition_entry.club,
+                    e.competition_entry.bowstyle,
+                    e.competition_entry.archer.get_gender_display(),
+                )
             } for e in details['entries']]
             details['entries_json'] = json.dumps(data)
 
@@ -304,7 +315,7 @@ class TargetList(ListView):
             )
             return HttpResponse(allocation.pk)
         elif data['method'] == 'delete':
-            TargetAllocation.objects.get(pk=data['entry']).delete()
+            TargetAllocation.objects.get(session_entry__id=data['session_entry']).delete()
             return HttpResponse('ok')
         return HttpResponseBadRequest()
 
