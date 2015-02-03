@@ -42,18 +42,19 @@ class EntryCreateForm(forms.Form):
         self.archer = archer
         self.competition = competition
         self.session_rounds = SessionRound.objects.filter(session__competition=competition)
-        self.fields['club'].label = 'Club (%s)' % self.archer.club
-        self.fields['bowstyle'].label = 'Bowstyle (%s)' % self.archer.bowstyle
+        current = self.get_current_obj()
+        self.fields['club'].label = 'Club (%s)' % current.club
+        self.fields['bowstyle'].label = 'Bowstyle (%s)' % current.bowstyle
         if self.competition.has_novices:
             self.fields['novice'] = forms.ChoiceField(
-                label='Experienced/Novice (%s)' % self.archer.get_novice_display(),
+                label='Experienced/Novice (%s)' % current.get_novice_display(),
                 choices=(('', '---------'),) + NOVICE_CHOICES,
                 required=False,
             )
             self.fields['update_novice'] = forms.BooleanField(required=False)
         if self.competition.has_juniors:
             self.fields['age'] = forms.ChoiceField(
-                label='Age (%s)' % self.archer.get_age_display(),
+                label='Age (%s)' % current.get_age_display(),
                 choices=(('', '---------'),) + AGE_CHOICES,
                 required=False,
             )
@@ -65,6 +66,9 @@ class EntryCreateForm(forms.Form):
             )
             if cache.get('entry-form:sessions'):
                 self.initial['sessions'] = cache.get('entry-form:sessions')
+
+    def get_current_obj(self):
+        return self.archer
 
     def save(self):
         with transaction.atomic():
@@ -92,20 +96,22 @@ class EntryCreateForm(forms.Form):
             self.archer.save()
 
     def create_competition_entry(self):
-        club = self.cleaned_data['club'] or self.archer.club
-        bowstyle = self.cleaned_data['bowstyle'] or self.archer.bowstyle
-        extra_params = {}
-        if self.competition.has_novices:
-            extra_params['novice'] = self.cleaned_data['novice'] or self.archer.novice
-        if self.competition.has_juniors:
-            extra_params['age'] = self.cleaned_data['age'] or self.archer.age
-        return CompetitionEntry.objects.create(
+        entry = CompetitionEntry(
             competition=self.competition,
             archer=self.archer,
-            club=club,
-            bowstyle=bowstyle,
-            **extra_params
         )
+        self.set_entry_data(entry)
+        entry.save()
+        return entry
+
+    def set_entry_data(self, entry):
+        default = self.get_current_obj()
+        entry.club = self.cleaned_data['club'] or default.club
+        entry.bowstyle = self.cleaned_data['bowstyle'] or default.bowstyle
+        if self.competition.has_novices:
+            entry.novice = self.cleaned_data['novice'] or default.novice
+        if self.competition.has_juniors:
+            entry.age = self.cleaned_data['age'] or default.age
 
     def create_session_entries(self, entry):
         if len(self.session_rounds) == 1:
@@ -119,3 +125,39 @@ class EntryCreateForm(forms.Form):
                     session_round=session_round,
                     competition_entry=entry,
                 )
+
+
+class EntryUpdateForm(EntryCreateForm):
+
+    def __init__(self, competition, instance, **kwargs):
+        self.instance = instance
+        super(EntryUpdateForm, self).__init__(
+            competition=competition,
+            archer=instance.archer,
+            **kwargs
+        )
+        self.initial['sessions'] = [se.session_round for se in self.instance.sessionentry_set.all()]
+
+    def get_current_obj(self):
+        return self.instance
+
+    def save(self):
+        with transaction.atomic():
+            self.update_archer()
+            self.set_entry_data(self.instance)
+            self.instance.save()
+            self.update_session_entries(self.instance)
+
+    def update_session_entries(self, entry):
+        if len(self.session_rounds) > 1:
+            existing_rounds = self.initial['sessions']
+            for session_round in self.cleaned_data['sessions']:
+                if session_round in existing_rounds:
+                    existing_rounds.remove(session_round)
+                else:
+                    SessionEntry.objects.create(
+                        session_round=session_round,
+                        competition_entry=entry,
+                    )
+            if existing_rounds:
+                entry.sessionentry_set.filter(session_round__in=existing_rounds).delete()
