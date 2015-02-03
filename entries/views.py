@@ -8,7 +8,7 @@ from django.core.urlresolvers import reverse
 from django.db.models import Prefetch
 from django.http import HttpResponse, HttpResponseBadRequest, HttpResponseRedirect, Http404
 from django.utils.datastructures import SortedDict
-from django.views.generic import View, DetailView, ListView, TemplateView, DeleteView
+from django.views.generic import View, DetailView, ListView, TemplateView, UpdateView, DeleteView
 from django.shortcuts import get_object_or_404
 from django.utils import timezone
 
@@ -21,7 +21,7 @@ from reportlab.lib.units import inch
 from core.models import Archer
 from scoring.utils import class_view_decorator
 
-from .forms import ArcherSearchForm, EntryCreateForm
+from .forms import ArcherSearchForm, EntryCreateForm, EntryUpdateForm
 from .models import (
     Competition, Session, CompetitionEntry, SessionEntry, TargetAllocation,
     SessionRound, SCORING_FULL, SCORING_DOZENS
@@ -177,6 +177,21 @@ class EntryAdd(CompetitionMixin, DetailView):
         else:
             context = self.get_context_data(form=form)
             return self.render_to_response(context)
+
+    def get_success_url(self):
+        return reverse('entry_list', kwargs={'slug': self.competition.slug})
+
+
+class EntryUpdate(CompetitionMixin, UpdateView):
+    model = CompetitionEntry
+    pk_url_kwarg = 'entry_id'
+    template_name = 'entries/entry_update.html'
+    form_class = EntryUpdateForm
+
+    def get_form_kwargs(self):
+        kwargs = super(EntryUpdate, self).get_form_kwargs()
+        kwargs['competition'] = self.competition
+        return kwargs
 
     def get_success_url(self):
         return reverse('entry_list', kwargs={'slug': self.competition.slug})
