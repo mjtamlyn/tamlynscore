@@ -207,6 +207,7 @@ class TargetList(ListView):
             'session_entry__competition_entry__bowstyle',
             'session_entry__competition_entry__club',
             'session_entry__competition_entry__archer',
+            'session_entry__competition_entry__archer__bowstyle',
             'session_entry__competition_entry__archer__club',
         )
 
