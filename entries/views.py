@@ -566,7 +566,7 @@ class ScoreSheetsPdf(HeadedPdfView):
                 continue
             for target, entry in entries:
                 table_data = self.header_table_for_entry(target, entry)
-                header_table = Table(table_data, [0.4 * inch, 2.5 * inch, 4 * inch])
+                header_table = Table(table_data, [0.5 * inch, 2.5 * inch, 4 * inch])
                 elements.append(KeepTogether([self.spacer, header_table, self.spacer] + score_sheet_elements))
             elements.append(PageBreak())
 
@@ -633,7 +633,7 @@ class ScoreSheetsPdf(HeadedPdfView):
 
             score_sheet_elements += [totals_table, self.spacer]
 
-        signing_table_widths = [0.7 * inch, 2 * inch]
+        signing_table_widths = [0.8 * inch, 2 * inch]
         signing_table = Table(
             [[self.Para('Archer', 'h3'), None, None, self.Para('Scorer', 'h3'), '']],
             signing_table_widths + [0.5 * inch] + signing_table_widths
@@ -665,6 +665,9 @@ class ScoreSheetsPdf(HeadedPdfView):
         ('BOX', (15, 0), (-1, -2), 2, colors.black),
         ('BOX', (15, -1), (-2, -1), 2, colors.black),
         ('LINEBEFORE', (16, 0), (-1, -1), 1.5, colors.black),
+
+        # span for distance
+        ('SPAN', (1, 0), (6, 0)),
     ])
 
     totals_table_style = TableStyle([
