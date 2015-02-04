@@ -1,12 +1,62 @@
 .competition-nav
-  height: 100%
+  overflow: visible
 
-  p
-    font-family: $highlight-sans-serif
-    font-weight: bold
+  background: none
+  margin-top: -10px
+  margin-bottom: 10px
+  border-bottom: 1px solid $borders
+  font-size: 0.9em
 
-  a
-    font-size: 0.9em
+  ul
+    margin: 0 auto
+    //overflow: auto
+    display: inline-block
+
+  li
+    float: left
+    border-left: 1px solid $borders
+    line-height: 30px
+    position: relative
+    &:last-child
+      border-right: 1px solid $borders
+    &:hover
+      background-color: $bg
+    a
+      padding: 10px
+    p
+      margin: 0
+      padding: 0 10px
+      cursor: pointer
+      &:after
+        content: "v"
+        margin-left: 5px
+        color: $borders
+
+    ul
+      display: none
+      position: absolute
+      top: 100%
+      left: -1px
+      width: 100%
+      float: left
+      background-color: white
+      border: 1px solid $borders
+      box-sizing: content-box
+      li
+        display: block
+        float: none
+        border: 0
+        &:last-child
+          border: 0
+        a
+          padding: 0
+          width: 100%
+          height: 100%
+          display: block
+    &:hover
+      ul
+        display: block
+
 
 #entry-list
 

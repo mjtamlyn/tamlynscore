@@ -5,68 +5,69 @@
     <a href="{% url 'competition_detail' slug=competition.slug %}"><h1>{{ competition }}</h1></a>
 </header>
 
-<div class="row">
-
-    {% block competition_nav %}
-        <div class="competition-nav col1">
-            {% with competition.result_modes.all as modes %}
-            <ul class="link-list">
-                <li><p>Before the shoot</p></li>
-                <li><a href="{% url 'entry_list' slug=competition.slug %}">Manage Entries</a></li>
-                <li><a href="{% url 'target_list' slug=competition.slug %}">Target lists</a></li>
-                <li><a href="{% url 'score_sheets' slug=competition.slug %}">Score sheets</a></li>
-                <li><p>On the day</p></li>
-                <li><a href="{% url 'registration' slug=competition.slug %}">Registration</a></li>
-                <li><a href="{% url 'input_scores' slug=competition.slug %}">Input scores</a></li>
-                <li><a href="{% url 'input_scores_mobile' slug=competition.slug %}">Input scores (mobile view)</a></li>
-                {% for mode in modes %}
-                    <li><a href="{% url 'new_leaderboard' slug=competition.slug mode=mode.mode format='html' %}">Leaderboard {{ mode|lower }}</a></li>
-                {% endfor %}
-                {% if not modes %}
-                    <li><a href="{% url 'leaderboard' slug=competition.slug %}">Leaderboard (by session)</a></li>
-                    <li><a href="{% url 'leaderboard_combined' slug=competition.slug %}">Leaderboard (Combined)</a></li>
-                    <li><a href="{% url 'leaderboard_combined_experienced' slug=competition.slug %}">Leaderboard (Experienced)</a></li>
-                    <li><a href="{% url 'leaderboard_combined_novice' slug=competition.slug %}">Leaderboard (Novice)</a></li>
-                    <li><a href="{% url 'leaderboard_teams' slug=competition.slug %}">Leaderboard (Teams)</a></li>
-                    <li><a href="{% url 'leaderboard_summary' slug=competition.slug %}">Leaderboard (Summary)</a></li>
-                {% endif %}
-                <li><a href="{% url 'olympic_index' slug=competition.slug %}">Head to heads panel</a></li>
-
-                <li><p>After the shoot</p></li>
-                {% for mode in modes %}
-                {% if not mode.leaderboard_only %}
-                    <li><a href="{% url 'new_results' slug=competition.slug mode=mode.mode format='html' %}">Results {{ mode|lower }}</a></li>
-                {% endif %}
-                {% endfor %}
-                <li><a href="{% url 'rankings_export' slug=competition.slug %}">Rankings Export (CSV)</a></li>
+{% block competition_nav %}
+<nav class="competition-nav">
+    {% with competition.result_modes.all as modes %}
+    <ul>
+        <li><a href="{% url 'entry_list' slug=competition.slug %}">Manage Entries</a></li>
+        <li><a href="{% url 'target_list' slug=competition.slug %}">Target lists</a></li>
+        <li><a href="{% url 'score_sheets' slug=competition.slug %}">Score sheets</a></li>
+        <li><a href="{% url 'registration' slug=competition.slug %}">Registration</a></li>
+        <li><a href="{% url 'input_scores' slug=competition.slug %}">Input scores</a></li>
+        <!--li><a href="{% url 'input_scores_mobile' slug=competition.slug %}">Input scores (mobile view)</a></li-->
+        <li><p>Leaderboards</p>
+            <ul>
+            {% for mode in modes %}
+                <li><a href="{% url 'new_leaderboard' slug=competition.slug mode=mode.mode format='html' %}">{{ mode }}</a></li>
+            {% empty %}
+                <li><a href="{% url 'leaderboard' slug=competition.slug %}">By session</a></li>
+                <li><a href="{% url 'leaderboard_combined' slug=competition.slug %}">Combined</a></li>
+                <li><a href="{% url 'leaderboard_combined_experienced' slug=competition.slug %}">Experienced</a></li>
+                <li><a href="{% url 'leaderboard_combined_novice' slug=competition.slug %}">Novice</a></li>
+                <li><a href="{% url 'leaderboard_teams' slug=competition.slug %}">Teams</a></li>
+                <li><a href="{% url 'leaderboard_summary' slug=competition.slug %}">Summary</a></li>
+            {% endfor %}
             </ul>
-            {% endwith %}
-        </div>
-        {% endblock %}
+        </li>
+        <li><p>Results</p>
+            <ul>
+            {% for mode in modes %}
+            {% if not mode.leaderboard_only %}
+                <li><a href="{% url 'new_results' slug=competition.slug mode=mode.mode format='html' %}">{{ mode }}</a></li>
+            {% endif %}
+            {% endfor %}
+            </ul>
+        </li>
+        <li><a href="{% url 'olympic_index' slug=competition.slug %}">Head to heads</a></li>
+        <li><a href="{% url 'rankings_export' slug=competition.slug %}">Rankings Export</a></li>
+    </ul>
+    {% endwith %}
+</nav>
+{% endblock %}
 
-    <div class="col5">
-        {% block competition_content %}
-        <div class="module">
-            <h3>About this competition</h3>
-            <dl>
-                <dt>Tournament date(s)</dt>
-                <dd>{{ competition.date }}{% if not competition.end_date == competition.date %} to {{ competition.end_date }}{% endif %}</dd>
-                <dt>Hosted by</dt>
-                <dd>{{ competition.tournament.host_club.name }}</dd>
-                <dt>Options</dt>
-                <dd>
-                    <ul>
-                        <li>{% if competition.has_teams %}Has team awards{% else %}Does not have team awards{% endif %}</li>
-                        <li>{% if competition.has_novices %}Has a novice category{% else %}Does not have a novice category{% endif %}</li>
-                        {% if competition.has_novices %}
-                        <li>{% if competition.novices_in_experienced_teams %}Novices can be in experienced teams{% else %}Novices cannot be in experienced teams{% endif %}</li>
-                        {% endif %}
-                    </ul>
-                </dd>
-        </div>
-        {% endblock %}
+{% block competition_content %}
+<div class="row">
+    <div class="col6">
+        <h3>About this competition</h3>
+        <dl>
+            <dt>Tournament date(s)</dt>
+            <dd>{{ competition.date }}{% if not competition.end_date == competition.date %} to {{ competition.end_date }}{% endif %}</dd>
+            <dt>Hosted by</dt>
+            <dd>{{ competition.tournament.host_club.name }}</dd>
+            <dt>Options</dt>
+            <dd>
+                <ul>
+                    <li>{% if competition.has_teams %}Has team awards{% else %}Does not have team awards{% endif %}</li>
+                    <li>{% if competition.has_novices %}Has a novice category{% else %}Does not have a novice category{% endif %}</li>
+                    {% if competition.has_novices %}
+                    <li>{% if competition.novices_in_experienced_teams %}Novices can be in experienced teams{% else %}Novices cannot be in experienced teams{% endif %}</li>
+                    {% endif %}
+                </ul>
+            </dd>
+        </dl>
     </div>
 </div>
+{% endblock %}
 
 {% endblock %}
 
