@@ -456,6 +456,8 @@ class Team(BaseResultMode):
     def get_team_types(self, competition):
         # TODO: support team types properly
         team_types = ['Non-compound']
+        if competition.split_gender_teams:
+            team_types = ['Gents non-compound', 'Ladies non-compound']
         if competition.compound_team_size is not None:
             team_types.append('Compound')
         if competition.junior_team_size is not None:
@@ -522,18 +524,29 @@ class Team(BaseResultMode):
     def is_valid_for_type(self, score, type, competition):
         if score.target.session_entry.competition_entry.guest:
             return False
+        is_non_compound = not score.target.session_entry.competition_entry.bowstyle.name == 'Compound'
         if type == 'Non-compound':
-            is_non_compound = not score.target.session_entry.competition_entry.bowstyle.name == 'Compound'
             if not competition.novices_in_experienced_teams:
                 return is_non_compound and score.target.session_entry.competition_entry.novice == 'E'
             return is_non_compound
+        if type == 'Gents non-compound':
+            if not competition.novices_in_experienced_teams:
+                return (is_non_compound
+                        and score.target.session_entry.competition_entry.novice == 'E'
+                        and score.target.session_entry.competition_entry.archer.gender == 'G')
+            return is_non_compound and score.target.session_entry.competition_entry.archer.gender == 'G'
+        if type == 'Ladies non-compound':
+            if not competition.novices_in_experienced_teams:
+                return (is_non_compound
+                        and score.target.session_entry.competition_entry.novice == 'E'
+                        and score.target.session_entry.competition_entry.archer.gender == 'L')
+            return is_non_compound and score.target.session_entry.competition_entry.archer.gender == 'L'
         if type == 'Compound':
-            return score.target.session_entry.competition_entry.bowstyle.name == 'Compound'
+            return not is_non_compound
         if type == 'Novice':
-            return not score.target.session_entry.competition_entry.bowstyle.name == 'Compound' and score.target.session_entry.competition_entry.novice == 'N'
+            return is_non_compound and score.target.session_entry.competition_entry.novice == 'N'
         if type == 'Junior':
             is_junior = score.target.session_entry.competition_entry.age == 'J'
-            is_non_compound = not score.target.session_entry.competition_entry.bowstyle.name == 'Compound'
             if not competition.novices_in_experienced_teams:
                 return is_junior and is_non_compound and score.target.session_entry.competition_entry.novice == 'E'
             return is_junior and is_non_compound
