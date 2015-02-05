@@ -40,6 +40,7 @@ class BaseResultMode(object):
     name = ''
     include_distance_breakdown = False
     ignore_subrounds = False
+    subrounds = {}
 
     def __init__(self, **kwargs):
         for key, value in kwargs.items():
@@ -94,13 +95,18 @@ class BaseResultMode(object):
     def label_for_round(self, round):
         return unicode(round)
 
+    def get_subrounds(self, score):
+        if score.is_team or self.ignore_subrounds:
+            return []
+        shot_round = score.target.session_entry.session_round.shot_round
+        if shot_round not in self.subrounds:
+            self.subrounds[shot_round] = shot_round.subrounds.all()
+        return self.subrounds[shot_round]
+
     def score_details(self, score, section):
         from entries.models import SCORING_TOTALS, SCORING_DOZENS, SCORING_FULL
         scores = []
-        if score.is_team or self.ignore_subrounds:
-            subrounds = []
-        else:
-            subrounds = score.target.session_entry.session_round.shot_round.subrounds.all()
+        subrounds = self.get_subrounds(score)
         if self.include_distance_breakdown and len(subrounds) > 1 and not score.target.session_entry.session_round.session.scoring_system == SCORING_TOTALS:
             if score.disqualified or score.target.session_entry.session_round.session.scoring_system == SCORING_TOTALS or hasattr(score, 'is_mock'):
                 scores += [''] * len(subrounds)
@@ -226,7 +232,7 @@ class ByRound(BaseResultMode):
     def get_rounds(self, competition):
         from entries.models import SessionRound
 
-        session_rounds = SessionRound.objects.filter(session__competition=competition, olympicsessionround__isnull=True).order_by('session__start')
+        session_rounds = SessionRound.objects.filter(session__competition=competition, olympicsessionround__isnull=True).order_by('session__start').select_related('shot_round')
         rounds = []
         for round in session_rounds:
             if round.shot_round not in rounds:
@@ -507,7 +513,6 @@ class Team(BaseResultMode):
                 continue
             if getattr(club_scores[0], 'components', None):
                 club_scores = sum((s.components for s in club_scores), [])
-                print club, len(club_scores), len(sessions), team_size
             if competition.combine_rounds_for_team_scores and not competition.allow_incomplete_teams and len(club_scores) < (team_size * len(sessions)):
                 continue
             team = ScoreMock(
