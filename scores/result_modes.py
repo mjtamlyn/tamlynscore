@@ -454,6 +454,8 @@ class Team(BaseResultMode):
             if club not in clubs:
                 clubs[club] = []
             clubs[club].append(score)
+        if not clubs:
+            return {}
         results = OrderedDict()
         for type in self.get_team_types(competition):
             results[type] = self.get_team_scores(competition, clubs, type)
