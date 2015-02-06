@@ -137,6 +137,10 @@ table.table tbody {
 table.table tbody tr {
   border-bottom: 1px solid #cccccc;
 }
+/* line 35, ../../sass/_tables.sass */
+table.table tbody tr.no-border {
+  border-bottom: none;
+}
 
 /* line 1, ../../sass/_forms.sass */
 input {
