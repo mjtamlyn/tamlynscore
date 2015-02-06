@@ -93,3 +93,7 @@ CACHES = {
         'BACKEND': 'django.core.cache.backends.locmem.LocMemCache',
     }
 }
+
+DEBUG_TOOLBAR_CONFIG = {
+    'JQUERY_URL': STATIC_URL + 'lib/jquery/jquery-2.1.3.min.js',
+}
