@@ -302,30 +302,20 @@ $border: 1px solid $darkbluegrey
     display: block
 
     .actions
-      margin: 10px
-      .action
-        float: left
-        &.active
-          font-style: italic
+      margin: 10px 0
 
-    table
-      border-collapse: collapse
-      margin-top: 10px
-      width: 100%
-      th
-        background-color: $vlightblue
-      th, td
-        border: $border
-        padding: 4px
+    tr.present
+      background-color: $bg
 
-      tr.present
-        background-color: $bg
-  
-        a.present
-          display: none
-      tr:not(.present)
-        a.not-present
-          display: none
+      a.present
+        display: none
+    tr:not(.present)
+      a.not-present
+        display: none
+
+    .archer-details
+      opacity: 0.5
+      font-style: italic
 
 .input-scores
   .input-board
