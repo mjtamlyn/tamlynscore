@@ -4,16 +4,22 @@
 {% block title %}{{ title }} - {{ mode }}{% endblock %}
 
 {% block competition_content %}
-<p><a href="{% url url_name slug=competition.slug mode=mode.slug format='pdf' %}" class="btn">PDF</a></p>
-<p><a href="{% url url_name slug=competition.slug mode=mode.slug format='csv' %}" class="btn">CSV</a></p>
-<div class="board selected">
-    <table>
-        {% for section, categories in results.items %}
-        <tr><td colspan="100%"><h4>{{ section }}</h4></td></tr>
-        {% for category, scores in categories.items %}
-            <tr><td colspan="100%"><h5>{{ category }}</h5></td></tr>
+<p>
+    <a href="{% url url_name slug=competition.slug mode=mode.slug format='pdf' %}" class="btn">PDF</a>
+    <a href="{% url url_name slug=competition.slug mode=mode.slug format='csv' %}" class="btn">CSV</a>
+</p>
+
+<div class="row">
+    {% for section, categories in results.items %}
+    {% for category, scores in categories.items %}
+    <div class="col3">
+        <table class="table">
+            {% ifchanged section %}
+            <tr><th colspan="100%">{{ section }}</th></tr>
+            {% endifchanged %}
+            <tr><th colspan="100%">{{ category }}</th></tr>
             {% for score in scores %}
-                <tr>
+                <tr {% if score.team %}class="no-border"{% endif %}>
                     {% if score.disqualified %}
                     <td></td>
                     {% else %}
@@ -32,7 +38,7 @@
                 </tr>
                 {% if score.team %}
                     {% for member in score.team %}
-                    <tr>
+                    <tr {% if not forloop.last %}class="no-border"{% endif %}>
                         <td></td>
                         <td>{{ member.target.session_entry.competition_entry.archer }}</td>
                         {% for detail in member.details %}
@@ -42,8 +48,9 @@
                     {% endfor %}
                 {% endif %}
             {% endfor %}
-        {% endfor %}
-        {% endfor %}
-    </table>
+        </table>
+    </div>
+    {% endfor %}
+    {% endfor %}
 </div>
 {% endblock %}
