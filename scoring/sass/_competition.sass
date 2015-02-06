@@ -320,6 +320,8 @@ $border: 1px solid $darkbluegrey
 .input-scores
   .input-board
     display: block
+    padding-bottom: 10px
+    border-bottom: 2px solid $borders
 
     .bosses
       overflow: auto
@@ -329,9 +331,10 @@ $border: 1px solid $darkbluegrey
       background-color: $vlightblue
       border: 1px solid $lightblue
       float: left
-      font-size: 20px
       height: $boss-size
       margin: 5px
+      padding: 5px
+      +border-radius(5px)
       text-align: center
       width: $boss-size
       &.done
@@ -341,8 +344,8 @@ $border: 1px solid $darkbluegrey
     .boss-link:focus
       outline: none
       .boss
-        border-color: $hlyellow
-        box-shadow: 0 0 5px $hlyellow
+        border-color: $lightblue
+        box-shadow: 0 0 5px $lightblue
 
 .input-arrows
   table

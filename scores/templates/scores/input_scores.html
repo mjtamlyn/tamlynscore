@@ -92,20 +92,24 @@
 {% block main %}
 {% csrf_token %}
 {% for session, details in target_list.items %}
-<h4>{{ session.start|date:"l, jS F - f a" }}</h4>
+<div class="row">
+    <div class="col6">
+        <h4>{{ session.start|date:"l, jS F - f a" }}</h4>
 
-<div class="input-board" id="session-{{ session.pk }}">
-    {% for dozen in details.dozens %}
-    <h5>{% if session.arrows_entered_per_end == 12 %}Dozen{% else %}End{% endif %} {{ dozen }}</h5>
-    <div class="bosses">
-        {% for boss, complete_lookup in details.bosses %}
-        <a href="{% block linklocation %}{% url session.input_view_name slug=competition.slug session_id=session.pk dozen=dozen boss=boss %}{% endblock %}" class="boss-link" rel="{{ dozen }}-{{ boss }}-{{ session.pk }}">
-            <div class="boss {{ complete_lookup|dozcomplete:dozen }}">{{ boss }}</div>
-        </a>
-        {% endfor %}
-        <div class="clear"></div>
+        <div class="input-board" id="session-{{ session.pk }}">
+            {% for dozen in details.dozens %}
+            <h5>{% if session.arrows_entered_per_end == 12 %}Dozen{% else %}End{% endif %} {{ dozen }}</h5>
+            <div class="bosses">
+                {% for boss, complete_lookup in details.bosses %}
+                <a href="{% block linklocation %}{% url session.input_view_name slug=competition.slug session_id=session.pk dozen=dozen boss=boss %}{% endblock %}" class="boss-link" rel="{{ dozen }}-{{ boss }}-{{ session.pk }}">
+                    <div class="boss {{ complete_lookup|dozcomplete:dozen }}">{{ boss }}</div>
+                </a>
+                {% endfor %}
+                <div class="clear"></div>
+            </div>
+            {% endfor %}
+        </div>
     </div>
-    {% endfor %}
 </div>
 {% endfor %}
 {% endblock %}
