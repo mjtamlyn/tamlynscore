@@ -6,6 +6,7 @@
         };
 
         $('.present').click(function (e) {
+            e.preventDefault();
             var $el = $(this);
             var request = $.post(
                 '',
@@ -20,6 +21,7 @@
         });
 
         $('.not-present').click(function (e) {
+            e.preventDefault();
             var $el = $(this);
             var request = $.post(
                 '',

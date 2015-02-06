@@ -10,71 +10,107 @@
 {% block title %}Registration{% endblock %}
 
 {% block main %}
-<div class="intro">
-    Sessions:
-    <ul>
-        {% for session, details in target_list.items %}
-        <li>
-        <span>{{ session.start|date:"l, jS F - f a" }}</span>
-        {% if details.entries|length %}
-        <span class="unallocated" title="Unallocated entries">{{ details.entries|length }}</span>
-        {% endif %}
-        <a class="btn" href="#session-{{ session.pk }}">Skip</a>
-        <small title="Unregistered entries">{{ details.unregistered }} Unregistered</small>
-        </li>
-        {% endfor %}
-    </ul>
+<div class="row">
+    <div class="col6">
+        <em>Sessions:</em>
+        <ul>
+            {% for session, details in target_list.items %}
+            <li><p>
+            <span>{{ session.start|date:"l, jS F - f a" }}</span>
+            {% if details.entries|length %}
+            <span class="unallocated" title="Unallocated entries">{{ details.entries|length }}</span>
+            {% endif %}
+            <a class="btn btn-small" href="#session-{{ session.pk }}">Skip</a>
+            <small title="Unregistered entries">{{ details.unregistered }} unregistered</small>
+            </p></li>
+            {% endfor %}
+        </ul>
+    </div>
 </div>
 
 {% for session, details in target_list.items %}
-<div class="registration-board" id="session-{{ session.pk }}" rel="{{ session.archers_per_target }}">
-    <ul class="actions">
-        <select class="club-filter">
-            <option data-club="--all--">--All--</option>
-        </select>
-    </ul>
-    <div class="clear"></div>
-    <table>
-        <thead>
-            <th>Target</th>
-            <th>Name</th>
-            <th>Club</th>
-            <th>Bowstyle</th>
-            <th>Gender</th>
-            {% if competition.has_novices %}
-            <th>Experience</th>
-            {% endif %}
-            {% if competition.has_juniors %}
-            <th>Age</th>
-            {% endif %}
-            <th>GNAS No.</th>
-            <th>Present</th>
-        </thead>
-        {% for boss, archers in details.target_list %}
-        {% for target, archer in archers %}
-        <tr class="archer {% if not archer or archer.session_entry.present %}present{% endif %}" data-club="{{ archer.session_entry.competition_entry.club_id }}" data-clubname="{{ archer.session_entry.competition_entry.club }}">
-            <td>{{ boss }}{{ target }}</td>
-            <td>{% if archer %}<a href="{% url 'archer_update' pk=archer.session_entry.competition_entry.archer_id %}?next={{ request.path }}">{{ archer.session_entry.competition_entry.archer }}</a>{% endif %}</td>
-            <td>{{ archer.session_entry.competition_entry.club }} {% if not archer.session_entry.competition_entry.club == archer.session_entry.competition_entry.archer.club %}({{ archer.session_entry.competition_entry.archer.club.name }}){% endif %}</td>
-            <td>{{ archer.session_entry.competition_entry.bowstyle }} {% if not archer.session_entry.competition_entry.bowstyle == archer.session_entry.competition_entry.archer.bowstyle %}({{ archer.session_entry.competition_entry.archer.bowstyle }}){% endif %}</td>
-            <td>{{ archer.session_entry.competition_entry.archer.get_gender_display }}</td>
-            {% if competition.has_novices %}
-            <td>{{ archer.session_entry.competition_entry.get_novice_display }} {% if not archer.session_entry.competition_entry.get_novice_display == archer.session_entry.competition_entry.archer.get_novice_display %}({{ archer.session_entry.competition_entry.archer.get_novice_display }}){% endif %}</td>
-            {% endif %}
-            {% if competition.has_juniors %}
-            <td>{{ archer.session_entry.competition_entry.get_age_display }}</td>
-            {% endif %}
-            <td>{{ archer.session_entry.competition_entry.archer.gnas_no }}</td>
-            <td>
-                {% if archer %}
-                <a href="#present" class="present" data-pk="{{ archer.session_entry.pk }}">Not Present</a>
-                <a href="#not-present" class="not-present" data-pk="{{ archer.session_entry.pk }}">Present</a>
-                {% endif %}
-            </td>
-        </tr>
-        {% endfor %}
-        {% endfor %}
-    </table>
+<div class="row">
+    <div class="col6">
+        <div class="registration-board" id="session-{{ session.pk }}" rel="{{ session.archers_per_target }}">
+            <div class="actions">
+                <select class="club-filter">
+                    <option data-club="--all--">--All--</option>
+                </select>
+            </div>
+            <table class="table">
+                <thead>
+                    <th>Target</th>
+                    <th>Name</th>
+                    <th>Club</th>
+                    <th>Bowstyle</th>
+                    <th>Gender</th>
+                    {% if competition.has_novices %}
+                    <th>Experience</th>
+                    {% endif %}
+                    {% if competition.has_juniors %}
+                    <th>Age</th>
+                    {% endif %}
+                    <th>GNAS No.</th>
+                    <th>Present</th>
+                </thead>
+                {% for boss, archers in details.target_list %}
+                {% for target, archer in archers %}
+                {% with archer.session_entry.competition_entry as entry %}
+                <tr class="archer {% if not archer or archer.session_entry.present %}present{% endif %}" data-club="{{ entry.club_id }}" data-clubname="{{ archer.session_entry.competition_entry.club }}">
+                    <td>{{ boss }}{{ target }}</td>
+                    <td>{% if archer %}<a href="{% url 'archer_update' pk=entry.archer_id %}?next={{ request.path }}">{{ entry.archer }}</a>{% endif %}</td>
+                    <td>
+                        {{ entry.club }}
+                        {% if not entry.club == entry.archer.club %}
+                        <span class="archer-details">({{ entry.archer.club.name }})</span>
+                        {% endif %}
+                    </td>
+                    <td>
+                        {% if archer %}
+                            <span class="pill {{ entry.bowstyle|slugify }}">{{ entry.bowstyle }}</span>
+                            {% if not entry.bowstyle == entry.archer.bowstyle %}
+                            <span class="archer-details">(
+                                <span class="pill {{ entry.archer.bowstyle|slugify }}">{{ entry.archer.bowstyle }}</span>
+                            )</span>
+                            {% endif %}
+                        {% endif %}
+                    </td>
+                    <td>
+                        {% if archer %}
+                            <span class="pill {{ entry.archer.get_gender_display|slugify }}">
+                                {{ entry.archer.get_gender_display }}
+                            </span>
+                        {% endif %}
+                    </td>
+                    {% if competition.has_novices %}
+                    <td>
+                        {% if archer and entry.novice == "N" or entry.archer.novice == "N" %}
+                        <span class="pill novice">{{ entry.get_novice_display }}</span>
+                        {% if not entry.get_novice_display == entry.archer.get_novice_display %}
+                        <span class="archer-details">(
+                            <span class="pill novice">{{ entry.archer.get_novice_display }}</span>
+                        )</span>
+                        {% endif %}
+                        {% endif %}
+                    </td>
+                    {% endif %}
+                    {% if competition.has_juniors %}
+                    <td>{{ entry.get_age_display }}</td>
+                    {% endif %}
+                    <td>{{ entry.archer.gnas_no }}</td>
+                    <td>
+                        {% if archer %}
+                        <a href="#present" class="present btn" data-pk="{{ archer.session_entry.pk }}">Not Present</a>
+                        <a href="#not-present" class="not-present btn" data-pk="{{ archer.session_entry.pk }}">Present</a>
+                        {% endif %}
+                    </td>
+                </tr>
+                {% endwith %}
+                {% endfor %}
+                {% endfor %}
+            </table>
+        </div>
+    </div>
 </div>
 {% endfor %}
 

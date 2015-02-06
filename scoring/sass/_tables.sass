@@ -1,5 +1,5 @@
 // Faked tables
-.table
+div.table
   display: table
   .table-row
     display: table-row
@@ -9,6 +9,25 @@
     &.header
       font-weight: bold
 
-.table
+div.table
   &.full-width
     width: 100%
+
+// Real tables
+
+table.table
+  border-collapse: collapse
+  width: 100%
+
+  td, th
+    padding: 8px 3px
+
+  thead
+    tr
+      border-bottom: 2px solid $borders
+
+  tbody
+    font-size: 14px
+
+    tr
+      border-bottom: 1px solid $borders
