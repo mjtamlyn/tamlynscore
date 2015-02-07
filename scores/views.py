@@ -849,8 +849,8 @@ class NewLeaderboard(PDFResultsRenderer, CSVResultsRenderer, ListView):
 
     def get(self, request, *args, **kwargs):
         self.competition = self.get_competition()
-        self.mode = self.get_mode()
         self.format = self.get_format()
+        self.mode = self.get_mode()
         self.object_list = self.get_queryset()
         context = self.get_context_data(competition=self.competition, object_list=self.object_list)
         return self.render_to_response(context)
@@ -860,7 +860,7 @@ class NewLeaderboard(PDFResultsRenderer, CSVResultsRenderer, ListView):
         return competition
 
     def get_mode(self):
-        mode = get_mode(self.kwargs['mode'], include_distance_breakdown=self.include_distance_breakdown)
+        mode = get_mode(self.kwargs['mode'], include_distance_breakdown=self.include_distance_breakdown, hide_golds=self.get_hide_golds())
         if not mode:
             raise Http404('No such mode')
         if not self.mode_exists(mode):
@@ -898,6 +898,11 @@ class NewLeaderboard(PDFResultsRenderer, CSVResultsRenderer, ListView):
         kwargs['url_name'] = self.url_name
         kwargs['title'] = self.title
         return super(NewLeaderboard, self).get_context_data(**kwargs)
+
+    def get_hide_golds(self):
+        if self.format == 'big-screen':
+            return True
+        return False
 
     def render_to_response(self, context, **response_kwargs):
         if self.format == 'pdf':

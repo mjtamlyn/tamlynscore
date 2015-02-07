@@ -133,10 +133,11 @@ class BaseResultMode(object):
             scores += [score.score, 'Retired', '']
         elif hasattr(score, 'partial_score'):
             scores += [
-                score.score,
+                score.partial_score,
+                score.final_score,
             ]
         elif section.round is None:
-            # weekend mode
+            # weekend mode -- TODO: This is also being picked up by the by session results mode
             scores += [
                 score.score,
                 score.hits,
@@ -146,15 +147,21 @@ class BaseResultMode(object):
         elif section.round.scoring_type == 'X':
             scores += [
                 score.score,
-                score.golds,
-                score.xs,
             ]
+            if not self.hide_golds:
+                scores += [
+                    score.golds,
+                    score.xs,
+                ]
         else:
             scores += [
                 score.score,
-                score.hits,
-                score.golds,
             ]
+            if not self.hide_golds:
+                scores += [
+                    score.hits,
+                    score.golds,
+                ]
         return scores
 
 
@@ -300,12 +307,10 @@ class ByRoundProgressional(ByRound, BaseResultMode):
                 partial = partial_scores.get(score.pk)
                 if partial is not None:
                     if not score.score == partial:
-                        score.golds = '(%s)' % score.score
+                        score.final_score = '(%s)' % score.score
                     else:
-                        score.golds = ''
-                    score.score = partial
-                    score.hits = ''
-                    score.xs = ''
+                        score.final_score = ''
+                    score.partial_score = partial
         self.leaderboard = leaderboard
         rounds = self.get_rounds(competition)
         return OrderedDict((

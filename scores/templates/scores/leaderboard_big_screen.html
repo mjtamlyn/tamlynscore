@@ -15,11 +15,11 @@
             <table class="table">
             {% for score in scores %}
             {% if forloop.counter < 9 %}
-                <tr>
+            <tr {% if score.team %}class="no-border"{% endif %}>
                     {% if score.disqualified %}
                     <td></td>
                     {% else %}
-                    <td>{{ forloop.counter }}</td>
+                    <td>{% if score.placing %}{{ score.placing }}{% endif %}</td>
                     {% endif %}
                     {% if score.team %}
                         <th>{{ score.club }}</th>
@@ -28,17 +28,18 @@
                         <td>{{ score.target.session_entry.competition_entry.club}}</td>
                         <td>{% if score.target.session_entry.competition_entry.novice == 'N' %}Novice{% endif %}</td>
                     {% endif %}
-                    <td>{{ score.score }}</td>
+                    {% for detail in score.details %}
+                        {% if detail %}
+                        <td>{{ detail }}</td>
+                        {% endif %}
+                    {% endfor %}
                 </tr>
                 {% if score.team %}
                     {% for member in score.team %}
-                    <tr>
+                    <tr {% if not forloop.last %}class="no-border"{% endif %}>
                         <td></td>
                         <td>{{ member.target.session_entry.competition_entry.archer }}</td>
                         <td>{{ member.score }}</td>
-                        <td>{{ member.hits }}</td>
-                        <td>{{ member.golds }}</td>
-                        <td>{{ member.xs }}</td>
                     </tr>
                     {% endfor %}
                 {% endif %}
