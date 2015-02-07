@@ -39,7 +39,6 @@ var Arrows = new Class({
     },
 
     setUp: function () {
-        $$('input')[0].focus();
         $$('input[type=text]').each(function (item, index, array) {
             if (item.get('type') !== 'text') {
                 return;
@@ -97,6 +96,7 @@ var Arrows = new Class({
         $$('form').addEvent('submit', function (e) {
             $$('input[disabled]').set('disabled', '');
         });
+        $$('input[type=text]:not([disabled])')[0].focus();
     },
 
     updateTotals: function (input) {
@@ -157,7 +157,6 @@ var Arrows = new Class({
         if (!currentFocus) {
             return;
         }
-        console.log('hello?');
         var row = currentFocus.getParent('tr');
         if (dir === 'up' || dir === 'down') {
             var table = row.getParent('table');
