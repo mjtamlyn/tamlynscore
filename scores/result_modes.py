@@ -311,6 +311,7 @@ class ByRoundProgressional(ByRound, BaseResultMode):
                     else:
                         score.final_score = ''
                     score.partial_score = partial
+                    score.score = partial
         self.leaderboard = leaderboard
         rounds = self.get_rounds(competition)
         return OrderedDict((
