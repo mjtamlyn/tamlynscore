@@ -35,7 +35,7 @@ class InputScores(TargetList):
     template_name = 'scores/input_scores.html'
 
     def get_queryset(self):
-        return super(InputScores, self).get_queryset().order_by('session_entry__session_round__session', 'boss', 'target')
+        return super(InputScores, self).get_queryset().order_by('session_entry__session_round__session', 'boss', 'target').select_related('score')
 
     def add_unallocated_entries(self, target_list):
         pass
