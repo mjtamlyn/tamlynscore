@@ -15,28 +15,30 @@
 <div class="module input-arrows">
     <h4>Enter arrow values for boss {{ boss }}, dozen {{ dozen }}</h4>
     <form action="" method="post" autocomplete="off">
-        <table class="target">
-            <tr>
-                <th colspan="2">Archer</th>
-                <td colspan="{% if forms.0.forms|length > 6 %}6{% else %}{{ forms.0.forms|length }}{% endif %}"></td>
-                {% if forms.0.forms|length > 6 %}
-                <th>ET</th>
-                <td colspan="6"></td>
-                <th>ET</th>
-                {% endif %}
-                <th>Doz</th>
-                {% if not round.has_xs %}
-                <th>Hits</th>
-                {% endif %}
-                <th>Golds</th>
-                {% if round.has_xs %}
-                <th>Xs</th>
-                {% endif %}
-                <th>RT</th>
-                <th>Retired</th>
-            </tr>
+        <table class="target table">
+            <thead>
+                <tr>
+                    <th colspan="2">Archer</th>
+                    <td colspan="{% if forms.0.forms|length > 6 %}6{% else %}{{ forms.0.forms|length }}{% endif %}"></td>
+                    {% if forms.0.forms|length > 6 %}
+                    <th>ET</th>
+                    <td colspan="6"></td>
+                    <th>ET</th>
+                    {% endif %}
+                    <th>Doz</th>
+                    {% if not round.has_xs %}
+                    <th>Hits</th>
+                    {% endif %}
+                    <th>Golds</th>
+                    {% if round.has_xs %}
+                    <th>Xs</th>
+                    {% endif %}
+                    <th>RT</th>
+                    <th>Retired</th>
+                </tr>
+            </thead>
             {% for target in forms %}
-            <tr>
+            <tr class="no-border">
                 <td>{{ target.target }}</td>
                 <td><a href="{% url 'input_arrows_archer' slug=competition.slug score_id=target.score.pk %}">{{ target.archer }}</a></td>
                 {% for form in target.forms %}
@@ -66,7 +68,7 @@
             {% endfor %}
         </table>
         <div class="save">
-            <input type="submit" value="Save" />
+            <input type="submit" value="Save" class="btn" />
         </div>
         {% csrf_token %}
     </form>
