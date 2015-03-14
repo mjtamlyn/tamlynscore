@@ -109,6 +109,9 @@ class Session(models.Model):
     def __unicode__(self):
         return u'{0} - {1}'.format(self.competition, self.start)
 
+    class Meta:
+        ordering = ['start']
+
     @property
     def details(self):
         details = ['A', 'B', 'C', 'D', 'E', 'F']
