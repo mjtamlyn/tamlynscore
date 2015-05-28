@@ -10,7 +10,7 @@ class ArcherAdmin(admin.ModelAdmin):
 
 
 class ClubAdmin(admin.ModelAdmin):
-    list_display = ('name', 'short_name', 'abbreviation')
+    list_display = ('name', 'short_name')
 
 
 class RoundAdmin(admin.ModelAdmin):

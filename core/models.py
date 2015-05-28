@@ -124,7 +124,6 @@ class County(models.Model):
 class Club(models.Model):
     name = models.CharField(max_length=500, unique=True)
     short_name = models.CharField(max_length=50, unique=True)
-    abbreviation = models.CharField(max_length=10, blank=True, default='')
 
     county = models.ForeignKey(County, blank=True, null=True)
 
