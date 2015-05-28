@@ -79,6 +79,11 @@
                         {% if competition.has_juniors and entry.age == "J" %}
                         <span class="pill junior">{{ entry.get_age_display }}</span>
                         {% endif %}
+                        {% if entry.archer.agb_number %}
+                            {{ entry.archer.agb_number }}
+                        {% else %}
+                            <strong>No AGB number</strong>
+                        {% endif %}
                     </p>
                 </div>
             </div>
