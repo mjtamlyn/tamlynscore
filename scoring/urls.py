@@ -1,5 +1,5 @@
 from django.conf import settings
-from django.conf.urls import patterns, include
+from django.conf.urls import include, url
 from django.conf.urls.static import static
 from django.contrib import admin
 from django.contrib.staticfiles.urls import staticfiles_urlpatterns
@@ -7,13 +7,13 @@ from django.contrib.staticfiles.urls import staticfiles_urlpatterns
 
 admin.autodiscover()
 
-urlpatterns = patterns('',
-    (r'', include('core.urls')),
-    (r'^tournaments/', include('entries.urls')),
-    (r'^tournaments/', include('scores.urls')),
-    (r'^tournaments/olympic/', include('olympic.urls')),
-    (r'^accounts/', include('accounts.urls')),
-    (r'^admin/', include(admin.site.urls)),
-)
+urlpatterns = [
+    url(r'', include('core.urls')),
+    url(r'^tournaments/', include('entries.urls')),
+    url(r'^tournaments/', include('scores.urls')),
+    url(r'^tournaments/olympic/', include('olympic.urls')),
+    url(r'^accounts/', include('accounts.urls')),
+    url(r'^admin/', include(admin.site.urls)),
+]
 
 urlpatterns += staticfiles_urlpatterns() + static(settings.MEDIA_URL, document_root=settings.MEDIA_ROOT)

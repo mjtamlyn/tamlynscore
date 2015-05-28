@@ -33,11 +33,13 @@ class ClubDetail(DetailView):
 @class_view_decorator(login_required)
 class ClubUpdate(UpdateView):
     model = Club
+    fields = '__all__'
 
 
 @class_view_decorator(login_required)
 class ClubCreate(CreateView):
     model = Club
+    fields = '__all__'
 
     def get_success_url(self):
         return self.request.GET.get('next') or super(ClubCreate, self).get_success_url()
@@ -66,6 +68,7 @@ class ArcherDetail(DetailView):
 @class_view_decorator(login_required)
 class ArcherUpdate(UpdateView):
     model = Archer
+    fields = '__all__'
 
     def get_success_url(self):
         return self.request.GET.get('next') or self.request.path
@@ -74,6 +77,7 @@ class ArcherUpdate(UpdateView):
 @class_view_decorator(login_required)
 class ArcherCreate(CreateView):
     model = Archer
+    fields = '__all__'
 
     def get_initial(self):
         initial = {}

@@ -9,7 +9,8 @@ from factory import fuzzy
 
 
 class UserFactory(factory.DjangoModelFactory):
-    FACTORY_FOR = User
+    class Meta:
+        model = User
     first_name = factory.Sequence(lambda n: 'Firstname {0}'.format(n))
     last_name = factory.Sequence(lambda n: 'Lastname {0}'.format(n))
     username = factory.Sequence(lambda n: 'user-{0}'.format(n).lower())
@@ -27,57 +28,66 @@ class UserFactory(factory.DjangoModelFactory):
 
 
 class BowstyleFactory(factory.DjangoModelFactory):
-    FACTORY_FOR = core_models.Bowstyle
+    class Meta:
+        model = core_models.Bowstyle
     name = factory.Sequence(lambda n: 'Bowstyle %s' % n)
 
 
 class ClubFactory(factory.DjangoModelFactory):
-    FACTORY_FOR = core_models.Club
+    class Meta:
+        model = core_models.Club
     name = factory.Sequence(lambda n: 'Name %s' % n)
     short_name = factory.Sequence(lambda n: 'Short Name %s' % n)
     slug = factory.Sequence(lambda n: 'name-%s' % n)
 
 
 class ArcherFactory(factory.DjangoModelFactory):
-    FACTORY_FOR = core_models.Archer
+    class Meta:
+        model = core_models.Archer
     name = fuzzy.FuzzyText(prefix='Archer ')
     club = factory.SubFactory(ClubFactory)
     bowstyle = factory.SubFactory(BowstyleFactory)
 
 
 class TournamentFactory(factory.DjangoModelFactory):
-    FACTORY_FOR = entries_models.Tournament
+    class Meta:
+        model = entries_models.Tournament
     short_name = factory.Sequence(lambda n: 'Tournament %s' % n)
     host_club = factory.SubFactory(ClubFactory)
 
 
 class CompetitionFactory(factory.DjangoModelFactory):
-    FACTORY_FOR = entries_models.Competition
+    class Meta:
+        model = entries_models.Competition
     tournament = factory.SubFactory(TournamentFactory)
     date = timezone.now().date()
     slug = factory.Sequence(lambda n: 'competition-%s' % n)
 
 
 class SessionFactory(factory.DjangoModelFactory):
-    FACTORY_FOR = entries_models.Session
+    class Meta:
+        model = entries_models.Session
     competition = factory.SubFactory(CompetitionFactory)
     start = timezone.now()
     archers_per_target = 4
 
 
 class RoundFactory(factory.DjangoModelFactory):
-    FACTORY_FOR = core_models.Round
+    class Meta:
+        model = core_models.Round
     name = factory.Sequence(lambda n: 'Name-%s' % n)
 
 
 class SessionRoundFactory(factory.DjangoModelFactory):
-    FACTORY_FOR = entries_models.SessionRound
+    class Meta:
+        model = entries_models.SessionRound
     session = factory.SubFactory(SessionFactory)
     shot_round = factory.SubFactory(RoundFactory)
 
 
 class CompetitionEntryFactory(factory.DjangoModelFactory):
-    FACTORY_FOR = entries_models.CompetitionEntry
+    class Meta:
+        model = entries_models.CompetitionEntry
     competition = factory.SubFactory(CompetitionFactory)
     archer = factory.SubFactory(ArcherFactory)
     club = factory.SubFactory(ClubFactory)
@@ -87,6 +97,7 @@ class CompetitionEntryFactory(factory.DjangoModelFactory):
 
 
 class SessionEntryFactory(factory.DjangoModelFactory):
-    FACTORY_FOR = entries_models.SessionEntry
+    class Meta:
+        model = entries_models.SessionEntry
     competition_entry = factory.SubFactory(CompetitionEntryFactory)
     session_round = factory.SubFactory(SessionRoundFactory)
