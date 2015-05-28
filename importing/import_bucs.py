@@ -51,8 +51,7 @@ for session_name, session_round in zip(['B'], session_rounds):
 #        continue
 #    except Club.DoesNotExist:
 #        full_name = club + 'versity Archery Club'
-#        abbreviation = ''.join([n[0] for n in full_name.split(' ')])
-#        club = Club(name=full_name, short_name=club, abbreviation=abbreviation)
+#        club = Club(name=full_name, short_name=club)
 #        club.clean()
 #        club.save()
 #        print club.pk, club.name
