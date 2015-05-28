@@ -1,8 +1,8 @@
-from django.conf.urls import patterns, url
+from django.conf.urls import url
 
 import views
 
-urlpatterns = patterns('core.views',
+urlpatterns = [
     url(r'^$', views.Index.as_view(), name='index'),
     url(r'^clubs/$', views.ClubList.as_view(), name='club_list'),
     url(r'^clubs/add/$', views.ClubCreate.as_view(), name='club_create'),
@@ -11,4 +11,4 @@ urlpatterns = patterns('core.views',
     url(r'^archer/add/$', views.ArcherCreate.as_view(), name='archer_create'),
     url(r'^archer/(?P<pk>\d+)/$', views.ArcherDetail.as_view(), name='archer_detail'),
     url(r'^archer/(?P<pk>\d+)/edit/$', views.ArcherUpdate.as_view(), name='archer_update'),
-)
+]

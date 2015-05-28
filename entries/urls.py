@@ -1,8 +1,8 @@
-from django.conf.urls import patterns, url
+from django.conf.urls import url
 
 from entries import views
 
-urlpatterns = patterns('entries.views',
+urlpatterns = [
     url(r'^$', views.CompetitionList.as_view(), name='tournaments_list'),
     url(r'^(?P<slug>[\w-]+)/$', views.CompetitionDetail.as_view(), name='competition_detail'),
     url(r'^(?P<slug>[\w-]+)/entries/$', views.EntryList.as_view(), name='entry_list'),
@@ -11,13 +11,13 @@ urlpatterns = patterns('entries.views',
     url(r'^(?P<slug>[\w-]+)/entries/edit/(?P<entry_id>\d+)/?$', views.EntryUpdate.as_view(), name='entry_update'),
     url(r'^(?P<slug>[\w-]+)/entries/delete/(?P<entry_id>\d+)/?$', views.EntryDelete.as_view(), name='entry_delete'),
     url(r'^(?P<slug>[\w-]+)/target-list/$', views.TargetList.as_view(), name='target_list'),
-    url(r'^(?P<slug>[\w-]+)/target-list/pdf/$', 'target_list_pdf', name='target_list_pdf'),
-    (r'^(?P<slug>[\w-]+)/target-list/lunch/$', 'target_list_lunch'),
+    url(r'^(?P<slug>[\w-]+)/target-list/pdf/$', views.target_list_pdf, name='target_list_pdf'),
+    url(r'^(?P<slug>[\w-]+)/target-list/lunch/$', views.target_list_lunch),
     url(r'^(?P<slug>[\w-]+)/score-sheets/$', views.ScoreSheets.as_view(), name='score_sheets'),
     url(r'^(?P<slug>[\w-]+)/score-sheets/(?P<round_id>\d+)/$', views.ScoreSheetsPdf.as_view(), name='score_sheets_pdf'),
     url(r'^(?P<slug>[\w-]+)/score-sheets/session/(?P<session_id>\d+)/$', views.SessionScoreSheetsPdf.as_view(),
         name='session_score_sheets_pdf'),
-    (r'^(?P<slug>[\w-]+)/running-slips/(?P<round_id>\d+)/$', 'running_slips_pdf'),
+    url(r'^(?P<slug>[\w-]+)/running-slips/(?P<round_id>\d+)/$', views.running_slips_pdf),
 
     url(r'^(?P<slug>[\w-]+)/registration/$', views.Registration.as_view(), name='registration'),
-)
+]
