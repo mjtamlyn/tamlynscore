@@ -158,7 +158,7 @@ class Archer(models.Model):
     bowstyle = models.ForeignKey(Bowstyle)
     age = models.CharField(max_length=1, choices=AGE_CHOICES, default='S')
     novice = models.CharField(max_length=1, choices=NOVICE_CHOICES, default='E')
-    gnas_no = models.BigIntegerField(blank=True, null=True)
+    agb_number = models.BigIntegerField(blank=True, null=True)
 
     def __unicode__(self):
         return self.name

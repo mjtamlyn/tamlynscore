@@ -36,6 +36,7 @@ class EntryCreateForm(forms.Form):
         required=False,
     )
     update_bowstyle = forms.BooleanField(required=False)
+    agb_number = forms.IntegerField(required=False, label='ArcheryGB number')
 
     def __init__(self, archer, competition, **kwargs):
         super(EntryCreateForm, self).__init__(**kwargs)
@@ -45,6 +46,7 @@ class EntryCreateForm(forms.Form):
         current = self.get_current_obj()
         self.fields['club'].label = 'Club (%s)' % current.club
         self.fields['bowstyle'].label = 'Bowstyle (%s)' % current.bowstyle
+        self.initial['agb_number'] = archer.agb_number
         if self.competition.has_novices:
             self.fields['novice'] = forms.ChoiceField(
                 label='Experienced/Novice (%s)' % current.get_novice_display(),
@@ -91,6 +93,9 @@ class EntryCreateForm(forms.Form):
             changed = True
         if self.competition.has_juniors and self.cleaned_data['age'] and self.cleaned_data['update_age']:
             self.archer.age = self.cleaned_data['age']
+            changed = True
+        if not self.cleaned_data['agb_number'] == self.archer.agb_number:
+            self.archer.agb_number = self.cleaned_data['agb_number']
             changed = True
         if changed:
             self.archer.save()
