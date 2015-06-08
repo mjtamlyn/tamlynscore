@@ -82,8 +82,8 @@ class ArcherCreate(CreateView):
     def get_initial(self):
         initial = {}
         cached = cache.get('archer-create')
-        if cached:
-            initial = cached
+        #if cached:
+        #    initial = cached
         name = self.request.GET.get('name')
         if name:
             initial['name'] = name
