@@ -66,8 +66,8 @@ class EntryCreateForm(forms.Form):
                 queryset=self.session_rounds,
                 widget=forms.CheckboxSelectMultiple,
             )
-            if cache.get('entry-form:sessions'):
-                self.initial['sessions'] = cache.get('entry-form:sessions')
+            #if cache.get('entry-form:sessions'):
+            #    self.initial['sessions'] = cache.get('entry-form:sessions')
 
     def get_current_obj(self):
         return self.archer
