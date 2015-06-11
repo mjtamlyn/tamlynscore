@@ -4,7 +4,7 @@ from django.core.urlresolvers import reverse
 from django.contrib.auth.decorators import login_required
 from django.db.models import Max
 from django.http import HttpResponseRedirect
-from django.views.generic import View, TemplateView
+from django.views.generic import View, TemplateView, FormView
 from django.shortcuts import render, get_object_or_404
 
 from reportlab.lib import colors
@@ -13,13 +13,13 @@ from reportlab.platypus import KeepTogether, PageBreak, Spacer, Table, TableStyl
 from reportlab.rl_config import defaultPageSize
 
 from entries.models import Competition
-from entries.views import ScoreSheetsPdf, HeadedPdfView
+from entries.views import CompetitionMixin, ScoreSheetsPdf, HeadedPdfView
 from scores.models import Score
 from scores.result_modes import BaseResultMode
 from scores.views import PDFResultsRenderer
 from scoring.utils import class_view_decorator
 from olympic.models import OlympicSessionRound, Seeding, Match, Result
-from olympic.forms import ResultForm
+from olympic.forms import ResultForm, SetupForm
 
 from itertools import groupby
 
@@ -50,9 +50,66 @@ class OlympicIndex(View):
         return self.get(request, slug)
 
 
+class FieldPlanMixin(CompetitionMixin):
+    def dispatch(self, request, *args, **kwargs):
+        # Use the slug because CompetitionMixin hasn't loaded the competition yet
+        self.session_rounds = OlympicSessionRound.objects.filter(session__competition__slug=self.kwargs['slug'])
+        return super(FieldPlanMixin, self).dispatch(request, *args, **kwargs)
+
+    def get_matches(self):
+        return Match.objects.filter(session_round__session__competition=self.competition).select_related('session_round', 'session_round__category')
+
+    def get_field_plan(self):
+        matches = self.get_matches()
+        if len(matches) == 0:
+            return None
+        max_timing = (max(matches, key=lambda m: m.timing)).timing
+        max_target = (max(matches, key=lambda m: m.target)).target  # slight assumption max target will never be target 2
+        levels = ['Finals', 'Semis', 'Quarters', '1/8', '1/16', '1/32', '1/64', '1/128']
+        passes = 'ABCDEFGHIJK'
+
+        layout = [[{} for i in range(max_target + 1)] for j in range(max_timing + 1)]
+        for i, row in enumerate(layout[1:]):
+            row[0] = 'Pass %s' % passes[i]
+        for i in range(max_target):
+            layout[0][i + 1] = i + 1
+        for m in matches:
+            layout[m.timing][m.target] = {
+                'category': m.session_round.category,
+                'level': levels[m.level - 1],
+            }
+            if m.target_2:
+                layout[m.timing][m.target_2] = {
+                    'category': m.session_round.category,
+                    'level': levels[m.level - 1],
+                }
+        for row in layout[1:]:
+            current = {}
+            for spot in row[1:]:
+                if spot and not spot.get('category') == current.get('category'):
+                    current = spot
+                    current['width'] = 1
+                elif spot:
+                    current['width'] += 1
+                elif spot is None:
+                    current = {}
+        return layout
+
+    def get_context_data(self, **kwargs):
+        context = super(FieldPlanMixin, self).get_context_data(**kwargs)
+        context['field_plan'] = self.get_field_plan()
+        return context
+
+
 @class_view_decorator(login_required)
-class OlympicSetup(View):
-    pass
+class OlympicSetup(FieldPlanMixin, FormView):
+    form_class = SetupForm
+    template_name = 'olympic/setup.html'
+
+    def get_form_kwargs(self):
+        kwargs = super(OlympicSetup, self).get_form_kwargs()
+        kwargs['session_rounds'] = self.session_rounds
+        return kwargs
 
 @class_view_decorator(login_required)
 class OlympicSeedingsPDF(PDFResultsRenderer, View):
@@ -491,7 +548,7 @@ class OlympicTree(OlympicResults):
 
 
 @class_view_decorator(login_required)
-class FieldPlan(HeadedPdfView):
+class FieldPlan(FieldPlanMixin, HeadedPdfView):
     title = 'Field plan'
     PAGE_HEIGHT=defaultPageSize[0]
     PAGE_WIDTH=defaultPageSize[1]
@@ -500,27 +557,23 @@ class FieldPlan(HeadedPdfView):
     def setMargins(self, doc):
         doc.bottomMargin = 0.4*inch
 
-    def get_matches(self):
-        return Match.objects.filter(session_round__session__competition=self.competition).select_related('session_round', 'session_round__category')
-
     def get_elements(self):
-        matches = self.get_matches()
-        max_timing = (max(matches, key=lambda m: m.timing)).timing
-        max_target = (max(matches, key=lambda m: m.target)).target  # slight assumption max target will never be target 2
-        table_data = [[None for i in range(max_target + 1)] for j in range(max_timing + 1)]
-        levels = ['Finals', 'Semis', 'Quarters', '1/8', '1/16', '1/32', '1/64', '1/128']
-        passes = 'ABCDEFGHIJK'
-        for i, row in enumerate(table_data[1:]):
-            row[0] = 'Pass %s' % passes[i]
-        for i in range(max_target):
-            table_data[0][i + 1] = i + 1
-        for m in matches:
-            table_data[m.timing][m.target] = '%s\n%s' % (m.session_round.category.short_code(), levels[m.level - 1])
-            if m.target_2:
-                table_data[m.timing][m.target_2] = '%s\n%s' % (m.session_round.category.short_code(), levels[m.level - 1])
-        widths = [35] + [11] * (len(table_data[0]) - 1)
+        field_plan = self.get_field_plan()
+        widths = [35] + [11] * (len(field_plan[0]) - 1)
+        table_style = self.get_table_style(field_plan)
+        table_data = [[None] + field_plan[0][1:]]
+        for row in field_plan[1:]:
+            table_row = [row[0]]
+            for target in row[1:]:
+                if target.get('width'):
+                    table_row.append('%s\n%s' % (target['category'].short_code(), target['level']))
+                elif target.get('category') or not target:
+                    table_row.append(None)
+                else:
+                    table_row.append(target)
+            table_data.append(table_row)
         table = Table(table_data, colWidths=widths)
-        table.setStyle(self.get_table_style(table_data))
+        table.setStyle(table_style)
         return [Spacer(0.5*inch, 0.5*inch), table]
 
     def get_table_style(self, data):
@@ -534,16 +587,10 @@ class FieldPlan(HeadedPdfView):
             ('BOX', (0, 0), (0, -1), 1, colors.black),
             ('BOX', (0, 0), (-1, 0), 1, colors.black),
         ]
-        for i, row in enumerate(data[1:], 1):
-            point = row[1]
-            start = 1
-            for j, target in enumerate(row[2:], 2):
-                if not target == point or j == len(row) - 1:
-                    if j == len(row) - 1:
-                        j = len(row)
-                    table_style.append(('SPAN', (start, i), (j - 1, i)))
-                    if point is None:
-                        table_style.append(('BACKGROUND', (start, i), (j - 1, i), colors.lightgrey))
-                    start = j
-                    point = target
+        for j, row in enumerate(data[1:], 1):
+            for i, target in enumerate(row[1:], 1):
+                if target.get('width', 0):
+                    table_style.append(('SPAN', (i, j), (i + target['width'] - 1, j)))
+                if not target:
+                    table_style.append(('BACKGROUND', (i, j), (i, j), colors.lightgrey))
         return table_style
