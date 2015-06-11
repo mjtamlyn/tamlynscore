@@ -566,7 +566,7 @@ class ScoreSheetsPdf(HeadedPdfView):
                 continue
             for target, entry in entries:
                 table_data = self.header_table_for_entry(target, entry)
-                header_table = Table(table_data, [0.5 * inch, 2.5 * inch, 4 * inch])
+                header_table = Table(table_data, [0.6 * inch, 2.5 * inch, 3.9 * inch])
                 elements.append(KeepTogether([self.spacer, header_table, self.spacer] + score_sheet_elements))
             elements.append(PageBreak())
 
