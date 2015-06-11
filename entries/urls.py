@@ -17,7 +17,7 @@ urlpatterns = [
     url(r'^(?P<slug>[\w-]+)/score-sheets/(?P<round_id>\d+)/$', views.ScoreSheetsPdf.as_view(), name='score_sheets_pdf'),
     url(r'^(?P<slug>[\w-]+)/score-sheets/session/(?P<session_id>\d+)/$', views.SessionScoreSheetsPdf.as_view(),
         name='session_score_sheets_pdf'),
-    url(r'^(?P<slug>[\w-]+)/running-slips/(?P<round_id>\d+)/$', views.running_slips_pdf),
+    url(r'^(?P<slug>[\w-]+)/running-slips/(?P<round_id>\d+)/$', views.running_slips_pdf, name='running_slips_pdf'),
 
     url(r'^(?P<slug>[\w-]+)/registration/$', views.Registration.as_view(), name='registration'),
 ]
