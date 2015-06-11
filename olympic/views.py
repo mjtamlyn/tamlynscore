@@ -111,6 +111,13 @@ class OlympicSetup(FieldPlanMixin, FormView):
         kwargs['session_rounds'] = self.session_rounds
         return kwargs
 
+    def form_valid(self, form):
+        form.save()
+        return super(OlympicSetup, self).form_valid(form)
+
+    def get_success_url(self):
+        return self.request.get_full_path()
+
 @class_view_decorator(login_required)
 class OlympicSeedingsPDF(PDFResultsRenderer, View):
     def get(self, request, slug):

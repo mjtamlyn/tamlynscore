@@ -25,6 +25,9 @@
     </table>
 </div>
 
-
-{{ form }}
+<form class="form" method="POST" action="{{ request.get_full_path }}">
+    {% csrf_token %}
+    {{ form.as_p }}
+    <input type="submit" class="btn">
+</form>
 {% endblock %}

@@ -67,7 +67,7 @@ class OlympicSessionRound(models.Model):
     category = models.ForeignKey(Category)
 
     def __unicode__(self):
-        return u'{0}, {1}'.format(self.session, self.shot_round)
+        return u'{0}, {1} {2}'.format(self.session, self.shot_round, self.category.name)
 
     def set_seedings(self, scores):
         scores = Score.objects.results(self.ranking_round, category=self.category).filter(pk__in=scores)
