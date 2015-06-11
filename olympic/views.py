@@ -573,7 +573,7 @@ class FieldPlan(FieldPlanMixin, HeadedPdfView):
             table_row = [row[0]]
             for target in row[1:]:
                 if target.get('width'):
-                    table_row.append('%s\n%s' % (target['category'].short_code(), target['level']))
+                    table_row.append('%s\n%s' % (target['category'].code(), target['level']))
                 elif target.get('category') or not target:
                     table_row.append(None)
                 else:
