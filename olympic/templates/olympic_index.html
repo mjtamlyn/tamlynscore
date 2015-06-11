@@ -50,6 +50,7 @@
 <div class="module olympic">
     <h4>Head to Heads</h4>
     <p>
+        <a class="btn" href="{% url 'olympic_setup' slug=competition.slug %}">Setup</a>
         <a class="btn" href="{% url 'olympic_field_plan' slug=competition.slug %}">Field plan</a>
         <a class="btn" href="{% url 'olympic_tree' slug=competition.slug %}">Tree (no results)</a>
         <a class="btn" href="{% url 'olympic_results' slug=competition.slug %}">Results</a>

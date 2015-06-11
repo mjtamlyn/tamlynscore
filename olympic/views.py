@@ -17,11 +17,13 @@ from entries.views import ScoreSheetsPdf, HeadedPdfView
 from scores.models import Score
 from scores.result_modes import BaseResultMode
 from scores.views import PDFResultsRenderer
+from scoring.utils import class_view_decorator
 from olympic.models import OlympicSessionRound, Seeding, Match, Result
 from olympic.forms import ResultForm
 
 from itertools import groupby
 
+@class_view_decorator(login_required)
 class OlympicIndex(View):
     def get(self, request, slug):
         competition = get_object_or_404(Competition, slug=slug)
@@ -47,9 +49,12 @@ class OlympicIndex(View):
         session_round.set_seedings(scores)
         return self.get(request, slug)
 
-olympic_index = login_required(OlympicIndex.as_view())
 
+@class_view_decorator(login_required)
+class OlympicSetup(View):
+    pass
 
+@class_view_decorator(login_required)
 class OlympicSeedingsPDF(PDFResultsRenderer, View):
     def get(self, request, slug):
         self.competition = get_object_or_404(Competition, slug=slug)
@@ -79,6 +84,7 @@ class OlympicSeedingsPDF(PDFResultsRenderer, View):
         return self.render_to_pdf({'results': results})
 
 
+@class_view_decorator(login_required)
 class OlympicInput(TemplateView):
     template_name = 'olympic/input.html'
 
@@ -139,6 +145,7 @@ class OlympicInput(TemplateView):
         return HttpResponseRedirect(reverse(olympic_index, kwargs={'slug': self.competition.slug}))
 
 
+@class_view_decorator(login_required)
 class OlympicScoreSheet(ScoreSheetsPdf):
     box_size = 0.35*inch
     wide_box = box_size*1.3
@@ -289,8 +296,8 @@ class OlympicScoreSheet(ScoreSheetsPdf):
         ('BOTTOMPADDING', (0, 0), (-1, -1), 5),
     ])
 
-olympic_score_sheet = login_required(OlympicScoreSheet.as_view())
 
+@class_view_decorator(login_required)
 class OlympicResults(HeadedPdfView):
     title = 'Results'
 
@@ -350,8 +357,8 @@ class OlympicResults(HeadedPdfView):
         ('LINEAFTER', (0, 0), (-2, -1), 0.5, colors.black),
     ))
 
-olympic_results = login_required(OlympicResults.as_view())
 
+@class_view_decorator(login_required)
 class OlympicTree(OlympicResults):
 
     PAGE_HEIGHT=defaultPageSize[0]
@@ -482,8 +489,8 @@ class OlympicTree(OlympicResults):
         ]))
         return elements
 
-olympic_tree = login_required(OlympicTree.as_view())
 
+@class_view_decorator(login_required)
 class FieldPlan(HeadedPdfView):
     title = 'Field plan'
     PAGE_HEIGHT=defaultPageSize[0]
