@@ -259,6 +259,7 @@ class ByRound(BaseResultMode):
                 results[category] = []
             results[category].append(score)
         for category in results:
+            print category, len(results[category])
             results[category] = self.sort_results(results[category])
             for i, score in enumerate(results[category]):
                 if not self.leaderboard and score.score == 0:
