@@ -1,0 +1,30 @@
+{% extends 'entries/competition_detail.html' %}
+
+{% block competition_content %}
+
+<div class="field-plan">
+    <table class="table field-plan">
+        {% for row in field_plan %}
+        <tr>
+            {% for detail in row %}
+                {% if detail %}
+                    {% if not detail.category %}
+                        <th>{{ detail }}</th>
+                    {% elif detail.width %}
+                        <td colspan="{{ detail.width }}" class="centered">
+                            {{ detail.category.short_code }}<br>
+                            {{ detail.level }}
+                        </td>
+                    {% endif %}
+                {% else %}
+                    <td class="empty"></td>
+                {% endif %}
+            {% endfor %}
+        </tr>
+        {% endfor %}
+    </table>
+</div>
+
+
+{{ form }}
+{% endblock %}
