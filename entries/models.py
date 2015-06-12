@@ -90,7 +90,7 @@ class ResultsMode(models.Model):
     competition = models.ForeignKey(Competition, related_name='result_modes')
     mode = models.CharField(max_length=31, choices=get_result_modes())
     leaderboard_only = models.BooleanField(default=False)
-    json = models.TextField(blank=True, default='', editable=False)
+    json = models.TextField(blank=True, default='')
 
     class Meta:
         unique_together = ('competition', 'mode')
