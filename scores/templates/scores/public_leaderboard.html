@@ -1,0 +1,11 @@
+{% extends 'base.html' %}
+
+{% block nav %}{% endblock %}
+
+{% block content %}
+<header>
+    <h1>{{ competition }}</h1>
+</header>
+
+{% include 'scores/_leaderboard.html' %}
+{% endblock %}

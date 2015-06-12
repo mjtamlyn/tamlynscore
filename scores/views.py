@@ -4,6 +4,7 @@ from itertools import groupby
 import json
 import math
 
+from django.conf import settings
 from django.contrib.auth.decorators import login_required
 from django.core.cache import cache
 from django.core.urlresolvers import reverse
@@ -1054,3 +1055,18 @@ class RankingsExport(CompetitionMixin, View):
                 else:
                     data[entry.pk][index] = 'Match Completed'
         return data.values()
+
+
+class ResultsFromCache(TemplateView):
+    template_name = 'scores/public_leaderboard.html'
+
+    def get_context_data(self, **kwargs):
+        competition = Competition.objects.get(slug=settings.CURRENT_EVENT)
+        db_mode = competition.result_modes.get(mode=self.kwargs['mode'])
+        mode = get_mode(db_mode.mode, include_distance_breakdown=False, hide_golds=False)
+        if db_mode.json:
+            kwargs['results'] = mode.deserialize(db_mode.json)
+        else:
+            kwargs['results'] = {}
+        kwargs['competition'] = competition
+        return super(ResultsFromCache, self).get_context_data(**kwargs)
