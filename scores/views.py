@@ -831,8 +831,14 @@ class CSVResultsRenderer(object):
         return response
 
 
+class JSONResultsRenderer(object):
+    def render_to_json(self, context):
+        results = self.mode.serialize(context['results'])
+        return HttpResponse(results, content_type='application/json')
+
+
 @class_view_decorator(login_required)
-class NewLeaderboard(PDFResultsRenderer, CSVResultsRenderer, ListView):
+class NewLeaderboard(PDFResultsRenderer, CSVResultsRenderer, JSONResultsRenderer, ListView):
     """General leaderboard/results generation.
 
     Strategy:
@@ -855,24 +861,46 @@ class NewLeaderboard(PDFResultsRenderer, CSVResultsRenderer, ListView):
         context = self.get_context_data(competition=self.competition, object_list=self.object_list)
         return self.render_to_response(context)
 
+    def post(self, request, *args, **kwargs):
+        self.competition = self.get_competition()
+        self.format = self.get_format()
+        self.mode, obj = self.get_mode(load=True)
+        self.object_list = self.get_queryset()
+        context = self.get_context_data(competition=self.competition, object_list=self.object_list)
+        obj.json = self.mode.serialize(context['results'])
+        obj.save()
+        return HttpResponseRedirect(request.get_full_path())
+
     def get_competition(self):
         competition = get_object_or_404(Competition, slug=self.kwargs['slug'])
         return competition
 
-    def get_mode(self):
+    def get_mode(self, load=False):
         mode = get_mode(self.kwargs['mode'], include_distance_breakdown=self.include_distance_breakdown, hide_golds=self.get_hide_golds())
         if not mode:
             raise Http404('No such mode')
-        if not self.mode_exists(mode):
+        if load:
+            exists, obj = self.mode_exists(mode, load=True)
+        else:
+            exists = self.mode_exists(mode)
+        if not exists:
             raise Http404('No such mode for this competition')
-        return mode
+        return (mode, obj) if load else mode
 
-    def mode_exists(self, mode):
-        return self.competition.result_modes.filter(mode=mode.slug).exists()
+    def mode_exists(self, mode, load=False):
+        if load:
+            try:
+                obj = self.competition.result_modes.filter(mode=mode.slug).get()
+            except ResultMode.DoesNotExist:
+                return False, None
+            else:
+                return True, obj
+        else:
+            return self.competition.result_modes.filter(mode=mode.slug).exists()
 
     def get_format(self):
         format = self.kwargs['format']
-        if format not in ['html', 'pdf', 'big-screen', 'csv']:
+        if format not in ['html', 'pdf', 'big-screen', 'csv', 'json']:
             raise Http404('No such format')
         return format
 
@@ -909,6 +937,8 @@ class NewLeaderboard(PDFResultsRenderer, CSVResultsRenderer, ListView):
             return self.render_to_pdf(context)
         if self.format == 'csv':
             return self.render_to_csv(context)
+        if self.format == 'json':
+            return self.render_to_json(context)
         results = context['results']
         for section in results:
             for category in results[section]:
@@ -931,8 +961,16 @@ class NewResults(NewLeaderboard):
     url_name = 'new_results'
     include_distance_breakdown = True
 
-    def mode_exists(self, mode):
-        return self.competition.result_modes.filter(mode=mode.slug, leaderboard_only=False).exists()
+    def mode_exists(self, mode, load=False):
+        if load:
+            try:
+                obj = self.competition.result_modes.filter(mode=mode.slug, leaderboard_only=False).get()
+            except ResultMode.DoesNotExist:
+                return False, None
+            else:
+                return True, obj
+        else:
+            return self.competition.result_modes.filter(mode=mode.slug, leaderboard_only=False).exists()
 
 
 class RankingsExport(CompetitionMixin, View):

@@ -15,6 +15,7 @@ class CompetitionEntryAdmin(admin.ModelAdmin):
 
 class ResultModeAdmin(admin.ModelAdmin):
     list_display = ('competition', 'mode')
+    readonly_fields = ('json',)
 
 
 class SessionEntryAdmin(admin.ModelAdmin):
