@@ -184,16 +184,28 @@ class BaseResultMode(object):
                     'scores': [],
                 }
                 for score in scores:
-                    json_score = [
-                        score.placing,
-                        score.target.pk,
-                    ] + self.score_details(score, section)
+                    if score.is_team:
+                        json_score = {
+                            'summary': [
+                                score.placing,
+                                score.club.pk,
+                            ] + self.score_details(score, section),
+                            'team': [[
+                                member.target.pk,
+                            ] + self.score_details(member, section) for member in score.team],
+                        }
+                    else:
+                        json_score = [
+                            score.placing,
+                            score.target.pk,
+                        ] + self.score_details(score, section)
                     json_category['scores'].append(json_score)
                 json_section['categories'].append(json_category)
             json_results.append(json_section)
         return json.dumps(json_results)
 
     def deserialize(self, json_results):
+        from core.models import Club
         from entries.models import TargetAllocation
 
         json_results = json.loads(json_results)
@@ -205,22 +217,42 @@ class BaseResultMode(object):
             for json_category in json_section['categories']:
                 category = json_category['category']
                 scores = []
+                individual_target_pks = [score[1] for score in json_category['scores'] if isinstance(score, list)]
+                team_target_pks = sum([
+                    [score[0] for score in place['team']]
+                for place in json_category['scores'] if isinstance(place, dict)], [])
                 targets = TargetAllocation.objects.filter(
-                    pk__in=(score[1] for score in json_category['scores'])
+                    pk__in=individual_target_pks + team_target_pks,
                 ).select_related(
                     'session_entry__competition_entry__archer',
                     'session_entry__competition_entry__club',
                 )
                 target_lookup = {target.pk: target for target in targets}
+                clubs = Club.objects.filter(
+                    pk__in=(score['summary'][1] for score in json_category['scores'] if isinstance(score, dict))
+                )
+                club_lookup = {club.pk: club for club in clubs}
                 for score in json_category['scores']:
-                    placing = score[0]
-                    target = score[1]
-                    details = score[2:]
-                    scores.append(ScoreMock(
-                        placing=placing,
-                        target=target_lookup.get(target, None),
-                        details=details,
-                    ))
+                    if isinstance(score, dict):
+                        summary = score['summary']
+                        scores.append(ScoreMock(
+                            placing=summary[0],
+                            club=club_lookup.get(summary[1], None),
+                            details=summary[2:],
+                            team=[ScoreMock(
+                                target=target_lookup.get(member[0], None),
+                                details=member[1:],
+                            ) for member in score['team']],
+                        ))
+                    else:
+                        placing = score[0]
+                        target = score[1]
+                        details = score[2:]
+                        scores.append(ScoreMock(
+                            placing=placing,
+                            target=target_lookup.get(target, None),
+                            details=details,
+                        ))
                 results[section][category] = scores
         return results
 
