@@ -5,8 +5,6 @@ from django.contrib import admin
 from django.contrib.staticfiles.urls import staticfiles_urlpatterns
 
 
-admin.autodiscover()
-
 urlpatterns = [
     url(r'', include('core.urls')),
     url(r'^tournaments/', include('entries.urls')),

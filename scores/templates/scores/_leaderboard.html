@@ -1,0 +1,44 @@
+<div class="row">
+    {% for section, categories in results.items %}
+    {% for category, scores in categories.items %}
+    <div class="col3">
+        <table class="table">
+            {% ifchanged section %}
+            <tr><th colspan="100%">{{ section }}</th></tr>
+            {% endifchanged %}
+            <tr><th colspan="100%">{{ category }}</th></tr>
+            {% for score in scores %}
+                <tr {% if score.team %}class="no-border"{% endif %}>
+                    {% if score.disqualified %}
+                    <td></td>
+                    {% else %}
+                    <td>{% if score.placing %}{{ score.placing }}{% endif %}</td>
+                    {% endif %}
+                    {% if score.team %}
+                        <th>{{ score.club }}</th>
+                    {% else %}
+                        <td>{{ score.target.session_entry.competition_entry.archer }}</td>
+                        <td>{{ score.target.session_entry.competition_entry.club}}</td>
+                        <td>{% if score.target.session_entry.competition_entry.novice == 'N' %}Novice{% endif %}</td>
+                    {% endif %}
+                    {% for detail in score.details %}
+                        <td>{{ detail }}</td>
+                    {% endfor %}
+                </tr>
+                {% if score.team %}
+                    {% for member in score.team %}
+                    <tr {% if not forloop.last %}class="no-border"{% endif %}>
+                        <td></td>
+                        <td>{{ member.target.session_entry.competition_entry.archer }}</td>
+                        {% for detail in member.details %}
+                            <td>{{ detail }}</td>
+                        {% endfor %}
+                    </tr>
+                    {% endfor %}
+                {% endif %}
+            {% endfor %}
+        </table>
+    </div>
+    {% endfor %}
+    {% endfor %}
+</div>

@@ -185,14 +185,44 @@ class BaseResultMode(object):
                 }
                 for score in scores:
                     json_score = [
-                        score.target.session_entry.competition_entry.archer.pk,
-                        score.target.session_entry.competition_entry.club.pk,
-                        'Novice' if score.target.session_entry.competition_entry.novice == 'N' else None,
+                        score.placing,
+                        score.target.pk,
                     ] + self.score_details(score, section)
                     json_category['scores'].append(json_score)
                 json_section['categories'].append(json_category)
             json_results.append(json_section)
         return json.dumps(json_results)
+
+    def deserialize(self, json_results):
+        from entries.models import TargetAllocation
+
+        json_results = json.loads(json_results)
+        results = OrderedDict()
+        for json_section in json_results:
+            kwargs = json_section['section']
+            section = ResultSection(**kwargs)
+            results[section] = OrderedDict()
+            for json_category in json_section['categories']:
+                category = json_category['category']
+                scores = []
+                targets = TargetAllocation.objects.filter(
+                    pk__in=(score[1] for score in json_category['scores'])
+                ).select_related(
+                    'session_entry__competition_entry__archer',
+                    'session_entry__competition_entry__club',
+                )
+                target_lookup = {target.pk: target for target in targets}
+                for score in json_category['scores']:
+                    placing = score[0]
+                    target = score[1]
+                    details = score[2:]
+                    scores.append(ScoreMock(
+                        placing=placing,
+                        target=target_lookup.get(target, None),
+                        details=details,
+                    ))
+                results[section][category] = scores
+        return results
 
 
 class BySession(BaseResultMode):

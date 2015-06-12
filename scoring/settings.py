@@ -67,7 +67,7 @@ MIDDLEWARE_CLASSES = (
     'django.contrib.auth.middleware.SessionAuthenticationMiddleware',
 )
 
-ROOT_URLCONF = 'scoring.urls'
+ROOT_URLCONF = os.environ.get('ROOT_URLCONF', 'scoring.urls')
 
 INSTALLED_APPS = (
     'django.contrib.auth',
@@ -102,3 +102,5 @@ CACHES = {
 DEBUG_TOOLBAR_CONFIG = {
     'JQUERY_URL': STATIC_URL + 'lib/jquery/jquery-2.1.3.min.js',
 }
+
+CURRENT_EVENT = os.environ.get('CURRENT_EVENT', 'bucs-outdoors-2014')
