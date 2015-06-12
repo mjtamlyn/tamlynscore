@@ -1,5 +1,6 @@
 from collections import OrderedDict
 import itertools
+import json
 
 from django.core.exceptions import ImproperlyConfigured
 from django.db import models, connection
@@ -164,6 +165,35 @@ class BaseResultMode(object):
                 ]
         return scores
 
+    def serialize(self, results=None):
+        if results is None:
+            results = self.get_results()
+        json_results = []
+        for section, categories in results.items():
+            json_section = {
+                'section': {
+                    'label': section.label,
+                    'round': section.round.pk,
+                    'headers': section.headers,
+                },
+                'categories': [],
+            }
+            for category, scores in categories.items():
+                json_category = {
+                    'category': category,
+                    'scores': [],
+                }
+                for score in scores:
+                    json_score = [
+                        score.target.session_entry.competition_entry.archer.pk,
+                        score.target.session_entry.competition_entry.club.pk,
+                        'Novice' if score.target.session_entry.competition_entry.novice == 'N' else None,
+                    ] + self.score_details(score, section)
+                    json_category['scores'].append(json_score)
+                json_section['categories'].append(json_category)
+            json_results.append(json_section)
+        return json.dumps(json_results)
+
 
 class BySession(BaseResultMode):
     slug = 'by-session'
@@ -259,7 +289,6 @@ class ByRound(BaseResultMode):
                 results[category] = []
             results[category].append(score)
         for category in results:
-            print category, len(results[category])
             results[category] = self.sort_results(results[category])
             for i, score in enumerate(results[category]):
                 if not self.leaderboard and score.score == 0:
