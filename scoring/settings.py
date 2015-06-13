@@ -9,7 +9,9 @@ DEBUG = not os.environ.get('PRODUCTION')
 TEMPLATE_DEBUG = DEBUG
 ALLOWED_HOSTS = [
     'archery-scoring.herokuapp.com',
+    'archery-scoring-public.herokuapp.com',
     'archery-scoring.mjtamlyn.co.uk',
+    'live.mjtamlyn.co.uk',
     '127.0.0.1',
     'localhost',
     '192.168.1.101',
