@@ -1,11 +1,6 @@
-{% extends 'base.html' %}
-
-{% block nav %}{% endblock %}
+{% extends 'public_base.html' %}
 
 {% block content %}
-<header>
-    <h1>{{ competition }} - Leaderboard</h1>
-</header>
-
+{{ block.super }}
 {% include 'scores/_leaderboard.html' %}
 {% endblock %}

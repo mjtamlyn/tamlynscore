@@ -1057,16 +1057,47 @@ class RankingsExport(CompetitionMixin, View):
         return data.values()
 
 
-class ResultsFromCache(TemplateView):
+class PublicResultsMixin(object):
+    def dispatch(self, request, *args, **kwargs):
+        self.competition = Competition.objects.get(slug=settings.CURRENT_EVENT)
+        self.modes = self.competition.result_modes.order_by('mode')
+        return super(PublicResultsMixin, self).dispatch(request, *args, **kwargs)
+
+    def get_context_data(self, **kwargs):
+        kwargs['competition'] = self.competition
+        kwargs['modes'] = self.modes
+        return super(PublicResultsMixin, self).get_context_data(**kwargs)
+
+class ResultsSummaryFromCache(PublicResultsMixin, TemplateView):
+    template_name = 'scores/public_leaderboard_summary.html'
+
+    def get_context_data(self, **kwargs):
+        db_modes = self.modes
+        kwargs['results'] = []
+        for db_mode in db_modes:
+            mode = get_mode(db_mode.mode, include_distance_breakdown=False, hide_golds=False)
+            if db_mode.json:
+                results = self.cut_results(mode.deserialize(db_mode.json))
+                kwargs['results'].append({
+                    'name': unicode(mode),
+                    'results': results
+                })
+        return super(ResultsSummaryFromCache, self).get_context_data(**kwargs)
+
+    def cut_results(self, results):
+        for section, categories in results.items():
+            for category, scores in categories.items():
+                results[section][category] = scores[:8]
+        return results
+
+class ResultsFromCache(PublicResultsMixin, TemplateView):
     template_name = 'scores/public_leaderboard.html'
 
     def get_context_data(self, **kwargs):
-        competition = Competition.objects.get(slug=settings.CURRENT_EVENT)
-        db_mode = competition.result_modes.get(mode=self.kwargs['mode'])
+        db_mode = self.competition.result_modes.get(mode=self.kwargs['mode'])
         mode = get_mode(db_mode.mode, include_distance_breakdown=False, hide_golds=False)
         if db_mode.json:
             kwargs['results'] = mode.deserialize(db_mode.json)
         else:
             kwargs['results'] = {}
-        kwargs['competition'] = competition
         return super(ResultsFromCache, self).get_context_data(**kwargs)

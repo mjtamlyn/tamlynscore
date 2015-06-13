@@ -1,0 +1,9 @@
+{% extends 'public_base.html' %}
+
+{% block content %}
+{{ block.super }}
+{% for leaderboard in results %}
+    <h2>{{ leaderboard.name }}</h2>
+    {% include 'scores/_leaderboard.html' with results=leaderboard.results %}
+{% endfor %}
+{% endblock %}

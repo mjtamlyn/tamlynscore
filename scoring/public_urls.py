@@ -7,7 +7,8 @@ from scores import views
 
 
 urlpatterns = [
-    url(r'(?P<mode>[\w-]+)/', views.ResultsFromCache.as_view()),
+    url('^$', views.ResultsSummaryFromCache.as_view(), name='summary'),
+    url('^(?P<mode>by-round|team|seedings)/$', views.ResultsFromCache.as_view(), name='mode-detail'),
 ]
 
 urlpatterns += staticfiles_urlpatterns() + static(settings.MEDIA_URL, document_root=settings.MEDIA_ROOT)
