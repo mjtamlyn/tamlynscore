@@ -1060,7 +1060,7 @@ class RankingsExport(CompetitionMixin, View):
 class PublicResultsMixin(object):
     def dispatch(self, request, *args, **kwargs):
         self.competition = Competition.objects.get(slug=settings.CURRENT_EVENT)
-        self.modes = self.competition.result_modes.order_by('mode')
+        self.modes = self.competition.result_modes.order_by('mode').exclude(json='')
         return super(PublicResultsMixin, self).dispatch(request, *args, **kwargs)
 
     def get_context_data(self, **kwargs):
