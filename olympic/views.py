@@ -206,7 +206,7 @@ class OlympicInput(TemplateView):
                     form['form'].save()
                 elif form['form'].instance.pk:
                     form['form'].instance.delete()
-        return HttpResponseRedirect(reverse(olympic_index, kwargs={'slug': self.competition.slug}))
+        return HttpResponseRedirect(reverse('olympic_index', kwargs={'slug': self.competition.slug}))
 
 
 @class_view_decorator(login_required)

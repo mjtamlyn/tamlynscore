@@ -15,6 +15,7 @@ class SetupForm(forms.Form):
         ('expanded', 'One target per archer'),
         ('half', 'Only allocate half of the matches'),
         ('quarter', 'Only allocate 1/4 of the matches'),
+        ('eighth', 'Only allocate 1/8 of the matches'),
         ('three-quarter', 'Only allocate 3/4 of the matches'),
     )
     LEVEL_CHOICES = (
@@ -64,6 +65,8 @@ class SetupForm(forms.Form):
             kwargs['half_only'] = True
         if self.cleaned_data['spread'] == 'quarter':
             kwargs['quarter_only'] = True
+        if self.cleaned_data['spread'] == 'eighth':
+            kwargs['eighth_only'] = True
         if self.cleaned_data['spread'] == 'three-quarter':
             kwargs['three_quarters'] = True
         if self.cleaned_data['delete']:
