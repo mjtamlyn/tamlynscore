@@ -44,6 +44,7 @@ class SetupForm(forms.Form):
     level = forms.TypedChoiceField(coerce=int, choices=LEVEL_CHOICES)
     timing = forms.TypedChoiceField(label='Pass', coerce=int, choices=TIMING_CHOICES)
     spread = forms.ChoiceField(label='Target spread', choices=SPREAD_CHOICES, required=False)
+    delete = forms.BooleanField(required=False)
 
     def __init__(self, session_rounds, **kwargs):
         self.session_rounds = session_rounds
@@ -65,4 +66,7 @@ class SetupForm(forms.Form):
             kwargs['quarter_only'] = True
         if self.cleaned_data['spread'] == 'three-quarter':
             kwargs['three_quarters'] = True
-        sr.make_matches(**kwargs)
+        if self.cleaned_data['delete']:
+            sr.remove_matches(self.cleaned_data['level'])
+        else:
+            sr.make_matches(**kwargs)

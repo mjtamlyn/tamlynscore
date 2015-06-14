@@ -98,6 +98,7 @@ class OlympicSessionRound(models.Model):
         return [(m, layout.index(m) * (1 + int(expanded)) + start) for m in layout]
 
     def make_matches(self, level, start=1, expanded=False, half_only=False, quarter_only=False, three_quarters=False, timing=None):
+        self.remove_matches(level)
         mapping = self._get_target_mapping(level, start, expanded, half_only, quarter_only, three_quarters)
         for match_id, target in mapping:
             match = Match(
@@ -110,6 +111,9 @@ class OlympicSessionRound(models.Model):
             if expanded:
                 match.target_2 = match.target + 1
             match.save()
+
+    def remove_matches(self, level):
+        self.match_set.filter(level=level).delete()
 
     def pretty_rank(self, rank, extra_rank_info=None):
         if rank <= 8:
