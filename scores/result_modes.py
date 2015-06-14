@@ -180,7 +180,7 @@ class BaseResultMode(object):
             }
             for category, scores in categories.items():
                 json_category = {
-                    'category': category,
+                    'category': unicode(category),
                     'scores': [],
                 }
                 for score in scores:
@@ -530,12 +530,17 @@ class Team(BaseResultMode):
             - aggregate and order
         - repeat for each team type
         """
+        from entries.models import SessionRound
+
         clubs = {}
         round = None
+        session_rounds = SessionRound.objects.filter(session__competition=competition, olympicsessionround__isnull=True).order_by('session__start').select_related('shot_round')
         for score in scores:
             if not leaderboard and not score.score:
                 continue
             session_entry = score.target.session_entry
+            if session_entry.session_round not in session_rounds:
+                continue
             if round is None:
                 round = session_entry.session_round.shot_round
             club = session_entry.competition_entry.club
