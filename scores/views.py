@@ -901,7 +901,7 @@ class NewLeaderboard(PDFResultsRenderer, CSVResultsRenderer, JSONResultsRenderer
 
     def get_format(self):
         format = self.kwargs['format']
-        if format not in ['html', 'pdf', 'big-screen', 'csv', 'json']:
+        if format not in ['html', 'pdf', 'pdf-summary', 'big-screen', 'csv', 'json']:
             raise Http404('No such format')
         return format
 
@@ -934,13 +934,16 @@ class NewLeaderboard(PDFResultsRenderer, CSVResultsRenderer, JSONResultsRenderer
         return False
 
     def render_to_response(self, context, **response_kwargs):
+        results = context['results']
         if self.format == 'pdf':
             return self.render_to_pdf(context)
-        if self.format == 'csv':
+        elif self.format == 'pdf-summary':
+            context['results'] = self.cut_results(results)
+            return self.render_to_pdf(context)
+        elif self.format == 'csv':
             return self.render_to_csv(context)
-        if self.format == 'json':
+        elif self.format == 'json':
             return self.render_to_json(context)
-        results = context['results']
         for section in results:
             for category in results[section]:
                 for score in results[section][category]:
@@ -949,6 +952,12 @@ class NewLeaderboard(PDFResultsRenderer, CSVResultsRenderer, JSONResultsRenderer
                         for archer in score.team:
                             archer.details = self.mode.score_details(archer, section)
         return super(NewLeaderboard, self).render_to_response(context, **response_kwargs)
+
+    def cut_results(self, results):
+        for section, categories in results.items():
+            for category, scores in categories.items():
+                results[section][category] = scores[:8]
+        return results
 
     def get_template_names(self, **kwargs):
         if self.format == 'big-screen':
