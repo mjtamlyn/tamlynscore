@@ -147,14 +147,20 @@ table.table tbody tr.no-border {
 }
 
 /* line 1, ../../sass/_forms.sass */
-input {
-  border: none;
-  padding: 3px 5px;
+input,
+select {
+  padding: 4px 7px;
   -moz-border-radius: 3px;
   -webkit-border-radius: 3px;
   border-radius: 3px;
   outline-color: #6FB3FF;
   border: 1px solid #6FB3FF;
+  font-size: 16px;
+}
+
+/* line 9, ../../sass/_forms.sass */
+input[type=submit] {
+  border: none;
 }
 
 @font-face {
@@ -226,25 +232,27 @@ li {
 /* line 1, ../../sass/_buttons.sass */
 .btn {
   font-family: "Helvetica Neue", "Trebuchet MS", Helvetica, sans-serif;
-  -moz-border-radius: 7px;
-  -webkit-border-radius: 7px;
-  border-radius: 7px;
-  border: 1px solid #6FB3FF;
+  -moz-border-radius: 5px;
+  -webkit-border-radius: 5px;
+  border-radius: 5px;
   background-color: #DDDAFA;
-  font-size: 14px;
-  padding: 4px 5px;
+  border: 1px solid #6FB3FF;
+  font-size: 16px;
+  padding: 5px 8px;
   cursor: pointer;
   text-align: center;
   -webkit-user-select: none;
+  display: inline-block;
 }
-/* line 12, ../../sass/_buttons.sass */
+/* line 13, ../../sass/_buttons.sass */
 .btn:hover {
   background-color: #6FB3FF;
 }
-/* line 15, ../../sass/_buttons.sass */
+/* line 16, ../../sass/_buttons.sass */
 .btn.btn-small {
   font-size: 12px;
   padding: 2px 4px;
+  margin: 0 1px;
 }
 
 /* line 1, ../../sass/components/_link_list.sass */
