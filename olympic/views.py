@@ -2,7 +2,7 @@ from collections import OrderedDict
 
 from django.core.urlresolvers import reverse
 from django.contrib.auth.decorators import login_required
-from django.db.models import Max
+from django.db.models import Max, Prefetch
 from django.http import HttpResponseRedirect
 from django.views.generic import View, TemplateView, FormView
 from django.shortcuts import render, get_object_or_404
@@ -496,7 +496,9 @@ class OlympicTree(OlympicResults):
         for i in self.match_cols:
             level = self.total_levels - i/3
             blocks = self.match_blocks(level)
-            matches = olympic_round.match_set.filter(level=level).order_by('target')
+            matches = olympic_round.match_set.filter(level=level).order_by('target').prefetch_related(
+                Prefetch('result_set', queryset=Result.objects.select_related())
+            )
             any_results = Result.objects.filter(match__session_round=olympic_round).exists()
             if (len(blocks) / len(matches)) == 2:
                 old_matches = matches
@@ -514,25 +516,16 @@ class OlympicTree(OlympicResults):
                 match = matches[m]
                 if match is None:
                     continue
-                results = match.result_set.select_related()
-                results = sorted(results, key=lambda r: Match.objects._effective_seed(r.seed.seed, level))
+                seeds = [match.match, (2**match.level) + 1 - match.match]
                 if m % 2:
-                    results.reverse()
-                if results:
-                    table_data[blocks[m][0]][i] = results[0].seed.seed
-                    table_data[blocks[m][0]][i + 1] = results[0].seed.entry.archer
-                    table_data[blocks[m][0]][i + 2] = results[0].display()
-                    table_data[blocks[m][1] - 1][i] = results[1].seed.seed
-                    table_data[blocks[m][1] - 1][i + 1] = results[1].seed.entry.archer
-                    table_data[blocks[m][1] - 1][i + 2] = results[1].display()
-                elif not any_results:
+                    seeds.reverse()
+                seeds_remaining = len(set(seeds).intersection(set(seedings_dict.keys())))
+                if self.total_levels - match.level > 0 or seeds_remaining == 2:
                     table_data[blocks[m][0]][i + 1] = '              ' * 2
                     table_data[blocks[m][0]][i + 2] = 'Target: ' + str(match.target)
+                    table_data[blocks[m][1] - 1][i + 2] = 'Target: ' + str(match.target)
                     if match.target_2:
                         table_data[blocks[m][1] - 1][i + 2] = 'Target: ' + str(match.target_2)
-                    seeds = [match.match, (2**match.level) + 1 - match.match]
-                    if m % 2:
-                        seeds.reverse()
                     if seeds[0] in seedings_dict or level == self.total_levels:
                         table_data[blocks[m][0]][i] = str(seeds[0])
                     if seeds[1] in seedings_dict or level == self.total_levels:
@@ -543,6 +536,27 @@ class OlympicTree(OlympicResults):
                     if seeds[1] in seedings_dict:
                         table_data[blocks[m][1] - 1][i + 1] = seedings_dict[seeds[1]].entry.archer.name
                         seedings_dict.pop(seeds[1])
+                results = match.result_set.all()
+                if not results:
+                    continue
+                results = sorted(results, key=lambda r: Match.objects._effective_seed(r.seed.seed, level))
+                if m % 2:
+                    results.reverse()
+                if len(results) == 1:
+                    r = results[0]
+                    seed = Match.objects._effective_seed(r.seed.seed, level)
+                    if seed == seeds[0]:
+                        results = [r, None]
+                    else:
+                        results = [None, r]
+                if results[0]:
+                    table_data[blocks[m][0]][i] = results[0].seed.seed
+                    table_data[blocks[m][0]][i + 1] = results[0].seed.entry.archer
+                    table_data[blocks[m][0]][i + 2] = results[0].display()
+                if results[1]:
+                    table_data[blocks[m][1] - 1][i] = results[1].seed.seed
+                    table_data[blocks[m][1] - 1][i + 1] = results[1].seed.entry.archer
+                    table_data[blocks[m][1] - 1][i + 2] = results[1].display()
 
         table = Table(table_data)
         table.setStyle(self.get_table_style())
