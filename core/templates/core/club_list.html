@@ -1,26 +1,29 @@
 {% extends 'base.html' %}
 
-{% block extrastyles %} 
-<style>
-    ul {
-        margin: 17px 25px;
-        -webkit-column-count: 4;
-    }
-</style>
-{% endblock %}
-
-{% block bodyclass %}club-list{% endblock %}
 
 {% block content %}
-<h1>Clubs</h1>
+<header>
+    <h1>Clubs</h1>
+</header>
 
-<a href="{% url 'club_create' %}" class="btn">Add club</a>
+<div class="col6">
+    <a href="{% url 'club_create' %}" class="btn">Add club</a>
 
-<ul>
     {% for club in club_list %}
-    <li><a href="{% url 'club_detail' slug=club.slug %}">{{ club }}</a></li>
+    {% ifchanged club.short_name.0 %}
+        {% if not forloop.first %}
+        </ul>
+        {% endif %}
+        <h2>{{ club.short_name.0 }}</h2>
+        <ul class="link-list">
+    {% endifchanged %}
+        <li>
+        <a href="{% url 'club_detail' slug=club.slug %}">{{ club.short_name }}</a>
+        </li>
+    {% if forloop.last %}
+        </ul>
+    {% endif %}
     {% endfor %}
-</ul>
-
+</div>
 {% endblock %}
 
