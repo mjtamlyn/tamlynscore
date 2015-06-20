@@ -1036,7 +1036,7 @@ class RankingsExport(CompetitionMixin, View):
                 entry.club.name,
                 entry.archer.get_gender_display(),
                 entry.bowstyle,
-                entry.archer.gnas_no,
+                entry.archer.agb_number,
             ] + [''] * (len(rounds) * 4 + len(olympic_rounds))
         for i, r in enumerate(rounds):
             round_indices[r.pk] = 5 + 4 * i

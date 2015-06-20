@@ -171,5 +171,5 @@ class Archer(models.Model):
             'club': self.club.pk,
             'bowstyle': self.bowstyle.pk,
             'novice': self.novice,
-            'gnas_no': self.gnas_no,
+            'agb_number': self.agb_number,
         })
