@@ -13,7 +13,7 @@
         <dt>Age</dt> <dd>{{ archer.get_age_display }}</dd>
         <dt>Experience</dt> <dd>{{ archer.get_novice_display }}</dd>
         <dt>Primary bowstyle</dt> <dd>{{ archer.bowstyle }}</dd>
-        <dt>GNAS number</dt> <dd>{{ archer.gnas_no|default:"Unknown" }}</dd>
+        <dt>AGB number</dt> <dd>{{ archer.agb_number|default:"Unknown" }}</dd>
     </dl>
 
     {% if shoots %}
