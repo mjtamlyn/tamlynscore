@@ -3,7 +3,7 @@ import math
 from django.db import models
 from django.template.defaultfilters import slugify
 
-from core.models import Archer, Bowstyle, Club, Round, AGE_CHOICES, NOVICE_CHOICES
+from core.models import Archer, Bowstyle, Club, Round, AGE_CHOICES, WA_AGE_CHOICES, NOVICE_CHOICES
 
 from scores.result_modes import get_result_modes
 
@@ -51,6 +51,7 @@ class Competition(models.Model):
 
     has_novices = models.BooleanField(default=False)
     has_juniors = models.BooleanField(default=False)
+    has_wa_age_groups = models.BooleanField(default=False)
     has_teams = models.BooleanField(default=False)
     novices_in_experienced_teams = models.BooleanField(default=False)
     exclude_later_shoots = models.BooleanField(default=False, help_text='Only the first session can count for results')
@@ -212,6 +213,10 @@ class SessionRound(models.Model):
                             allocation += (
                                 entry.get_novice_display(),
                             )
+                        if competition.has_wa_age_groups and entry.wa_age:
+                            allocation += (
+                                entry.get_wa_age_display(),
+                            )
                     if whole_session:
                         allocation += (shot_round.name,)
                     targets.append((target,) + allocation)
@@ -230,6 +235,7 @@ class CompetitionEntry(models.Model):
     club = models.ForeignKey(Club)
     bowstyle = models.ForeignKey(Bowstyle)
     age = models.CharField(max_length=1, choices=AGE_CHOICES, default='S')
+    wa_age = models.CharField(max_length=1, choices=WA_AGE_CHOICES, default='')
     novice = models.CharField(max_length=1, choices=NOVICE_CHOICES, default='E')
 
     guest = models.BooleanField(default=False)

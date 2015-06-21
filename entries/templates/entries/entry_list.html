@@ -41,6 +41,11 @@
                     {% if competition.has_juniors %}
                     <span class="pill junior">{{ sr.junior_count }} Junior</span><br>
                     {% endif %}
+                    {% if competition.has_wa_age_groups %}
+                        {% for age_group, count in sr.wa_age_groups %}
+                        <span class="pill {{ age_group|slugify }}">{{ count }} {{ age_group }}</span>
+                        {% endfor %}<br>
+                    {% endif %}
                 {% endif %}
             {% endfor %}
             </div>
@@ -78,6 +83,9 @@
                         {% endif %}
                         {% if competition.has_juniors and entry.age == "J" %}
                         <span class="pill junior">{{ entry.get_age_display }}</span>
+                        {% endif %}
+                        {% if competition.has_wa_age_groups and entry.wa_age %}
+                        <span class="pill junior">{{ entry.get_wa_age_display }}</span>
                         {% endif %}
                         {% if entry.archer.agb_number %}
                             {{ entry.archer.agb_number }}

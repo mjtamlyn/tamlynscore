@@ -2,7 +2,7 @@ from django.core.cache import cache
 from django.db import transaction
 from django import forms
 
-from core.models import Archer, Bowstyle, Club, NOVICE_CHOICES, AGE_CHOICES
+from core.models import Archer, Bowstyle, Club, NOVICE_CHOICES, AGE_CHOICES, WA_AGE_CHOICES
 from .models import CompetitionEntry, SessionRound, SessionEntry
 
 
@@ -61,6 +61,13 @@ class EntryCreateForm(forms.Form):
                 required=False,
             )
             self.fields['update_age'] = forms.BooleanField(required=False)
+        if self.competition.has_wa_age_groups:
+            self.fields['wa_age'] = forms.ChoiceField(
+                label='Age Group (%s)' % current.get_wa_age_display(),
+                choices=WA_AGE_CHOICES,
+                required=False,
+            )
+            self.fields['update_wa_age'] = forms.BooleanField(required=False)
         if len(self.session_rounds) > 1:
             self.fields['sessions'] = forms.ModelMultipleChoiceField(
                 queryset=self.session_rounds,
@@ -94,6 +101,9 @@ class EntryCreateForm(forms.Form):
         if self.competition.has_juniors and self.cleaned_data['age'] and self.cleaned_data['update_age']:
             self.archer.age = self.cleaned_data['age']
             changed = True
+        if self.competition.has_wa_age_groups and self.cleaned_data['wa_age'] and self.cleaned_data['update_wa_age']:
+            self.archer.wa_age = self.cleaned_data['wa_age']
+            changed = True
         if not self.cleaned_data['agb_number'] == self.archer.agb_number:
             self.archer.agb_number = self.cleaned_data['agb_number']
             changed = True
@@ -117,6 +127,8 @@ class EntryCreateForm(forms.Form):
             entry.novice = self.cleaned_data['novice'] or default.novice
         if self.competition.has_juniors:
             entry.age = self.cleaned_data['age'] or default.age
+        if self.competition.has_wa_age_groups:
+            entry.wa_age = self.cleaned_data['wa_age'] or default.wa_age
 
     def create_session_entries(self, entry):
         if len(self.session_rounds) == 1:

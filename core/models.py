@@ -37,6 +37,13 @@ AGE_CHOICES = (
     ('S', 'Senior'),
 )
 
+WA_AGE_CHOICES = (
+    ('C', 'Cadet'),
+    ('J', 'Junior'),
+    ('', 'Senior'),  # Map senior to '' as we never really print it
+    ('M', 'Master'),
+)
+
 
 class Subround(models.Model):
     arrows = models.PositiveIntegerField()
@@ -156,6 +163,7 @@ class Archer(models.Model):
     club = models.ForeignKey(Club)
     bowstyle = models.ForeignKey(Bowstyle)
     age = models.CharField(max_length=1, choices=AGE_CHOICES, default='S')
+    wa_age = models.CharField(max_length=1, choices=WA_AGE_CHOICES, default='')
     novice = models.CharField(max_length=1, choices=NOVICE_CHOICES, default='E')
     agb_number = models.BigIntegerField(blank=True, null=True)
 
@@ -167,6 +175,7 @@ class Archer(models.Model):
             'id': self.pk,
             'name': self.name,
             'age': self.age,
+            'wa_age': self.wa_age,
             'gender': self.gender,
             'club': self.club.pk,
             'bowstyle': self.bowstyle.pk,
