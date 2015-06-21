@@ -71,6 +71,9 @@
                                     {% if competition.has_juniors and entry.session_entry.competition_entry.age == "J" %}
                                     <span class="pill junior">{{ entry.session_entry.competition_entry.get_age_display }}</span>
                                     {% endif %}
+                                    {% if competition.has_wa_age_groups and entry.session_entry.competition_entry.wa_age %}
+                                    <span class="pill junior">{{ entry.session_entry.competition_entry.get_wa_age_display }}</span>
+                                    {% endif %}
                                 </p>
                             {% endif %}
                         </div>
@@ -96,6 +99,9 @@
                         {% endif %}
                         {% if competition.has_juniors and entry.competition_entry.age == "J" %}
                         <span class="pill junior">{{ entry.competition_entry.get_age_display }}</span>
+                        {% endif %}
+                        {% if competition.has_wa_age_groups and entry.competition_entry.wa_age %}
+                        <span class="pill junior">{{ entry.competition_entry.get_wa_age_display }}</span>
                         {% endif %}
                     </p>
                 </div>

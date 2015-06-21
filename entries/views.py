@@ -103,13 +103,18 @@ class EntryList(CompetitionMixin, ListView):
                 bowstyles = collections.Counter(e.competition_entry.bowstyle for e in sr.sessionentry_set.all())
                 genders = collections.Counter(
                     e.competition_entry.archer.get_gender_display() for e in sr.sessionentry_set.all())
+                # TODO: Remove counters not needed by competition options
                 novice_count = len([e for e in sr.sessionentry_set.all() if e.competition_entry.novice == 'N'])
                 junior_count = len([e for e in sr.sessionentry_set.all() if e.competition_entry.age == 'J'])
+                wa_age_groups = collections.Counter(
+                    e.competition_entry.archer.get_wa_age_display() for e in
+                    sr.sessionentry_set.all() if e.competition_entry.archer.wa_age)
                 session_round_stats.append({
                     'session_round': sr,
                     'total_entries': len(sr.sessionentry_set.all()),
                     'bowstyles': bowstyles.most_common(5),
                     'genders': genders.most_common(2),
+                    'wa_age_groups': wa_age_groups.most_common(4),
                     'novice_count': novice_count,
                     'junior_count': junior_count,
                 })
@@ -578,7 +583,7 @@ class ScoreSheetsPdf(HeadedPdfView):
             category = u'{0} {1}'.format(entry.archer.get_gender_display(), entry.bowstyle)
             if self.competition.has_juniors and entry.age == 'J':
                 category = 'Junior ' + category
-            return [
+            header_elements = [
                 [
                     self.Para(target, 'h2'),
                     self.Para(entry.archer, 'h2'),
@@ -587,9 +592,17 @@ class ScoreSheetsPdf(HeadedPdfView):
                 [
                     None,
                     self.Para(category, 'h2'),
-                    self.Para(entry.get_novice_display(), 'h2') if self.competition.has_novices else None,
+                    None,
                 ],
             ]
+            category_labels = []
+            if self.competition.has_novices:
+                category_labels.append(entry.get_novice_display())
+            if self.competition.has_wa_age_groups and entry.wa_age:
+                category_labels.append(entry.get_wa_age_display())
+            if category_labels:
+                header_elements[1][2] = self.Para(' '.join(category_labels), 'h2')
+            return header_elements
         else:
             return [
                 [self.Para(target, 'h2'), None, None],
