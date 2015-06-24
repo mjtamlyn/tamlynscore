@@ -25,8 +25,8 @@
             $('table .active').removeClass('active');
             $(this).addClass('active');
         };
-        $('table .field').live('touchstart', tablePress);
-        $('table .field').live('click', tablePress);
+        $('table .field').on('touchstart', tablePress);
+        $('table .field').on('click', tablePress);
 
         var buttonPress = function (e) {
             e.preventDefault();
@@ -44,14 +44,12 @@
                 if (input.attr('name') == other_input.name) {
                     if (inputs[i+1]) {
                         $(inputs[i+1]).parent().addClass('active');
-                    } else {
-                        $('.save input').focus();
                     }
                 }
             });
         };
-        $('.input-buttons .input').live('touchstart', buttonPress);
-        $('.input-buttons .input').live('click', buttonPress);
+        $('.input-buttons .input').on('touchstart', buttonPress);
+        $('.input-buttons .input').on('click', buttonPress);
     });
 </script>
 {% endblock %}
@@ -99,6 +97,7 @@
             {% endfor %}
         </table>
         <div class="input-buttons">
+            <div class="input" data-value="X">X</div>
             <div class="input" data-value="10">10</div>
             <div class="input" data-value="9">9</div>
             <div class="input" data-value="8">8</div>
@@ -112,7 +111,7 @@
             <div class="input" data-value="M">M</div>
         </div>
         <div class="save">
-            <input type="submit" value="Save" />
+            <input type="submit" value="Save" class="btn" />
         </div>
         {% csrf_token %}
     </form>
