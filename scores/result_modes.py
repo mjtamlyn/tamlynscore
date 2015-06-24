@@ -72,8 +72,10 @@ class BaseResultMode(object):
                 score.placing = placing
         return results
 
-    def get_section_for_round(self, round):
+    def get_section_for_round(self, round, competition):
         headers = ['Pl.'] + self.get_main_headers()
+        if competition.has_wa_age_groups:
+            headers.append(None)
         if self.include_distance_breakdown:
             subrounds = round.subrounds.all()
             if len(subrounds) > 1:
@@ -324,7 +326,7 @@ class ByRound(BaseResultMode):
         self.leaderboard = leaderboard
         rounds = self.get_rounds(competition)
         return OrderedDict((
-            self.get_section_for_round(round),
+            self.get_section_for_round(round, competition),
             self.get_round_results(competition, round, scores)
         ) for round in rounds)
 
@@ -407,7 +409,7 @@ class ByRoundProgressional(ByRound, BaseResultMode):
         self.leaderboard = leaderboard
         rounds = self.get_rounds(competition)
         return OrderedDict((
-            self.get_section_for_round(round),
+            self.get_section_for_round(round, competition),
             self.get_round_results(competition, round, scores)
         ) for round in rounds)
 
@@ -428,7 +430,7 @@ class DoubleRound(BaseResultMode):
         self.leaderboard = leaderboard
         rounds = self.get_rounds(competition)
         return OrderedDict((
-            self.get_section_for_round(round),
+            self.get_section_for_round(round, competition),
             self.get_round_results(competition, round, scores)
         ) for round in rounds)
 
@@ -502,7 +504,7 @@ class H2HSeedings(ByRound, BaseResultMode):
         self.leaderboard = leaderboard
         rounds = self.get_rounds(competition)
         return OrderedDict((
-            self.get_section_for_round(round),
+            self.get_section_for_round(round, competition),
             self.get_round_results(competition, round, scores)
         ) for round in rounds)
 
@@ -562,7 +564,7 @@ class Team(BaseResultMode):
         results = OrderedDict()
         for type in self.get_team_types(competition):
             results[type] = self.get_team_scores(competition, clubs, type)
-        return {self.get_section_for_round(round): results}
+        return {self.get_section_for_round(round, competition): results}
 
     def get_team_types(self, competition):
         # TODO: support team types properly
