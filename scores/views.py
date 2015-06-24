@@ -806,8 +806,17 @@ class PDFResultsRenderer(object):
             row += [
                 score.target.session_entry.competition_entry.archer.name,
                 score.target.session_entry.competition_entry.club.name + (' (Guest)' if score.guest else ''),
-                'Novice' if score.target.session_entry.competition_entry.novice == 'N' else None,
             ]
+            if self.competition.has_novices:
+                if score.target.session_entry.competition_entry.novice == 'N':
+                    row.append('Novice')
+                else:
+                    row.append(None)
+            if self.competition.has_wa_age_groups:
+                if score.target.session_entry.competition_entry.wa_age:
+                    row.append(score.target.session_entry.competition_entry.get_wa_age_display())
+                else:
+                    row.append(None)
         row += self.mode.score_details(score, section)
         return rows
 
@@ -823,8 +832,17 @@ class CSVResultsRenderer(object):
                     row += [
                         score.target.session_entry.competition_entry.archer.name,
                         score.target.session_entry.competition_entry.club.name + (' (Guest)' if score.guest else ''),
-                        'Novice' if score.target.session_entry.competition_entry.novice == 'N' else None,
                     ]
+                    if self.competition.has_novices:
+                        if score.target.session_entry.competition_entry.novice == 'N':
+                            row.append('Novice')
+                        else:
+                            row.append('')
+                    if self.competition.has_wa_age_groups:
+                        if score.target.session_entry.competition_entry.wa_age:
+                            row.append(score.target.session_entry.competition_entry.get_wa_age_display())
+                        else:
+                            row.append('')
                     row += self.mode.score_details(score, section)
                     data.append(row)
         writer = csv.writer(response)
