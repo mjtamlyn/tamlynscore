@@ -1,86 +1,53 @@
 {% extends 'base.html' %}
 
-{% block extrastyles %}
-<style>
-    .left{
-        float: left;
-    }
-    .right{
-        float: right;
-    }
-    .details_block {
-        margin: 20px;
-    }
-    .names {
-        margin: 17px 20px 0px 0px;
-    }
-    p {
-        margin: 20px 0px 0px 0px;
-    }
-    h4 {
-        margin: 1px 0px 0px 0px;
-    }
-    li {
-        margin: 5px 0px 0px 0px;
-    }
-    .logo_block {
-        margin: 20px;
-        padding: 0px 50px;
-    }
-    .logo {
-        width: 200px; 
-        height: 200px;
-        border: 1px solid blue;
-        margin: 20px;
-    }
-    .affiliations {
-        padding: 5px;
-    }
-    .archers ul {
-        margin: 17px 25px;
-        -webkit-column-count: 4;
-    }
-</style>    
-{% endblock %}
-
 {% block content %}
 <h1>{{ club.name }}</h1>
 
-<div class="details_block left">
-    <div class="basic left">
+<div class="row">
+    <div class="col3">
         <ul class="names">
-            <li>Full name <h4>{{ club.name }}</h4></li>
-            <li>Short name <h4>{{ club.short_name }}</h4></li>
+            <li>Full name <strong>{{ club.name }}</strong></li>
+            <li>Short name <strong>{{ club.short_name }}</strong></li>
         </ul>
     </div>
-    <div class="affiliations">
-        <p>Affiliated to:</p>
-        {% if club.county %}
-        <ul>
-            <li><a href="#">{{ club.county }}</a></li>
-            <li><a href="#">{{ club.county.region }}</a></li>
-            <li><a href="#">{{ club.county.region.country }}</a></li>
-        </ul>
-        {% endif %}
-    </div>
-    <div class="clear"></div>
-</div>
-<div class="logo_block right">
-    <p><a class="btn" href="{% url 'club_update' slug=club.slug %}">Edit</a></p>
-    <div class="logo">
-        (( club.logo ))
+    <div class="col3">
+        <p><a class="btn" href="{% url 'club_update' slug=club.slug %}">Edit</a></p>
     </div>
 </div>
-<div class="clear"></div> 
 
 {% if archers %}
-<div class="archers">
-    <h3>Archers</h3>
-    <ul>
+<div class="row">
+    <div class="col6">
+        <h3>Archers</h3>
         {% for archer in archers %}
-        <li><a href="{% url 'archer_detail' pk=archer.pk %}">{{ archer }}</a></li>
+        <div class="col2">
+            <div class="archer-block">
+                <div class="name">
+                    <p>{{ archer }}</p>
+                </div>
+                <div class="bottom">
+                    {% if archer.entries %}
+                    <ul>
+                        {% for entry in archer.entries %}
+                        <li>{{ entry.competition }}</li>
+                        {% endfor %}
+                    </ul>
+                    {% endif %}
+                    <p>
+                        <span class="pill bowstyle {{ archer.bowstyle|slugify }}">{{ archer.bowstyle }}</span>
+                        <span class="pill gender {{ archer.get_gender_display|lower }}">{{ archer.get_gender_display }}</span>
+                        {% if competition.has_novices and archer.novice == "N" %}
+                        <span class="pill novice">{{ archer.get_novice_display }}</span>
+                        {% endif %}
+                        {% if competition.has_juniors and archer.age == "J" %}
+                        <span class="pill junior">{{ archer.get_age_display }}</span>
+                        {% endif %}
+                    </p>
+                </div>
+            </div>
+        </div>
         {% endfor %}
-    </ul>
+    </div>
 </div>
 {% endif %}
 
