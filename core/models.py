@@ -163,7 +163,7 @@ class Archer(models.Model):
     club = models.ForeignKey(Club)
     bowstyle = models.ForeignKey(Bowstyle)
     age = models.CharField(max_length=1, choices=AGE_CHOICES, default='S')
-    wa_age = models.CharField(max_length=1, choices=WA_AGE_CHOICES, default='')
+    wa_age = models.CharField(max_length=1, choices=WA_AGE_CHOICES, default='', blank=True)
     novice = models.CharField(max_length=1, choices=NOVICE_CHOICES, default='E')
     agb_number = models.BigIntegerField(blank=True, null=True)
 
