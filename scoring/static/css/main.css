@@ -388,54 +388,6 @@ nav .nav-link:hover {
   text-align: right;
 }
 
-/* line 1, ../../sass/_accounts.sass */
-#login {
-  width: 300px;
-  padding-top: 15px;
-}
-/* line 5, ../../sass/_accounts.sass */
-#login .error {
-  color: #D58100;
-  font-size: 12px;
-  text-align: center;
-  padding: 0 10px;
-}
-/* line 11, ../../sass/_accounts.sass */
-#login table {
-  border-spacing: 5px;
-  margin: 0 auto 10;
-}
-/* line 15, ../../sass/_accounts.sass */
-#login table input {
-  border: 2px solid #DDDAFA;
-  border-radius: 4px;
-  font-family: Verdana;
-  margin: 0;
-  outline: none;
-  padding: 5px;
-}
-/* line 23, ../../sass/_accounts.sass */
-#login table input:focus {
-  border-color: #6FB3FF;
-}
-/* line 26, ../../sass/_accounts.sass */
-#login .submit {
-  text-align: center;
-}
-/* line 29, ../../sass/_accounts.sass */
-#login .submit input[type=submit] {
-  border: 2px solid #111D2A;
-  border-radius: 10px;
-  background-image: -webkit-linear-gradient(#111D2A, #353345, #111D2A);
-  color: white;
-  cursor: pointer;
-  font-size: 18px;
-  font-family: Georgia;
-  font-weight: bold;
-  margin: 0 auto;
-  padding: 5px;
-}
-
 /* line 1, ../../sass/_competition.sass */
 .competition-nav {
   overflow: visible;
