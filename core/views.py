@@ -3,8 +3,10 @@ import copy
 from django.core.cache import cache
 from django.core.urlresolvers import reverse
 from django.contrib.auth.decorators import login_required
+from django.db.models import Prefetch
 from django.views.generic import TemplateView, ListView, DetailView, UpdateView, CreateView
 
+from entries.models import CompetitionEntry
 from scoring.utils import class_view_decorator
 from scores.models import Score
 
@@ -26,7 +28,12 @@ class ClubDetail(DetailView):
     model = Club
 
     def get_context_data(self, **kwargs):
-        archers = self.object.archer_set.order_by('name')
+        entries = Prefetch(
+            'competitionentry_set',
+            queryset=CompetitionEntry.objects.select_related('competition', 'competition__tournament'),
+            to_attr='entries',
+        )
+        archers = self.object.archer_set.select_related('bowstyle').order_by('name').prefetch_related(entries)
         return super(ClubDetail, self).get_context_data(archers=archers, **kwargs)
 
 
