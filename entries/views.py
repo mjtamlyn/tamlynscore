@@ -252,7 +252,7 @@ class TargetList(ListView):
             target_list[session]['targets'].append(allocation)
 
         # Turn the targets into an actual target list
-        for session, options in target_list.iteritems():
+        for session, options in target_list.items():
             details = session.details
             # Work out which bosses and details we need
             archers_per_target = session.archers_per_target
