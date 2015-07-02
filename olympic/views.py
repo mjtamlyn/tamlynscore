@@ -453,7 +453,7 @@ class OlympicTree(OlympicResults):
             offset = 2 ** (i / 3 - 1) if i else 0
 
             for j in range(self.rows):
-                if (not i is 0 and not j % 2 ** (i / 3)) or (i is 0 and not j % 2):
+                if (not i == 0 and not j % 2 ** (i / 3)) or (i == 0 and not j % 2):
                     properties.append(
                         ('LINEABOVE', (i, j + offset), (i + 2, j + offset), 1, colors.black),
                     )

@@ -154,7 +154,7 @@ class SessionRound(models.Model):
         archers_per_target = self.session.archers_per_target
         needed_bosses = int(math.ceil(entries / float(archers_per_target)))
         current_target_allocations = TargetAllocation.objects.filter(session_entry__session_round=self).select_related()
-        #FIXME: Don't do this for making target lists
+        # FIXME: Don't do this for making target lists
         minimum_boss = current_target_allocations.aggregate(models.Min('boss'))['boss__min']
         if not minimum_boss:
             minimum_boss = 1

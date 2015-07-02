@@ -1,4 +1,5 @@
 import collections
+import functools
 import itertools
 import json
 import math
@@ -750,7 +751,7 @@ class RunningSlipsPdf(ScoreSheetsPdf):
             all_entries = []
             for boss, entries in itertools.groupby(self.session_round.target_list(), lambda x: x[0][:-1]):
                 entries = list(entries)
-                if not reduce(lambda e, f: e or f, [entry[1] for entry in entries]):
+                if not functools.reduce(lambda e, f: e or f, [entry[1] for entry in entries]):
                     continue
                 all_entries.append(entries)
             if scoring_type == SCORING_FULL:
@@ -765,7 +766,7 @@ class RunningSlipsPdf(ScoreSheetsPdf):
         headings = self.session_round.shot_round.score_sheet_headings
         while all_entries:
             entries_group, all_entries = all_entries[:6], all_entries[6:]
-            for dozen in range(1, dozens + 1):
+            for dozen in range(1, int(dozens) + 1):
                 for entries in entries_group:
                     table_data = [(
                         ['Dozen {0}'.format(dozen)] + [None] * 6 + ['ET'] + [None] * 6 +
