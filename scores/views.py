@@ -1095,6 +1095,7 @@ class PublicResultsMixin(object):
         kwargs['modes'] = self.modes
         return super(PublicResultsMixin, self).get_context_data(**kwargs)
 
+
 class ResultsSummaryFromCache(PublicResultsMixin, TemplateView):
     template_name = 'scores/public_leaderboard_summary.html'
 
@@ -1116,6 +1117,7 @@ class ResultsSummaryFromCache(PublicResultsMixin, TemplateView):
             for category, scores in categories.items():
                 results[section][category] = scores[:8]
         return results
+
 
 class ResultsFromCache(PublicResultsMixin, TemplateView):
     template_name = 'scores/public_leaderboard.html'

@@ -23,6 +23,7 @@ from olympic.forms import ResultForm, SetupForm
 
 from itertools import groupby
 
+
 @class_view_decorator(login_required)
 class OlympicIndex(View):
     def get(self, request, slug):
@@ -117,6 +118,7 @@ class OlympicSetup(FieldPlanMixin, FormView):
 
     def get_success_url(self):
         return self.request.get_full_path()
+
 
 @class_view_decorator(login_required)
 class OlympicSeedingsPDF(PDFResultsRenderer, View):
@@ -297,8 +299,6 @@ class OlympicScoreSheet(ScoreSheetsPdf):
 
             table_of_score_sheets = Table(table_of_score_sheets)
             table_of_score_sheets.setStyle(self.big_table_style)
-
-
 
             elements.append(KeepTogether([header_table, table_of_score_sheets]))
             elements.append(PageBreak())

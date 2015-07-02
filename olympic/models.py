@@ -147,7 +147,6 @@ class OlympicSessionRound(models.Model):
                 self.results = results
                 self.total_levels = total_levels
 
-
         seedings = self.seeding_set.all().select_related().prefetch_related('result_set')
         total_levels = self.match_set.aggregate(models.Max('level'))['level__max']
 

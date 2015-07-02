@@ -4,6 +4,7 @@ from olympic.models import OlympicSessionRound, Seeding, Result, Match
 
 import xlrd
 
+
 class Command(BaseCommand):
     def handle(self, *args, **options):
         book = xlrd.open_workbook(args[0])
