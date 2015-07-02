@@ -15,7 +15,7 @@ class OlympicRound(models.Model):
     distance = models.PositiveIntegerField()
     match_type = models.CharField(max_length=1, choices=MATCH_TYPES)
 
-    def __unicode__(self):
+    def __str__(self):
         return 'Olympic Round at {0}m ({1})'.format(self.distance, self.get_match_type_display())
 
 
@@ -26,7 +26,7 @@ class Category(models.Model):
     class Meta:
         verbose_name_plural = 'categories'
 
-    def __unicode__(self):
+    def __str__(self):
         return u'Category: {0}'.format(self.name)
 
     def code(self):
@@ -66,7 +66,7 @@ class OlympicSessionRound(models.Model):
     ranking_round = models.ForeignKey(SessionRound)
     category = models.ForeignKey(Category)
 
-    def __unicode__(self):
+    def __str__(self):
         return u'{0}, {1} {2}'.format(self.session, self.shot_round, self.category.name)
 
     def set_seedings(self, scores):
@@ -177,7 +177,7 @@ class Seeding(models.Model):
     session_round = models.ForeignKey(OlympicSessionRound)
     seed = models.PositiveIntegerField()
 
-    def __unicode__(self):
+    def __str__(self):
         return u'Seed {0} - {1} {2}'.format(self.seed, self.session_round.shot_round, self.entry)
 
 
@@ -204,7 +204,6 @@ class MatchManager(models.Manager):
 
     def match_for_seed(self, seed, level):
         match_number = self._match_number_for_seed(seed.seed, level)
-        effective_seed = self._effective_seed(seed.seed, level)
         match = self.get(level=level, session_round=seed.session_round, match=match_number)
         return match
 
@@ -246,7 +245,7 @@ class Match(models.Model):
     class Meta:
         verbose_name_plural = 'matches'
 
-    def __unicode__(self):
+    def __str__(self):
         return u'Match {0} at level {1} on round {2}'.format(self.match, self.level, self.session_round)
 
 
@@ -260,7 +259,7 @@ class Result(models.Model):
     dns = models.BooleanField(default=False)
     win_by_forfeit = models.BooleanField(default=False)
 
-    def __unicode__(self):
+    def __str__(self):
         return u'Result of match {0}'.format(self.match)
 
     def display(self):

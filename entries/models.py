@@ -24,7 +24,7 @@ class Tournament(models.Model):
 
     host_club = models.ForeignKey(Club)
 
-    def __unicode__(self):
+    def __str__(self):
         return self.short_name
 
 
@@ -32,7 +32,7 @@ class Sponsor(models.Model):
     name = models.CharField(max_length=200)
     logo = models.ImageField(upload_to='sponsors')
 
-    def __unicode__(self):
+    def __str__(self):
         return self.name
 
 
@@ -69,7 +69,7 @@ class Competition(models.Model):
     class Meta:
         unique_together = ('date', 'tournament')
 
-    def __unicode__(self):
+    def __str__(self):
         return u'{0} {1}'.format(self.tournament, self.date.year)
 
     def clean(self, *args, **kwargs):
@@ -96,7 +96,7 @@ class ResultsMode(models.Model):
     class Meta:
         unique_together = ('competition', 'mode')
 
-    def __unicode__(self):
+    def __str__(self):
         return unicode(self.get_mode_display())
 
 
@@ -108,7 +108,7 @@ class Session(models.Model):
     archers_per_target = models.IntegerField()
     arrows_entered_per_end = models.IntegerField(default=12)
 
-    def __unicode__(self):
+    def __str__(self):
         return u'{0} - {1}'.format(self.competition, self.start)
 
     class Meta:
@@ -224,7 +224,7 @@ class SessionRound(models.Model):
                     targets.append((target, None))
         return targets
 
-    def __unicode__(self):
+    def __str__(self):
         return u'{0}, {1}'.format(self.session, self.shot_round)
 
 
@@ -242,7 +242,7 @@ class CompetitionEntry(models.Model):
     b_team = models.BooleanField(default=False)
     c_team = models.BooleanField(default=False)
 
-    def __unicode__(self):
+    def __str__(self):
         return u'{0} at {1}'.format(self.archer, self.competition)
 
     class Meta:
@@ -272,7 +272,7 @@ class SessionEntry(models.Model):
     present = models.BooleanField(default=False)
     index = models.PositiveIntegerField(default=1)
 
-    def __unicode__(self):
+    def __str__(self):
         return u'{0} - {1}'.format(self.competition_entry, self.session_round.shot_round)
 
     class Meta:
@@ -284,5 +284,5 @@ class TargetAllocation(models.Model):
     boss = models.PositiveIntegerField()
     target = models.CharField(max_length=1)
 
-    def __unicode__(self):
+    def __str__(self):
         return u'{0}{1} - {2}'.format(self.boss, self.target, self.session_entry)
