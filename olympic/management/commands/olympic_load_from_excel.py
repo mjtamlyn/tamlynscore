@@ -27,5 +27,3 @@ class Command(BaseCommand):
                         win=win
                 )
                 result.save()
-
-
