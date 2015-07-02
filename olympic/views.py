@@ -213,8 +213,8 @@ class OlympicInput(TemplateView):
 
 @class_view_decorator(login_required)
 class OlympicScoreSheet(ScoreSheetsPdf):
-    box_size = 0.35*inch
-    wide_box = box_size*1.3
+    box_size = 0.35 * inch
+    wide_box = box_size * 1.3
     title_position = 30
 
     match_names = [
@@ -240,11 +240,11 @@ class OlympicScoreSheet(ScoreSheetsPdf):
     def update_style(self):
         super(OlympicScoreSheet, self).update_style()
         self.col_widths = 3 * [self.box_size] + 3 * [self.wide_box] + [self.box_size * 3, self.box_size]
-        self.row_heights = 8 * [self.box_size*0.85]
+        self.row_heights = 8 * [self.box_size * 0.85]
 
     def setMargins(self, doc):
-        doc.topMargin = 0.4*inch
-        doc.bottomMargin = 0.2*inch
+        doc.topMargin = 0.4 * inch
+        doc.bottomMargin = 0.2 * inch
 
     def get_elements(self):
         elements = []
@@ -257,7 +257,7 @@ class OlympicScoreSheet(ScoreSheetsPdf):
                 [self.Para(u'{0} {1}'.format(entry.archer.get_gender_display(), entry.bowstyle), 'h2'), self.Para(u'Seed {0}'.format(seeding.seed), 'h2')],
             ]
 
-            header_table = Table(header_table_data, [3*inch, 4*inch])
+            header_table = Table(header_table_data, [3 * inch, 4 * inch])
 
             matches = Match.objects.matches_for_seed(seeding, highest_seed=highest_seed)
 
@@ -284,7 +284,7 @@ class OlympicScoreSheet(ScoreSheetsPdf):
                         [None] * 6 + ['Opponent Signature', None],
                         [None] * 8,
                         [None] * 6 + ['Win?', None],
-                        ['Shoot-off', None,  None, 'Total', None, 'Opponent Total', None, None],
+                        ['Shoot-off', None, None, 'Total', None, 'Opponent Total', None, None],
                 ]
                 score_sheet = Table(table_data, self.col_widths, self.row_heights)
                 score_sheet.setStyle(self.scores_table_style if match else self.bye_style)
@@ -425,12 +425,12 @@ class OlympicResults(HeadedPdfView):
 @class_view_decorator(login_required)
 class OlympicTree(OlympicResults):
 
-    PAGE_HEIGHT=defaultPageSize[0]
-    PAGE_WIDTH=defaultPageSize[1]
+    PAGE_HEIGHT = defaultPageSize[0]
+    PAGE_WIDTH = defaultPageSize[1]
     do_sponsors = False
 
     def setMargins(self, doc):
-        doc.bottomMargin = 0.4*inch
+        doc.bottomMargin = 0.4 * inch
 
     @property
     def match_cols(self):
@@ -450,10 +450,10 @@ class OlympicTree(OlympicResults):
         vert_line = None
         for i in self.match_cols:
 
-            offset = 2 ** (i/3 - 1) if i else 0
+            offset = 2 ** (i / 3 - 1) if i else 0
 
             for j in range(self.rows):
-                if (not i is 0 and not j % 2 ** (i/3)) or (i is 0 and not j % 2):
+                if (not i is 0 and not j % 2 ** (i / 3)) or (i is 0 and not j % 2):
                     properties.append(
                         ('LINEABOVE', (i, j + offset), (i + 2, j + offset), 1, colors.black),
                     )
@@ -475,10 +475,10 @@ class OlympicTree(OlympicResults):
         return blocks
 
     def name_rows(self, col):
-        level = self.total_levels - col/3
+        level = self.total_levels - col / 3
         rows = []
         for start, end in self.match_blocks(level):
-            rows += [start, end-1]
+            rows += [start, end - 1]
         return rows
 
     def get_round_elements(self, olympic_round):
@@ -494,7 +494,7 @@ class OlympicTree(OlympicResults):
         table_data = [[None for i in range(self.cols)] for j in range(self.rows)]
 
         for i in self.match_cols:
-            level = self.total_levels - i/3
+            level = self.total_levels - i / 3
             blocks = self.match_blocks(level)
             matches = olympic_round.match_set.filter(level=level).order_by('target').prefetch_related(
                 Prefetch('result_set', queryset=Result.objects.select_related())
@@ -515,7 +515,7 @@ class OlympicTree(OlympicResults):
                 match = matches[m]
                 if match is None:
                     continue
-                seeds = [match.match, (2**match.level) + 1 - match.match]
+                seeds = [match.match, (2 ** match.level) + 1 - match.match]
                 if m % 2:
                     seeds.reverse()
                 seeds_remaining = len(set(seeds).intersection(set(seedings_dict.keys())))
@@ -570,12 +570,12 @@ class OlympicTree(OlympicResults):
 @class_view_decorator(login_required)
 class FieldPlan(FieldPlanMixin, HeadedPdfView):
     title = 'Field plan'
-    PAGE_HEIGHT=defaultPageSize[0]
-    PAGE_WIDTH=defaultPageSize[1]
+    PAGE_HEIGHT = defaultPageSize[0]
+    PAGE_WIDTH = defaultPageSize[1]
     do_sponsors = False
 
     def setMargins(self, doc):
-        doc.bottomMargin = 0.4*inch
+        doc.bottomMargin = 0.4 * inch
 
     def get_elements(self):
         field_plan = self.get_field_plan()
@@ -594,7 +594,7 @@ class FieldPlan(FieldPlanMixin, HeadedPdfView):
             table_data.append(table_row)
         table = Table(table_data, colWidths=widths)
         table.setStyle(table_style)
-        return [Spacer(0.5*inch, 0.5*inch), table]
+        return [Spacer(0.5 * inch, 0.5 * inch), table]
 
     def get_table_style(self, data):
         table_style = [
