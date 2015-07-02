@@ -222,7 +222,12 @@ class InputDozens(View):
 
     def get(self, request, slug, session_id, boss, dozen):
         competition = get_object_or_404(Competition, slug=slug)
-        scores = Score.objects.filter(target__session_entry__session_round__session=session_id, target__boss=boss, target__session_entry__present=True, retired=False).order_by('target__target').select_related()
+        scores = Score.objects.filter(
+            target__session_entry__session_round__session=session_id,
+            target__boss=boss,
+            target__session_entry__present=True,
+            retired=False,
+        ).order_by('target__target').select_related()
         next_exists = self.get_next_exists(session_id, boss)
         num_dozens = SessionRound.objects.filter(session__pk=session_id)[0].shot_round.arrows / 12
         try:
@@ -233,7 +238,12 @@ class InputDozens(View):
 
     def post(self, request, slug, session_id, boss, dozen):
         competition = get_object_or_404(Competition, slug=slug)
-        scores = Score.objects.filter(target__session_entry__session_round__session=session_id, target__boss=boss, target__session_entry__present=True, retired=False).order_by('target__target').select_related()
+        scores = Score.objects.filter(
+            target__session_entry__session_round__session=session_id,
+            target__boss=boss,
+            target__session_entry__present=True,
+            retired=False,
+        ).order_by('target__target').select_related()
         num_dozens = SessionRound.objects.filter(session__pk=session_id)[0].shot_round.arrows / 12
         try:
             forms = get_dozen_formset(scores, num_dozens, boss, dozen, scores[0].target.session_entry.session_round.session.arrows_entered_per_end, data=request.POST)
@@ -363,7 +373,9 @@ class LeaderboardTeams(ListView):
     title = 'Leaderboard (Teams)'
 
     def get_queryset(self):
-        scores = Score.objects.filter(target__session_entry__competition_entry__competition__slug=self.kwargs['slug']).select_related().exclude(target__session_entry__competition_entry__bowstyle__name='Compound')
+        scores = Score.objects.filter(
+            target__session_entry__competition_entry__competition__slug=self.kwargs['slug']
+        ).select_related().exclude(target__session_entry__competition_entry__bowstyle__name='Compound')
         scores = scores.order_by(
             'target__session_entry__competition_entry__bowstyle',
             'target__session_entry__competition_entry__archer__gender',
