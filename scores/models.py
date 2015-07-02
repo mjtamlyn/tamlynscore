@@ -116,7 +116,7 @@ class Score(models.Model):
 
     def running_total(self, dozen):
         if self.target.session_entry.session_round.session.scoring_system == SCORING_FULL:
-            return self.arrow_set.filter(arrow_of_round__lte=int(dozen)*self.arrows_entered_per_end).aggregate(models.Sum('arrow_value'))['arrow_value__sum']
+            return self.arrow_set.filter(arrow_of_round__lte=int(dozen) * self.arrows_entered_per_end).aggregate(models.Sum('arrow_value'))['arrow_value__sum']
         elif self.target.session_entry.session_round.session.scoring_system == SCORING_DOZENS:
             return self.dozen_set.filter(dozen__lt=dozen).aggregate(total=models.Sum('total'))['total'] or 0
 

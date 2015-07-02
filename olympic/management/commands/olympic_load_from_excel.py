@@ -14,7 +14,7 @@ class Command(BaseCommand):
             for n in range(2, sheet.nrows):
                 row = sheet.row(n)
                 seed = Seeding.objects.get(session_round=session_round, seed=row[0].value)
-                level  = row[1].value
+                level = row[1].value
                 match = Match.objects.match_for_seed(seed, level)
                 score_column = 17 if session_round.shot_round.match_type == 'C' else 22
                 score = row[score_column].value

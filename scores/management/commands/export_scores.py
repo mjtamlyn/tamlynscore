@@ -27,7 +27,7 @@ class Command(BaseCommand):
         while not valid:
             obj = raw_input(msg)
             try:
-                obj = iterable[int(obj)-1]
+                obj = iterable[int(obj) - 1]
             except (ValueError, IndexError):
                 pass
             else:

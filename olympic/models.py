@@ -138,7 +138,7 @@ class OlympicSessionRound(models.Model):
         real_rank = 8
         while real_rank < rank:
             real_rank = real_rank * 2
-        return real_rank/2 + 1
+        return real_rank / 2 + 1
 
     def get_results(self):
 
