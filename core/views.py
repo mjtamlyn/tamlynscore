@@ -88,9 +88,9 @@ class ArcherCreate(CreateView):
 
     def get_initial(self):
         initial = {}
-        cached = cache.get('archer-create')
-        #if cached:
-        #    initial = cached
+        cached = cache.get('archer-create-%s' % self.request.user.pk)
+        if cached:
+            initial = cached
         name = self.request.GET.get('name')
         if name:
             initial['name'] = name
@@ -99,7 +99,7 @@ class ArcherCreate(CreateView):
     def form_valid(self, form):
         cache_data = copy.copy(form.cleaned_data)
         del cache_data['name']
-        cache.set('archer-create', cache_data)
+        cache.set('archer-create-%s' % self.request.user.pk, cache_data)
         return super(ArcherCreate, self).form_valid(form)
 
     def get_success_url(self):

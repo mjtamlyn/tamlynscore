@@ -168,4 +168,3 @@ class Command(BaseCommand):
        # Add the target allocation
         boss, target = entry['target'][:-1], entry['target'][-1]
         TargetAllocation.objects.create(boss=boss, target=target, session_entry=session_entry)
-
