@@ -103,7 +103,8 @@ class Score(models.Model):
                     self.hits += 1
                 if ((scoring_type in ['T', 'X', 'I'] and arrow.arrow_value == 10) or
                     (scoring_type == 'F' and arrow.arrow_value == 9) or
-                    (scoring_type == 'W' and arrow.arrow_value == 5)):
+                    (scoring_type == 'W' and arrow.arrow_value == 5)
+                ):
                     self.golds += 1
                 if scoring_type == 'X' and arrow.is_x:
                     self.xs += 1

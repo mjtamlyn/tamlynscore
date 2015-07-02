@@ -21,11 +21,11 @@ reader = csv.reader(sys.stdin)
 for row in reader:
     session, boss, target, cid, name, _, _, _, _, notes = row
     if notes or not cid:
-        print row
+        print(row)
         continue
     ce = CompetitionEntry.objects.get(id=cid)
     if not ce.archer.name == name:
-        print 'Bad name for archer %s (%s, %s%s)' % (name, session, boss, target)
+        print('Bad name for archer %s (%s, %s%s)' % (name, session, boss, target))
     se = SessionEntry(
         competition_entry=ce,
         session_round=session_key[session],

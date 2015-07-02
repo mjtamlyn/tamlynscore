@@ -1,6 +1,7 @@
 import copy
 import csv
 from itertools import groupby
+import functools
 import json
 import math
 
@@ -97,7 +98,7 @@ class InputScores(TargetList):
                             combined_lookup[dozen] = False
                 bosses.append((boss, combined_lookup))
             combine = lambda x, y: x and y
-            session_complete = bosses and reduce(combine, [reduce(combine, b[1].values()) for b in bosses])
+            session_complete = bosses and functools.reduce(combine, [functools.reduce(combine, b[1].values()) for b in bosses])
             if session_complete:
                 cache.set(cache_key, bosses, 30000)
 
@@ -659,7 +660,7 @@ class ResultsPdf(HeadedPdfView, LeaderboardSummary):
                         if self.include_dns:
                             table_data.append([None, dns.competition_entry.archer.name, dns.competition_entry.club.name, 'DNS'])
                 else:
-                    #FIXME! DNS for a category where everyone shot...
+                    # FIXME! DNS for a category where everyone shot...
                     pass
                 table = Table(table_data)
                 table.setStyle(self.table_style)

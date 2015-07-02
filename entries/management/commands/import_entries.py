@@ -55,7 +55,7 @@ class Command(BaseCommand):
             self.info('%s: %s' % (i, o))
         valid = False
         while not valid:
-            obj = raw_input(msg)
+            obj = input(msg)
             try:
                 obj = iterable[int(obj) - 1]
             except (ValueError, IndexError):
@@ -124,7 +124,7 @@ class Command(BaseCommand):
                 except Club.MultipleObjectsReturned:
                     clubs = Club.objects.filter(name__icontains=entry['club'])
                     club = self.make_selection(clubs, 'Choose a club: ')
-            #TODO: handle people shooting for another club
+            # TODO: handle people shooting for another club
             self.clubs[entry['club']] = club
         self.info('Club is %s' % club)
 
@@ -146,13 +146,13 @@ class Command(BaseCommand):
         self.info('Archer is %s' % archer)
 
         # Check if they've entered already
-        #entered = self.session.sessionentry_set.filter(archer=archer).exists()
-        #if entered:
+        # entered = self.session.sessionentry_set.filter(archer=archer).exists()
+        # if entered:
         #    self.info('Archer %s is already entered' % archer)
         #    return
 
         # Check archer's details
-        #TODO
+        # TODO
 
         # Make the entry
         if not self.kwargs['dry_run']:
@@ -165,6 +165,6 @@ class Command(BaseCommand):
             )
             session_entry = self.session.sessionentry_set.create(competition_entry=competition_entry)
 
-       # Add the target allocation
+        # Add the target allocation
         boss, target = entry['target'][:-1], entry['target'][-1]
         TargetAllocation.objects.create(boss=boss, target=target, session_entry=session_entry)

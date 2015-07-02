@@ -25,7 +25,7 @@ class Command(BaseCommand):
             self.info('%s: %s' % (i, o))
         valid = False
         while not valid:
-            obj = raw_input(msg)
+            obj = input(msg)
             try:
                 obj = iterable[int(obj) - 1]
             except (ValueError, IndexError):
