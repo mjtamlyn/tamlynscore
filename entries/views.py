@@ -449,7 +449,7 @@ class PdfView(View):
         return doc
 
     def Para(self, string, style='Normal'):
-        return Paragraph(unicode(string), self.styles[style])
+        return Paragraph(str(string), self.styles[style])
 
     def get_elements(self):
         return [self.Para('This is not done yet')]
@@ -466,7 +466,7 @@ class HeadedPdfView(PdfView):
         if self.title:
             title = u'{0}: {1}'.format(self.competition, self.title)
         else:
-            title = unicode(self.competition)
+            title = str(self.competition)
         canvas.drawCentredString(self.PAGE_WIDTH / 2.0, self.PAGE_HEIGHT - self.title_position, title)
 
         if self.do_sponsors:

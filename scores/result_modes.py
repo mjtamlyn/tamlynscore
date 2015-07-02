@@ -96,7 +96,7 @@ class BaseResultMode(object):
         return ['Archer', 'Club', None]
 
     def label_for_round(self, round):
-        return unicode(round)
+        return str(round)
 
     def get_subrounds(self, score):
         if score.is_team or self.ignore_subrounds:
@@ -182,7 +182,7 @@ class BaseResultMode(object):
             }
             for category, scores in categories.items():
                 json_category = {
-                    'category': unicode(category),
+                    'category': str(category),
                     'scores': [],
                 }
                 for score in scores:
@@ -480,7 +480,7 @@ class DoubleRound(BaseResultMode):
         return results
 
     def label_for_round(self, round):
-        return 'Double %s' % unicode(round)
+        return 'Double %s' % str(round)
 
 
 class H2HSeedings(ByRound, BaseResultMode):
@@ -727,14 +727,14 @@ class Weekend(BaseResultMode):
                     fita = round
                     break
             for division in all_fita_results[fita]:
-                if 'Compound' in unicode(category.category) and 'Compound' in division:
+                if 'Compound' in str(category.category) and 'Compound' in division:
                     if category.category.gender == 'G' and 'Gent' in division:
                         fita_results = all_fita_results[fita][division]
                         break
                     if category.category.gender == 'L' and 'Lady' in division:
                         fita_results = all_fita_results[fita][division]
                         break
-                if 'Recurve' in unicode(category.category) and 'Recurve' in division:
+                if 'Recurve' in str(category.category) and 'Recurve' in division:
                     if category.category.gender == 'G' and 'Gent' in division:
                         fita_results = all_fita_results[fita][division]
                         break
@@ -748,14 +748,14 @@ class Weekend(BaseResultMode):
 
             for round, divisions in seeding_results.items():
                 for division in divisions:
-                    if 'Compound' in unicode(category.category) and '50m' in round.round.name:
+                    if 'Compound' in str(category.category) and '50m' in round.round.name:
                         if category.category.gender == 'G' and division.gender == 'G':
                             ranking_results = seeding_results[round][division]
                             break
                         if category.category.gender == 'L' and division.gender == 'L':
                             ranking_results = seeding_results[round][division]
                             break
-                    if 'Recurve' in unicode(category.category) and '70m' in round.round.name:
+                    if 'Recurve' in str(category.category) and '70m' in round.round.name:
                         if category.category.gender == 'G' and division.gender == 'G':
                             ranking_results = seeding_results[round][division]
                             break

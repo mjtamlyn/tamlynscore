@@ -10,5 +10,4 @@ pystache==0.5.4
 reportlab==3.2.0
 sqlparse==0.1.15
 static3==0.6.1
-unicodecsv==0.13.0
 wheel==0.24.0

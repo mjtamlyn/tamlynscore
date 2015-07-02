@@ -97,7 +97,7 @@ class ResultsMode(models.Model):
         unique_together = ('competition', 'mode')
 
     def __str__(self):
-        return unicode(self.get_mode_display())
+        return str(self.get_mode_display())
 
 
 class Session(models.Model):
