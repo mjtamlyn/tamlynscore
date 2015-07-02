@@ -381,7 +381,7 @@ class LeaderboardTeams(ListView):
             if club not in club_results:
                 club_results[club] = []
             club_results[club].append(score)
-        for club, scores in club_results.iteritems():
+        for club, scores in club_results.items():
             team = sorted(scores, key=lambda s: (s.score, s.hits, s.golds, s.xs), reverse=True)[:max_per_team]
             total = sum([s.score for s in team])
             total_golds = sum([s.golds for s in team])
