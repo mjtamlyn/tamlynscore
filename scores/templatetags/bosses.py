@@ -1,7 +1,4 @@
-from django.db.models import Max
 from django import template
-
-from scores.models import Arrow
 
 register = template.Library()
 

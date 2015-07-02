@@ -21,7 +21,7 @@ from reportlab.lib.units import inch
 from reportlab.platypus import SimpleDocTemplate, Spacer, Table, TableStyle, Paragraph
 from reportlab.rl_config import defaultPageSize
 
-from entries.models import Competition, SessionRound, CompetitionEntry, SCORING_TOTALS, SCORING_DOZENS, SCORING_FULL
+from entries.models import Competition, SessionRound, CompetitionEntry, SCORING_TOTALS, SCORING_DOZENS, SCORING_FULL, ResultsMode
 from entries.views import HeadedPdfView, TargetList, CompetitionMixin
 from olympic.models import OlympicRound, Result
 from scoring.utils import class_view_decorator
@@ -910,7 +910,7 @@ class NewLeaderboard(PDFResultsRenderer, CSVResultsRenderer, JSONResultsRenderer
         if load:
             try:
                 obj = self.competition.result_modes.filter(mode=mode.slug).get()
-            except ResultMode.DoesNotExist:
+            except ResultsMode.DoesNotExist:
                 return False, None
             else:
                 return True, obj
@@ -993,7 +993,7 @@ class NewResults(NewLeaderboard):
         if load:
             try:
                 obj = self.competition.result_modes.filter(mode=mode.slug, leaderboard_only=False).get()
-            except ResultMode.DoesNotExist:
+            except ResultsMode.DoesNotExist:
                 return False, None
             else:
                 return True, obj

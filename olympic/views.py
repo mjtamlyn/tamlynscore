@@ -264,7 +264,7 @@ class OlympicScoreSheet(ScoreSheetsPdf):
                 match, timing = matches[i]
                 match_title = self.Para(self.match_names[i], 'h3')
                 if match and i > 0:
-                    boss = self.Para('T. {0}'.format(match), 'h3') 
+                    boss = self.Para('T. {0}'.format(match), 'h3')
                 elif match:
                     boss = self.Para('T. {0} / {1}'.format(match, match + 2), 'h3')
                 else:
@@ -499,7 +499,6 @@ class OlympicTree(OlympicResults):
             matches = olympic_round.match_set.filter(level=level).order_by('target').prefetch_related(
                 Prefetch('result_set', queryset=Result.objects.select_related())
             )
-            any_results = Result.objects.filter(match__session_round=olympic_round).exists()
             if (len(blocks) / len(matches)) == 2:
                 old_matches = matches
                 matches = []
