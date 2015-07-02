@@ -34,14 +34,14 @@ class Category(models.Model):
             code = self.gender
         else:
             code = ''
-        return code + u''.join([unicode(b)[0] for b in self.bowstyles.all()])
+        return code + u''.join([str(b)[0] for b in self.bowstyles.all()])
 
     def short_code(self):
         if self.gender:
             code = self.gender
         else:
             code = ''
-        return code + unicode(self.bowstyles.all()[0])[0]
+        return code + str(self.bowstyles.all()[0])[0]
 
     @property
     def name(self):
@@ -49,7 +49,7 @@ class Category(models.Model):
             name = self.get_gender_display() + ' '
         else:
             name = ''
-        return name + u', '.join([unicode(b) for b in self.bowstyles.all()])
+        return name + u', '.join([str(b) for b in self.bowstyles.all()])
 
     @property
     def short_name(self):
@@ -57,7 +57,7 @@ class Category(models.Model):
             name = self.get_gender_display() + ' '
         else:
             name = ''
-        return name + unicode(self.bowstyles.all()[0])
+        return name + str(self.bowstyles.all()[0])
 
 
 class OlympicSessionRound(models.Model):

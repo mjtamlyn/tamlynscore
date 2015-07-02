@@ -136,7 +136,7 @@ class Arrow(models.Model):
             return u'X'
         if self.arrow_value == 0:
             return u'M'
-        return unicode(self.arrow_value)
+        return str(self.arrow_value)
 
 
 class Dozen(models.Model):
@@ -145,4 +145,4 @@ class Dozen(models.Model):
     dozen = models.PositiveIntegerField()
 
     def __str__(self):
-        return unicode(self.total)
+        return str(self.total)

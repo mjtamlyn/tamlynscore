@@ -1,5 +1,5 @@
 import copy
-import unicodecsv as csv
+import csv
 from itertools import groupby
 import json
 import math
@@ -188,7 +188,7 @@ class InputArrowsArcher(TemplateView):
         for arrow in arrows:
             dozen = (arrow.arrow_of_round - 13) / per_end
             point = arrow.arrow_of_round % per_end - 1
-            layout[dozen]['scores'][point] = unicode(arrow)
+            layout[dozen]['scores'][point] = str(arrow)
             layout[dozen]['doz'] += arrow.arrow_value
             if point < 6 and point >= 0:
                 layout[dozen]['et1'] += arrow.arrow_value
@@ -774,10 +774,10 @@ class PDFResultsRenderer(object):
         for section, categories in results.items():
             if not categories:
                 continue
-            elements.append(Paragraph(unicode(section), self.styles['h1']))
+            elements.append(Paragraph(str(section), self.styles['h1']))
 
             for category, scores in categories.items():
-                elements.append(Paragraph(unicode(category), self.styles['h2']))
+                elements.append(Paragraph(str(category), self.styles['h2']))
                 table_data = [section.headers]
                 for score in scores:
                     table_data += self.rows_from_score(scores, score, section)
@@ -796,7 +796,7 @@ class PDFResultsRenderer(object):
         team_style = copy.copy(self.styles['Normal'])
         team_style.fontName = 'Helvetica-Bold'
         if score.is_team:
-            row += [Paragraph(unicode(score.club), team_style)]
+            row += [Paragraph(str(score.club), team_style)]
             for member in score.team:
                 rows.append([
                     None,
@@ -828,7 +828,7 @@ class CSVResultsRenderer(object):
         for section, categories in context['results'].items():
             for category, scores in categories.items():
                 for score in scores:
-                    row = [unicode(section), unicode(category)]
+                    row = [str(section), str(category)]
                     row += [
                         score.target.session_entry.competition_entry.archer.name,
                         score.target.session_entry.competition_entry.club.name + (' (Guest)' if score.guest else ''),
@@ -1106,7 +1106,7 @@ class ResultsSummaryFromCache(PublicResultsMixin, TemplateView):
             if db_mode.json:
                 results = self.cut_results(mode.deserialize(db_mode.json))
                 kwargs['results'].append({
-                    'name': unicode(mode),
+                    'name': str(mode),
                     'results': results
                 })
         return super(ResultsSummaryFromCache, self).get_context_data(**kwargs)

@@ -24,7 +24,7 @@ class RoundAdmin(admin.ModelAdmin):
         return sum(map(lambda s: s.arrows, instance.subrounds.all()))
 
     def subround_details(self, instance):
-        return ', '.join(map(unicode, instance.subrounds.all()))
+        return ', '.join(map(str, instance.subrounds.all()))
 
 
 admin.site.register(Country)
