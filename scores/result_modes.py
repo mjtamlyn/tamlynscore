@@ -32,7 +32,7 @@ class ResultSection(object):
         self.round = round
         self.headers = headers
 
-    def __unicode__(self):
+    def __str__(self):
         return self.label
 
 
@@ -47,7 +47,7 @@ class BaseResultMode(object):
         for key, value in kwargs.items():
             setattr(self, key, value)
 
-    def __unicode__(self):
+    def __str__(self):
         return self.name
 
     def get_results(self, competition, scores, leaderboard=False, request=None):

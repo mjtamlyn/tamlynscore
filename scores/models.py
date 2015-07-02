@@ -38,9 +38,9 @@ class ScoreManager(models.Manager):
         if category:
             scores = scores.order_by(
                     'disqualified',
-                    '-score', 
-                    '-golds', 
-                    '-xs'
+                    '-score',
+                    '-golds',
+                    '-xs',
                     )
         else:
             scores = scores.order_by(
@@ -49,9 +49,9 @@ class ScoreManager(models.Manager):
                     'target__session_entry__competition_entry__archer__gender',
                     'target__session_entry__competition_entry__guest',
                     'disqualified',
-                    '-score', 
-                    '-golds', 
-                    '-xs'
+                    '-score',
+                    '-golds',
+                    '-xs',
                     )
         if category:
             results = scores
@@ -86,7 +86,7 @@ class Score(models.Model):
 
     is_team = False
 
-    def __unicode__(self):
+    def __str__(self):
         return u'Score for {0}'.format(self.target)
 
     def update_score(self):
@@ -131,7 +131,7 @@ class Arrow(models.Model):
     arrow_of_round = models.PositiveIntegerField()
     is_x = models.BooleanField(default=False)
 
-    def __unicode__(self):
+    def __str__(self):
         if self.is_x:
             return u'X'
         if self.arrow_value == 0:
@@ -144,5 +144,5 @@ class Dozen(models.Model):
     total = models.PositiveIntegerField()
     dozen = models.PositiveIntegerField()
 
-    def __unicode__(self):
+    def __str__(self):
         return unicode(self.total)

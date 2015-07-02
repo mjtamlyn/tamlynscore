@@ -51,7 +51,7 @@ class Subround(models.Model):
     unit = models.CharField(max_length=1, choices=DISTANCE_UNITS)
     target_face = models.PositiveIntegerField()
 
-    def __unicode__(self):
+    def __str__(self):
         return u'{0} arrows at {1} {2} ({3}cm)'.format(
             self.arrows,
             self.distance,
@@ -68,7 +68,7 @@ class Round(models.Model):
     subrounds = models.ManyToManyField(Subround)
     scoring_type = models.CharField(max_length=1, choices=SCORING_TYPES)
 
-    def __unicode__(self):
+    def __str__(self):
         return self.name
 
     @property
@@ -95,7 +95,7 @@ class Round(models.Model):
 class Bowstyle(models.Model):
     name = models.CharField(max_length=50, unique=True)
 
-    def __unicode__(self):
+    def __str__(self):
         return self.name
 
 
@@ -105,7 +105,7 @@ class Country(models.Model):
     class Meta:
         verbose_name_plural = 'countries'
 
-    def __unicode__(self):
+    def __str__(self):
         return self.name
 
 
@@ -113,7 +113,7 @@ class Region(models.Model):
     name = models.CharField(max_length=50, unique=True)
     country = models.ForeignKey(Country)
 
-    def __unicode__(self):
+    def __str__(self):
         return self.name
 
 
@@ -124,7 +124,7 @@ class County(models.Model):
     class Meta:
         verbose_name_plural = 'counties'
 
-    def __unicode__(self):
+    def __str__(self):
         return self.name
 
 
@@ -143,7 +143,7 @@ class Club(models.Model):
         self.slug = slugify(self.short_name)
         return super(Club, self).clean(*args, **kwargs)
 
-    def __unicode__(self):
+    def __str__(self):
         return self.short_name
 
     def json(self):
@@ -167,7 +167,7 @@ class Archer(models.Model):
     novice = models.CharField(max_length=1, choices=NOVICE_CHOICES, default='E')
     agb_number = models.BigIntegerField(blank=True, null=True)
 
-    def __unicode__(self):
+    def __str__(self):
         return self.name
 
     def json(self):
