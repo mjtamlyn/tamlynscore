@@ -10,7 +10,7 @@ from entries.models import CompetitionEntry
 from scoring.utils import class_view_decorator
 from scores.models import Score
 
-from .models import Club, Archer
+from .models import County, Club, Archer
 
 
 @class_view_decorator(login_required)
@@ -50,6 +50,15 @@ class ClubCreate(CreateView):
 
     def get_success_url(self):
         return self.request.GET.get('next') or super(ClubCreate, self).get_success_url()
+
+
+@class_view_decorator(login_required)
+class CountyCreate(CreateView):
+    model = County
+    fields = '__all__'
+
+    def get_success_url(self):
+        return self.request.GET.get('next') or reverse('home')
 
 
 @class_view_decorator(login_required)
