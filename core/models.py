@@ -118,14 +118,15 @@ class Region(models.Model):
 
 
 class County(models.Model):
-    name = models.CharField(max_length=50, unique=True)
+    name = models.CharField(max_length=500, unique=True)
+    short_name = models.CharField(max_length=50, unique=True)
     region = models.ForeignKey(Region)
 
     class Meta:
         verbose_name_plural = 'counties'
 
     def __str__(self):
-        return self.name
+        return self.short_name
 
 
 class Club(models.Model):

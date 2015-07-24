@@ -70,7 +70,7 @@ class Migration(migrations.Migration):
         migrations.AlterField(
             model_name='resultsmode',
             name='mode',
-            field=models.CharField(choices=[('weekend', 'Weekend (Masters style)'), ('by-round', 'By round'), ('seedings', 'Seedings'), ('team', 'Teams'), ('by-session', 'By session'), ('double-round', 'Double round'), ('by-round-progressional', 'By round (progressional)')], max_length=31),
+            field=models.CharField(choices=(('weekend', 'Weekend (Masters style)'), ('by-round', 'By round'), ('seedings', 'Seedings'), ('team', 'Teams'), ('by-session', 'By session'), ('double-round', 'Double round'), ('by-round-progressional', 'By round (progressional)')), max_length=31),
         ),
         migrations.AlterField(
             model_name='session',
