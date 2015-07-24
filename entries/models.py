@@ -3,7 +3,7 @@ import math
 from django.db import models
 from django.template.defaultfilters import slugify
 
-from core.models import Archer, Bowstyle, Club, Round, AGE_CHOICES, WA_AGE_CHOICES, NOVICE_CHOICES
+from core.models import Archer, Bowstyle, Club, County, Round, AGE_CHOICES, WA_AGE_CHOICES, NOVICE_CHOICES
 
 from scores.result_modes import get_result_modes
 
@@ -55,6 +55,7 @@ class Competition(models.Model):
     has_teams = models.BooleanField(default=False)
     novices_in_experienced_teams = models.BooleanField(default=False)
     exclude_later_shoots = models.BooleanField(default=False, help_text='Only the first session can count for results')
+    use_county_teams = models.BooleanField(default=False)
     strict_b_teams = models.BooleanField(default=False, help_text='e.g. BUTC')
     strict_c_teams = models.BooleanField(default=False, help_text='e.g. BUTC')
     allow_incomplete_teams = models.BooleanField(default=True)
@@ -232,7 +233,8 @@ class CompetitionEntry(models.Model):
     competition = models.ForeignKey(Competition)
 
     archer = models.ForeignKey(Archer)
-    club = models.ForeignKey(Club)
+    club = models.ForeignKey(Club, blank=True, null=True)
+    county = models.ForeignKey(County, blank=True, null=True)
     bowstyle = models.ForeignKey(Bowstyle)
     age = models.CharField(max_length=1, choices=AGE_CHOICES, default='S')
     wa_age = models.CharField(max_length=1, choices=WA_AGE_CHOICES, default='', blank=True)
@@ -259,10 +261,15 @@ class CompetitionEntry(models.Model):
         return u'{2}{3}{0} {1}'.format(self.archer.get_gender_display(), self.bowstyle, junior, novice)
 
     def team_name(self, short_form=True):
-        club = self.club.short_name if short_form else self.club.name
+        if self.club_id:
+            name = self.club.short_name if short_form else self.club.name
+        elif self.county_id:
+            name = self.club.short_name if short_form else self.club.name
+        else:
+            return None
         if self.b_team or self.c_team:
-            return '%s (%s)' % (club, 'B' if self.b_team else 'C')
-        return club
+            return '%s (%s)' % (name, 'B' if self.b_team else 'C')
+        return name
 
 
 class SessionEntry(models.Model):
