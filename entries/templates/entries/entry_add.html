@@ -12,7 +12,11 @@
 {% block competition_content %}
 <h2>Create entry for {{ archer }}</h2>
 <p>
-    <a class="btn" href="{% url 'club_create' %}?next={{ request.path }}">Add club</a>
+    {% if competition.use_county_teams %}
+        <a class="btn" href="{% url 'county_create' %}?next={{ request.path }}">Add county</a>
+    {% else %}
+        <a class="btn" href="{% url 'club_create' %}?next={{ request.path }}">Add club</a>
+    {% endif %}
 </p>
 <form method="POST" action="">
     {% csrf_token %}

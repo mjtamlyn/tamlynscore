@@ -124,6 +124,7 @@ class County(models.Model):
 
     class Meta:
         verbose_name_plural = 'counties'
+        ordering = ('short_name',)
 
     def __str__(self):
         return self.short_name
