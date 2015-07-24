@@ -264,7 +264,7 @@ class CompetitionEntry(models.Model):
         if self.club_id:
             name = self.club.short_name if short_form else self.club.name
         elif self.county_id:
-            name = self.club.short_name if short_form else self.club.name
+            name = self.county.short_name if short_form else self.county.name
         else:
             return None
         if self.b_team or self.c_team:
