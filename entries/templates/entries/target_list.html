@@ -61,7 +61,7 @@
                         </div>
                         <div class="bottom">
                             {% if entry %}
-                                <p>{{ entry.session_entry.competition_entry.club }}</p>
+                                <p>{{ entry.session_entry.competition_entry.team_name }}</p>
                                 <p>
                                     <span class="pill bowstyle {{ entry.session_entry.competition_entry.bowstyle|slugify }}">{{ entry.session_entry.competition_entry.bowstyle }}</span>
                                     <span class="pill gender {{ entry.session_entry.competition_entry.archer.get_gender_display|lower }}">{{ entry.session_entry.competition_entry.archer.get_gender_display }}</span>
@@ -90,7 +90,7 @@
                     <p>{{ entry.competition_entry.archer }}</p>
                 </div>
                 <div class="bottom">
-                    <p>{{ entry.competition_entry.club }}</p>
+                    <p>{{ entry.competition_entry.team_name }}</p>
                     <p>
                         <span class="pill bowstyle {{ entry.competition_entry.bowstyle|slugify }}">{{ entry.competition_entry.bowstyle }}</span>
                         <span class="pill gender {{ entry.competition_entry.archer.get_gender_display|lower }}">{{ entry.competition_entry.archer.get_gender_display }}</span>

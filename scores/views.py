@@ -81,7 +81,7 @@ class InputScores(TargetList):
             cache_key = 'bosses_cache_%d' % session.pk
             targets = options['targets']
             bosses = options['bosses'] = cache.get(cache_key) or []
-            dozens = options['dozens'] = range(1, 1 + session_round.shot_round.arrows / session_round.session.arrows_entered_per_end)
+            dozens = options['dozens'] = range(1, 1 + int(session_round.shot_round.arrows / session_round.session.arrows_entered_per_end))
             if bosses:
                 continue
             for boss, allocations in groupby(targets, lambda t: t.boss):
@@ -184,7 +184,7 @@ class InputArrowsArcher(TemplateView):
             'et1': 0,
             'et2': 0,
             'rt': 0,
-        } for i in range(round.arrows / per_end)]
+        } for i in range(int(round.arrows / per_end))]
         arrows = score.arrow_set.all()
         for arrow in arrows:
             dozen = (arrow.arrow_of_round - 13) / per_end
@@ -230,7 +230,7 @@ class InputDozens(View):
             retired=False,
         ).order_by('target__target').select_related()
         next_exists = self.get_next_exists(session_id, boss)
-        num_dozens = SessionRound.objects.filter(session__pk=session_id)[0].shot_round.arrows / 12
+        num_dozens = int(SessionRound.objects.filter(session__pk=session_id)[0].shot_round.arrows / 12)
         try:
             forms = get_dozen_formset(scores, num_dozens, boss, dozen, scores[0].target.session_entry.session_round.session.arrows_entered_per_end)
         except IndexError:
