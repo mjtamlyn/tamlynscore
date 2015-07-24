@@ -160,7 +160,7 @@ class Club(models.Model):
 class Archer(models.Model):
     name = models.CharField(max_length=200)
     gender = models.CharField(max_length=1, choices=GENDER_CHOICES)
-    club = models.ForeignKey(Club)
+    club = models.ForeignKey(Club, blank=True, null=True)
     bowstyle = models.ForeignKey(Bowstyle)
     age = models.CharField(max_length=1, choices=AGE_CHOICES, default='S')
     wa_age = models.CharField(max_length=1, choices=WA_AGE_CHOICES, default='', blank=True)
