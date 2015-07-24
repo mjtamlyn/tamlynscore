@@ -41,7 +41,7 @@
                 <thead>
                     <th>Target</th>
                     <th>Name</th>
-                    <th>Club</th>
+                    <th>{% if competition.use_county_teams %}County{% else %}Club{% endif %}</th>
                     <th>Bowstyle</th>
                     <th>Gender</th>
                     {% if competition.has_novices %}
@@ -56,13 +56,17 @@
                 {% for boss, archers in details.target_list %}
                 {% for target, archer in archers %}
                 {% with archer.session_entry.competition_entry as entry %}
-                <tr class="archer {% if not archer or archer.session_entry.present %}present{% endif %}" data-club="{{ entry.club_id }}" data-clubname="{{ archer.session_entry.competition_entry.club }}">
+                <tr class="archer {% if not archer or archer.session_entry.present %}present{% endif %}" data-club="{% if competition.use_county_teams %}{{ entry.county_id }}{% else %}{{ entry.club_id }}{% endif %}" data-clubname="{% if competition.use_county_teams %}{{ archer.session_entry.competition_entry.county }}{% else %}{{ archer.session_entry.competition_entry.club }}{% endif %}">
                     <td>{{ boss }}{{ target }}</td>
                     <td>{% if archer %}<a href="{% url 'archer_update' pk=entry.archer_id %}?next={{ request.path }}">{{ entry.archer }}</a>{% endif %}</td>
                     <td>
-                        {{ entry.club }}
-                        {% if not entry.club == entry.archer.club %}
-                        <span class="archer-details">({{ entry.archer.club.name }})</span>
+                        {% if competition.use_county_teams %}
+                            {{ entry.county }}
+                        {% else %}
+                            {{ entry.club }}
+                            {% if not entry.club == entry.archer.club %}
+                            <span class="archer-details">({{ entry.archer.club.name }})</span>
+                            {% endif %}
                         {% endif %}
                     </td>
                     <td>

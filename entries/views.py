@@ -286,6 +286,7 @@ class TargetList(ListView):
         ).exclude(targetallocation__isnull=False).select_related(
             'session_round__session',
             'competition_entry__club',
+            'competition_entry__county',
             'competition_entry__archer',
             'competition_entry__bowstyle'
         )
@@ -298,7 +299,7 @@ class TargetList(ListView):
             details['entries'] = sorted(details['entries'], key=lambda e: (
                 e.session_round.shot_round_id,
                 e.competition_entry.bowstyle.name,
-                e.competition_entry.club.short_name,
+                e.competition_entry.team_name(),
                 e.competition_entry.archer.gender,
                 e.competition_entry.age,
                 e.competition_entry.novice,
@@ -313,7 +314,7 @@ class TargetList(ListView):
             'name': entry.competition_entry.archer.name,
             'gender': entry.competition_entry.archer.get_gender_display(),
             'bowstyle': entry.competition_entry.bowstyle.name,
-            'club': entry.competition_entry.club.short_name,
+            'club': entry.competition_entry.team_name(),
             'text': u'%s %s %s %s' % (
                 entry.competition_entry.archer,
                 entry.competition_entry.club,
@@ -346,7 +347,7 @@ class TargetList(ListView):
         return context
 
     def post(self, request, slug):
-        data = json.loads(request.body)
+        data = json.loads(request.body.decode('utf-8'))
         if data['method'] == 'create':
             allocation = TargetAllocation.objects.create(
                 session_entry_id=data['entry'],
@@ -616,7 +617,7 @@ class ScoreSheetsPdf(HeadedPdfView):
 
         for subround in subrounds:
             subround_title = self.Para(u'{0}{1}'.format(subround.distance, subround.unit), 'h3')
-            dozens = subround.arrows / 12
+            dozens = int(subround.arrows / 12)
             extra = subround.arrows % 12
             total_rows = dozens + 2
             scoring_labels = (

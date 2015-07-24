@@ -2,7 +2,7 @@ from django.core.cache import cache
 from django.db import transaction
 from django import forms
 
-from core.models import Archer, Bowstyle, Club, NOVICE_CHOICES, AGE_CHOICES, WA_AGE_CHOICES
+from core.models import Archer, Bowstyle, Club, County, NOVICE_CHOICES, AGE_CHOICES, WA_AGE_CHOICES
 from .models import CompetitionEntry, SessionRound, SessionEntry
 
 
@@ -26,11 +26,6 @@ class ArcherSearchForm(forms.Form):
 
 
 class EntryCreateForm(forms.Form):
-    club = forms.ModelChoiceField(
-        queryset=Club.objects,
-        required=False,
-    )
-    update_club = forms.BooleanField(required=False)
     bowstyle = forms.ModelChoiceField(
         queryset=Bowstyle.objects,
         required=False,
@@ -44,9 +39,21 @@ class EntryCreateForm(forms.Form):
         self.competition = competition
         self.session_rounds = SessionRound.objects.filter(session__competition=competition)
         current = self.get_current_obj()
-        self.fields['club'].label = 'Club (%s)' % current.club
         self.fields['bowstyle'].label = 'Bowstyle (%s)' % current.bowstyle
         self.initial['agb_number'] = archer.agb_number
+        if self.competition.use_county_teams:
+            self.fields['county'] = forms.ModelChoiceField(
+                label='County (%s)' % current.club.county if current.club and current.club.county else 'County',
+                queryset=County.objects,
+                required=False,
+            )
+        else:
+            self.fields['club'] = forms.ModelChoiceField(
+                label='Club (%s)' % current.club if current.club else 'Club',
+                queryset=Club.objects,
+                required=False,
+            )
+            self.fields['update_club'] = forms.BooleanField(required=False)
         if self.competition.has_novices:
             self.fields['novice'] = forms.ChoiceField(
                 label='Experienced/Novice (%s)' % current.get_novice_display(),
@@ -89,7 +96,7 @@ class EntryCreateForm(forms.Form):
 
     def update_archer(self):
         changed = False
-        if self.cleaned_data['club'] and self.cleaned_data['update_club']:
+        if not self.competition.use_county_teams and self.cleaned_data['club'] and self.cleaned_data['update_club']:
             self.archer.club = self.cleaned_data['club']
             changed = True
         if self.cleaned_data['bowstyle'] and self.cleaned_data['update_bowstyle']:
@@ -121,7 +128,10 @@ class EntryCreateForm(forms.Form):
 
     def set_entry_data(self, entry):
         default = self.get_current_obj()
-        entry.club = self.cleaned_data['club'] or default.club
+        if self.competition.use_county_teams:
+            entry.county = self.cleaned_data['county'] or default.club.county
+        else:
+            entry.club = self.cleaned_data['club'] or default.club
         entry.bowstyle = self.cleaned_data['bowstyle'] or default.bowstyle
         if self.competition.has_novices:
             entry.novice = self.cleaned_data['novice'] or default.novice
