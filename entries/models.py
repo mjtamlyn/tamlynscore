@@ -266,7 +266,7 @@ class CompetitionEntry(models.Model):
         elif self.county_id:
             name = self.county.short_name if short_form else self.county.name
         else:
-            return None
+            return ''
         if self.b_team or self.c_team:
             return '%s (%s)' % (name, 'B' if self.b_team else 'C')
         return name
