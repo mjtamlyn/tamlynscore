@@ -9,11 +9,6 @@
 <script src="{{ STATIC_URL }}js/underscore-min.js"></script>
 <script src="{{ STATIC_URL }}js/backbone-min.js"></script>
 <script src="{{ STATIC_URL }}js/leaderboard-butc.js"></script>
-<script type="text/javascript">
-    $(document).ready(function () {
-        window.init(JSON.parse('{{ serialized_results|escapejs }}'), '{{ template|escapejs }}');
-    });
-</script>
 {% endblock %}
 
 {% block nav_links %}
