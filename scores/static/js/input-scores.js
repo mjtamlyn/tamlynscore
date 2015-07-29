@@ -74,5 +74,4 @@ window.addEvent('domready', function () {
     if ('{{ focus }}') {
         $$('[rel={{ focus }}]')[0].fireEvent('keydown', {key: 'right', stop: function () {}});
     }
-
 });
