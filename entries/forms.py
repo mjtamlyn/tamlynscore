@@ -135,7 +135,7 @@ class EntryCreateForm(forms.Form):
     def set_entry_data(self, entry):
         default = self.get_current_obj()
         if self.competition.use_county_teams:
-            entry.county = self.cleaned_data['county'] or default.county
+            entry.county = self.cleaned_data['county'] or (default.club.county if default.club else None)
         else:
             entry.club = self.cleaned_data['club'] or default.club
         entry.bowstyle = self.cleaned_data['bowstyle'] or default.bowstyle
