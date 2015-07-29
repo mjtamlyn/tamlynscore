@@ -3548,10 +3548,9 @@ ul.link-list li a:hover {
   cursor: pointer;
 }
 /* line 16, ../../sass/components/_link_list.sass */
-ul.link-list li a:before {
-  content: ">";
-  color: #cccccc;
+ul.link-list li a i.fa {
   margin-right: 5px;
+  color: #cccccc;
 }
 
 /* line 1, ../../sass/components/_archer_block.sass */
