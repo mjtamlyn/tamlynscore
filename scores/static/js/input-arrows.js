@@ -193,4 +193,3 @@ window.addEvent('domready', function () {
     arrows = new Arrows();
     arrows.setUp();
 });
-
