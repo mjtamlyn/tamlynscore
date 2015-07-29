@@ -11,7 +11,7 @@ from scoring.utils import class_view_decorator
 from scores.models import Score
 
 from .models import County, Club, Archer
-
+from .forms import ArcherForm
 
 @class_view_decorator(login_required)
 class Index(TemplateView):
@@ -93,7 +93,7 @@ class ArcherUpdate(UpdateView):
 @class_view_decorator(login_required)
 class ArcherCreate(CreateView):
     model = Archer
-    fields = '__all__'
+    form_class = ArcherForm
 
     def get_initial(self):
         initial = {}
