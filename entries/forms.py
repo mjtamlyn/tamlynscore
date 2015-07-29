@@ -9,6 +9,10 @@ from .models import CompetitionEntry, SessionRound, SessionEntry
 class ArcherSearchForm(forms.Form):
     query = forms.CharField()
 
+    def __init__(self, *args, **kwargs):
+        super(ArcherSearchForm, self).__init__(*args, **kwargs)
+        self.fields['query'].widget.attrs.update({'autofocus': ''})
+
     def get_archers(self):
         # One day, do this with expressions and/or contrib.postgres. Please.
         term = self.cleaned_data['query']
@@ -53,6 +57,7 @@ class EntryCreateForm(forms.Form):
                 queryset=Club.objects,
                 required=False,
             )
+            self.fields['club'].widget.attrs.update({'autofocus': ''})
             self.fields['update_club'] = forms.BooleanField(required=False)
         if self.competition.has_novices:
             self.fields['novice'] = forms.ChoiceField(
