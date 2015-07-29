@@ -13,6 +13,7 @@ from scores.models import Score
 from .models import County, Club, Archer
 from .forms import ArcherForm
 
+
 @class_view_decorator(login_required)
 class Index(TemplateView):
     template_name = 'index.html'
