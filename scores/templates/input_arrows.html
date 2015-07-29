@@ -3,12 +3,6 @@
 {% block scripts %}
 <script src="{{ STATIC_URL }}js/mootools-core-1.3.js"></script>
 <script src="{{ STATIC_URL }}js/input-arrows.js"></script>
-<script>
-    window.addEvent('domready', function () {
-        arrows = new Arrows();
-        arrows.setUp();
-    });
-</script>
 {% endblock %}
 
 {% block competition_content %}
