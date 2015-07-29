@@ -58,8 +58,8 @@
             <div class="archer-block">
                 <div class="name">
                     <div class="actions">
-                        <a href="{% url 'entry_update' slug=competition.slug entry_id=entry.pk %}">Edit</a>
-                        <a href="{% url 'entry_delete' slug=competition.slug entry_id=entry.pk %}">X</a>
+                        <a class="action-button" href="{% url 'entry_update' slug=competition.slug entry_id=entry.pk %}"><i class="fa fa-pencil-square"></i></a>
+                        <a class="action-button" href="{% url 'entry_delete' slug=competition.slug entry_id=entry.pk %}"><i class="fa fa-trash"></i></a>
                     </div>
                     <p>{{ entry.archer }}</p>
                 </div>
