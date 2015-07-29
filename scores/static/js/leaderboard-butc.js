@@ -50,3 +50,7 @@
         });
     }
 })($);
+
+$(document).ready(function () {
+    window.init(JSON.parse('{{ serialized_results|escapejs }}'), '{{ template|escapejs }}');
+});
