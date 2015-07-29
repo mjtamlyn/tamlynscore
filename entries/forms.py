@@ -51,6 +51,7 @@ class EntryCreateForm(forms.Form):
                 queryset=County.objects,
                 required=False,
             )
+            self.fields['county'].widget.attrs.update({'autofocus': ''})
         else:
             self.fields['club'] = forms.ModelChoiceField(
                 label='Club (%s)' % current.club if current.club else 'Club',
