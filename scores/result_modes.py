@@ -73,7 +73,7 @@ class BaseResultMode(object):
         return results
 
     def get_section_for_round(self, round, competition):
-        headers = ['Pl.'] + self.get_main_headers()
+        headers = ['Pl.'] + self.get_main_headers(competition)
         if competition.has_wa_age_groups:
             headers.append(None)
         if self.include_distance_breakdown:
@@ -92,8 +92,8 @@ class BaseResultMode(object):
             headers=headers,
         )
 
-    def get_main_headers(self):
-        return ['Archer', 'Club', None]
+    def get_main_headers(self, competition):
+        return ['Archer', 'County' if competition.use_county_teams else 'Club', None]
 
     def label_for_round(self, round):
         return str(round)
@@ -228,6 +228,7 @@ class BaseResultMode(object):
                 ).select_related(
                     'session_entry__competition_entry__archer',
                     'session_entry__competition_entry__club',
+                    'session_entry__competition_entry__county',
                 )
                 target_lookup = {target.pk: target for target in targets}
                 clubs = Club.objects.filter(
@@ -545,17 +546,13 @@ class Team(BaseResultMode):
                 continue
             if round is None:
                 round = session_entry.session_round.shot_round
-            club = session_entry.competition_entry.club
+            club = session_entry.competition_entry.team_name()
+            if not club:
+                continue
             if session_entry.index > 1 and competition.exclude_later_shoots:
                 continue
             if score.disqualified or score.retired:
                 continue
-            if competition.strict_b_teams:
-                if session_entry.competition_entry.b_team:
-                    club = '%s (B)' % club.short_name
-            if competition.strict_c_teams:
-                if session_entry.competition_entry.c_team:
-                    club = '%s (C)' % club.short_name
             if club not in clubs:
                 clubs[club] = []
             clubs[club].append(score)
@@ -568,6 +565,15 @@ class Team(BaseResultMode):
 
     def get_team_types(self, competition):
         # TODO: support team types properly
+        if competition.use_county_teams:
+            return [
+                'Recurve',
+                'Compound',
+                'Barebow',
+                'Longbow',
+                'Junior Recurve',
+                'Junior Compound',
+            ]
         team_types = ['Non-compound']
         if competition.split_gender_teams:
             team_types = ['Gents non-compound', 'Ladies non-compound']
@@ -636,6 +642,13 @@ class Team(BaseResultMode):
     def is_valid_for_type(self, score, type, competition):
         if score.target.session_entry.competition_entry.guest:
             return False
+        if competition.use_county_teams:
+            bowstyle = score.target.session_entry.competition_entry.bowstyle.name
+            is_junior = score.target.session_entry.competition_entry.age == 'J'
+            if type in ['Recurve', 'Compound', 'Barebow', 'Longbow']:
+                return not is_junior and bowstyle == type
+            if type in ['Junior Recurve', 'Junior Compound']:
+                return is_junior and 'Junior %s' % bowstyle == type
         is_non_compound = not score.target.session_entry.competition_entry.bowstyle.name == 'Compound'
         if type == 'Non-compound':
             if not competition.novices_in_experienced_teams:
@@ -663,8 +676,8 @@ class Team(BaseResultMode):
                 return is_junior and is_non_compound and score.target.session_entry.competition_entry.novice == 'E'
             return is_junior and is_non_compound
 
-    def get_main_headers(self):
-        return ['Club']
+    def get_main_headers(self, competition):
+        return ['County' if competition.use_county_teams else 'Club']
 
     def label_for_round(self, round):
         return 'Team'
@@ -794,7 +807,7 @@ class Weekend(BaseResultMode):
                 result.placing = i
             full_results[category.category.short_name] = results
 
-        headers = ['Pl.'] + self.get_main_headers() + ['720', 'H2H', '1440', 'Total']
+        headers = ['Pl.'] + self.get_main_headers(competition) + ['720', 'H2H', '1440', 'Total']
         section = ResultSection('Weekend results', None, headers)
         return {section: full_results}
 
