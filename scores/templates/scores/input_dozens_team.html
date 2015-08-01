@@ -1,0 +1,47 @@
+{% extends 'entries/competition_detail.html' %}
+
+{% block scripts %}
+<script src="{{ STATIC_URL }}lib/jquery/jquery-2.1.3.min.js"></script>
+<script src="{{ STATIC_URL }}js/input-dozens.js"></script>
+{% endblock %}
+
+{% block competition_content %}
+<div class="module input-dozens">
+    <h4>Enter arrow values for {{ team }}, dozen {{ dozen }}</h4>
+    <form action="" method="post" autocomplete="off">
+        <table class="target">
+            <tr>
+                <th colspan="2">Archer</th>
+                <th>Doz</th>
+                <th>RT</th>
+            </tr>
+            {% for target in forms %}
+            <tr>
+                <td>{{ target.boss }}{{ target.target }}</td>
+                <td>{{ target.archer }}</td>
+                <th class="doz-total">
+                    {% if target.form.total.errors %}
+                    <p class="error">{{ target.form.total.errors }}</p>
+                    {% endif %}
+                    {{ target.form.total }}
+                </th>
+                {% if target.score_form %}
+                <td><ul>{{ target.score_form.as_ul }}</ul></td>
+                {% endif %}
+                <th class="rt" rel="{{ target.running_total }}">{{ target.running_total }}</th>
+            </tr>
+            {% empty %}
+            <tr><td colspan="10">No archers</td></tr>
+            {% endfor %}
+        </table>
+        <div class="save">
+            <input type="submit" value="Save" class="btn" />
+            {% if next_exists %}
+            <input type="submit" value="Save and go to next target" name="next" class="btn" />
+            {% endif %}
+        </div>
+        {% csrf_token %}
+    </form>
+    <div class="clear"></div>
+</div>
+{% endblock %}
