@@ -74,7 +74,7 @@ def get_dozen_formset(scores, num_dozens, dozen, data=None):
             'running_total': score.running_total(dozen),
             'score_form': None,
         }
-        prefix = score.target.target + str(dozen)
+        prefix = str(score.target.boss) + score.target.target + str(dozen)
         try:
             instance = Dozen.objects.get(score=score, dozen=dozen)
         except Dozen.DoesNotExist:

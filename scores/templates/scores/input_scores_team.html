@@ -12,7 +12,7 @@
         <div class="input-board">
             <div class="bosses">
                 {% for dozen in dozens %}
-                <div class="boss"><a href="{% url 'input_dozens_team' slug=competition.slug dozen=dozen team_id=1 %}">{{ dozen }}</a></div>
+                <div class="boss"><a href="{% url 'input_dozens_team' slug=competition.slug dozen=dozen team_id=team.pk %}">{{ dozen }}</a></div>
                 {% endfor %}
             </div>
             <div class="clear"></div>
