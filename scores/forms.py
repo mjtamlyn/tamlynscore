@@ -63,12 +63,13 @@ class ScoreForm(forms.ModelForm):
         exclude = ['target', 'score', 'hits', 'retired', 'disqualified']
 
 
-def get_dozen_formset(scores, num_dozens, boss, dozen, arrows_per_end, data=None):
+def get_dozen_formset(scores, num_dozens, dozen, data=None):
     forms_list = []
     dozen = int(dozen)
     for score in scores:
         target = {
             'archer': score.target.session_entry.competition_entry.archer,
+            'boss': score.target.boss,
             'target': score.target.target,
             'running_total': score.running_total(dozen),
             'score_form': None,

@@ -22,6 +22,7 @@ from reportlab.lib.units import inch
 from reportlab.platypus import SimpleDocTemplate, Spacer, Table, TableStyle, Paragraph
 from reportlab.rl_config import defaultPageSize
 
+from core.models import County
 from entries.models import Competition, SessionRound, CompetitionEntry, SCORING_TOTALS, SCORING_DOZENS, SCORING_FULL, ResultsMode
 from entries.views import HeadedPdfView, TargetList, CompetitionMixin
 from olympic.models import OlympicRound, Result
@@ -105,6 +106,19 @@ class InputScores(TargetList):
         if 'ft' in self.request.GET and 'fd' in self.request.GET and 'fs' in self.request.GET:
             context['focus'] = self.request.GET['fd'] + '-' + self.request.GET['ft'] + '-' + self.request.GET['fs']
 
+        return context
+
+
+@class_view_decorator(login_required)
+class InputScoresTeam(CompetitionMixin, TemplateView):
+    template_name = 'scores/input_scores_team.html'
+
+    def get_context_data(self, **kwargs):
+        context = super(InputScoresTeam, self).get_context_data(**kwargs)
+        entries = CompetitionEntry.objects.filter(competition=self.competition).select_related('county').filter(county__isnull=False)
+        teams = set(entry.county for entry in entries)
+        context['teams'] = sorted(teams, key=lambda t: str(t))
+        context['dozens'] = range(1, 13)
         return context
 
 
@@ -274,6 +288,61 @@ class InputDozens(View):
                 success_url = reverse(self.next_url_name, kwargs={'slug': slug}) + '?fd={0}&ft={1}&fs={2}'.format(dozen, boss, session_id)
             return HttpResponseRedirect(success_url)
         next_exists = self.get_next_exists(session_id, boss)
+        return render(request, self.template, locals())
+
+
+class InputDozensTeam(View):
+    template = 'scores/input_dozens_team.html'
+    next_url_name = 'input_scores_team'
+
+    def get(self, request, slug, team_id, dozen):
+        competition = get_object_or_404(Competition, slug=slug)
+        team = get_object_or_404(County, pk=team_id)
+        scores = Score.objects.filter(
+            target__session_entry__competition_entry__county=team,
+            target__session_entry__present=True,
+            retired=False,
+        ).order_by('target__boss', 'target__target').select_related()
+        num_dozens = 12
+        try:
+            forms = get_dozen_formset(scores, num_dozens, dozen=dozen)
+        except IndexError:
+            pass
+        return render(request, self.template, locals())
+
+    def post(self, request, slug, team_id, dozen):
+        competition = get_object_or_404(Competition, slug=slug)
+        team = get_object_or_404(County, pk=team_id)
+        scores = Score.objects.filter(
+            target__session_entry__competition_entry__county=team,
+            target__session_entry__present=True,
+            retired=False,
+        ).order_by('target__boss', 'target__target').select_related()
+        num_dozens = 12
+        try:
+            forms = get_dozen_formset(scores, num_dozens, dozen, data=request.POST)
+        except IndexError:
+            forms = []
+        dozens = []
+        failed = False
+        for score in forms:
+            if score['form'].is_valid():
+                dozens.append(score['form'].save(commit=False))
+                if score['score_form']:
+                    if score['score_form'].is_valid():
+                        score['score_form'].save(commit=False)
+                    else:
+                        failed = True
+            else:
+                failed = True
+        if not failed:
+            for dbdozen in dozens:
+                dbdozen.save()
+            for score in scores:
+                score.update_score()
+                score.save(force_update=True)
+            success_url = reverse(self.next_url_name, kwargs={'slug': slug})
+            return HttpResponseRedirect(success_url)
         return render(request, self.template, locals())
 
 

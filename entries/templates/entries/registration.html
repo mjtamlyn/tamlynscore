@@ -60,10 +60,8 @@
                     <td>{{ boss }}{{ target }}</td>
                     <td>{% if archer %}<a href="{% url 'archer_update' pk=entry.archer_id %}?next={{ request.path }}">{{ entry.archer }}</a>{% endif %}</td>
                     <td>
-                        {% if competition.use_county_teams %}
-                            {{ entry.county }}
-                        {% else %}
-                            {{ entry.club }}
+                        {{ entry.team_name }}
+                        {% if not competition.use_county_teams %}
                             {% if not entry.club == entry.archer.club %}
                             <span class="archer-details">({{ entry.archer.club.name }})</span>
                             {% endif %}
