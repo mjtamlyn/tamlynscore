@@ -190,7 +190,7 @@ class BaseResultMode(object):
                         json_score = {
                             'summary': [
                                 score.placing,
-                                score.club.pk,
+                                score.club,
                             ] + self.score_details(score, section),
                             'team': [[
                                 member.target.pk,
@@ -207,7 +207,6 @@ class BaseResultMode(object):
         return json.dumps(json_results)
 
     def deserialize(self, json_results):
-        from core.models import Club
         from entries.models import TargetAllocation
 
         json_results = json.loads(json_results)
@@ -231,16 +230,12 @@ class BaseResultMode(object):
                     'session_entry__competition_entry__county',
                 )
                 target_lookup = {target.pk: target for target in targets}
-                clubs = Club.objects.filter(
-                    pk__in=(score['summary'][1] for score in json_category['scores'] if isinstance(score, dict))
-                )
-                club_lookup = {club.pk: club for club in clubs}
                 for score in json_category['scores']:
                     if isinstance(score, dict):
                         summary = score['summary']
                         scores.append(ScoreMock(
                             placing=summary[0],
-                            club=club_lookup.get(summary[1], None),
+                            club=summary[1],
                             details=summary[2:],
                             team=[ScoreMock(
                                 target=target_lookup.get(member[0], None),
