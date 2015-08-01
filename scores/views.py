@@ -887,7 +887,7 @@ class PDFResultsRenderer(object):
         else:
             row += [
                 score.target.session_entry.competition_entry.archer.name,
-                score.target.session_entry.competition_entry.club.name + (' (Guest)' if score.guest else ''),
+                ' '.join(filter(None, [score.target.session_entry.competition_entry.team_name(), '(Guest)' if score.guest else ''])),
             ]
             if self.competition.has_novices:
                 if score.target.session_entry.competition_entry.novice == 'N':
