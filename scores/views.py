@@ -201,7 +201,7 @@ class InputArrowsArcher(TemplateView):
         } for i in range(int(round.arrows / per_end))]
         arrows = score.arrow_set.all()
         for arrow in arrows:
-            dozen = (arrow.arrow_of_round - 13) / per_end
+            dozen = int((arrow.arrow_of_round - 13) / per_end)
             point = arrow.arrow_of_round % per_end - 1
             layout[dozen]['scores'][point] = str(arrow)
             layout[dozen]['doz'] += arrow.arrow_value
@@ -246,7 +246,7 @@ class InputDozens(View):
         next_exists = self.get_next_exists(session_id, boss)
         num_dozens = int(SessionRound.objects.filter(session__pk=session_id)[0].shot_round.arrows / 12)
         try:
-            forms = get_dozen_formset(scores, num_dozens, boss, dozen, scores[0].target.session_entry.session_round.session.arrows_entered_per_end)
+            forms = get_dozen_formset(scores, num_dozens, dozen)
         except IndexError:
             pass
         return render(request, self.template, locals())
@@ -261,7 +261,7 @@ class InputDozens(View):
         ).order_by('target__target').select_related()
         num_dozens = SessionRound.objects.filter(session__pk=session_id)[0].shot_round.arrows / 12
         try:
-            forms = get_dozen_formset(scores, num_dozens, boss, dozen, scores[0].target.session_entry.session_round.session.arrows_entered_per_end, data=request.POST)
+            forms = get_dozen_formset(scores, num_dozens, dozen, data=request.POST)
         except IndexError:
             forms = []
         dozens = []
