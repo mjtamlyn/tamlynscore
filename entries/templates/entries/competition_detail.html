@@ -19,7 +19,7 @@
         <li><a href="{% url 'input_scores' slug=competition.slug %}">Input scores</a></li>
         {% endif %}
         <!--li><a href="{% url 'input_scores_mobile' slug=competition.slug %}">Input scores (mobile view)</a></li-->
-        <li><p>Leaderboards</p>
+        <li><p class="drop">Leaderboards</p>
             <ul>
             {% for mode in modes %}
                 <li><a href="{% url 'new_leaderboard' slug=competition.slug mode=mode.mode format='html' %}">{{ mode }}</a></li>
@@ -33,7 +33,7 @@
             {% endfor %}
             </ul>
         </li>
-        <li><p>Results</p>
+        <li><p class="drop">Results</p>
             <ul>
             {% for mode in modes %}
             {% if not mode.leaderboard_only %}

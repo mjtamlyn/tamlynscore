@@ -21,15 +21,18 @@
       border-right: 1px solid $borders
     &:hover
       background-color: $bg
+      p.drop:after
+        color: inherit
     a
       padding: 10px
     p
       margin: 0
       padding: 0 10px
       cursor: pointer
-      &:after
-        content: "v"
+      &.drop:after
         margin-left: 5px
+        @include fa-icon()
+        content: $fa-var-caret-down
         color: $borders
 
     ul

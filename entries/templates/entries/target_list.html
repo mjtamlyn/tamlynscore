@@ -26,7 +26,7 @@
                 {% if details.entries|length %}
                 <span class="unallocated" title="Unallocated entries">{{ details.entries|length }}</span>
                 {% endif %}
-                <a class="btn btn-small" href="#session-{{ session.pk }}">Edit</a>
+                <a class="btn btn-small edit" href="#session-{{ session.pk }}">Edit</a>
                 </li>
                 {% endfor %}
             </ul>
@@ -47,7 +47,7 @@
                         <div class="name">
                             <div class="actions">
                                 {% if entry %}
-                                    <a class="delete" data-pk="{{ entry.session_entry.pk }}">X</a>
+                                    <a class="delete action-button" data-pk="{{ entry.session_entry.pk }}"></a>
                                 {% endif %}
                             </div>
                             <p>

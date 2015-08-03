@@ -17,3 +17,13 @@
     font-size: 12px
     padding: 2px 4px
     margin: 0 1px
+    &:before
+      margin-right: 2px
+
+.edit:before
+  @include fa-icon()
+  content: $fa-var-pencil
+
+.delete:before
+  @include fa-icon()
+  content: $fa-var-remove

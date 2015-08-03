@@ -5,3 +5,5 @@
 .sass-cache
 fabfile.py
 collected_static/
+*.json
+*.dump
