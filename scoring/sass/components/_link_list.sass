@@ -10,9 +10,12 @@ ul.link-list
     a
       padding: 10px
       display: block
+      &:before
+        margin-right: 5px
+        @include fa-icon()
+        content: $fa-var-chevron-right
+        font-size: 14px
+        color: $borders
       &:hover
         background: $bg
         cursor: pointer
-      i.fa
-        margin-right: 5px
-        color: $borders
