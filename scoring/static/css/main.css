@@ -3498,7 +3498,22 @@ li {
   display: inline-block;
 }
 /* line 13, ../../sass/_buttons.sass */
-.btn.edit:before {
+.btn:hover {
+  background-color: #6FB3FF;
+}
+/* line 16, ../../sass/_buttons.sass */
+.btn.btn-small {
+  font-size: 12px;
+  padding: 2px 4px;
+  margin: 0 1px;
+}
+/* line 20, ../../sass/_buttons.sass */
+.btn.btn-small:before {
+  margin-right: 2px;
+}
+
+/* line 23, ../../sass/_buttons.sass */
+.edit:before {
   display: inline-block;
   font: normal normal normal 14px/1 FontAwesome;
   font-size: inherit;
@@ -3506,17 +3521,17 @@ li {
   -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale;
   content: "";
-  margin-right: 2px;
 }
-/* line 18, ../../sass/_buttons.sass */
-.btn:hover {
-  background-color: #6FB3FF;
-}
-/* line 21, ../../sass/_buttons.sass */
-.btn.btn-small {
-  font-size: 12px;
-  padding: 2px 4px;
-  margin: 0 1px;
+
+/* line 27, ../../sass/_buttons.sass */
+.delete:before {
+  display: inline-block;
+  font: normal normal normal 14px/1 FontAwesome;
+  font-size: inherit;
+  text-rendering: auto;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+  content: "";
 }
 
 /* line 1, ../../sass/components/_link_list.sass */
@@ -3584,22 +3599,15 @@ ul.link-list li a:hover {
   cursor: pointer;
 }
 /* line 21, ../../sass/components/_archer_block.sass */
-.archer-block .actions .action-button.delete:before {
+.archer-block .actions .action-button:before {
   padding: 5px 0px 6px 0px;
-  display: inline-block;
-  font: normal normal normal 14px/1 FontAwesome;
-  font-size: inherit;
-  text-rendering: auto;
-  -webkit-font-smoothing: antialiased;
-  -moz-osx-font-smoothing: grayscale;
-  content: "";
 }
-/* line 26, ../../sass/components/_archer_block.sass */
+/* line 24, ../../sass/components/_archer_block.sass */
 .archer-block .bottom {
   padding: 0 10px;
 }
 
-/* line 29, ../../sass/components/_archer_block.sass */
+/* line 27, ../../sass/components/_archer_block.sass */
 .pill {
   font-size: 11px;
   line-height: 2em;
@@ -3612,29 +3620,29 @@ ul.link-list li a:hover {
   -webkit-border-radius: 0.5em;
   border-radius: 0.5em;
 }
-/* line 39, ../../sass/components/_archer_block.sass */
+/* line 37, ../../sass/components/_archer_block.sass */
 .pill.gent {
   background-color: #A62;
 }
-/* line 41, ../../sass/components/_archer_block.sass */
+/* line 39, ../../sass/components/_archer_block.sass */
 .pill.lady {
   background-color: #F57;
 }
-/* line 44, ../../sass/components/_archer_block.sass */
+/* line 42, ../../sass/components/_archer_block.sass */
 .pill.recurve {
   background-color: #A21;
 }
-/* line 46, ../../sass/components/_archer_block.sass */
+/* line 44, ../../sass/components/_archer_block.sass */
 .pill.compound {
   background-color: #6C4;
   color: #000F1F;
 }
-/* line 49, ../../sass/components/_archer_block.sass */
+/* line 47, ../../sass/components/_archer_block.sass */
 .pill.barebow {
   background-color: #6FB3FF;
   color: #000F1F;
 }
-/* line 52, ../../sass/components/_archer_block.sass */
+/* line 50, ../../sass/components/_archer_block.sass */
 .pill.longbow {
   background-color: #000F1F;
 }
