@@ -17,8 +17,11 @@
     font-size: 16px
 
     .action-button
-      margin-left: 5px
       cursor: pointer
+      &.delete:before
+        padding: 5px 0px 6px 0px
+        @include fa-icon()
+        content: $fa-var-remove
 
   .bottom
     padding: 0 10px
