@@ -10,6 +10,11 @@
   -webkit-user-select: none
   display: inline-block
 
+  &.edit:before
+    @include fa-icon()
+    content: $fa-var-pencil
+    margin-right: 2px
+
   &:hover
     background-color: $lightblue
 

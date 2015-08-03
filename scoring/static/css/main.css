@@ -3498,10 +3498,21 @@ li {
   display: inline-block;
 }
 /* line 13, ../../sass/_buttons.sass */
+.btn.edit:before {
+  display: inline-block;
+  font: normal normal normal 14px/1 FontAwesome;
+  font-size: inherit;
+  text-rendering: auto;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+  content: "";
+  margin-right: 2px;
+}
+/* line 18, ../../sass/_buttons.sass */
 .btn:hover {
   background-color: #6FB3FF;
 }
-/* line 16, ../../sass/_buttons.sass */
+/* line 21, ../../sass/_buttons.sass */
 .btn.btn-small {
   font-size: 12px;
   padding: 2px 4px;
@@ -3570,15 +3581,25 @@ ul.link-list li a:hover {
 }
 /* line 19, ../../sass/components/_archer_block.sass */
 .archer-block .actions .action-button {
-  margin-left: 5px;
   cursor: pointer;
 }
-/* line 23, ../../sass/components/_archer_block.sass */
+/* line 21, ../../sass/components/_archer_block.sass */
+.archer-block .actions .action-button.delete:before {
+  padding: 5px 0px 6px 0px;
+  display: inline-block;
+  font: normal normal normal 14px/1 FontAwesome;
+  font-size: inherit;
+  text-rendering: auto;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+  content: "";
+}
+/* line 26, ../../sass/components/_archer_block.sass */
 .archer-block .bottom {
   padding: 0 10px;
 }
 
-/* line 26, ../../sass/components/_archer_block.sass */
+/* line 29, ../../sass/components/_archer_block.sass */
 .pill {
   font-size: 11px;
   line-height: 2em;
@@ -3591,29 +3612,29 @@ ul.link-list li a:hover {
   -webkit-border-radius: 0.5em;
   border-radius: 0.5em;
 }
-/* line 36, ../../sass/components/_archer_block.sass */
+/* line 39, ../../sass/components/_archer_block.sass */
 .pill.gent {
   background-color: #A62;
 }
-/* line 38, ../../sass/components/_archer_block.sass */
+/* line 41, ../../sass/components/_archer_block.sass */
 .pill.lady {
   background-color: #F57;
 }
-/* line 41, ../../sass/components/_archer_block.sass */
+/* line 44, ../../sass/components/_archer_block.sass */
 .pill.recurve {
   background-color: #A21;
 }
-/* line 43, ../../sass/components/_archer_block.sass */
+/* line 46, ../../sass/components/_archer_block.sass */
 .pill.compound {
   background-color: #6C4;
   color: #000F1F;
 }
-/* line 46, ../../sass/components/_archer_block.sass */
+/* line 49, ../../sass/components/_archer_block.sass */
 .pill.barebow {
   background-color: #6FB3FF;
   color: #000F1F;
 }
-/* line 49, ../../sass/components/_archer_block.sass */
+/* line 52, ../../sass/components/_archer_block.sass */
 .pill.longbow {
   background-color: #000F1F;
 }
