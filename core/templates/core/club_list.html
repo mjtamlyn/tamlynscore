@@ -18,7 +18,7 @@
         <ul class="link-list">
     {% endifchanged %}
         <li>
-        <a href="{% url 'club_detail' slug=club.slug %}">{{ club.short_name }}</a>
+        <a href="{% url 'club_detail' slug=club.slug %}"><i class="fa fa-caret-right"></i>{{ club.short_name }}</a>
         </li>
     {% if forloop.last %}
         </ul>
