@@ -33,11 +33,19 @@ The application should then be running, and accessible on `localhost:8001`.
 
 ## License
 
+<<<<<<< HEAD
 The project is covered by an MIT license:
 ```
 The MIT License (MIT)
 
 Copyright (c) 2011-2015 Marc Tamlyn
+=======
+The project is covered by the MIT License:
+```
+The MIT License (MIT)
+
+Copyright (c) 2015 Marc Tamlyn
+>>>>>>> 251ae90438352c432512073abce29db474fecf4b
 
 Permission is hereby granted, free of charge, to any person obtaining a copy
 of this software and associated documentation files (the "Software"), to deal
