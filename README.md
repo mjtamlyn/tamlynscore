@@ -1,7 +1,7 @@
 TamlynScore
 ===
 
-Django-based responsive archery scoring web application.
+Django-based archery scoring web application.
 
 ## Requirements
 
@@ -28,5 +28,4 @@ The application should then be running, and accessible on `localhost:8001`.
 **Note:** It's thoroughly recommended that you use a virtual environment for python to run this project.
 
 ## Contributors
-* [Marc Tamlyn](https://twitter.com/mjtamlyn)
-* [David Richardson](https://twitter.com/tankski_dr)
+* [See all the contributors on GitHub!](https://github.com/mjtamlyn/archery-scoring/graphs/contributors)
