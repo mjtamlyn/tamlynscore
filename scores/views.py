@@ -1133,7 +1133,7 @@ class RankingsExport(CompetitionMixin, View):
         for entry in entries:
             data[entry.pk] = [
                 entry.archer.name,
-                entry.club.name,
+                entry.team_name(),
                 entry.archer.get_gender_display(),
                 entry.bowstyle,
                 entry.archer.agb_number,
