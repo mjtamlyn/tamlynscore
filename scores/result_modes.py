@@ -93,7 +93,9 @@ class BaseResultMode(object):
         )
 
     def get_main_headers(self, competition):
-        return ['Archer', 'County' if competition.use_county_teams else 'Club', None]
+        if competition.use_county_teams:
+            return ['Archer', 'County']
+        return ['Archer', 'Club', None]
 
     def label_for_round(self, round):
         return str(round)
