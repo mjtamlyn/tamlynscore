@@ -126,8 +126,8 @@ class BaseResultMode(object):
                 elif score.target.session_entry.session_round.session.scoring_system == SCORING_DOZENS:
                     counter = 1
                     for subround in subrounds:
-                        subround_scores.append(score.dozen_set.filter(dozen__in=range(counter, counter + subround.arrows / 12)).aggregate(models.Sum('total'))['total__sum'])
-                        counter += subround.arrows / 12
+                        subround_scores.append(score.dozen_set.filter(dozen__in=range(counter, counter + int(subround.arrows / 12))).aggregate(models.Sum('total'))['total__sum'])
+                        counter += int(subround.arrows / 12)
 
                 scores += subround_scores
         if score.disqualified:
