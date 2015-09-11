@@ -7,7 +7,7 @@
 </header>
 
 <div class="col6">
-    <a href="{% url 'club_create' %}" class="btn">Add club</a>
+    <a href="{% url 'club_create' %}" class="btn add">Add club</a>
 
     {% for club in club_list %}
     {% ifchanged club.short_name.0 %}

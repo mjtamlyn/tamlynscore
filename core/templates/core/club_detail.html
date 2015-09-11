@@ -11,7 +11,7 @@
         </ul>
     </div>
     <div class="col3">
-        <p><a class="btn" href="{% url 'club_update' slug=club.slug %}">Edit</a></p>
+        <p><a class="btn edit" href="{% url 'club_update' slug=club.slug %}">Edit</a></p>
     </div>
 </div>
 
@@ -19,20 +19,25 @@
 <div class="row">
     <div class="col6">
         <h3>Archers</h3>
+        <div class="flex">
         {% for archer in archers %}
-        <div class="col2">
+        <div class="flex-item col2">
             <div class="archer-block">
                 <div class="name">
+                    <div class="actions">
+                        <a class="action-button edit" href="{% url 'archer_update' pk=archer.pk %}"></a>
+                    </div>
                     <p>{{ archer }}</p>
                 </div>
                 <div class="bottom">
-                    {% if archer.entries %}
-                    <ul>
-                        {% for entry in archer.entries %}
-                        <li>{{ entry.competition }}</li>
-                        {% endfor %}
-                    </ul>
-                    {% endif %}
+                    <div class="entries">
+                        <p><a class="action-button reveal" href="#">{{ archer.entries|length }} competition{{ archer.entries|pluralize }}</a></p>
+                        <ul>
+                            {% for entry in archer.entries %}
+                            <li>{{ entry.competition }}</li>
+                            {% endfor %}
+                        </ul>
+                    </div>
                     <p>
                         <span class="pill bowstyle {{ archer.bowstyle|slugify }}">{{ archer.bowstyle }}</span>
                         <span class="pill gender {{ archer.get_gender_display|lower }}">{{ archer.get_gender_display }}</span>
@@ -47,6 +52,7 @@
             </div>
         </div>
         {% endfor %}
+        </div>
     </div>
 </div>
 {% endif %}

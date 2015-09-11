@@ -13,6 +13,9 @@
   &:hover
     background-color: $lightblue
 
+  &:before
+    margin-right: 5px
+
   &.btn-small
     font-size: 12px
     padding: 2px 4px
@@ -20,10 +23,21 @@
     &:before
       margin-right: 2px
 
-.edit:before
-  @include fa-icon()
-  content: $fa-var-pencil
+.btn,
+.action-button
+  &.add:before
+    @include fa-icon()
+    content: $fa-var-plus
 
-.delete:before
-  @include fa-icon()
-  content: $fa-var-remove
+  &.edit:before
+    @include fa-icon()
+    content: $fa-var-pencil
+
+  &.delete:before
+    @include fa-icon()
+    content: $fa-var-remove
+
+  &.reveal:after
+    @include fa-icon()
+    content: $fa-var-chevron-down
+    margin-left: 3px

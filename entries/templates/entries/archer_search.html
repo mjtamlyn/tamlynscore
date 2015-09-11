@@ -15,7 +15,7 @@
 <p><a href="{% url 'archer_create' %}?competition={{ competition.slug }}{% if search_form.cleaned_data.query %}&name={{ search_form.cleaned_data.query|urlencode }}{% endif %}" class="btn">Create new archer</a></p>
 
 {% if archers %}
-<div class="row">
+<div class="row flex">
     {% for archer in archers %}
     <div class="col2">
         <a href="{% url 'entry_add' slug=competition.slug archer_id=archer.pk %}">

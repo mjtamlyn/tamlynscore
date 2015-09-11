@@ -3335,19 +3335,27 @@ footer p {
   width: 16.66667%;
 }
 
+/* line 54, ../../sass/_layout.sass */
+.flex {
+  display: -webkit-flex;
+  display: flex;
+  -webkit-flex-wrap: wrap;
+  flex-wrap: wrap;
+}
+
 @media (max-width: 1200px) {
-  /* line 55, ../../sass/_layout.sass */
+  /* line 61, ../../sass/_layout.sass */
   .container {
     width: 920px;
   }
 }
 @media (max-width: 950px) {
-  /* line 59, ../../sass/_layout.sass */
+  /* line 65, ../../sass/_layout.sass */
   .container {
     width: 100%;
   }
 
-  /* line 62, ../../sass/_layout.sass */
+  /* line 68, ../../sass/_layout.sass */
   .col1, .col2, .col3, .col4, .col5 {
     width: 100%;
   }
@@ -3502,18 +3510,34 @@ li {
   background-color: #6FB3FF;
 }
 /* line 16, ../../sass/_buttons.sass */
+.btn:before {
+  margin-right: 5px;
+}
+/* line 19, ../../sass/_buttons.sass */
 .btn.btn-small {
   font-size: 12px;
   padding: 2px 4px;
   margin: 0 1px;
 }
-/* line 20, ../../sass/_buttons.sass */
+/* line 23, ../../sass/_buttons.sass */
 .btn.btn-small:before {
   margin-right: 2px;
 }
 
-/* line 23, ../../sass/_buttons.sass */
-.edit:before {
+/* line 28, ../../sass/_buttons.sass */
+.btn.add:before,
+.action-button.add:before {
+  display: inline-block;
+  font: normal normal normal 14px/1 FontAwesome;
+  font-size: inherit;
+  text-rendering: auto;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+  content: "";
+}
+/* line 32, ../../sass/_buttons.sass */
+.btn.edit:before,
+.action-button.edit:before {
   display: inline-block;
   font: normal normal normal 14px/1 FontAwesome;
   font-size: inherit;
@@ -3522,9 +3546,9 @@ li {
   -moz-osx-font-smoothing: grayscale;
   content: "";
 }
-
-/* line 27, ../../sass/_buttons.sass */
-.delete:before {
+/* line 36, ../../sass/_buttons.sass */
+.btn.delete:before,
+.action-button.delete:before {
   display: inline-block;
   font: normal normal normal 14px/1 FontAwesome;
   font-size: inherit;
@@ -3532,6 +3556,18 @@ li {
   -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale;
   content: "";
+}
+/* line 40, ../../sass/_buttons.sass */
+.btn.reveal:after,
+.action-button.reveal:after {
+  display: inline-block;
+  font: normal normal normal 14px/1 FontAwesome;
+  font-size: inherit;
+  text-rendering: auto;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+  content: "";
+  margin-left: 3px;
 }
 
 /* line 1, ../../sass/components/_link_list.sass */
