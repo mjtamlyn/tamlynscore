@@ -168,6 +168,7 @@ class Archer(models.Model):
     wa_age = models.CharField(max_length=1, choices=WA_AGE_CHOICES, default='', blank=True)
     novice = models.CharField(max_length=1, choices=NOVICE_CHOICES, default='E')
     agb_number = models.BigIntegerField(blank=True, null=True)
+    archived = models.BooleanField(default=False)
 
     def __str__(self):
         return self.name

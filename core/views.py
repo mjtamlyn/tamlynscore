@@ -29,13 +29,19 @@ class ClubDetail(DetailView):
     model = Club
 
     def get_context_data(self, **kwargs):
+        context = super(ClubDetail, self).get_context_data(**kwargs)
         entries = Prefetch(
             'competitionentry_set',
             queryset=CompetitionEntry.objects.select_related('competition', 'competition__tournament'),
             to_attr='entries',
         )
-        archers = self.object.archer_set.select_related('bowstyle').order_by('name').prefetch_related(entries)
-        return super(ClubDetail, self).get_context_data(archers=archers, **kwargs)
+        context['archers'] = self.object.archer_set.filter(
+            archived=False,
+        ).select_related('bowstyle').order_by('name').prefetch_related(entries)
+        context['archived_archer_count'] = self.object.archer_set.filter(
+            archived=True,
+        ).count()
+        return context
 
 
 @class_view_decorator(login_required)
@@ -85,7 +91,7 @@ class ArcherDetail(DetailView):
 @class_view_decorator(login_required)
 class ArcherUpdate(UpdateView):
     model = Archer
-    fields = '__all__'
+    form_class = ArcherForm
 
     def get_success_url(self):
         return self.request.GET.get('next') or self.request.path

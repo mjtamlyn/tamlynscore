@@ -52,6 +52,11 @@
         </div>
         {% endfor %}
         </div>
+        {% if archived_archer_count %}
+        <div class="row6">
+            <p>View {{ archived_archer_count }} archived archer{{ archived_archer_count|pluralize }}</p>
+        </div>
+        {% endif %}
     </div>
 </div>
 {% endif %}
