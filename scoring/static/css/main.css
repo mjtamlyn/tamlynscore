@@ -3506,35 +3506,36 @@ li {
   -moz-border-radius: 5px;
   -webkit-border-radius: 5px;
   border-radius: 5px;
-  background-color: #DDDAFA;
-  border: 1px solid #6FB3FF;
+  background-color: #004ca2;
+  color: white;
   font-size: 16px;
-  padding: 5px 8px;
+  padding: 5px 10px;
+  border: 0;
   cursor: pointer;
   text-align: center;
   -webkit-user-select: none;
   display: inline-block;
 }
-/* line 13, ../../sass/_buttons.sass */
+/* line 14, ../../sass/_buttons.sass */
 .btn:hover {
-  background-color: #6FB3FF;
+  background-color: #0064d5;
 }
-/* line 16, ../../sass/_buttons.sass */
+/* line 17, ../../sass/_buttons.sass */
 .btn:before {
   margin-right: 5px;
 }
-/* line 19, ../../sass/_buttons.sass */
+/* line 20, ../../sass/_buttons.sass */
 .btn.btn-small {
   font-size: 12px;
   padding: 2px 4px;
   margin: 0 1px;
 }
-/* line 23, ../../sass/_buttons.sass */
+/* line 24, ../../sass/_buttons.sass */
 .btn.btn-small:before {
   margin-right: 2px;
 }
 
-/* line 26, ../../sass/_buttons.sass */
+/* line 27, ../../sass/_buttons.sass */
 button.action-button {
   font-size: inherit;
   background: none;
@@ -3543,7 +3544,7 @@ button.action-button {
   margin: 0;
 }
 
-/* line 35, ../../sass/_buttons.sass */
+/* line 36, ../../sass/_buttons.sass */
 .btn.add:before,
 .action-button.add:before {
   display: inline-block;
@@ -3554,7 +3555,7 @@ button.action-button {
   -moz-osx-font-smoothing: grayscale;
   content: "";
 }
-/* line 39, ../../sass/_buttons.sass */
+/* line 40, ../../sass/_buttons.sass */
 .btn.edit:before,
 .action-button.edit:before {
   display: inline-block;
@@ -3565,7 +3566,7 @@ button.action-button {
   -moz-osx-font-smoothing: grayscale;
   content: "";
 }
-/* line 43, ../../sass/_buttons.sass */
+/* line 44, ../../sass/_buttons.sass */
 .btn.delete:before,
 .action-button.delete:before {
   display: inline-block;
@@ -3576,7 +3577,7 @@ button.action-button {
   -moz-osx-font-smoothing: grayscale;
   content: "";
 }
-/* line 47, ../../sass/_buttons.sass */
+/* line 48, ../../sass/_buttons.sass */
 .btn.archive:before,
 .action-button.archive:before {
   display: inline-block;
@@ -3587,7 +3588,7 @@ button.action-button {
   -moz-osx-font-smoothing: grayscale;
   content: "";
 }
-/* line 51, ../../sass/_buttons.sass */
+/* line 52, ../../sass/_buttons.sass */
 .btn.reveal:after,
 .action-button.reveal:after {
   display: inline-block;
