@@ -10,8 +10,6 @@
                 {% block extrastyles %}
                 {% endblock extrastyles %}
             {% endblock styles %}
-            {% block scripts %}
-            {% endblock scripts %}
         {% endblock head %}
     </head>
     {# TODO: Remove bodyclass in favour of page_id #}
@@ -39,5 +37,7 @@
             </footer>
             {% endblock footer %}
         </div>
+        {% block scripts %}
+        {% endblock scripts %}
     </body>
 </html>
