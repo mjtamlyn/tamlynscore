@@ -4,14 +4,13 @@
 <h1>{{ club.name }}</h1>
 
 <div class="row">
-    <div class="col3">
+    <div class="col6">
+        <div class="pull-right">
+            <p><a class="btn edit" href="{% url 'club_update' slug=club.slug %}">Edit</a></p>
+        </div>
         <ul class="names">
-            <li>Full name <strong>{{ club.name }}</strong></li>
-            <li>Short name <strong>{{ club.short_name }}</strong></li>
+            <li>Short name: <strong>{{ club.short_name }}</strong></li>
         </ul>
-    </div>
-    <div class="col3">
-        <p><a class="btn edit" href="{% url 'club_update' slug=club.slug %}">Edit</a></p>
     </div>
 </div>
 
@@ -19,7 +18,7 @@
 <div class="row">
     <div class="col6">
         <h3>Archers</h3>
-        <div class="flex">
+        <div class="row flex">
         {% for archer in archers %}
         <div class="flex-item col2">
             <div class="archer-block">
@@ -41,10 +40,10 @@
                     <p>
                         <span class="pill bowstyle {{ archer.bowstyle|slugify }}">{{ archer.bowstyle }}</span>
                         <span class="pill gender {{ archer.get_gender_display|lower }}">{{ archer.get_gender_display }}</span>
-                        {% if competition.has_novices and archer.novice == "N" %}
+                        {% if archer.novice == "N" %}
                         <span class="pill novice">{{ archer.get_novice_display }}</span>
                         {% endif %}
-                        {% if competition.has_juniors and archer.age == "J" %}
+                        {% if archer.age == "J" %}
                         <span class="pill junior">{{ archer.get_age_display }}</span>
                         {% endif %}
                     </p>

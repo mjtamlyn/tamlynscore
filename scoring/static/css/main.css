@@ -3343,19 +3343,24 @@ footer p {
   flex-wrap: wrap;
 }
 
+/* line 60, ../../sass/_layout.sass */
+.pull-right {
+  float: right;
+}
+
 @media (max-width: 1200px) {
-  /* line 61, ../../sass/_layout.sass */
+  /* line 64, ../../sass/_layout.sass */
   .container {
     width: 920px;
   }
 }
 @media (max-width: 950px) {
-  /* line 65, ../../sass/_layout.sass */
+  /* line 68, ../../sass/_layout.sass */
   .container {
     width: 100%;
   }
 
-  /* line 68, ../../sass/_layout.sass */
+  /* line 71, ../../sass/_layout.sass */
   .col1, .col2, .col3, .col4, .col5 {
     width: 100%;
   }
