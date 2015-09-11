@@ -3,21 +3,13 @@
 {% block content %}
 <h1>{{ club.name }}</h1>
 
-<div class="row">
-    <div class="col6">
-        <div class="pull-right">
-            <p><a class="btn edit" href="{% url 'club_update' club_slug=club.slug %}">Edit</a></p>
-        </div>
-        <ul class="names">
-            <li>Short name: <strong>{{ club.short_name }}</strong></li>
-        </ul>
-    </div>
-</div>
-
 {% if archers %}
 <div class="row">
     <div class="col6">
-        <h3>Archers</h3>
+        <div class="pull-right">
+            <a class="btn" href="{{ club.get_absolute_url }}">Back</a>
+        </div>
+        <h3>Archived Archers</h3>
         <div class="row flex">
         {% for archer in archers %}
         <div class="flex-item col2">
@@ -27,7 +19,7 @@
                         <a class="action-button edit" href="{% url 'archer_update' pk=archer.pk %}"></a>
                         <form class="inline" action="{% url 'archer_archive' pk=archer.pk %}" method="POST">
                             {% csrf_token %}
-                            <input type="hidden" name="archived" value="on">
+                            <input type="hidden" name="archived" value="">
                             <button type="submit" class="action-button archive">
                         </form>
                     </div>

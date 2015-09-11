@@ -156,7 +156,7 @@ class Club(models.Model):
         })
 
     def get_absolute_url(self):
-        return reverse('club_detail', kwargs={'slug': self.slug})
+        return reverse('club_detail', kwargs={'club_slug': self.slug})
 
 
 class Archer(models.Model):

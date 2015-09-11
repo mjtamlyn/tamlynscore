@@ -4,6 +4,7 @@ from django.core.cache import cache
 from django.core.urlresolvers import reverse
 from django.contrib.auth.decorators import login_required
 from django.db.models import Prefetch
+from django.shortcuts import get_object_or_404
 from django.views.generic import TemplateView, ListView, DetailView, UpdateView, CreateView
 
 from entries.models import CompetitionEntry
@@ -12,6 +13,23 @@ from scores.models import Score
 
 from .models import County, Club, Archer
 from .forms import ArcherForm
+
+
+class ClubMixin(object):
+    def dispatch(self, request, *args, **kwargs):
+        self.club = get_object_or_404(Club, slug=self.kwargs['club_slug'])
+        return super().dispatch(request, *args, **kwargs)
+
+    def get_archer_queryset(self):
+        entries = Prefetch(
+            'competitionentry_set',
+            queryset=CompetitionEntry.objects.select_related('competition', 'competition__tournament'),
+            to_attr='entries',
+        )
+        return self.club.archer_set.select_related('bowstyle').order_by('name').prefetch_related(entries)
+
+    def get_context_data(self, **kwargs):
+        return super().get_context_data(club=self.club, **kwargs)
 
 
 @class_view_decorator(login_required)
@@ -25,29 +43,35 @@ class ClubList(ListView):
 
 
 @class_view_decorator(login_required)
-class ClubDetail(DetailView):
-    model = Club
+class ClubDetail(ClubMixin, TemplateView):
+    template_name = 'core/club_detail.html'
 
     def get_context_data(self, **kwargs):
         context = super(ClubDetail, self).get_context_data(**kwargs)
-        entries = Prefetch(
-            'competitionentry_set',
-            queryset=CompetitionEntry.objects.select_related('competition', 'competition__tournament'),
-            to_attr='entries',
-        )
-        context['archers'] = self.object.archer_set.filter(
+        context['archers'] = self.get_archer_queryset().filter(
             archived=False,
-        ).select_related('bowstyle').order_by('name').prefetch_related(entries)
-        context['archived_archer_count'] = self.object.archer_set.filter(
+        )
+        context['archived_archer_count'] = self.club.archer_set.filter(
             archived=True,
         ).count()
         return context
 
 
 @class_view_decorator(login_required)
-class ClubUpdate(UpdateView):
-    model = Club
+class ClubUpdate(ClubMixin, UpdateView):
     fields = '__all__'
+
+    def get_object(self):
+        return self.club
+
+
+@class_view_decorator(login_required)
+class ArchiveArcherList(ClubMixin, ListView):
+    template_name = 'core/archive_archers.html'
+    context_object_name = 'archers'
+
+    def get_queryset(self):
+        return self.get_archer_queryset().filter(archived=True)
 
 
 @class_view_decorator(login_required)
