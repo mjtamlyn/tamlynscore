@@ -3429,6 +3429,11 @@ select {
   font-size: 16px;
 }
 
+/* line 9, ../../sass/_forms.sass */
+form.inline {
+  display: inline;
+}
+
 @font-face {
   font-family: "Museo";
   src: url("../fonts/Museo500-Regular-webfont.eot");
@@ -3529,7 +3534,16 @@ li {
   margin-right: 2px;
 }
 
-/* line 28, ../../sass/_buttons.sass */
+/* line 26, ../../sass/_buttons.sass */
+button.action-button {
+  font-size: inherit;
+  background: none;
+  padding: 0;
+  border: 0;
+  margin: 0;
+}
+
+/* line 35, ../../sass/_buttons.sass */
 .btn.add:before,
 .action-button.add:before {
   display: inline-block;
@@ -3540,7 +3554,7 @@ li {
   -moz-osx-font-smoothing: grayscale;
   content: "";
 }
-/* line 32, ../../sass/_buttons.sass */
+/* line 39, ../../sass/_buttons.sass */
 .btn.edit:before,
 .action-button.edit:before {
   display: inline-block;
@@ -3551,7 +3565,7 @@ li {
   -moz-osx-font-smoothing: grayscale;
   content: "";
 }
-/* line 36, ../../sass/_buttons.sass */
+/* line 43, ../../sass/_buttons.sass */
 .btn.delete:before,
 .action-button.delete:before {
   display: inline-block;
@@ -3562,7 +3576,18 @@ li {
   -moz-osx-font-smoothing: grayscale;
   content: "";
 }
-/* line 40, ../../sass/_buttons.sass */
+/* line 47, ../../sass/_buttons.sass */
+.btn.archive:before,
+.action-button.archive:before {
+  display: inline-block;
+  font: normal normal normal 14px/1 FontAwesome;
+  font-size: inherit;
+  text-rendering: auto;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+  content: "";
+}
+/* line 51, ../../sass/_buttons.sass */
 .btn.reveal:after,
 .action-button.reveal:after {
   display: inline-block;

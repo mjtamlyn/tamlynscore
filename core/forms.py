@@ -10,4 +10,4 @@ class ArcherForm(forms.ModelForm):
 
     class Meta:
         model = Archer
-        fields = '__all__'
+        exclude = ['archived']

@@ -25,6 +25,11 @@
                 <div class="name">
                     <div class="actions">
                         <a class="action-button edit" href="{% url 'archer_update' pk=archer.pk %}"></a>
+                        <form class="inline" action="{% url 'archer_archive' pk=archer.pk %}" method="POST">
+                            {% csrf_token %}
+                            <input type="hidden" name="archived" value="on">
+                            <button type="submit" class="action-button archive">
+                        </form>
                     </div>
                     <p>{{ archer }}</p>
                 </div>

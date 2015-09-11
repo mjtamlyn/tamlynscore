@@ -126,3 +126,12 @@ class ArcherCreate(CreateView):
                 'archer_id': self.object.pk,
             })
         return self.object.club.get_absolute_url()
+
+
+@class_view_decorator(login_required)
+class ArcherArchive(UpdateView):
+    model = Archer
+    fields = ['archived']
+
+    def get_success_url(self):
+        return self.object.club.get_absolute_url()

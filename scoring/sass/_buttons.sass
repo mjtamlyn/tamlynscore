@@ -23,6 +23,13 @@
     &:before
       margin-right: 2px
 
+button.action-button
+  font-size: inherit
+  background: none
+  padding: 0
+  border: 0
+  margin: 0
+
 .btn,
 .action-button
   &.add:before
@@ -36,6 +43,10 @@
   &.delete:before
     @include fa-icon()
     content: $fa-var-remove
+
+  &.archive:before
+    @include fa-icon()
+    content: $fa-var-archive
 
   &.reveal:after
     @include fa-icon()

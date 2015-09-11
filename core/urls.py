@@ -12,4 +12,5 @@ urlpatterns = [
     url(r'^archer/add/$', views.ArcherCreate.as_view(), name='archer_create'),
     url(r'^archer/(?P<pk>\d+)/$', views.ArcherDetail.as_view(), name='archer_detail'),
     url(r'^archer/(?P<pk>\d+)/edit/$', views.ArcherUpdate.as_view(), name='archer_update'),
+    url(r'^archer/(?P<pk>\d+)/archive/$', views.ArcherArchive.as_view(), name='archer_archive'),
 ]
