@@ -578,7 +578,7 @@ class Team(BaseResultMode):
             team_types.append('Compound')
         if competition.junior_team_size is not None:
             team_types.append('Junior')
-        if competition.has_novices:
+        if competition.novice_team_size is not None:
             team_types.append('Novice')
         return team_types
 

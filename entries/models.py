@@ -59,7 +59,7 @@ class Competition(models.Model):
     strict_c_teams = models.BooleanField(default=False, help_text='e.g. BUTC')
     allow_incomplete_teams = models.BooleanField(default=True)
     team_size = models.PositiveIntegerField(default=4)
-    novice_team_size = models.PositiveIntegerField(default=3)
+    novice_team_size = models.PositiveIntegerField(blank=True, null=True)
     compound_team_size = models.PositiveIntegerField(blank=True, null=True, default=None)
     junior_team_size = models.PositiveIntegerField(blank=True, null=True, default=None)
     force_mixed_teams = models.BooleanField(default=False)
