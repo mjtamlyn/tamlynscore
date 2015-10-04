@@ -61,7 +61,6 @@
             <dt>Options</dt>
             <dd>
                 <ul>
-                    <li>{% if competition.has_teams %}Has team awards{% else %}Does not have team awards{% endif %}</li>
                     <li>{% if competition.has_novices %}Has a novice category{% else %}Does not have a novice category{% endif %}</li>
                     {% if competition.has_novices %}
                     <li>{% if competition.novices_in_experienced_teams %}Novices can be in experienced teams{% else %}Novices cannot be in experienced teams{% endif %}</li>

@@ -52,7 +52,6 @@ class Competition(models.Model):
     has_novices = models.BooleanField(default=False)
     has_juniors = models.BooleanField(default=False)
     has_wa_age_groups = models.BooleanField(default=False)
-    has_teams = models.BooleanField(default=False)
     novices_in_experienced_teams = models.BooleanField(default=False)
     exclude_later_shoots = models.BooleanField(default=False, help_text='Only the first session can count for results')
     use_county_teams = models.BooleanField(default=False)
@@ -90,7 +89,7 @@ class Competition(models.Model):
 
 class ResultsMode(models.Model):
     competition = models.ForeignKey(Competition, related_name='result_modes')
-    mode = models.CharField(max_length=31, choices=tuple(get_result_modes()))
+    mode = models.CharField(max_length=31, choices=tuple(get_result_modes()))  # TODO work out how to make this not throw new migrations every time
     leaderboard_only = models.BooleanField(default=False)
     json = models.TextField(blank=True, default='')
 
