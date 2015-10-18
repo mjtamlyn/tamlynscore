@@ -3,6 +3,7 @@ from django.utils import timezone
 
 from core import models as core_models
 from entries import models as entries_models
+from scores.result_modes import ByRound
 
 import factory
 from factory import fuzzy
@@ -52,6 +53,7 @@ class ArcherFactory(factory.DjangoModelFactory):
 class TournamentFactory(factory.DjangoModelFactory):
     class Meta:
         model = entries_models.Tournament
+    full_name = factory.Sequence(lambda n: 'Tournament %s Archery Championship' % n)
     short_name = factory.Sequence(lambda n: 'Tournament %s' % n)
     host_club = factory.SubFactory(ClubFactory)
 
@@ -70,12 +72,13 @@ class SessionFactory(factory.DjangoModelFactory):
     competition = factory.SubFactory(CompetitionFactory)
     start = timezone.now()
     archers_per_target = 4
+    scoring_system = entries_models.SCORING_FULL
 
 
 class RoundFactory(factory.DjangoModelFactory):
     class Meta:
         model = core_models.Round
-    name = factory.Sequence(lambda n: 'Name-%s' % n)
+    name = factory.Sequence(lambda n: 'Round %s' % n)
 
 
 class SessionRoundFactory(factory.DjangoModelFactory):
@@ -101,3 +104,10 @@ class SessionEntryFactory(factory.DjangoModelFactory):
         model = entries_models.SessionEntry
     competition_entry = factory.SubFactory(CompetitionEntryFactory)
     session_round = factory.SubFactory(SessionRoundFactory)
+
+
+class ResultsModeFactory(factory.DjangoModelFactory):
+    class Meta:
+        model = entries_models.ResultsMode
+    competition = factory.SubFactory(CompetitionFactory)
+    mode = ByRound().slug

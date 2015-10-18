@@ -22,7 +22,7 @@ class Tournament(models.Model):
     full_name = models.CharField(max_length=300, unique=True)
     short_name = models.CharField(max_length=20)
 
-    host_club = models.ForeignKey(Club)
+    host_club = models.ForeignKey(Club, blank=True, null=True)
 
     def __str__(self):
         return self.short_name

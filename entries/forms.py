@@ -2,8 +2,166 @@ from django.core.cache import cache
 from django.db import transaction
 from django import forms
 
-from core.models import Archer, Bowstyle, Club, County, NOVICE_CHOICES, AGE_CHOICES, WA_AGE_CHOICES
-from .models import CompetitionEntry, SessionRound, SessionEntry
+from core.models import Archer, Bowstyle, Club, County, Round, NOVICE_CHOICES, AGE_CHOICES, WA_AGE_CHOICES
+from scores.result_modes import get_result_modes, ByRound
+
+from .models import Tournament, Competition, CompetitionEntry, Session, SessionRound, SessionEntry, SCORING_SYSTEMS, SCORING_FULL
+
+
+class CompetitionForm(forms.Form):
+    # Fields about the shoot itself
+    full_name = forms.CharField(max_length=300)
+    short_name = forms.CharField(max_length=20)
+    date = forms.DateField()
+    end_date = forms.DateField(required=False)
+
+    # Fields about sessions and rounds shot in them
+    scoring_system = forms.ChoiceField(choices=SCORING_SYSTEMS, initial=SCORING_FULL)
+    archers_per_target = forms.IntegerField(initial=4)
+    arrows_entered_per_end = forms.IntegerField(initial=12, help_text='Number of arrow values included on each running slip')
+    session_1_time = forms.DateTimeField()
+    session_1_rounds = forms.ModelMultipleChoiceField(Round.objects)
+    session_2_time = forms.DateTimeField(required=False)
+    session_2_rounds = forms.ModelMultipleChoiceField(Round.objects, required=False)
+    session_3_time = forms.DateTimeField(required=False)
+    session_3_rounds = forms.ModelMultipleChoiceField(Round.objects, required=False)
+    session_4_time = forms.DateTimeField(required=False)
+    session_4_rounds = forms.ModelMultipleChoiceField(Round.objects, required=False)
+    session_5_time = forms.DateTimeField(required=False)
+    session_5_rounds = forms.ModelMultipleChoiceField(Round.objects, required=False)
+    session_6_time = forms.DateTimeField(required=False)
+    session_6_rounds = forms.ModelMultipleChoiceField(Round.objects, required=False)
+
+    # Fields about result types
+    result_modes = forms.MultipleChoiceField(choices=get_result_modes, widget=forms.CheckboxSelectMultiple, initial=[ByRound.slug])
+    leaderboard_only_modes = forms.MultipleChoiceField(choices=get_result_modes, widget=forms.CheckboxSelectMultiple, required=False)
+
+    # Fields about individual results
+    has_novices = forms.BooleanField(required=False, label='Use a novice category')
+    has_juniors = forms.BooleanField(required=False, label='Use a general junior category')
+    has_wa_age_groups = forms.BooleanField(required=False, label='Use WA style age groups')
+    exclude_later_shoots = forms.BooleanField(required=False, help_text='Only the first session can count for results')
+
+    # Fields about team results
+    team_size = forms.IntegerField(required=False)
+    allow_incomplete_teams = forms.BooleanField(required=False, initial=True, help_text='Print results for teams without a full complement of archers')
+    combine_rounds_for_team_scores = forms.BooleanField(required=False, help_text='Base each archer\'s contribution to the team on their aggregate score accross all rounds')
+    force_mixed_teams = forms.BooleanField(required=False, help_text='Require a team member of each gender')
+    split_gender_teams = forms.BooleanField(required=False, help_text='Split teams by gender. Does not affect novice teams')
+    use_county_teams = forms.BooleanField(required=False, help_text='Group teams by county instead of club')
+    strict_b_teams = forms.BooleanField(required=False, help_text='Allow two separate team entries from a club with predetermined archers')
+    strict_c_teams = forms.BooleanField(required=False, help_text='Allow three separate team entries from a club with predetermined archers')
+    novice_team_size = forms.IntegerField(required=False)
+    novices_in_experienced_teams = forms.BooleanField(required=False, help_text='Allow novice scores to count in experienced results')
+    compound_team_size = forms.IntegerField(required=False)
+    junior_team_size = forms.IntegerField(required=False)
+
+    def __init__(self, instance=None, initial=None, **kwargs):
+        if initial is None:
+            initial = {}
+        if instance is None:
+            instance = Competition()
+        else:
+            initial = self.get_initial(initial, instance)
+        self.instance = instance
+        super(CompetitionForm, self).__init__(initial=initial, **kwargs)
+
+    def get_initial(self, initial, instance):
+        initial['full_name'] = instance.tournament.full_name
+        initial['short_name'] = instance.tournament.short_name
+        initial['date'] = instance.date
+        initial['end_date'] = instance.end_date
+
+        sessions = instance.session_set.order_by('start')
+        initial['archers_per_target'] = sessions[0].archers_per_target
+        initial['scoring_system'] = sessions[0].scoring_system
+        initial['arrows_entered_per_end'] = sessions[0].arrows_entered_per_end
+        for i, session in enumerate(sessions, 1):
+            initial['session_%s_time' % i] = session.start
+            initial['session_%s_rounds' % i] = list(session.sessionround_set.values_list('shot_round', flat=True))
+
+        initial['result_modes'] = list(instance.result_modes.values_list('mode', flat=True))
+        return initial
+
+    def clean(self):
+        self.clean_session_fields()
+
+    def clean_session_fields(self):
+        # No need to validate first pair as they're both required
+        for i in range(2, 7):
+            time = self.cleaned_data.get('session_%s_time' % i)
+            rounds = self.cleaned_data.get('session_%s_rounds' % i)
+            if (not time and rounds) or (time and not rounds):
+                self.add_error('session_%s_time' % i,
+                    forms.ValidationError('Must have start and rounds for a session', code='session_match')
+                )
+        times = [self.cleaned_data.get('session_%s_time' % i) for i in range(1, 7)]
+        current_time = times[0]
+        for i, time in enumerate(times[1:], 1):
+            if time is None:
+                if any(times[i:]):
+                    self.add_error('session_1_time',
+                        forms.ValidationError('Must not have gaps in sessions', code='session_order')
+                    )
+                break
+            elif time < current_time:
+                self.add_error('session_1_time',
+                    forms.ValidationError('Session times must be in order', code='session_order')
+                )
+            current_time = time
+
+    def save(self):
+        self.handle_shoot_fields()
+        self.instance.save()
+        self.handle_session_fields()
+        self.handle_result_mode_fields()
+
+    def handle_shoot_fields(self):
+        tournament, _ = Tournament.objects.get_or_create(
+            full_name=self.cleaned_data['full_name'],
+            defaults={'short_name': self.cleaned_data['short_name']},
+        )
+        tournament.save()
+        self.instance.tournament = tournament
+        self.instance.date = self.cleaned_data['date']
+
+    def handle_session_fields(self):
+        sessions = self.instance.session_set.order_by('start')
+        for i in range(1, 7):
+            try:
+                session = sessions[i - 1]
+            except IndexError:
+                session = Session(competition=self.instance)
+            session_time = self.cleaned_data['session_%s_time' % i]
+            if session_time is None:
+                if session.pk:
+                    session.delete()
+                continue
+            session.start = session_time
+            session.scoring_system = self.cleaned_data['scoring_system']
+            session.archers_per_target = self.cleaned_data['archers_per_target']
+            session.arrows_entered_per_end = self.cleaned_data['arrows_entered_per_end']
+            session.save()
+            rounds_to_be_shot = {r.pk for r in self.cleaned_data['session_%s_rounds' % i]}
+            existing_session_rounds = session.sessionround_set.values_list('shot_round', flat=True)
+            for rnd in existing_session_rounds:
+                if rnd in rounds_to_be_shot:
+                    rounds_to_be_shot.remove(rnd)
+                else:
+                    session.sessionround_set.filter(shot_round=rnd).delete()
+            for rnd in rounds_to_be_shot:
+                session.sessionround_set.create(shot_round_id=rnd)
+
+    def handle_result_mode_fields(self):
+        modes = set(self.cleaned_data['result_modes'])
+        existing_result_modes = self.instance.result_modes.values_list('mode', flat=True)
+        for mode in existing_result_modes:
+            if mode in modes:
+                modes.remove(mode)
+            else:
+                self.instance.result_modes.filter(mode=mode).delete()
+        for mode in modes:
+            self.instance.result_modes.create(mode=mode)
 
 
 class ArcherSearchForm(forms.Form):
