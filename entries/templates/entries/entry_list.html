@@ -11,7 +11,7 @@
     <div class="col2">
         <form action="{% url 'archer_search' slug=competition.slug %}" method="GET">
             {{ search_form.query }}
-            <input type="submit" value="Add entry" class="btn">
+            <button type="submit" class="btn add">Add entry</button>
         </form>
     </div>
     <div class="col4">

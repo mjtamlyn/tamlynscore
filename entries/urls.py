@@ -4,7 +4,9 @@ from entries import views
 
 urlpatterns = [
     url(r'^$', views.CompetitionList.as_view(), name='tournaments_list'),
+    url(r'^add/$', views.CompetitionCreate.as_view(), name='competition_create'),
     url(r'^(?P<slug>[\w-]+)/$', views.CompetitionDetail.as_view(), name='competition_detail'),
+    url(r'^(?P<slug>[\w-]+)/edit/$', views.CompetitionUpdate.as_view(), name='competition_update'),
     url(r'^(?P<slug>[\w-]+)/entries/$', views.EntryList.as_view(), name='entry_list'),
     url(r'^(?P<slug>[\w-]+)/entries/search/$', views.ArcherSearch.as_view(), name='archer_search'),
     url(r'^(?P<slug>[\w-]+)/entries/add/(?P<archer_id>\d+)/$', views.EntryAdd.as_view(), name='entry_add'),

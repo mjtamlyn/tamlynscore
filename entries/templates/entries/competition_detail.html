@@ -2,6 +2,7 @@
 
 {% block content %}
 <header>
+    <a class="pull-right btn edit" href="{% url 'competition_update' slug=competition.slug %}">Edit</a>
     <a href="{% url 'competition_detail' slug=competition.slug %}"><h1>{{ competition }}</h1></a>
 </header>
 

@@ -1,0 +1,12 @@
+{% extends 'base.html' %}
+
+{% block content %}
+    <h2>{% if form.instance.pk %}{{ form.instance }}{% else %}Add competition{% endif %}</h2>
+    <form method="post">
+        {% csrf_token %}
+        <ul>
+            {{ form.as_ul }}
+            <li><input type="submit" class="btn"></li>
+        </ul>
+    </form>
+{% endblock %}

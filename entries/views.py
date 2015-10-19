@@ -9,7 +9,7 @@ from django.core.urlresolvers import reverse
 from django.db.models import Prefetch
 from django.http import HttpResponse, HttpResponseBadRequest, HttpResponseRedirect, Http404
 from django.utils.datastructures import SortedDict
-from django.views.generic import View, DetailView, ListView, TemplateView, UpdateView, DeleteView
+from django.views.generic import View, DetailView, ListView, TemplateView, UpdateView, DeleteView, FormView
 from django.shortcuts import get_object_or_404
 from django.utils import timezone
 
@@ -22,7 +22,7 @@ from reportlab.lib.units import inch
 from core.models import Archer
 from scoring.utils import class_view_decorator
 
-from .forms import ArcherSearchForm, EntryCreateForm, EntryUpdateForm
+from .forms import ArcherSearchForm, CompetitionForm, EntryCreateForm, EntryUpdateForm
 from .models import (
     Competition, Session, CompetitionEntry, SessionEntry, TargetAllocation,
     SessionRound, SCORING_FULL, SCORING_DOZENS
@@ -47,6 +47,19 @@ class CompetitionList(ListView):
 
 
 @class_view_decorator(login_required)
+class CompetitionCreate(FormView):
+    form_class = CompetitionForm
+    template_name = 'entries/competition_form.html'
+
+    def form_valid(self, form):
+        self.competition = form.save()
+        return super(CompetitionCreate, self).form_valid(form)
+
+    def get_success_url(self):
+        return reverse('competition_detail', kwargs={'slug': self.competition.slug})
+
+
+@class_view_decorator(login_required)
 class CompetitionDetail(DetailView):
     model = Competition
     object_name = 'competition'
@@ -59,6 +72,24 @@ class CompetitionMixin(object):
 
     def get_context_data(self, **kwargs):
         return super(CompetitionMixin, self).get_context_data(competition=self.competition, **kwargs)
+
+
+@class_view_decorator(login_required)
+class CompetitionUpdate(CompetitionMixin, FormView):
+    form_class = CompetitionForm
+    template_name = 'entries/competition_form.html'
+
+    def get_form_kwargs(self):
+        kwargs = super(CompetitionUpdate, self).get_form_kwargs()
+        kwargs['instance'] = self.competition
+        return kwargs
+
+    def form_valid(self, form):
+        self.competition = form.save()
+        return super(CompetitionUpdate, self).form_valid(form)
+
+    def get_success_url(self):
+        return reverse('competition_detail', kwargs={'slug': self.competition.slug})
 
 
 @class_view_decorator(login_required)

@@ -112,9 +112,11 @@ class CompetitionForm(forms.Form):
 
     def save(self):
         self.handle_shoot_fields()
+        self.instance.clean()
         self.instance.save()
         self.handle_session_fields()
         self.handle_result_mode_fields()
+        return self.instance
 
     def handle_shoot_fields(self):
         tournament, _ = Tournament.objects.get_or_create(

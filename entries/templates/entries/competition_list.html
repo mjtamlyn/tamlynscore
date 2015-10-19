@@ -2,7 +2,8 @@
 
 {% block content %}
 <header>
-    <h1>Tournaments</h1>
+    <a class="pull-right btn add" href="{% url 'competition_create' %}">New competition</a>
+    <h1>Competitions</h1>
 </header>
 
 {% if current %}
