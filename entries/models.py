@@ -38,6 +38,7 @@ class Sponsor(models.Model):
 
 class Competition(models.Model):
     tournament = models.ForeignKey(Tournament)
+    admins = models.ManyToManyField('core.User')
 
     date = models.DateField()
     end_date = models.DateField(blank=True, null=True)
@@ -86,10 +87,17 @@ class Competition(models.Model):
             self._sessions_with_rounds = sessions
             return sessions
 
+    def is_admin(self, user):
+        if user.is_anonymous():
+            return False
+        if user.is_superuser:
+            return True
+        return self.admins.filter(pk=user.pk).exists()
+
 
 class ResultsMode(models.Model):
     competition = models.ForeignKey(Competition, related_name='result_modes')
-    mode = models.CharField(max_length=31, choices=tuple(get_result_modes()))  # TODO work out how to make this not throw new migrations every time
+    mode = models.CharField(max_length=31, choices=tuple(get_result_modes()))
     leaderboard_only = models.BooleanField(default=False)
     json = models.TextField(blank=True, default='')
 

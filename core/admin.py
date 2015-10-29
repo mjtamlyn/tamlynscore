@@ -1,6 +1,12 @@
 from django.contrib import admin
 
-from core.models import Country, Region, County, Club, Archer, Bowstyle, Round, Subround
+from custom_user.admin import EmailUserAdmin
+
+from core.models import User, Country, Region, County, Club, Archer, Bowstyle, Round, Subround
+
+
+class UserAdmin(EmailUserAdmin):
+    pass
 
 
 class ArcherAdmin(admin.ModelAdmin):
@@ -35,3 +41,4 @@ admin.site.register(Archer, ArcherAdmin)
 admin.site.register(Bowstyle)
 admin.site.register(Round, RoundAdmin)
 admin.site.register(Subround)
+admin.site.register(User, UserAdmin)

@@ -1,104 +1,100 @@
-from django.contrib.auth.models import AnonymousUser
-from django.core.urlresolvers import reverse, resolve
-from django.test import TestCase, RequestFactory
+from django.core.urlresolvers import reverse
+from django.test import TestCase
 
 from core.models import Archer
 from entries.forms import ArcherSearchForm, EntryCreateForm
 from entries.models import CompetitionEntry
-from entries.views import EntryList
 
 from . import factories
+from .cases import ViewCase, LoggedInViewCase
 
 
-class LoggedInRequestFactory(RequestFactory):
+class CompetitionViewCase(ViewCase):
+    @classmethod
+    def setUpTestData(cls):
+        cls.competition = factories.CompetitionFactory.create()
+        cls.user = factories.SuperuserFactory.create()
 
-    def __init__(self, user, **kwargs):
-        self.user = user
-        return super(LoggedInRequestFactory, self).__init__(**kwargs)
-
-    def request(self, **kwargs):
-        request = super(LoggedInRequestFactory, self).request(**kwargs)
-        request.user = self.user
-        return request
+    def get_url_kwargs(self):
+        return {'slug': self.competition.slug}
 
 
-class TestEntryList(TestCase):
-    def setUp(self):
-        self.competition = factories.CompetitionFactory.create()
-        self.user = factories.UserFactory.create()
-        self.rf = LoggedInRequestFactory(self.user)
+class TestEntryList(CompetitionViewCase, LoggedInViewCase, TestCase):
+    url_name = 'entry_list'
 
     def test_simple(self):
-        view = EntryList.as_view()
-        request = self.rf.get('/')
-        response = view(request, slug=self.competition.slug)
+        response = self.get_response()
         self.assertEqual(response.status_code, 200)
-        response.render()
-
-    def test_context(self):
-        view = EntryList.as_view()
-        request = self.rf.get('/')
-        response = view(request, slug=self.competition.slug)
-        context = response.context_data
-        self.assertEqual(context['competition'], self.competition)
-
-    def test_auth(self):
-        view = EntryList.as_view()
-        request = self.rf.get('/')
-        request.user = AnonymousUser()
-        response = view(request, slug=self.competition.slug)
-        self.assertEqual(response.status_code, 302)
-
-    def test_reversal(self):
-        url = reverse('entry_list', kwargs={'slug': self.competition.slug})
-        match = resolve(url)
-        self.assertEqual(match.func.__name__, 'EntryList')
 
 
-class TestExistingArcherSingleSession(TestCase):
-    """Test the entry flow situation 1:
+class TestArcherSearch(CompetitionViewCase, LoggedInViewCase, TestCase):
+    url_name = 'archer_search'
 
-    Entering an archer already in the system into a competition with a single
-    session entry/round, using all their default values.
-    """
-
-    def setUp(self):
-        self.archer = factories.ArcherFactory.create()
-        self.session_round = factories.SessionRoundFactory.create()
-        self.competition = self.session_round.session.competition
-        self.user = factories.UserFactory.create()
-        self.client.login(username=self.user.username, password='password')
+    @classmethod
+    def setUpTestData(cls):
+        super(TestArcherSearch, cls).setUpTestData()
+        cls.archer = factories.ArcherFactory.create(name='David Longworth', club__name='Oxford Archers')
+        cls.session_round = factories.SessionRoundFactory.create(session__competition=cls.competition)
 
     def test_get_search_form(self):
-        url = reverse('archer_search', kwargs={'slug': self.competition.slug})
-        response = self.client.get(url)
+        response = self.get_response()
         self.assertEqual(response.status_code, 200)
         self.assertIsInstance(response.context['search_form'], ArcherSearchForm)
 
     def test_enter_search_term(self):
-        url = reverse('archer_search', kwargs={'slug': self.competition.slug})
         data = {'query': self.archer.name}
-        response = self.client.get(url, data=data)
+        response = self.get_response(data=data)
         self.assertEqual(response.status_code, 200)
         self.assertIsInstance(response.context['search_form'], ArcherSearchForm)
         self.assertSequenceEqual(response.context['archers'], [self.archer])
 
+    def test_bad_spelling(self):
+        data = {'query': 'dave lonworth'}
+        response = self.get_response(data=data)
+        self.assertEqual(response.status_code, 200)
+        self.assertIsInstance(response.context['search_form'], ArcherSearchForm)
+        self.assertSequenceEqual(response.context['archers'], [self.archer])
+
+    def test_club_name(self):
+        data = {'query': 'Oxford Archers'}
+        response = self.get_response(data=data)
+        self.assertEqual(response.status_code, 200)
+        self.assertIsInstance(response.context['search_form'], ArcherSearchForm)
+        self.assertSequenceEqual(response.context['archers'], [self.archer])
+
+    def test_bad_club_name(self):
+        data = {'query': 'oxford archery club'}
+        response = self.get_response(data=data)
+        self.assertEqual(response.status_code, 200)
+        self.assertIsInstance(response.context['search_form'], ArcherSearchForm)
+        self.assertSequenceEqual(response.context['archers'], [self.archer])
+
+
+class TestEntryAdd(CompetitionViewCase, LoggedInViewCase, TestCase):
+    url_name = 'entry_add'
+
+    @classmethod
+    def setUpTestData(cls):
+        super(TestEntryAdd, cls).setUpTestData()
+        cls.archer = factories.ArcherFactory.create()
+        cls.session_round = factories.SessionRoundFactory.create(session__competition=cls.competition)
+
+    def setUp(self):
+        self.competition.refresh_from_db()
+
+    def get_url_kwargs(self):
+        kwargs = super(TestEntryAdd, self).get_url_kwargs()
+        kwargs['archer_id'] = self.archer.pk
+        return kwargs
+
     def test_select_archer(self):
-        url = reverse('entry_add', kwargs={
-            'slug': self.competition.slug,
-            'archer_id': self.archer.pk,
-        })
-        response = self.client.get(url)
+        response = self.get_response()
         self.assertEqual(response.status_code, 200)
         self.assertEqual(response.context['archer'], self.archer)
         self.assertIsInstance(response.context['form'], EntryCreateForm)
 
     def test_submit_entry(self):
-        url = reverse('entry_add', kwargs={
-            'slug': self.competition.slug,
-            'archer_id': self.archer.pk,
-        })
-        response = self.client.post(url)
+        response = self.post_response()
         self.assertEqual(response.status_code, 302)
         self.assertEqual(CompetitionEntry.objects.count(), 1)
         entry = CompetitionEntry.objects.get()
@@ -107,70 +103,23 @@ class TestExistingArcherSingleSession(TestCase):
         self.assertEqual(entry.bowstyle, self.archer.bowstyle)
         self.assertEqual(entry.sessionentry_set.get().session_round, self.session_round)
 
-
-class TestMoreSearches(TestCase):
-
-    def setUp(self):
-        self.archer = factories.ArcherFactory.create(name='David Longworth', club__name='Oxford Archers')
-        self.competition = factories.CompetitionFactory.create()
-        self.user = factories.UserFactory.create()
-        self.client.login(username=self.user.username, password='password')
-
-    def test_bad_spelling(self):
-        url = reverse('archer_search', kwargs={'slug': self.competition.slug})
-        data = {'query': 'dave lonworth'}
-        response = self.client.get(url, data=data)
-        self.assertEqual(response.status_code, 200)
-        self.assertIsInstance(response.context['search_form'], ArcherSearchForm)
-        self.assertSequenceEqual(response.context['archers'], [self.archer])
-
-    def test_club_name(self):
-        url = reverse('archer_search', kwargs={'slug': self.competition.slug})
-        data = {'query': 'Oxford Archers'}
-        response = self.client.get(url, data=data)
-        self.assertEqual(response.status_code, 200)
-        self.assertIsInstance(response.context['search_form'], ArcherSearchForm)
-        self.assertSequenceEqual(response.context['archers'], [self.archer])
-
-    def test_bad_club_name(self):
-        url = reverse('archer_search', kwargs={'slug': self.competition.slug})
-        data = {'query': 'oxford archery club'}
-        response = self.client.get(url, data=data)
-        self.assertEqual(response.status_code, 200)
-        self.assertIsInstance(response.context['search_form'], ArcherSearchForm)
-        self.assertSequenceEqual(response.context['archers'], [self.archer])
-
-
-class TestMultiSession(TestCase):
-
-    def setUp(self):
-        self.archer = factories.ArcherFactory.create()
-        self.competition = factories.CompetitionFactory.create()
-        self.session_round = factories.SessionRoundFactory.create(session__competition=self.competition)
+    def setup_multisession(self):
         self.session_round_2 = factories.SessionRoundFactory.create(session__competition=self.competition)
-        self.user = factories.UserFactory.create()
-        self.client.login(username=self.user.username, password='password')
 
-    def test_select_archer(self):
-        url = reverse('entry_add', kwargs={
-            'slug': self.competition.slug,
-            'archer_id': self.archer.pk,
-        })
-        response = self.client.get(url)
+    def test_multisession_select_archer(self):
+        self.setup_multisession()
+        response = self.get_response()
         self.assertEqual(response.status_code, 200)
         self.assertEqual(response.context['archer'], self.archer)
         self.assertIsInstance(response.context['form'], EntryCreateForm)
         self.assertTrue('sessions' in response.context['form'].fields)
 
-    def test_single_session(self):
-        url = reverse('entry_add', kwargs={
-            'slug': self.competition.slug,
-            'archer_id': self.archer.pk,
-        })
+    def test_single_of_multisession(self):
+        self.setup_multisession()
         data = {
             'sessions': [self.session_round.pk],
         }
-        response = self.client.post(url, data=data)
+        response = self.post_response(data=data)
         self.assertEqual(response.status_code, 302)
         self.assertEqual(CompetitionEntry.objects.count(), 1)
         entry = CompetitionEntry.objects.get()
@@ -180,14 +129,11 @@ class TestMultiSession(TestCase):
         self.assertEqual(entry.sessionentry_set.get().session_round, self.session_round)
 
     def test_both_sessions(self):
-        url = reverse('entry_add', kwargs={
-            'slug': self.competition.slug,
-            'archer_id': self.archer.pk,
-        })
+        self.setup_multisession()
         data = {
             'sessions': [self.session_round.pk, self.session_round_2.pk],
         }
-        response = self.client.post(url, data=data)
+        response = self.post_response(data=data)
         self.assertEqual(response.status_code, 302)
         self.assertEqual(CompetitionEntry.objects.count(), 1)
         entry = CompetitionEntry.objects.get()
@@ -201,32 +147,15 @@ class TestMultiSession(TestCase):
         )
 
     def test_no_sessions_fail(self):
-        url = reverse('entry_add', kwargs={
-            'slug': self.competition.slug,
-            'archer_id': self.archer.pk,
-        })
-        response = self.client.post(url)
+        self.setup_multisession()
+        response = self.post_response()
         self.assertEqual(response.status_code, 200)
         self.assertEqual(CompetitionEntry.objects.count(), 0)
 
-
-class TestDifferentEntryDetails(TestCase):
-
-    def setUp(self):
-        self.archer = factories.ArcherFactory.create()
-        self.competition = factories.CompetitionFactory.create()
-        self.session_round = factories.SessionRoundFactory.create(session__competition=self.competition)
-        self.user = factories.UserFactory.create()
-        self.client.login(username=self.user.username, password='password')
-
     def test_different_club(self):
         other_club = factories.ClubFactory.create()
-        url = reverse('entry_add', kwargs={
-            'slug': self.competition.slug,
-            'archer_id': self.archer.pk,
-        })
         data = {'club': other_club.pk}
-        response = self.client.post(url, data)
+        response = self.post_response(data)
         self.assertEqual(response.status_code, 302)
         self.assertEqual(CompetitionEntry.objects.count(), 1)
         entry = CompetitionEntry.objects.get()
@@ -234,15 +163,11 @@ class TestDifferentEntryDetails(TestCase):
 
     def test_different_club_with_update(self):
         other_club = factories.ClubFactory.create()
-        url = reverse('entry_add', kwargs={
-            'slug': self.competition.slug,
-            'archer_id': self.archer.pk,
-        })
         data = {
             'club': other_club.pk,
             'update_club': True,
         }
-        response = self.client.post(url, data)
+        response = self.post_response(data)
         self.assertEqual(response.status_code, 302)
         self.assertEqual(CompetitionEntry.objects.count(), 1)
         entry = CompetitionEntry.objects.get()
@@ -252,12 +177,8 @@ class TestDifferentEntryDetails(TestCase):
 
     def test_different_bowstyle(self):
         other_bowstyle = factories.BowstyleFactory.create()
-        url = reverse('entry_add', kwargs={
-            'slug': self.competition.slug,
-            'archer_id': self.archer.pk,
-        })
         data = {'bowstyle': other_bowstyle.pk}
-        response = self.client.post(url, data)
+        response = self.post_response(data)
         self.assertEqual(response.status_code, 302)
         self.assertEqual(CompetitionEntry.objects.count(), 1)
         entry = CompetitionEntry.objects.get()
@@ -265,15 +186,11 @@ class TestDifferentEntryDetails(TestCase):
 
     def test_different_bowstyle_with_update(self):
         other_bowstyle = factories.BowstyleFactory.create()
-        url = reverse('entry_add', kwargs={
-            'slug': self.competition.slug,
-            'archer_id': self.archer.pk,
-        })
         data = {
             'bowstyle': other_bowstyle.pk,
             'update_bowstyle': True,
         }
-        response = self.client.post(url, data)
+        response = self.post_response(data)
         self.assertEqual(response.status_code, 302)
         self.assertEqual(CompetitionEntry.objects.count(), 1)
         entry = CompetitionEntry.objects.get()
@@ -284,13 +201,9 @@ class TestDifferentEntryDetails(TestCase):
     def test_default_experience(self):
         self.assertEqual(self.archer.novice, 'E')
         self.assertFalse(self.competition.has_novices)
-        url = reverse('entry_add', kwargs={
-            'slug': self.competition.slug,
-            'archer_id': self.archer.pk,
-        })
-        response = self.client.get(url)
+        response = self.get_response()
         self.assertNotIn('novice', response.context['form'].fields)
-        response = self.client.post(url)
+        response = self.post_response()
         self.assertEqual(response.status_code, 302)
         self.assertEqual(CompetitionEntry.objects.count(), 1)
         entry = CompetitionEntry.objects.get()
@@ -301,11 +214,7 @@ class TestDifferentEntryDetails(TestCase):
         self.archer.save()
         self.competition.has_novices = True
         self.competition.save()
-        url = reverse('entry_add', kwargs={
-            'slug': self.competition.slug,
-            'archer_id': self.archer.pk,
-        })
-        response = self.client.post(url)
+        response = self.post_response()
         self.assertEqual(response.status_code, 302)
         self.assertEqual(CompetitionEntry.objects.count(), 1)
         entry = CompetitionEntry.objects.get()
@@ -315,12 +224,8 @@ class TestDifferentEntryDetails(TestCase):
         self.assertEqual(self.archer.novice, 'E')
         self.competition.has_novices = True
         self.competition.save()
-        url = reverse('entry_add', kwargs={
-            'slug': self.competition.slug,
-            'archer_id': self.archer.pk,
-        })
         data = {'novice': 'N'}
-        response = self.client.post(url, data)
+        response = self.post_response(data)
         self.assertEqual(response.status_code, 302)
         self.assertEqual(CompetitionEntry.objects.count(), 1)
         entry = CompetitionEntry.objects.get()
@@ -330,15 +235,11 @@ class TestDifferentEntryDetails(TestCase):
         self.assertEqual(self.archer.novice, 'E')
         self.competition.has_novices = True
         self.competition.save()
-        url = reverse('entry_add', kwargs={
-            'slug': self.competition.slug,
-            'archer_id': self.archer.pk,
-        })
         data = {
             'novice': 'N',
             'update_novice': True,
         }
-        response = self.client.post(url, data)
+        response = self.post_response(data)
         self.assertEqual(response.status_code, 302)
         self.assertEqual(CompetitionEntry.objects.count(), 1)
         entry = CompetitionEntry.objects.get()
@@ -349,13 +250,9 @@ class TestDifferentEntryDetails(TestCase):
     def test_default_age(self):
         self.assertEqual(self.archer.age, 'S')
         self.assertFalse(self.competition.has_juniors)
-        url = reverse('entry_add', kwargs={
-            'slug': self.competition.slug,
-            'archer_id': self.archer.pk,
-        })
-        response = self.client.get(url)
+        response = self.get_response()
         self.assertNotIn('age', response.context['form'].fields)
-        response = self.client.post(url)
+        response = self.post_response()
         self.assertEqual(response.status_code, 302)
         self.assertEqual(CompetitionEntry.objects.count(), 1)
         entry = CompetitionEntry.objects.get()
@@ -366,11 +263,7 @@ class TestDifferentEntryDetails(TestCase):
         self.archer.save()
         self.competition.has_juniors = True
         self.competition.save()
-        url = reverse('entry_add', kwargs={
-            'slug': self.competition.slug,
-            'archer_id': self.archer.pk,
-        })
-        response = self.client.post(url)
+        response = self.post_response()
         self.assertEqual(response.status_code, 302)
         self.assertEqual(CompetitionEntry.objects.count(), 1)
         entry = CompetitionEntry.objects.get()
@@ -380,12 +273,8 @@ class TestDifferentEntryDetails(TestCase):
         self.assertEqual(self.archer.age, 'S')
         self.competition.has_juniors = True
         self.competition.save()
-        url = reverse('entry_add', kwargs={
-            'slug': self.competition.slug,
-            'archer_id': self.archer.pk,
-        })
         data = {'age': 'J'}
-        response = self.client.post(url, data)
+        response = self.post_response(data)
         self.assertEqual(response.status_code, 302)
         self.assertEqual(CompetitionEntry.objects.count(), 1)
         entry = CompetitionEntry.objects.get()
@@ -395,15 +284,11 @@ class TestDifferentEntryDetails(TestCase):
         self.assertEqual(self.archer.age, 'S')
         self.competition.has_juniors = True
         self.competition.save()
-        url = reverse('entry_add', kwargs={
-            'slug': self.competition.slug,
-            'archer_id': self.archer.pk,
-        })
         data = {
             'age': 'J',
             'update_age': True,
         }
-        response = self.client.post(url, data)
+        response = self.post_response(data)
         self.assertEqual(response.status_code, 302)
         self.assertEqual(CompetitionEntry.objects.count(), 1)
         entry = CompetitionEntry.objects.get()
@@ -412,24 +297,25 @@ class TestDifferentEntryDetails(TestCase):
         self.assertEqual(archer.age, 'J')
 
 
-class TestEntryDelete(TestCase):
+class TestEntryDelete(CompetitionViewCase, LoggedInViewCase, TestCase):
+    url_name = 'entry_delete'
 
-    def setUp(self):
-        self.entry = factories.CompetitionEntryFactory.create()
-        self.competition = self.entry.competition
-        self.url = reverse('entry_delete', kwargs={
-            'slug': self.competition.slug,
-            'entry_id': self.entry.pk,
-        })
-        self.user = factories.UserFactory.create()
-        self.client.login(username=self.user.username, password='password')
+    @classmethod
+    def setUpTestData(cls):
+        super(TestEntryDelete, cls).setUpTestData()
+        cls.entry = factories.CompetitionEntryFactory.create(competition=cls.competition)
+
+    def get_url_kwargs(self):
+        kwargs = super(TestEntryDelete, self).get_url_kwargs()
+        kwargs['entry_id'] = self.entry.pk
+        return kwargs
 
     def test_get(self):
-        response = self.client.get(self.url)
+        response = self.get_response()
         self.assertEqual(response.status_code, 200)
 
     def test_delete(self):
-        response = self.client.post(self.url)
+        response = self.post_response()
         success_url = reverse('entry_list', kwargs={'slug': self.competition.slug})
         self.assertRedirects(response, success_url)
         self.assertEqual(CompetitionEntry.objects.count(), 0)

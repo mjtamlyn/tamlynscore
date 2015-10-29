@@ -4,6 +4,8 @@ from django.core.urlresolvers import reverse
 from django.db import models
 from django.template.defaultfilters import slugify
 
+from custom_user.models import AbstractEmailUser
+
 
 DISTANCE_UNITS = (
     ('m', 'metres'),
@@ -43,6 +45,10 @@ WA_AGE_CHOICES = (
     ('', 'Senior'),  # Map senior to '' as we never really print it
     ('M', 'Master'),
 )
+
+
+class User(AbstractEmailUser):
+    pass
 
 
 class Subround(models.Model):

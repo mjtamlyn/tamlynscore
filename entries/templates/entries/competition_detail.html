@@ -2,7 +2,9 @@
 
 {% block content %}
 <header>
-    <a class="pull-right btn edit" href="{% url 'competition_update' slug=competition.slug %}">Edit</a>
+    {% if competition_admin %}
+        <a class="pull-right btn edit" href="{% url 'competition_update' slug=competition.slug %}">Edit</a>
+    {% endif %}
     <a href="{% url 'competition_detail' slug=competition.slug %}"><h1>{{ competition }}</h1></a>
 </header>
 
@@ -10,27 +12,21 @@
 <nav class="competition-nav">
     {% with competition.result_modes.all as modes %}
     <ul>
-        <li><a href="{% url 'entry_list' slug=competition.slug %}">Manage Entries</a></li>
-        <li><a href="{% url 'target_list' slug=competition.slug %}">Target lists</a></li>
-        <li><a href="{% url 'score_sheets' slug=competition.slug %}">Score sheets</a></li>
-        <li><a href="{% url 'registration' slug=competition.slug %}">Registration</a></li>
-        {% if competition.use_county_teams %}
-        <li><a href="{% url 'input_scores_team' slug=competition.slug %}">Input scores</a></li>
-        {% else %}
-        <li><a href="{% url 'input_scores' slug=competition.slug %}">Input scores</a></li>
+        {% if competition_admin %}
+            <li><a href="{% url 'entry_list' slug=competition.slug %}">Manage Entries</a></li>
+            <li><a href="{% url 'target_list' slug=competition.slug %}">Target lists</a></li>
+            <li><a href="{% url 'score_sheets' slug=competition.slug %}">Score sheets</a></li>
+            <li><a href="{% url 'registration' slug=competition.slug %}">Registration</a></li>
+            {% if competition.use_county_teams %}
+            <li><a href="{% url 'input_scores_team' slug=competition.slug %}">Input scores</a></li>
+            {% else %}
+            <li><a href="{% url 'input_scores' slug=competition.slug %}">Input scores</a></li>
+            {% endif %}
         {% endif %}
-        <!--li><a href="{% url 'input_scores_mobile' slug=competition.slug %}">Input scores (mobile view)</a></li-->
         <li><p class="drop">Leaderboards</p>
             <ul>
             {% for mode in modes %}
-                <li><a href="{% url 'new_leaderboard' slug=competition.slug mode=mode.mode format='html' %}">{{ mode }}</a></li>
-            {% empty %}
-                <li><a href="{% url 'leaderboard' slug=competition.slug %}">By session</a></li>
-                <li><a href="{% url 'leaderboard_combined' slug=competition.slug %}">Combined</a></li>
-                <li><a href="{% url 'leaderboard_combined_experienced' slug=competition.slug %}">Experienced</a></li>
-                <li><a href="{% url 'leaderboard_combined_novice' slug=competition.slug %}">Novice</a></li>
-                <li><a href="{% url 'leaderboard_teams' slug=competition.slug %}">Teams</a></li>
-                <li><a href="{% url 'leaderboard_summary' slug=competition.slug %}">Summary</a></li>
+                <li><a href="{% url 'leaderboard' slug=competition.slug mode=mode.mode format='html' %}">{{ mode }}</a></li>
             {% endfor %}
             </ul>
         </li>
@@ -38,13 +34,15 @@
             <ul>
             {% for mode in modes %}
             {% if not mode.leaderboard_only %}
-                <li><a href="{% url 'new_results' slug=competition.slug mode=mode.mode format='html' %}">{{ mode }}</a></li>
+                <li><a href="{% url 'results' slug=competition.slug mode=mode.mode format='html' %}">{{ mode }}</a></li>
             {% endif %}
             {% endfor %}
             </ul>
         </li>
-        <li><a href="{% url 'olympic_index' slug=competition.slug %}">Head to heads</a></li>
-        <li><a href="{% url 'rankings_export' slug=competition.slug %}">Rankings Export</a></li>
+        {% if competition_admin %}
+            <li><a href="{% url 'olympic_index' slug=competition.slug %}">Head to heads</a></li>
+            <li><a href="{% url 'rankings_export' slug=competition.slug %}">Rankings Export</a></li>
+        {% endif %}
     </ul>
     {% endwith %}
 </nav>
