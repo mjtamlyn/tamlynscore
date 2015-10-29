@@ -38,7 +38,7 @@ class Sponsor(models.Model):
 
 class Competition(models.Model):
     tournament = models.ForeignKey(Tournament)
-    admins = models.ManyToManyField('core.User')
+    admins = models.ManyToManyField('core.User', blank=False)
 
     date = models.DateField()
     end_date = models.DateField(blank=True, null=True)
