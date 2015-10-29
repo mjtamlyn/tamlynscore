@@ -88,12 +88,12 @@ INSTALLED_APPS = (
     'scores',
     'olympic',
     'accounts',
-
 )
 
 TEST_RUNNER = 'tests.runner.ScoringRunner'
 
 LOGIN_REDIRECT_URL = '/'
+AUTH_USER_MODEL = 'core.User'
 
 CACHES = {
     'default': {

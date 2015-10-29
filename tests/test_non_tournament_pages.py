@@ -16,7 +16,7 @@ class BasicPageTest(object):
     def login(self):
         if self.user is None:
             self.user = factories.UserFactory.create()
-        logged_in = self.client.login(username=self.user.username, password=self.user.raw_password)
+        logged_in = self.client.login(username=self.user.email, password=self.user.raw_password)
         self.assertTrue(logged_in)
 
     def reverse(self):

@@ -67,7 +67,7 @@ class TestExistingArcherSingleSession(TestCase):
         self.session_round = factories.SessionRoundFactory.create()
         self.competition = self.session_round.session.competition
         self.user = factories.UserFactory.create()
-        self.client.login(username=self.user.username, password='password')
+        self.client.login(username=self.user.email, password='password')
 
     def test_get_search_form(self):
         url = reverse('archer_search', kwargs={'slug': self.competition.slug})
@@ -114,7 +114,7 @@ class TestMoreSearches(TestCase):
         self.archer = factories.ArcherFactory.create(name='David Longworth', club__name='Oxford Archers')
         self.competition = factories.CompetitionFactory.create()
         self.user = factories.UserFactory.create()
-        self.client.login(username=self.user.username, password='password')
+        self.client.login(username=self.user.email, password='password')
 
     def test_bad_spelling(self):
         url = reverse('archer_search', kwargs={'slug': self.competition.slug})
@@ -149,7 +149,7 @@ class TestMultiSession(TestCase):
         self.session_round = factories.SessionRoundFactory.create(session__competition=self.competition)
         self.session_round_2 = factories.SessionRoundFactory.create(session__competition=self.competition)
         self.user = factories.UserFactory.create()
-        self.client.login(username=self.user.username, password='password')
+        self.client.login(username=self.user.email, password='password')
 
     def test_select_archer(self):
         url = reverse('entry_add', kwargs={
@@ -217,7 +217,7 @@ class TestDifferentEntryDetails(TestCase):
         self.competition = factories.CompetitionFactory.create()
         self.session_round = factories.SessionRoundFactory.create(session__competition=self.competition)
         self.user = factories.UserFactory.create()
-        self.client.login(username=self.user.username, password='password')
+        self.client.login(username=self.user.email, password='password')
 
     def test_different_club(self):
         other_club = factories.ClubFactory.create()
@@ -422,7 +422,7 @@ class TestEntryDelete(TestCase):
             'entry_id': self.entry.pk,
         })
         self.user = factories.UserFactory.create()
-        self.client.login(username=self.user.username, password='password')
+        self.client.login(username=self.user.email, password='password')
 
     def test_get(self):
         response = self.client.get(self.url)
