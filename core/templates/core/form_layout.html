@@ -3,10 +3,8 @@
 {% block forms %}
 	<form action="" method="post">
 		{% csrf_token %}
-		{% if archer_name %}
-			<h2>{{ archer_name }}</h2>
-		{% else %}
-			<h2>Add archer</h2>
+		{% if form_title %}
+			<h2>{{ form_title }}</h2>
 		{% endif %}
 		{{ block.super }}
 		<p><input type="submit" class="btn"></p>
