@@ -811,6 +811,7 @@ class Weekend(BaseResultMode):
 
 def get_result_modes():
     modes = BaseResultMode.__subclasses__()
+    modes = sorted(modes, key=lambda m: m.slug)
     return [(mode.slug, mode.name) for mode in modes]
 
 

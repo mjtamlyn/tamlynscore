@@ -1,4 +1,3 @@
-from django.contrib.auth.models import User
 from django.utils import timezone
 
 from core import models as core_models
@@ -11,21 +10,22 @@ from factory import fuzzy
 
 class UserFactory(factory.DjangoModelFactory):
     class Meta:
-        model = User
-    first_name = factory.Sequence(lambda n: 'Firstname {0}'.format(n))
-    last_name = factory.Sequence(lambda n: 'Lastname {0}'.format(n))
-    username = factory.Sequence(lambda n: 'user-{0}'.format(n).lower())
-    email = factory.LazyAttribute(lambda a: '{0}@example.com'.format(a.username).lower())
+        model = core_models.User
+    email = factory.Sequence(lambda n: 'user-{0}@example.com'.format(n).lower())
 
     @classmethod
     def _prepare(cls, create, **kwargs):
         password = kwargs.pop('password', 'password')
         user = super(UserFactory, cls)._prepare(create=False, **kwargs)
         user.set_password(password)
-        user.raw_password = password
+        user.plain_password = password
         if create:
             user.save()
         return user
+
+
+class SuperuserFactory(UserFactory):
+    is_superuser = True
 
 
 class BowstyleFactory(factory.DjangoModelFactory):
@@ -37,9 +37,9 @@ class BowstyleFactory(factory.DjangoModelFactory):
 class ClubFactory(factory.DjangoModelFactory):
     class Meta:
         model = core_models.Club
-    name = factory.Sequence(lambda n: 'Name %s' % n)
-    short_name = factory.Sequence(lambda n: 'Short Name %s' % n)
-    slug = factory.Sequence(lambda n: 'name-%s' % n)
+    name = factory.Sequence(lambda n: 'Club %s Company of Archers' % n)
+    short_name = factory.Sequence(lambda n: 'Club %s' % n)
+    slug = factory.Sequence(lambda n: 'club-%s' % n)
 
 
 class ArcherFactory(factory.DjangoModelFactory):
