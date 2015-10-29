@@ -18,10 +18,14 @@ class UserFactory(factory.DjangoModelFactory):
         password = kwargs.pop('password', 'password')
         user = super(UserFactory, cls)._prepare(create=False, **kwargs)
         user.set_password(password)
-        user.raw_password = password
+        user.plain_password = password
         if create:
             user.save()
         return user
+
+
+class SuperuserFactory(UserFactory):
+    is_superuser = True
 
 
 class BowstyleFactory(factory.DjangoModelFactory):
@@ -33,9 +37,9 @@ class BowstyleFactory(factory.DjangoModelFactory):
 class ClubFactory(factory.DjangoModelFactory):
     class Meta:
         model = core_models.Club
-    name = factory.Sequence(lambda n: 'Name %s' % n)
-    short_name = factory.Sequence(lambda n: 'Short Name %s' % n)
-    slug = factory.Sequence(lambda n: 'name-%s' % n)
+    name = factory.Sequence(lambda n: 'Club %s Company of Archers' % n)
+    short_name = factory.Sequence(lambda n: 'Club %s' % n)
+    slug = factory.Sequence(lambda n: 'club-%s' % n)
 
 
 class ArcherFactory(factory.DjangoModelFactory):

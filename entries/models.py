@@ -92,7 +92,7 @@ class Competition(models.Model):
             return False
         if user.is_superuser:
             return True
-        return self.competition.admins.filter(pk=user.pk).exists()
+        return self.admins.filter(pk=user.pk).exists()
 
 
 class ResultsMode(models.Model):
