@@ -431,7 +431,7 @@ class PdfView(View):
     PAGE_HEIGHT = defaultPageSize[1]
     PAGE_WIDTH = defaultPageSize[0]
 
-    def set_options(self, round_id=None, session_id=None):
+    def set_options(self, slug=None, round_id=None, session_id=None):
         if round_id:
             self.session_round = get_object_or_404(SessionRound, pk=round_id)
         else:

@@ -36,6 +36,7 @@ class OlympicIndex(CompetitionMixin, View):
 
         if 'remove-all' in request.GET:
             Seeding.objects.filter(session_round__pk=request.GET['remove-all']).delete()
+        competition = self.competition
         return render(request, 'olympic_index.html', locals())
 
     def post(self, request, slug):

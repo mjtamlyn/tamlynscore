@@ -40,7 +40,9 @@
             </ul>
         </li>
         {% if competition_admin %}
-            <li><a href="{% url 'olympic_index' slug=competition.slug %}">Head to heads</a></li>
+            {% if competition.has_olympic %}
+                <li><a href="{% url 'olympic_index' slug=competition.slug %}">Head to heads</a></li>
+            {% endif %}
             <li><a href="{% url 'rankings_export' slug=competition.slug %}">Rankings Export</a></li>
         {% endif %}
     </ul>

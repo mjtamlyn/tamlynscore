@@ -87,6 +87,9 @@ class Competition(models.Model):
             self._sessions_with_rounds = sessions
             return sessions
 
+    def has_olympic(self):
+        return self.session_set.filter(olympicsessionround__isnull=False).exists()
+
     def is_admin(self, user):
         if user.is_anonymous():
             return False
