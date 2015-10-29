@@ -17,7 +17,6 @@ urlpatterns = [
     url(r'^(?P<slug>(\w+-?)+)/leaderboard/combined/experienced/$', views.LeaderboardCombinedExperienced.as_view(), name='leaderboard_combined_experienced'),
     url(r'^(?P<slug>(\w+-?)+)/leaderboard/combined/novice/$', views.LeaderboardCombinedNovice.as_view(), name='leaderboard_combined_novice'),
     url(r'^(?P<slug>(\w+-?)+)/leaderboard/teams/$', views.LeaderboardTeams.as_view(), name='leaderboard_teams'),
-    url(r'^(?P<slug>(\w+-?)+)/leaderboard/butc/$', views.LeaderboardBUTC.as_view(), name='leaderboard_butc'),
     url(r'^(?P<slug>(\w+-?)+)/leaderboard/summary/$', views.LeaderboardSummary.as_view(), name='leaderboard_summary'),
     url(r'^(?P<slug>(\w+-?)+)/leaderboard/big-screen/$', views.LeaderboardBigScreen.as_view(), name='leaderboard_big_screen'),
     url(r'^(?P<slug>(\w+-?)+)/leaderboard/big-screen/(?P<session_id>\d+)/$', views.LeaderboardBigScreenSession.as_view(), name='leaderboard_big_screen_session'),
