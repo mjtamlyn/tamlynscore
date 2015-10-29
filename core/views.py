@@ -2,13 +2,13 @@ import copy
 
 from django.core.cache import cache
 from django.core.urlresolvers import reverse
-from django.contrib.auth.decorators import login_required
 from django.db.models import Prefetch
 from django.shortcuts import get_object_or_404
 from django.views.generic import TemplateView, ListView, DetailView, UpdateView, CreateView
 
+from braces.views import LoginRequiredMixin, SuperuserRequiredMixin
+
 from entries.models import CompetitionEntry
-from scoring.utils import class_view_decorator
 from scores.models import Score
 
 from .models import County, Club, Archer
@@ -32,17 +32,14 @@ class ClubMixin(object):
         return super().get_context_data(club=self.club, **kwargs)
 
 
-@class_view_decorator(login_required)
 class Index(TemplateView):
     template_name = 'index.html'
 
 
-@class_view_decorator(login_required)
 class ClubList(ListView):
     model = Club
 
 
-@class_view_decorator(login_required)
 class ClubDetail(ClubMixin, TemplateView):
     template_name = 'core/club_detail.html'
 
@@ -57,15 +54,13 @@ class ClubDetail(ClubMixin, TemplateView):
         return context
 
 
-@class_view_decorator(login_required)
-class ClubUpdate(ClubMixin, UpdateView):
+class ClubUpdate(SuperuserRequiredMixin, ClubMixin, UpdateView):
     fields = '__all__'
 
     def get_object(self):
         return self.club
 
 
-@class_view_decorator(login_required)
 class ArchiveArcherList(ClubMixin, ListView):
     template_name = 'core/archive_archers.html'
     context_object_name = 'archers'
@@ -74,8 +69,7 @@ class ArchiveArcherList(ClubMixin, ListView):
         return self.get_archer_queryset().filter(archived=True)
 
 
-@class_view_decorator(login_required)
-class ClubCreate(CreateView):
+class ClubCreate(LoginRequiredMixin, CreateView):
     model = Club
     fields = '__all__'
 
@@ -83,8 +77,7 @@ class ClubCreate(CreateView):
         return self.request.GET.get('next') or super(ClubCreate, self).get_success_url()
 
 
-@class_view_decorator(login_required)
-class CountyCreate(CreateView):
+class CountyCreate(SuperuserRequiredMixin, CreateView):
     model = County
     fields = '__all__'
 
@@ -92,7 +85,6 @@ class CountyCreate(CreateView):
         return self.request.GET.get('next') or reverse('home')
 
 
-@class_view_decorator(login_required)
 class ArcherDetail(DetailView):
     model = Archer
 
@@ -112,8 +104,7 @@ class ArcherDetail(DetailView):
         return super(ArcherDetail, self).get_context_data(shoots=shoots, **kwargs)
 
 
-@class_view_decorator(login_required)
-class ArcherUpdate(UpdateView):
+class ArcherUpdate(LoginRequiredMixin, UpdateView):
     model = Archer
     form_class = ArcherForm
 
@@ -121,8 +112,7 @@ class ArcherUpdate(UpdateView):
         return self.request.GET.get('next') or self.request.path
 
 
-@class_view_decorator(login_required)
-class ArcherCreate(CreateView):
+class ArcherCreate(LoginRequiredMixin, CreateView):
     model = Archer
     form_class = ArcherForm
 
@@ -152,8 +142,7 @@ class ArcherCreate(CreateView):
         return self.object.club.get_absolute_url()
 
 
-@class_view_decorator(login_required)
-class ArcherArchive(UpdateView):
+class ArcherArchive(LoginRequiredMixin, UpdateView):
     model = Archer
     fields = ['archived']
 

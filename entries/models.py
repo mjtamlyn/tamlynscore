@@ -38,6 +38,7 @@ class Sponsor(models.Model):
 
 class Competition(models.Model):
     tournament = models.ForeignKey(Tournament)
+    admins = models.ManyToManyField('core.User')
 
     date = models.DateField()
     end_date = models.DateField(blank=True, null=True)
@@ -85,6 +86,13 @@ class Competition(models.Model):
             sessions = self.session_set.order_by('start').prefetch_related('sessionround_set')
             self._sessions_with_rounds = sessions
             return sessions
+
+    def is_admin(self, user):
+        if user.is_anonymous():
+            return False
+        if user.is_superuser:
+            return True
+        return self.competition.admins.filter(pk=user.pk).exists()
 
 
 class ResultsMode(models.Model):

@@ -4,7 +4,6 @@ import itertools
 import json
 import math
 
-from django.contrib.auth.decorators import login_required
 from django.core.urlresolvers import reverse
 from django.db.models import Prefetch
 from django.http import HttpResponse, HttpResponseBadRequest, HttpResponseRedirect, Http404
@@ -13,6 +12,7 @@ from django.views.generic import View, DetailView, ListView, TemplateView, Updat
 from django.shortcuts import get_object_or_404
 from django.utils import timezone
 
+from braces.views import MessageMixin, SuperuserRequiredMixin
 from reportlab.platypus import SimpleDocTemplate, Paragraph, Spacer, Table, PageBreak, TableStyle, KeepTogether
 from reportlab.lib.styles import getSampleStyleSheet
 from reportlab.rl_config import defaultPageSize
@@ -20,7 +20,6 @@ from reportlab.lib import colors
 from reportlab.lib.units import inch
 
 from core.models import Archer
-from scoring.utils import class_view_decorator
 
 from .forms import ArcherSearchForm, CompetitionForm, EntryCreateForm, EntryUpdateForm
 from .models import (
@@ -29,7 +28,6 @@ from .models import (
 )
 
 
-@class_view_decorator(login_required)
 class CompetitionList(ListView):
     model = Competition
 
@@ -46,8 +44,7 @@ class CompetitionList(ListView):
         return context
 
 
-@class_view_decorator(login_required)
-class CompetitionCreate(FormView):
+class CompetitionCreate(SuperuserRequiredMixin, FormView):
     form_class = CompetitionForm
     template_name = 'entries/competition_form.html'
 
@@ -59,22 +56,29 @@ class CompetitionCreate(FormView):
         return reverse('competition_detail', kwargs={'slug': self.competition.slug})
 
 
-@class_view_decorator(login_required)
-class CompetitionDetail(DetailView):
-    model = Competition
-    object_name = 'competition'
+class CompetitionMixin(MessageMixin):
+    admin_required = True
 
-
-class CompetitionMixin(object):
     def dispatch(self, request, *args, **kwargs):
         self.competition = get_object_or_404(Competition, slug=kwargs['slug'])
+        self.is_admin = self.competition.is_admin(self.request.user)
+        if self.admin_required and not self.is_admin:
+            self.messages.error('You must be logged in as a competition admin to do that.')
+            return HttpResponseRedirect(reverse('competition_detail', kwargs={'slug': self.kwargs['slug']}))
         return super(CompetitionMixin, self).dispatch(request, *args, **kwargs)
 
     def get_context_data(self, **kwargs):
-        return super(CompetitionMixin, self).get_context_data(competition=self.competition, **kwargs)
+        return super(CompetitionMixin, self).get_context_data(competition=self.competition, competition_admin=self.is_admin, **kwargs)
 
 
-@class_view_decorator(login_required)
+class CompetitionDetail(CompetitionMixin, DetailView):
+    admin_required = False
+    object_name = 'competition'
+
+    def get_object(self):
+        return self.competition
+
+
 class CompetitionUpdate(CompetitionMixin, FormView):
     form_class = CompetitionForm
     template_name = 'entries/competition_form.html'
@@ -92,7 +96,6 @@ class CompetitionUpdate(CompetitionMixin, FormView):
         return reverse('competition_detail', kwargs={'slug': self.competition.slug})
 
 
-@class_view_decorator(login_required)
 class EntryList(CompetitionMixin, ListView):
     model = CompetitionEntry
     template_name = 'entries/entry_list.html'
@@ -164,7 +167,6 @@ class EntryList(CompetitionMixin, ListView):
         return context
 
 
-@class_view_decorator(login_required)
 class ArcherSearch(CompetitionMixin, TemplateView):
     template_name = 'entries/archer_search.html'
 
@@ -184,7 +186,6 @@ class ArcherSearch(CompetitionMixin, TemplateView):
         return self.render_to_response(context)
 
 
-@class_view_decorator(login_required)
 class EntryAdd(CompetitionMixin, DetailView):
     model = Archer
     pk_url_kwarg = 'archer_id'
@@ -234,7 +235,6 @@ class EntryUpdate(CompetitionMixin, UpdateView):
         return reverse('entry_list', kwargs={'slug': self.competition.slug})
 
 
-@class_view_decorator(login_required)
 class EntryDelete(CompetitionMixin, DeleteView):
     model = CompetitionEntry
     pk_url_kwarg = 'entry_id'
@@ -244,14 +244,13 @@ class EntryDelete(CompetitionMixin, DeleteView):
         return reverse('entry_list', kwargs={'slug': self.competition.slug})
 
 
-@class_view_decorator(login_required)
-class TargetList(ListView):
+class TargetList(CompetitionMixin, ListView):
     template_name = 'entries/target_list.html'
     model = TargetAllocation
 
     def get_queryset(self):
         return self.model.objects.filter(
-            session_entry__competition_entry__competition__slug=self.kwargs['slug'],
+            session_entry__competition_entry__competition=self.competition,
         ).select_related(
             'session_entry__competition_entry__competition__tournament',
             'session_entry__session_round__session',
@@ -372,7 +371,6 @@ class TargetList(ListView):
         self.add_unallocated_entries(target_list)
 
         context.update({
-            'competition': self.competition,
             'target_list': target_list
         })
         return context
@@ -416,23 +414,13 @@ class Registration(TargetList):
         return HttpResponse('ok')
 
 
-@class_view_decorator(login_required)
-class ScoreSheets(ListView):
+class ScoreSheets(CompetitionMixin, ListView):
     template_name = 'entries/score_sheets.html'
 
     def get_queryset(self):
         return SessionRound.objects.filter(
-            session__competition__slug=self.kwargs['slug']
+            session__competition=self.competition,
         ).select_related('session', 'shot_round', 'session__competition__tournament')
-
-    def get_context_data(self, **kwargs):
-        context = super(ScoreSheets, self).get_context_data(**kwargs)
-        rounds = context['object_list']
-        if rounds:
-            context['competition'] = rounds[0].session.competition
-        else:
-            context['competition'] = Competition.objects.get(slug=self.kwargs['slug'])
-        return context
 
 
 # PDF views
@@ -443,11 +431,7 @@ class PdfView(View):
     PAGE_HEIGHT = defaultPageSize[1]
     PAGE_WIDTH = defaultPageSize[0]
 
-    def set_options(self, slug=None, round_id=None, session_id=None):
-        if slug:
-            self.competition = get_object_or_404(Competition, slug=slug)
-        else:
-            self.competition = None
+    def set_options(self, round_id=None, session_id=None):
         if round_id:
             self.session_round = get_object_or_404(SessionRound, pk=round_id)
         else:
@@ -528,7 +512,7 @@ class HeadedPdfView(PdfView):
         return response
 
 
-class TargetListPdf(HeadedPdfView):
+class TargetListPdf(CompetitionMixin, HeadedPdfView):
     title = 'Target List'
     lunch = False
 
@@ -570,16 +554,12 @@ class TargetListPdf(HeadedPdfView):
             elements += [spacer, table, spacer, PageBreak()]
         return elements
 
-target_list_pdf = login_required(TargetListPdf.as_view())
-
 
 class TargetListLunch(TargetListPdf):
     lunch = True
-target_list_lunch = login_required(TargetListLunch.as_view())
 
 
-@class_view_decorator(login_required)
-class ScoreSheetsPdf(HeadedPdfView):
+class ScoreSheetsPdf(CompetitionMixin, HeadedPdfView):
 
     box_size = 0.32 * inch
     wide_box = box_size * 1.35
@@ -866,6 +846,3 @@ class RunningSlipsPdf(ScoreSheetsPdf):
         ('BOX', (0, 0), (-1, -1), 2, colors.black),
         ('INNERGRID', (0, 0), (-1, -1), 0.25, colors.black),
     ])
-
-
-running_slips_pdf = login_required(RunningSlipsPdf.as_view())

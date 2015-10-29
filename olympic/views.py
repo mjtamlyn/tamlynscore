@@ -1,7 +1,6 @@
 from collections import OrderedDict
 
 from django.core.urlresolvers import reverse
-from django.contrib.auth.decorators import login_required
 from django.db.models import Max, Prefetch
 from django.http import HttpResponseRedirect
 from django.views.generic import View, TemplateView, FormView
@@ -12,23 +11,19 @@ from reportlab.lib.units import inch
 from reportlab.platypus import KeepTogether, PageBreak, Spacer, Table, TableStyle
 from reportlab.rl_config import defaultPageSize
 
-from entries.models import Competition
 from entries.views import CompetitionMixin, ScoreSheetsPdf, HeadedPdfView
 from scores.models import Score
 from scores.result_modes import BaseResultMode
 from scores.views import PDFResultsRenderer
-from scoring.utils import class_view_decorator
 from olympic.models import OlympicSessionRound, Seeding, Match, Result
 from olympic.forms import ResultForm, SetupForm
 
 from itertools import groupby
 
 
-@class_view_decorator(login_required)
-class OlympicIndex(View):
+class OlympicIndex(CompetitionMixin, View):
     def get(self, request, slug):
-        competition = get_object_or_404(Competition, slug=slug)
-        session_rounds = OlympicSessionRound.objects.filter(session__competition=competition).order_by('session__start').select_related()
+        session_rounds = OlympicSessionRound.objects.filter(session__competition=self.competition).order_by('session__start').select_related()
         session_info = [(
             session_round.session,
             session_round,
@@ -102,7 +97,6 @@ class FieldPlanMixin(CompetitionMixin):
         return context
 
 
-@class_view_decorator(login_required)
 class OlympicSetup(FieldPlanMixin, FormView):
     form_class = SetupForm
     template_name = 'olympic/setup.html'
@@ -120,10 +114,8 @@ class OlympicSetup(FieldPlanMixin, FormView):
         return self.request.get_full_path()
 
 
-@class_view_decorator(login_required)
 class OlympicSeedingsPDF(PDFResultsRenderer, View):
     def get(self, request, slug):
-        self.competition = get_object_or_404(Competition, slug=slug)
         self.title = 'Seedings'
         session_rounds = OlympicSessionRound.objects.filter(session__competition=self.competition).order_by('session__start').select_related()
         results = OrderedDict()
@@ -150,14 +142,12 @@ class OlympicSeedingsPDF(PDFResultsRenderer, View):
         return self.render_to_pdf({'results': results})
 
 
-@class_view_decorator(login_required)
 class OlympicInput(TemplateView):
     template_name = 'olympic/input.html'
 
     labels = ['Bronze', 'Final', 'Semi', '1/4', '1/8', '1/16', '1/32', '1/64']
 
     def dispatch(self, request, slug, seed_pk):
-        self.competition = get_object_or_404(Competition, slug=slug)
         self.seed = get_object_or_404(Seeding.objects.select_related(), pk=seed_pk)
         self.results = self.seed.result_set.all()
         highest_level = Match.objects.filter(session_round=self.seed.session_round).order_by('-level')[0].level
@@ -195,7 +185,6 @@ class OlympicInput(TemplateView):
 
     def get_context_data(self):
         return {
-            'competition': self.competition,
             'seed': self.seed,
             'results': self.results,
             'forms': self.forms,
@@ -211,7 +200,6 @@ class OlympicInput(TemplateView):
         return HttpResponseRedirect(reverse('olympic_index', kwargs={'slug': self.competition.slug}))
 
 
-@class_view_decorator(login_required)
 class OlympicScoreSheet(ScoreSheetsPdf):
     box_size = 0.35 * inch
     wide_box = box_size * 1.3
@@ -228,8 +216,6 @@ class OlympicScoreSheet(ScoreSheetsPdf):
     ]
 
     def set_options(self, slug=None, round_id=None):
-        if slug:
-            self.competition = get_object_or_404(Competition, slug=slug)
         if round_id:
             self.session_round = get_object_or_404(OlympicSessionRound, pk=round_id)
             if self.competition.sponsors.exists():
@@ -361,8 +347,7 @@ class OlympicScoreSheet(ScoreSheetsPdf):
     ])
 
 
-@class_view_decorator(login_required)
-class OlympicResults(HeadedPdfView):
+class OlympicResults(CompetitionMixin, HeadedPdfView):
     title = 'Results'
 
     match_headers = ['1/64', '1/32', '1/16', '1/8', 'QF', 'SF', 'F']
@@ -422,7 +407,6 @@ class OlympicResults(HeadedPdfView):
     ))
 
 
-@class_view_decorator(login_required)
 class OlympicTree(OlympicResults):
 
     PAGE_HEIGHT = defaultPageSize[0]
@@ -567,7 +551,6 @@ class OlympicTree(OlympicResults):
         return elements
 
 
-@class_view_decorator(login_required)
 class FieldPlan(FieldPlanMixin, HeadedPdfView):
     title = 'Field plan'
     PAGE_HEIGHT = defaultPageSize[0]
