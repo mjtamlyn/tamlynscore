@@ -6,5 +6,5 @@
 {% endblock %}
 
 {% block content %}
-    {% form form using "core/archer_form_layout.html" with archer_name=form.instance.name %}
+    {% form form using "core/form_layout.html" with form_title=form.instance.name|default:"Add archer" %}
 {% endblock %}
