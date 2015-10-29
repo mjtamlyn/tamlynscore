@@ -7,3 +7,4 @@ fabfile.py
 collected_static/
 *.json
 *.dump
+env/

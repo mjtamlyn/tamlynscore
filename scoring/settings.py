@@ -82,6 +82,7 @@ INSTALLED_APPS = (
     'django.contrib.admin',
     'gunicorn',
     'debug_toolbar',
+    'floppyforms',
 
     'scoring',
     'core',
