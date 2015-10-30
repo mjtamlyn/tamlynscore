@@ -1,0 +1,18 @@
+{% extends 'base.html' %}
+
+{% load floppyforms %}
+
+{% block content %}
+    {% if validlink %}
+    <h2>Welcome to Archery Scoring!</h2>
+    <p>Set a password to activate your account</p>
+    <form class="form" method="POST" action=".">
+        {% csrf_token %}
+        {% form form using 'floppyforms/layouts/p.html' %}
+        <input type="submit" class="btn">
+    </form>
+    {% else %}
+    <p>Sorry, your link seems to be invalid. Please contact the Marc to get a new one.</p>
+    {% endif %}
+{% endblock %}
+

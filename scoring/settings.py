@@ -96,6 +96,7 @@ TEST_RUNNER = 'tests.runner.ScoringRunner'
 
 LOGIN_REDIRECT_URL = '/'
 AUTH_USER_MODEL = 'core.User'
+PASSWORD_RESET_TIMEOUT_DAYS = 7  # also used for registration.
 
 CACHES = {
     'default': {
