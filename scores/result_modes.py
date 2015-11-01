@@ -295,8 +295,6 @@ class BySession(BaseResultMode):
             session_entry = score.target.session_entry
             if session_entry.session_round.session_id is not session.id:
                 continue
-            if competition.exclude_later_shoots and session_entry.index > 1:
-                continue
             category = session_entry.competition_entry.category()
             if category not in results:
                 results[category] = []
@@ -321,6 +319,7 @@ class BySession(BaseResultMode):
 class ByRound(BaseResultMode):
     slug = 'by-round'
     name = 'By round'
+    include_later_shoots_anyway = False
 
     def get_results(self, competition, scores, leaderboard=False, request=None):
         """Get the results for each category, by round.
@@ -354,7 +353,7 @@ class ByRound(BaseResultMode):
             session_entry = score.target.session_entry
             if session_entry.session_round.shot_round.id is not round.id:
                 continue
-            if competition.exclude_later_shoots and session_entry.index > 1:
+            if not self.include_later_shoots_anyway and competition.exclude_later_shoots and session_entry.index > 1:
                 continue
             category = self.get_category_for_entry(session_entry.competition_entry)
             if category not in results:
@@ -378,6 +377,12 @@ class ByRound(BaseResultMode):
 
     def get_category_for_entry(self, entry):
         return entry.category()
+
+
+class ByRoundAllShot(ByRound, BaseResultMode):
+    slug = 'all-shot'
+    name = 'By round (include later shoots)'
+    include_later_shoots_anyway = True
 
 
 class ByRoundProgressional(ByRound, BaseResultMode):
@@ -465,9 +470,7 @@ class DoubleRound(BaseResultMode):
                 results[category][session_entry.competition_entry] = []
             results[category][session_entry.competition_entry].append(score)
         for category, scores in results.items():
-            for entry in scores.keys():
-                if len(scores[entry]) < 2:
-                    scores.pop(entry)
+            scores = OrderedDict((entry, rounds) for entry, rounds in scores.items() if len(rounds) >= 2)
             if not scores:
                 results.pop(category)
                 continue
