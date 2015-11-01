@@ -6,7 +6,6 @@ import dj_database_url
 BASE_DIR = os.path.dirname(os.path.dirname(__file__))
 
 DEBUG = not os.environ.get('PRODUCTION')
-TEMPLATE_DEBUG = DEBUG
 ALLOWED_HOSTS = [
     'archery-scoring.herokuapp.com',
     'archery-scoring-public.herokuapp.com',
