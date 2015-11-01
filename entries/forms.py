@@ -313,10 +313,11 @@ class EntryCreateForm(forms.Form):
                 competition_entry=entry,
             )
         else:
-            for session_round in self.cleaned_data['sessions']:
+            for i, session_round in enumerate(self.cleaned_data['sessions'], 1):
                 SessionEntry.objects.create(
                     session_round=session_round,
                     competition_entry=entry,
+                    index=i,
                 )
 
 
@@ -354,3 +355,6 @@ class EntryUpdateForm(EntryCreateForm):
                     )
             if existing_rounds:
                 entry.sessionentry_set.filter(session_round__in=existing_rounds).delete()
+        for i, sr in enumerate(entry.sessionentry_set.all(), 1):
+            sr.index = i
+            sr.save()
