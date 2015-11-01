@@ -84,6 +84,8 @@ class BaseResultMode(object):
         headers.append('Score')
         if round.scoring_type == 'X':
             headers += ['10s', 'Xs']
+        elif round.scoring_type == 'I':
+            headers += ['10s']
         else:
             headers += ['Hits', 'Golds']
         return ResultSection(
@@ -157,6 +159,14 @@ class BaseResultMode(object):
                 scores += [
                     score.golds,
                     score.xs,
+                ]
+        elif section.round.scoring_type == 'I':
+            scores += [
+                score.score,
+            ]
+            if not self.hide_golds:
+                scores += [
+                    score.golds,
                 ]
         else:
             scores += [

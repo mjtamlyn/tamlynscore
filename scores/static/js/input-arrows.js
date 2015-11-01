@@ -140,6 +140,8 @@ var Arrows = new Class({
             'doz-total': ET1 + ET2,
             'hits': hits,
             'golds': golds,
+            '10s': golds,
+            '10s+xs': golds,
             'xs': xs,
             'rt': rt + ET1 + ET2,
         };

@@ -20,13 +20,9 @@
                     <th>ET</th>
                     {% endif %}
                     <th>Doz</th>
-                    {% if not round.has_xs %}
-                    <th>Hits</th>
-                    {% endif %}
-                    <th>Golds</th>
-                    {% if round.has_xs %}
-                    <th>Xs</th>
-                    {% endif %}
+                    {% for heading in round.scoring_headings %}
+                    <th>{{ heading }}</th>
+                    {% endfor %}
                     <th>RT</th>
                     <th>Retired</th>
                 </tr>
@@ -45,13 +41,9 @@
                 <th class="end-total et2">0</th>
                 {% endif %}
                 <th class="doz-total">0</th>
-                {% if not round.has_xs %}
-                <th class="hits">0</th>
-                {% endif %}
-                <th class="golds">0</th>
-                {% if round.has_xs %}
-                <th class="xs">0</th>
-                {% endif %}
+                {% for heading in round.scoring_headings %}
+                <th class="{{ heading|lower }}"></th>
+                {% endfor %}
                 <th class="rt" rel="{{ target.running_total }}">{{ target.running_total }}</th>
                 {% endif %}
                 {% endfor %}

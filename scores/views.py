@@ -118,11 +118,15 @@ class InputScoresMobile(InputScores):
     template_name = 'scores/input_scores_mobile.html'
 
 
-class InputArrowsView(CompetitionMixin, View):
-    template = 'input_arrows.html'
+class InputArrowsView(CompetitionMixin, TemplateView):
+    template_name = 'input_arrows.html'
     next_url_name = 'input_scores'
 
-    def get(self, request, slug, session_id, boss, dozen):
+    def get_context_data(self, **kwargs):
+        context = super(InputArrowsView, self).get_context_data(**kwargs)
+        session_id = self.kwargs['session_id']
+        boss = self.kwargs['boss']
+        dozen = self.kwargs['boss']
         scores = Score.objects.filter(target__session_entry__session_round__session=session_id, target__boss=boss, target__session_entry__present=True).order_by('target__target').select_related()
         try:
             forms = get_arrow_formset(scores, session_id, boss, dozen, scores[0].target.session_entry.session_round.session.arrows_entered_per_end)
@@ -130,14 +134,14 @@ class InputArrowsView(CompetitionMixin, View):
         except IndexError:
             forms = None
             round = None
-        return render(request, self.template, {
-            'competition': self.competition,
+        context.update({
             'scores': scores,
             'forms': forms,
             'round': round,
             'dozen': dozen,
             'boss': boss,
         })
+        return context
 
     def post(self, request, slug, session_id, boss, dozen):
         scores = Score.objects.filter(target__session_entry__session_round__session=session_id, target__boss=boss).order_by('target__target').select_related()
@@ -214,7 +218,7 @@ class InputArrowsArcher(TemplateView):
         }
 
 
-class InputDozens(View):
+class InputDozens(CompetitionMixin, View):
     template = 'input_dozens.html'
     next_url_name = 'input_scores'
 
@@ -222,7 +226,7 @@ class InputDozens(View):
         return Score.objects.filter(target__session_entry__session_round__session=session_id, target__boss=int(boss) + 1).order_by('target__target').exists()
 
     def get(self, request, slug, session_id, boss, dozen):
-        competition = get_object_or_404(Competition, slug=slug)
+        competition = self.competition
         scores = Score.objects.filter(
             target__session_entry__session_round__session=session_id,
             target__boss=boss,
@@ -238,7 +242,7 @@ class InputDozens(View):
         return render(request, self.template, locals())
 
     def post(self, request, slug, session_id, boss, dozen):
-        competition = get_object_or_404(Competition, slug=slug)
+        competition = self.competition
         scores = Score.objects.filter(
             target__session_entry__session_round__session=session_id,
             target__boss=boss,
@@ -375,6 +379,7 @@ class PDFResultsRenderer(object):
             for category, scores in categories.items():
                 elements.append(Paragraph(str(category), self.styles['h2']))
                 table_data = [section.headers]
+                print(section.headers)
                 for score in scores:
                     table_data += self.rows_from_score(scores, score, section)
                 table = Table(table_data)
@@ -413,6 +418,8 @@ class PDFResultsRenderer(object):
                     row.append(score.target.session_entry.competition_entry.get_wa_age_display())
                 else:
                     row.append(None)
+            else:
+                row.append(None)
         row += self.mode.score_details(score, section)
         return rows
 

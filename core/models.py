@@ -95,7 +95,21 @@ class Round(models.Model):
 
     @property
     def score_sheet_headings(self):
-        return ['10+X', 'X'] if self.has_xs else ['H', 'G']
+        if self.scoring_type == 'X':
+            return ['10+X', 'X']
+        elif self.scoring_type == 'I':
+            return ['10s']
+        else:
+            return ['H', 'G']
+
+    @property
+    def scoring_headings(self):
+        if self.scoring_type == 'X':
+            return ['10s+Xs', 'Xs']
+        elif self.scoring_type == 'I':
+            return ['10s']
+        else:
+            return ['Hits', 'Golds']
 
 
 class Bowstyle(models.Model):
