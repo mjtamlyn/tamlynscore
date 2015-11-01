@@ -799,7 +799,7 @@ class RunningSlipsPdf(ScoreSheetsPdf):
         elements = []
         while all_entries:
             entries_group, all_entries = all_entries[:6], all_entries[6:]
-            for dozen in range(1, dozens):
+            for dozen in range(1, int(dozens)):
                 for entries in entries_group:
                     # we don't do the last dozen here
                     table_data = [
