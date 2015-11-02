@@ -318,6 +318,8 @@ class EntryCreateForm(forms.Form):
             entry.wa_age = self.cleaned_data['wa_age']
         if self.competition.has_agb_age_groups:
             entry.agb_age = self.cleaned_data['agb_age']
+            if entry.agb_age:
+                entry.age = 'J'
 
     def create_session_entries(self, entry):
         if len(self.session_rounds) == 1:
