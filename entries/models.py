@@ -3,7 +3,7 @@ import math
 from django.db import models
 from django.template.defaultfilters import slugify
 
-from core.models import Archer, Bowstyle, Club, County, Round, AGE_CHOICES, WA_AGE_CHOICES, NOVICE_CHOICES
+from core.models import Archer, Bowstyle, Club, County, Round, AGE_CHOICES, WA_AGE_CHOICES, AGB_AGE_CHOICES, NOVICE_CHOICES
 
 from scores.result_modes import get_result_modes
 
@@ -53,6 +53,7 @@ class Competition(models.Model):
     has_novices = models.BooleanField(default=False)
     has_juniors = models.BooleanField(default=False)
     has_wa_age_groups = models.BooleanField(default=False)
+    has_agb_age_groups = models.BooleanField(default=False)
     novices_in_experienced_teams = models.BooleanField(default=False)
     exclude_later_shoots = models.BooleanField(default=False, help_text='Only the first session can count for results')
     use_county_teams = models.BooleanField(default=False)
@@ -228,6 +229,10 @@ class SessionRound(models.Model):
                             allocation += (
                                 entry.get_wa_age_display(),
                             )
+                        if competition.has_agb_age_groups and entry.agb_age:
+                            allocation += (
+                                entry.get_agb_age_display(),
+                            )
                     if whole_session:
                         allocation += (shot_round.name,)
                     targets.append((target,) + allocation)
@@ -248,6 +253,7 @@ class CompetitionEntry(models.Model):
     bowstyle = models.ForeignKey(Bowstyle)
     age = models.CharField(max_length=1, choices=AGE_CHOICES, default='S')
     wa_age = models.CharField(max_length=1, choices=WA_AGE_CHOICES, default='', blank=True)
+    agb_age = models.CharField(max_length=3, choices=AGB_AGE_CHOICES, default='', blank=True)
     novice = models.CharField(max_length=1, choices=NOVICE_CHOICES, default='E')
 
     guest = models.BooleanField(default=False)
@@ -268,6 +274,8 @@ class CompetitionEntry(models.Model):
     def category(self):
         junior = 'Junior ' if self.competition.has_juniors and self.age == 'J' else ''
         novice = 'Novice ' if self.competition.has_novices and self.novice == 'N' else ''
+        if self.competition.has_agb_age_groups and self.agb_age:
+            junior = '%s ' % self.get_agb_age_display()
         return u'{2}{3}{0} {1}'.format(self.archer.get_gender_display(), self.bowstyle, junior, novice)
 
     def team_name(self, short_form=True):

@@ -46,6 +46,14 @@ WA_AGE_CHOICES = (
     ('M', 'Master'),
 )
 
+AGB_AGE_CHOICES = (
+    ('', 'Senior'),
+    ('U18', 'U18'),
+    ('U16', 'U16'),
+    ('U14', 'U14'),
+    ('U12', 'U12'),
+)
+
 
 class User(AbstractEmailUser):
     pass
@@ -186,6 +194,7 @@ class Archer(models.Model):
     bowstyle = models.ForeignKey(Bowstyle)
     age = models.CharField(max_length=1, choices=AGE_CHOICES, default='S')
     wa_age = models.CharField(max_length=1, choices=WA_AGE_CHOICES, default='', blank=True)
+    agb_age = models.CharField(max_length=3, choices=AGB_AGE_CHOICES, default='', blank=True)
     novice = models.CharField(max_length=1, choices=NOVICE_CHOICES, default='E')
     agb_number = models.BigIntegerField(blank=True, null=True)
     archived = models.BooleanField(default=False)
@@ -199,6 +208,7 @@ class Archer(models.Model):
             'name': self.name,
             'age': self.age,
             'wa_age': self.wa_age,
+            'agb_age': self.agb_age,
             'gender': self.gender,
             'club': self.club.pk,
             'bowstyle': self.bowstyle.pk,
