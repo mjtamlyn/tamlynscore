@@ -5,9 +5,11 @@
 
 <div class="row">
     <div class="col6">
+        {% if user.is_authenticated %}
         <div class="pull-right">
             <p><a class="btn edit" href="{% url 'club_update' club_slug=club.slug %}">Edit</a></p>
         </div>
+        {% endif %}
         <ul class="names">
             <li>Short name: <strong>{{ club.short_name }}</strong></li>
         </ul>
@@ -17,12 +19,18 @@
 {% if archers %}
 <div class="row">
     <div class="col6">
+        {% if user.is_authenticated %}
+        <div class="pull-right">
+            <p><a class="btn edit" href="{% url 'club_archer_create' club_slug=club.slug %}">Add new archer</a></p>
+        </div>
+        {% endif %}
         <h3>Archers</h3>
         <div class="row flex">
         {% for archer in archers %}
         <div class="flex-item col2">
             <div class="archer-block">
                 <div class="name">
+                    {% if user.is_authenticated %}
                     <div class="actions">
                         <a class="action-button edit" href="{% url 'archer_update' pk=archer.pk %}"></a>
                         <form class="inline" action="{% url 'archer_archive' pk=archer.pk %}" method="POST">
@@ -31,6 +39,7 @@
                             <button type="submit" class="action-button archive">
                         </form>
                     </div>
+                    {% endif %}
                     <p>{{ archer }}</p>
                 </div>
                 <div class="bottom">

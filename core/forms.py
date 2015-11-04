@@ -10,4 +10,17 @@ class ArcherForm(forms.ModelForm):
 
     class Meta:
         model = Archer
-        exclude = ['archived']
+        fields = ['name', 'gender', 'club', 'bowstyle', 'age', 'novice', 'agb_number']
+
+
+class ClubArcherForm(ArcherForm):
+    def __init__(self, club, **kwargs):
+        super(ClubArcherForm, self).__init__(**kwargs)
+        self.club = club
+
+    class Meta(ArcherForm.Meta):
+        fields = ['name', 'gender', 'bowstyle', 'age', 'novice', 'agb_number']
+
+    def save(self):
+        self.instance.club = self.club
+        return super(ClubArcherForm, self).save()

@@ -12,7 +12,7 @@ from entries.models import CompetitionEntry
 from scores.models import Score
 
 from .models import County, Club, Archer
-from .forms import ArcherForm
+from .forms import ArcherForm, ClubArcherForm
 
 
 class ClubMixin(object):
@@ -67,6 +67,19 @@ class ArchiveArcherList(ClubMixin, ListView):
 
     def get_queryset(self):
         return self.get_archer_queryset().filter(archived=True)
+
+
+class ClubArcherCreate(ClubMixin, LoginRequiredMixin, CreateView):
+    model = Archer
+    form_class = ClubArcherForm
+
+    def get_form_kwargs(self):
+        kwargs = super(ClubArcherCreate, self).get_form_kwargs()
+        kwargs['club'] = self.club
+        return kwargs
+
+    def get_success_url(self):
+        return self.club.get_absolute_url()
 
 
 class ClubCreate(LoginRequiredMixin, CreateView):

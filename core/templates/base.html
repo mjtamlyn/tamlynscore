@@ -21,7 +21,11 @@
                 <a href="{% url 'index' %}" class="nav-link">Home</a>
                 <a href="{% url 'club_list' %}" class="nav-link">Clubs</a>
                 <a href="{% url 'tournaments_list' %}" class="nav-link">Tournaments</a>
+                {% if user.is_authenticated %}
                 <a href="{% url 'logout' %}" class="nav-link">Log Out</a>
+                {% else %}
+                <a href="{% url 'login' %}" class="nav-link">Log In</a>
+                {% endif %}
                 {% endblock nav_links %}
             </nav>
             {% endblock nav %}
