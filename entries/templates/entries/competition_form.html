@@ -1,12 +1,6 @@
 {% extends 'base.html' %}
+{% load floppyforms %}
 
 {% block content %}
-    <h2>{% if form.instance.pk %}{{ form.instance }}{% else %}Add competition{% endif %}</h2>
-    <form method="post">
-        {% csrf_token %}
-        <ul>
-            {{ form.as_ul }}
-            <li><input type="submit" class="btn"></li>
-        </ul>
-    </form>
+	{% form form using "core/form_layout.html" with form_title=form.instance.name|default:"Add competition" %}
 {% endblock %}
