@@ -14,7 +14,9 @@
     <ul>
         {% if competition_admin %}
             <li><a href="{% url 'entry_list' slug=competition.slug %}">Manage Entries</a></li>
-            <li><a href="{% url 'target_list' slug=competition.slug %}">Target lists</a></li>
+        {% endif %}
+        <li><a href="{% url 'target_list' slug=competition.slug %}">Target list</a></li>
+        {% if competition_admin %}
             <li><a href="{% url 'score_sheets' slug=competition.slug %}">Score sheets</a></li>
             <li><a href="{% url 'registration' slug=competition.slug %}">Registration</a></li>
             {% if competition.use_county_teams %}

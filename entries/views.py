@@ -251,6 +251,7 @@ class EntryDelete(CompetitionMixin, DeleteView):
 class TargetList(CompetitionMixin, ListView):
     template_name = 'entries/target_list.html'
     model = TargetAllocation
+    admin_required = False
 
     def get_queryset(self):
         return self.model.objects.filter(
@@ -379,6 +380,10 @@ class TargetList(CompetitionMixin, ListView):
         })
         return context
 
+
+class TargetListEdit(TargetList):
+    template_name = 'entries/target_list_edit.html'
+
     def post(self, request, slug):
         data = json.loads(request.body.decode('utf-8'))
         if data['method'] == 'create':
@@ -396,6 +401,7 @@ class TargetList(CompetitionMixin, ListView):
 
 class Registration(TargetList):
     template_name = 'entries/registration.html'
+    admin_required = True
 
     def add_unallocated_entries(self, target_list):
         pass

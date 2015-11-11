@@ -29,6 +29,7 @@ from .result_modes import get_mode
 
 class InputScores(TargetList):
     template_name = 'scores/input_scores.html'
+    admin_required = True
 
     def get_queryset(self):
         return super(InputScores, self).get_queryset().order_by('session_entry__session_round__session', 'boss', 'target').select_related('score')

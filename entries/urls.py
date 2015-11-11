@@ -13,6 +13,7 @@ urlpatterns = [
     url(r'^(?P<slug>[\w-]+)/entries/edit/(?P<entry_id>\d+)/?$', views.EntryUpdate.as_view(), name='entry_update'),
     url(r'^(?P<slug>[\w-]+)/entries/delete/(?P<entry_id>\d+)/?$', views.EntryDelete.as_view(), name='entry_delete'),
     url(r'^(?P<slug>[\w-]+)/target-list/$', views.TargetList.as_view(), name='target_list'),
+    url(r'^(?P<slug>[\w-]+)/target-list/edit/$', views.TargetListEdit.as_view(), name='target_list_edit'),
     url(r'^(?P<slug>[\w-]+)/target-list/pdf/$', views.TargetListPdf.as_view(), name='target_list_pdf'),
     url(r'^(?P<slug>[\w-]+)/target-list/lunch/$', views.TargetListLunch.as_view()),
     url(r'^(?P<slug>[\w-]+)/score-sheets/$', views.ScoreSheets.as_view(), name='score_sheets'),
