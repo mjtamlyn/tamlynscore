@@ -6,14 +6,10 @@ select
   border: 1px solid $lightblue
   font-size: 16px
 
+$competition-mobile-breakpoint: 640px
+
 form.inline
   display: inline
-
-// TODO: Form styling
-// Classes so far:
-//  * form-group
-//  * form-subgroup
-//  * form-item
 
 div.form-group
 
@@ -49,6 +45,9 @@ div.form-group
     display: flex
 
     margin-bottom: 8px
+
+    &.contains-subgroup
+      display: flex
 
     &.align-bottom
       align-items: flex-end
@@ -103,3 +102,8 @@ div.form-group
       display: block
 
       width: 100%
+
+@media only screen and (max-width: $competition-mobile-breakpoint)
+  div.form-group
+    div.form-flex-wrapper.contains-subgroup
+      display: block
