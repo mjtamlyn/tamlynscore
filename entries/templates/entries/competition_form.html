@@ -2,7 +2,7 @@
 
 {# TODO: JS datepickers, populate form start/end dates auto #}
 {# TODO: Add button that "adds" another competition entry up to 6 #}
-{# TODO: Separate juniors/novices? #}
+{# TODO: Add help text to fields #}
 
 {% block content %}
 <form action="" method="post">
@@ -15,276 +15,329 @@
 	<div class="form-group">
 		<h2>General Information</h2>
 
-		<div class="form-item">
-			<label>
-				Full name:
-				{{ form.full_name }}
-			</label>
+		<div class="form-flex-wrapper">
+			<div class="form-item">
+				<label>
+					Full name:
+					{{ form.full_name }}
+				</label>
+			</div>
+            <div class="form-item flex-0-5">
+                <label>
+                    Short name:
+                    {{ form.short_name }}
+                </label>
+            </div>
 		</div>
-		<div class="form-item">
-			<label>
-				Short name:
-				{{ form.short_name }}
-			</label>
-		</div>
-		<div class="form-item">
-			<label>
-				Start date:
-				{{ form.date }}
-			</label>
-		</div>
-		<div class="form-item">
-			<label>
-				End date:
-				{{ form.end_date }}
-			</label>
-		</div>
+
+        <div class="form-flex-wrapper">
+            <div class="form-item">
+                <label>
+                    Start date:
+                    {{ form.date }}
+                </label>
+            </div>
+            <div class="form-item">
+                <label>
+                    End date:
+                    {{ form.end_date }}
+                </label>
+            </div>
+        </div>
 	</div>
 
 	<div class="form-group">
 		<h2>Scoring Details</h2>
 
-		<div class="form-item">
-			<label>
-				Scoring system:
-				{{ form.scoring_system }}
-			</label>
-		</div>
-		<div class="form-item">
-			<label>
-				Archers per target:
-				{{ form.archers_per_target }}
-			</label>
-		</div>
-		<div class="form-item">
-			<label>
-				Arrows entered per end:
-				{{ form.arrows_entered_per_end }}
-			</label>
-		</div>
-		<div class="form-item">
-			<label>
-				Team size:
-				{{ form.team_size }}
-			</label>
-		</div>
-		<div class="form-item">
-			<label>
-				Compound team size:
-				{{ form.compound_team_size }}
-			</label>
-		</div>
+		<div class="form-flex-wrapper">
+			<div class="form-item">
+				<label class="single-select">
+					Scoring system:
+					{{ form.scoring_system }}
+				</label>
+			</div>
+            <div class="form-item">
+                <label>
+                    Arrows entered per end:
+                    {{ form.arrows_entered_per_end }}
+                </label>
+            </div>
+        </div>
 
-		<div class="subgroup">
-			<h3>Novices</h3>
+        <div class="form-flex-wrapper align-bottom">
 			<div class="form-item">
 				<label>
-					Has novices:
-					{{ form.has_novices }}
+					Archers per target:
+					{{ form.archers_per_target }}
 				</label>
 			</div>
 			<div class="form-item">
 				<label>
-					Novice team size:
-					{{ form.novice_team_size }}
+					Team size:
+					{{ form.team_size }}
+				</label>
+			</div>
+			<div class="form-item">
+				<label>
+					Compound team size:
+					{{ form.compound_team_size }}
 				</label>
 			</div>
 		</div>
 
-		<div class="subgroup">
-			<h3>Juniors</h3>
-			<div class="form-item">
-				<label>
-					Has juniors:
-					{{ form.has_juniors }}
-				</label>
-			</div>
-			<div class="form-item">
-				<label>
-					Junior team size:
-					{{ form.junior_team_size }}
-				</label>
-			</div>
-		</div>
+        <div class="form-flex-wrapper">
+    		<div class="form-subgroup form-flex-subgroup">
+    			<h3>Novices</h3>
+
+    			<div class="form-flex-wrapper">
+    				<div class="form-item">
+    					<label class="has-checkbox">
+    						Has novices:
+    						{{ form.has_novices }}
+    					</label>
+    				</div>
+    			</div>
+                <div class="form-flex-wrapper">
+                    <div class="form-item">
+                        <label>
+                            Novice team size:
+                            {{ form.novice_team_size }}
+                        </label>
+                    </div>
+                </div>
+    		</div>
+
+    		<div class="form-subgroup form-flex-subgroup">
+    			<h3>Juniors</h3>
+
+    			<div class="form-flex-wrapper">
+    				<div class="form-item">
+    					<label class="has-checkbox">
+    						Has juniors:
+    						{{ form.has_juniors }}
+    					</label>
+    				</div>
+    			</div>
+                <div class="form-flex-wrapper">
+                    <div class="form-item">
+                        <label>
+                            Junior team size:
+                            {{ form.junior_team_size }}
+                        </label>
+                    </div>
+                </div>
+    		</div>
+        </div>
 	</div>
 
 	<div class="form-group">
 		<h2>Sessions</h2>
 
-		<div class="form-subgroup">
-			<h3>Session 1</h3>
-			<div class="form-item">
-				<label>
-					Session time:
-					{{ form.session_1_time }}
-				</label>
-			</div>
-			<div class="form-item">
-				<label>
-					Session rounds:
-					{{ form.session_1_rounds }}
-				</label>
-			</div>
-		</div>
-		<div class="form-subgroup">
-			<h3>Session 2</h3>
-			<div class="form-item">
-				<label>
-					Session time:
-					{{ form.session_2_time }}
-				</label>
-			</div>
-			<div class="form-item">
-				<label>
-					Session rounds:
-					{{ form.session_2_rounds }}
-				</label>
-			</div>
-		</div>
-		<div class="form-subgroup">
-			<h3>Session 3</h3>
-			<div class="form-item">
-				<label>
-					Session time:
-					{{ form.session_3_time }}
-				</label>
-			</div>
-			<div class="form-item">
-				<label>
-					Session rounds:
-					{{ form.session_3_rounds }}
-				</label>
-			</div>
-		</div>
-		<div class="form-subgroup">
-			<h3>Session 4</h3>
-			<div class="form-item">
-				<label>
-					Session time:
-					{{ form.session_4_time }}
-				</label>
-			</div>
-			<div class="form-item">
-				<label>
-					Session rounds:
-					{{ form.session_4_rounds }}
-				</label>
-			</div>
-		</div>
-		<div class="form-subgroup">
-			<h3>Session 5</h3>
-			<div class="form-item">
-				<label>
-					Session time:
-					{{ form.session_5_time }}
-				</label>
-			</div>
-			<div class="form-item">
-				<label>
-					Session rounds:
-					{{ form.session_5_rounds }}
-				</label>
-			</div>
-		</div>
-		<div class="form-subgroup">
-			<h3>Session 6</h3>
-			<div class="form-item">
-				<label>
-					Session time:
-					{{ form.session_6_time }}
-				</label>
-			</div>
-			<div class="form-item">
-				<label>
-					Session rounds:
-					{{ form.session_6_rounds }}
-				</label>
-			</div>
-		</div>
+        <div class="form-flex-wrapper">
+    		<div class="form-subgroup form-flex-subgroup">
+    			<h3>Session 1</h3>
+
+				<div class="form-item">
+					<label>
+						Session time:
+						{{ form.session_1_time }}
+					</label>
+				</div>
+				<div class="form-item">
+					<label>
+						Session rounds:
+						{{ form.session_1_rounds }}
+					</label>
+				</div>
+    		</div>
+
+            <div class="form-subgroup form-flex-subgroup">
+                <h3>Session 2</h3>
+
+                <div class="form-item">
+                    <label>
+                        Session time:
+                        {{ form.session_2_time }}
+                    </label>
+                </div>
+                <div class="form-item">
+                    <label>
+                        Session rounds:
+                        {{ form.session_2_rounds }}
+                    </label>
+                </div>
+            </div>
+        </div>
+
+        <div class="form-flex-wrapper">
+    		<div class="form-subgroup form-flex-subgroup">
+    			<h3>Session 3</h3>
+
+				<div class="form-item">
+					<label>
+						Session time:
+						{{ form.session_3_time }}
+					</label>
+				</div>
+				<div class="form-item">
+					<label>
+						Session rounds:
+						{{ form.session_3_rounds }}
+					</label>
+				</div>
+    		</div>
+
+            <div class="form-subgroup form-flex-subgroup">
+                <h3>Session 4</h3>
+
+                <div class="form-item">
+                    <label>
+                        Session time:
+                        {{ form.session_4_time }}
+                    </label>
+                </div>
+                <div class="form-item">
+                    <label>
+                        Session rounds:
+                        {{ form.session_4_rounds }}
+                    </label>
+                </div>
+            </div>
+        </div>
+
+        <div class="form-flex-wrapper">
+    		<div class="form-subgroup form-flex-subgroup">
+    			<h3>Session 5</h3>
+
+    			<div class="form-item">
+    				<label>
+    					Session time:
+    					{{ form.session_5_time }}
+    				</label>
+    			</div>
+    			<div class="form-item">
+    				<label>
+    					Session rounds:
+    					{{ form.session_5_rounds }}
+    				</label>
+    			</div>
+    		</div>
+
+            <div class="form-subgroup form-flex-subgroup">
+                <h3>Session 6</h3>
+
+                <div class="form-item">
+                    <label>
+                        Session time:
+                        {{ form.session_6_time }}
+                    </label>
+                </div>
+                <div class="form-item">
+                    <label>
+                        Session rounds:
+                        {{ form.session_6_rounds }}
+                    </label>
+                </div>
+            </div>
+        </div>
 	</div>
 
 	<div class="form-group">
 		<h2>Results and Leaderboards</h2>
 
-		<div class="form-item">
-			<label>
-				Result modes:
-				{{ form.result_modes }}
-			</label>
-		</div>
-		<div class="form-item">
-			<label>
-				Leaderboard only modes:
-				{{ form.leaderboard_only_modes }}
-			</label>
-		</div>
+        <div class="form-flex-wrapper">
+            <div class="form-subgroup form-flex-subgroup">
+                <h3>Result modes</h3>
+
+                <div class="form-item">
+                    {{ form.result_modes }}
+                </div>
+            </div>
+
+            <div class="form-subgroup form-flex-subgroup">
+                <h3>Leaderboard only modes</h3>
+
+                <div class="form-item">
+                    {{ form.leaderboard_only_modes }}
+                </div>
+            </div>
+        </div>
 
 		<div class="form-subgroup">
 			<h3>Individual Results</h3>
-			<div class="form-item">
-				<label>
-					Has WA age groups:
-					{{ form.has_wa_age_groups }}
-				</label>
-			</div>
-			<div class="form-item">
-				<label>
-					Exclude later shoots:
-					{{ form.exclude_later_shoots }}
-				</label>
-			</div>
+
+            <div class="form-flex-wrapper">
+    			<div class="form-item">
+    				<label class="has-checkbox">
+    					Has WA age groups:
+    					{{ form.has_wa_age_groups }}
+    				</label>
+    			</div>
+    			<div class="form-item">
+    				<label class="has-checkbox">
+    					Exclude later shoots:
+    					{{ form.exclude_later_shoots }}
+    				</label>
+    			</div>
+            </div>
 		</div>
 
 		<div class="form-subgroup">
 			<h3>Team Results</h3>
-			<div class="form-item">
-				<label>
-					Allow incomplete teams:
-					{{ form.allow_incomplete_teams }}
-				</label>
-			</div>
-			<div class="form-item">
-				<label>
-					Combine rounds for team scores:
-					{{ form.combine_rounds_for_team_scores }}
-				</label>
-			</div>
-			<div class="form-item">
-				<label>
-					Force mixed teams:
-					{{ form.force_mixed_teams }}
-				</label>
-			</div>
-			<div class="form-item">
-				<label>
-					Split gender teams:
-					{{ form.split_gender_teams }}
-				</label>
-			</div>
-			<div class="form-item">
-				<label>
-					Use county teams:
-					{{ form.use_county_teams }}
-				</label>
-			</div>
-			<div class="form-item">
-				<label>
-					Strict B teams:
-					{{ form.strict_b_teams }}
-				</label>
-			</div>
-			<div class="form-item">
-				<label>
-					Strict C teams:
-					{{ form.strict_c_teams }}
-				</label>
-			</div>
-			<div class="form-item">
-				<label>
-					Novices in experienced teams:
-					{{ form.novices_in_experienced_teams }}
-				</label>
-			</div>
+
+            <div class="form-flex-wrapper">
+    			<div class="form-item">
+    				<label class="has-checkbox">
+    					Allow incomplete teams:
+    					{{ form.allow_incomplete_teams }}
+    				</label>
+    			</div>
+    			<div class="form-item">
+    				<label class="has-checkbox">
+    					Combine rounds for team scores:
+    					{{ form.combine_rounds_for_team_scores }}
+    				</label>
+    			</div>
+    			<div class="form-item">
+    				<label class="has-checkbox">
+    					Force mixed teams:
+    					{{ form.force_mixed_teams }}
+    				</label>
+    			</div>
+    			<div class="form-item">
+    				<label class="has-checkbox">
+    					Split gender teams:
+    					{{ form.split_gender_teams }}
+    				</label>
+    			</div>
+            </div>
+
+            <div class="form-flex-wrapper">
+    			<div class="form-item">
+    				<label class="has-checkbox">
+    					Use county teams:
+    					{{ form.use_county_teams }}
+    				</label>
+    			</div>
+    			<div class="form-item">
+    				<label class="has-checkbox">
+    					Strict B teams:
+    					{{ form.strict_b_teams }}
+    				</label>
+    			</div>
+    			<div class="form-item">
+    				<label class="has-checkbox">
+    					Strict C teams:
+    					{{ form.strict_c_teams }}
+    				</label>
+    			</div>
+    			<div class="form-item">
+    				<label class="has-checkbox">
+    					Novices in experienced teams:
+    					{{ form.novices_in_experienced_teams }}
+    				</label>
+    			</div>
+            </div>
 		</div>
 	</div>
 

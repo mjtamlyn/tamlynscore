@@ -8,3 +8,98 @@ select
 
 form.inline
   display: inline
+
+// TODO: Form styling
+// Classes so far:
+//  * form-group
+//  * form-subgroup
+//  * form-item
+
+div.form-group
+
+  margin-bottom: 32px
+
+  h2
+    text-align: left
+    line-height: 1.47
+
+    border-bottom: 2px solid rgba(0, 0, 0, 0.09)
+
+  div.form-flex-subgroup
+    flex: 0.5
+
+    margin: 0px 8px
+
+  div.form-subgroup
+    margin-bottom: 16px
+
+    h3
+      text-align: left
+      line-height: 1.47
+
+      border-bottom: 1px solid rgba(0, 0, 0, 0.05)
+
+    & > div.form-item
+      margin-bottom: 8px
+
+      &:last-of-type
+        margin-bottom: 0px
+
+  div.form-flex-wrapper
+    display: flex
+
+    margin-bottom: 8px
+
+    &.align-bottom
+      align-items: flex-end
+
+    &.align-center
+      align-items: flex-center
+
+    div.form-item
+      flex: 1
+
+      margin: 0px 8px
+
+      & > ul > li > label > input
+        display: inline-block !important
+        width: auto !important
+
+      &.flex-0-5
+        flex: 0.5
+
+      &.flex-0-75
+        flex: 0.75
+
+      label
+        font-size: 14px
+
+        select
+          -webkit-appearance: none
+          -moz-appearance: none
+          appearance: none
+
+        &.single-select select
+          background-repeat: no-repeat
+          background-position: 100% center
+          background-image: url(data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHZlcnNpb249IjEuMSIgeD0iMTJweCIgeT0iMHB4IiB3aWR0aD0iMjRweCIgaGVpZ2h0PSIzcHgiIHZpZXdCb3g9IjAgMCA2IDMiIGVuYWJsZS1iYWNrZ3JvdW5kPSJuZXcgMCAwIDYgMyIgeG1sOnNwYWNlPSJwcmVzZXJ2ZSI+PHBvbHlnb24gcG9pbnRzPSI1Ljk5MiwwIDIuOTkyLDMgLTAuMDA4LDAgIi8+PC9zdmc+)
+
+      label input,
+      label select
+        margin-top: 4px
+
+    div.form-flex-subgroup
+      & div.form-item
+        margin: 0px
+
+      & > div.form-item
+        margin-bottom: 8px
+
+        &:last-of-type
+          margin-bottom: 0px
+
+    div.form-item label:not(.has-checkbox) input,
+    div.form-item label:not(.has-checkbox) select
+      display: block
+
+      width: 100%
