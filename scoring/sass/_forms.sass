@@ -6,6 +6,11 @@ select
   border: 1px solid $lightblue
   font-size: 16px
 
+input:disabled
+  outline-color: desaturate($lightblue, 50%)
+  border-color: desaturate($lightblue, 50%)
+  background-color: #F0F0F0
+
 $competition-mobile-breakpoint: 640px
 
 form.inline
@@ -14,6 +19,9 @@ form.inline
 div.form-group
 
   margin-bottom: 32px
+
+  button
+    margin: 0px 8px
 
   h2
     text-align: left
