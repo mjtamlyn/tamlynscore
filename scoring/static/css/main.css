@@ -3522,31 +3522,32 @@ div.form-group div.form-flex-wrapper div.form-item label select {
   -webkit-appearance: none;
   -moz-appearance: none;
   appearance: none;
+  background-color: transparent;
 }
-/* line 89, ../../sass/_forms.sass */
+/* line 91, ../../sass/_forms.sass */
 div.form-group div.form-flex-wrapper div.form-item label.single-select select {
   background-repeat: no-repeat;
   background-position: 100% center;
   background-image: url(data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHZlcnNpb249IjEuMSIgeD0iMTJweCIgeT0iMHB4IiB3aWR0aD0iMjRweCIgaGVpZ2h0PSIzcHgiIHZpZXdCb3g9IjAgMCA2IDMiIGVuYWJsZS1iYWNrZ3JvdW5kPSJuZXcgMCAwIDYgMyIgeG1sOnNwYWNlPSJwcmVzZXJ2ZSI+PHBvbHlnb24gcG9pbnRzPSI1Ljk5MiwwIDIuOTkyLDMgLTAuMDA4LDAgIi8+PC9zdmc+);
 }
-/* line 94, ../../sass/_forms.sass */
+/* line 96, ../../sass/_forms.sass */
 div.form-group div.form-flex-wrapper div.form-item label input,
 div.form-group div.form-flex-wrapper div.form-item label select {
   margin-top: 4px;
 }
-/* line 99, ../../sass/_forms.sass */
+/* line 101, ../../sass/_forms.sass */
 div.form-group div.form-flex-wrapper div.form-flex-subgroup div.form-item {
   margin: 0px;
 }
-/* line 102, ../../sass/_forms.sass */
+/* line 104, ../../sass/_forms.sass */
 div.form-group div.form-flex-wrapper div.form-flex-subgroup > div.form-item {
   margin-bottom: 8px;
 }
-/* line 105, ../../sass/_forms.sass */
+/* line 107, ../../sass/_forms.sass */
 div.form-group div.form-flex-wrapper div.form-flex-subgroup > div.form-item:last-of-type {
   margin-bottom: 0px;
 }
-/* line 108, ../../sass/_forms.sass */
+/* line 110, ../../sass/_forms.sass */
 div.form-group div.form-flex-wrapper div.form-item label:not(.has-checkbox) input,
 div.form-group div.form-flex-wrapper div.form-item label:not(.has-checkbox) select {
   display: block;
@@ -3554,7 +3555,7 @@ div.form-group div.form-flex-wrapper div.form-item label:not(.has-checkbox) sele
 }
 
 @media only screen and (max-width: 640px) {
-  /* line 116, ../../sass/_forms.sass */
+  /* line 118, ../../sass/_forms.sass */
   div.form-group div.form-flex-wrapper.contains-subgroup {
     display: block;
   }

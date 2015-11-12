@@ -1,15 +1,24 @@
 {% extends 'base.html' %}
 
+{% block scripts %}
+<script src="{{ STATIC_URL }}lib/jquery/jquery-2.1.3.min.js"></script>
+<script src="{{ STATIC_URL }}js/jquery.datetimepicker.full.js"></script>
+<script src="{{ STATIC_URL }}js/competition_form.js"></script>
+<link rel="stylesheet" type="text/css" href="{{ STATIC_URL }}css/components/jquery.datetimepicker.css">
+{% endblock %}
+
 {# TODO: JS datepickers, populate form start/end dates auto #}
 {# TODO: Add button that "adds" another competition entry up to 6 #}
 {# TODO: Add help text to fields #}
 
 {% block content %}
 <form action="" method="post">
+    {% csrf_token %}
+
 	{% if form.instance.pk %}
-		<h1>{{ form.instance }}</h1>
+		<h1 id="title">{{ form.instance }}</h1>
 	{% else %}
-		<h1>Add competition</h1>
+		<h1 id="title">Add competition</h1>
 	{% endif %}
 
 	<div class="form-group">
@@ -84,57 +93,13 @@
 				</label>
 			</div>
 		</div>
-
-        <div class="form-flex-wrapper">
-    		<div class="form-subgroup form-flex-subgroup">
-    			<h3>Novices</h3>
-
-    			<div class="form-flex-wrapper">
-    				<div class="form-item">
-    					<label class="has-checkbox">
-    						Has novices:
-    						{{ form.has_novices }}
-    					</label>
-    				</div>
-    			</div>
-                <div class="form-flex-wrapper">
-                    <div class="form-item">
-                        <label>
-                            Novice team size:
-                            {{ form.novice_team_size }}
-                        </label>
-                    </div>
-                </div>
-    		</div>
-
-    		<div class="form-subgroup form-flex-subgroup">
-    			<h3>Juniors</h3>
-
-    			<div class="form-flex-wrapper">
-    				<div class="form-item">
-    					<label class="has-checkbox">
-    						Has juniors:
-    						{{ form.has_juniors }}
-    					</label>
-    				</div>
-    			</div>
-                <div class="form-flex-wrapper">
-                    <div class="form-item">
-                        <label>
-                            Junior team size:
-                            {{ form.junior_team_size }}
-                        </label>
-                    </div>
-                </div>
-    		</div>
-        </div>
 	</div>
 
 	<div class="form-group">
 		<h2>Sessions</h2>
 
-        <div class="form-flex-wrapper contains-subgroup">
-    		<div class="form-subgroup form-flex-subgroup">
+        <div id="session_group_1" class="form-flex-wrapper contains-subgroup">
+    		<div id="session_1" class="form-subgroup form-flex-subgroup">
     			<h3>Session 1</h3>
 
 				<div class="form-item">
@@ -151,7 +116,7 @@
 				</div>
     		</div>
 
-            <div class="form-subgroup form-flex-subgroup">
+            <div id="session_2" class="form-subgroup form-flex-subgroup">
                 <h3>Session 2</h3>
 
                 <div class="form-item">
@@ -169,7 +134,7 @@
             </div>
         </div>
 
-        <div class="form-flex-wrapper contains-subgroup">
+        <div id="session_group_2" class="form-flex-wrapper contains-subgroup">
     		<div class="form-subgroup form-flex-subgroup">
     			<h3>Session 3</h3>
 
@@ -205,7 +170,7 @@
             </div>
         </div>
 
-        <div class="form-flex-wrapper contains-subgroup">
+        <div id="session_group_3" class="form-flex-wrapper contains-subgroup">
     		<div class="form-subgroup form-flex-subgroup">
     			<h3>Session 5</h3>
 
@@ -240,6 +205,8 @@
                 </div>
             </div>
         </div>
+
+        <button class="btn add pull-right" id="add_sessions">Add more sessions</button>
 	</div>
 
 	<div class="form-group">
@@ -259,6 +226,50 @@
 
                 <div class="form-item">
                     {{ form.leaderboard_only_modes }}
+                </div>
+            </div>
+        </div>
+
+        <div class="form-flex-wrapper">
+            <div class="form-subgroup form-flex-subgroup">
+                <h3>Novices</h3>
+
+                <div class="form-flex-wrapper">
+                    <div class="form-item">
+                        <label class="has-checkbox">
+                            Use novice category:
+                            {{ form.has_novices }}
+                        </label>
+                    </div>
+                </div>
+                <div class="form-flex-wrapper">
+                    <div class="form-item">
+                        <label>
+                            Novice team size:
+                            {{ form.novice_team_size }}
+                        </label>
+                    </div>
+                </div>
+            </div>
+
+            <div class="form-subgroup form-flex-subgroup">
+                <h3>Juniors</h3>
+
+                <div class="form-flex-wrapper">
+                    <div class="form-item">
+                        <label class="has-checkbox">
+                            Use general junior category:
+                            {{ form.has_juniors }}
+                        </label>
+                    </div>
+                </div>
+                <div class="form-flex-wrapper">
+                    <div class="form-item">
+                        <label>
+                            Junior team size:
+                            {{ form.junior_team_size }}
+                        </label>
+                    </div>
                 </div>
             </div>
         </div>
