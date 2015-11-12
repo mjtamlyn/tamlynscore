@@ -1,5 +1,8 @@
 {% extends 'base.html' %}
-{% load floppyforms %}
+
+{# TODO: JS datepickers, populate form start/end dates auto #}
+{# TODO: Add button that "adds" another competition entry up to 6 #}
+{# TODO: Separate juniors/novices? #}
 
 {% block content %}
 <form action="" method="post">
@@ -58,6 +61,50 @@
 				Arrows entered per end:
 				{{ form.arrows_entered_per_end }}
 			</label>
+		</div>
+		<div class="form-item">
+			<label>
+				Team size:
+				{{ form.team_size }}
+			</label>
+		</div>
+		<div class="form-item">
+			<label>
+				Compound team size:
+				{{ form.compound_team_size }}
+			</label>
+		</div>
+
+		<div class="subgroup">
+			<h3>Novices</h3>
+			<div class="form-item">
+				<label>
+					Has novices:
+					{{ form.has_novices }}
+				</label>
+			</div>
+			<div class="form-item">
+				<label>
+					Novice team size:
+					{{ form.novice_team_size }}
+				</label>
+			</div>
+		</div>
+
+		<div class="subgroup">
+			<h3>Juniors</h3>
+			<div class="form-item">
+				<label>
+					Has juniors:
+					{{ form.has_juniors }}
+				</label>
+			</div>
+			<div class="form-item">
+				<label>
+					Junior team size:
+					{{ form.junior_team_size }}
+				</label>
+			</div>
 		</div>
 	</div>
 
@@ -176,18 +223,6 @@
 			<h3>Individual Results</h3>
 			<div class="form-item">
 				<label>
-					Has novices:
-					{{ form.has_novices }}
-				</label>
-			</div>
-			<div class="form-item">
-				<label>
-					Has juniors:
-					{{ form.has_juniors }}
-				</label>
-			</div>
-			<div class="form-item">
-				<label>
 					Has WA age groups:
 					{{ form.has_wa_age_groups }}
 				</label>
@@ -202,30 +237,6 @@
 
 		<div class="form-subgroup">
 			<h3>Team Results</h3>
-			<div class="form-item">
-				<label>
-					Team size:
-					{{ form.team_size }}
-				</label>
-			</div>
-			<div class="form-item">
-				<label>
-					Novice team size:
-					{{ form.novice_team_size }}
-				</label>
-			</div>
-			<div class="form-item">
-				<label>
-					Compound team size:
-					{{ form.compound_team_size }}
-				</label>
-			</div>
-			<div class="form-item">
-				<label>
-					Junior team size:
-					{{ form.junior_team_size }}
-				</label>
-			</div>
 			<div class="form-item">
 				<label>
 					Allow incomplete teams:
@@ -276,5 +287,7 @@
 			</div>
 		</div>
 	</div>
+
+	<input type="submit" class="btn" />
 </form>
 {% endblock %}
