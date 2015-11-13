@@ -525,11 +525,14 @@ class HeadedPdfView(PdfView):
 class TargetListPdf(CompetitionMixin, HeadedPdfView):
     title = 'Target List'
     lunch = False
+    admin_required = False
 
     def setMargins(self, doc):
-        doc.topMargin = 1.1 * inch
+        doc.topMargin = 1 * inch
         if self.competition.sponsors.exists():
             doc.bottomMargin = 1.5 * inch
+        else:
+            doc.bottomMargin = 0.5 * inch
 
     def update_style(self):
         self.styles['h2'].alignment = 1
