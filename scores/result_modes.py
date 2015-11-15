@@ -144,7 +144,7 @@ class BaseResultMode(object):
                 score.final_score,
             ]
         elif section.round is None:
-            # weekend mode -- TODO: This is also being picked up by the by session results mode
+            # weekend mode -- TODO: Make sure this has better round type data, also look at by session if not all rounds are identical...
             scores += [
                 score.score,
                 score.hits,
@@ -282,7 +282,10 @@ class BySession(BaseResultMode):
         self.leaderboard = leaderboard
         sessions = self.get_sessions(competition)
         return OrderedDict((
-            ResultSection(session.start.strftime('%Y/%m/%d %I:%M %p')),
+            ResultSection(
+                session.start.strftime('%Y/%m/%d %I:%M %p'),
+                round=scores[0].target.session_entry.session_round.shot_round,
+            ),
             self.get_session_results(competition, session, scores),
         ) for session in sessions)
 
