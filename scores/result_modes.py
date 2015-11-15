@@ -36,6 +36,44 @@ class ResultSection(object):
         return self.label
 
 
+class ResultCategory(object):
+    def __init__(self, bowstyle, gender, junior=None, novice=None):
+        self.bowstyle = bowstyle
+        self.gender = gender
+        self.junior = junior
+        self.novice = novice
+
+    def __str__(self):
+        parts = filter(None, [
+            self.junior,
+            self.novice,
+            self.gender,
+            str(self.bowstyle),
+        ])
+        return ' '.join(parts)
+
+    def __eq__(self, other):
+        return (
+            self.bowstyle,
+            self.gender,
+            self.junior,
+            self.novice,
+        ) == (
+            other.bowstyle,
+            other.gender,
+            other.junior,
+            other.novice,
+        )
+
+    def __hash__(self):
+        return hash((
+            self.bowstyle.pk,
+            self.gender,
+            self.junior,
+            self.novice,
+        ))
+
+
 class BaseResultMode(object):
     slug = ''
     name = ''
@@ -54,11 +92,22 @@ class BaseResultMode(object):
         raise ImproperlyConfigured('Subclasses must implement get_results')
 
     def sort_results(self, scores):
-        results = sorted(scores, key=lambda s: (s.score, s.hits, s.golds, s.xs), reverse=True)
+        scores = sorted(scores, key=lambda s: (s.score, s.hits, s.golds, s.xs), reverse=True)
         placing = 0
         current_score = None
         placing_counter = 1
-        for score in results:
+        results = []
+        for score in scores:
+            if not isinstance(score, ScoreMock):
+                score = ScoreMock(
+                    target=score.target,
+                    score=score.score,
+                    hits=score.hits,
+                    golds=score.golds,
+                    xs=score.xs,
+                    disqualified=score.disqualified,
+                    retired=score.retired,
+                )
             if score.disqualified or score.guest:
                 score.placing = None
             else:
@@ -70,6 +119,7 @@ class BaseResultMode(object):
                     placing += placing_counter
                     placing_counter = 1
                 score.placing = placing
+            results.append(score)
         return results
 
     def get_section_for_round(self, round, competition):
@@ -266,6 +316,21 @@ class BaseResultMode(object):
                 results[section][category] = scores
         return results
 
+    def get_categories_for_entry(self, competition, entry):
+        kwargs = {
+            'gender': entry.archer.get_gender_display(),
+            'bowstyle': entry.bowstyle,
+        }
+        if competition.has_juniors and entry.age == 'J':
+            kwargs['junior'] = 'Junior'
+        if competition.has_novices and entry.novice == 'N':
+            kwargs['novice'] = 'Novice'
+        categories = [ResultCategory(**kwargs)]
+        if competition.novices_in_experienced_individual and entry.novice == 'N':
+            kwargs.pop('novice')
+            categories.append(ResultCategory(**kwargs))
+        return categories
+
 
 class BySession(BaseResultMode):
     slug = 'by-session'
@@ -298,10 +363,12 @@ class BySession(BaseResultMode):
             session_entry = score.target.session_entry
             if session_entry.session_round.session_id is not session.id:
                 continue
-            category = session_entry.competition_entry.category()
-            if category not in results:
-                results[category] = []
-            results[category].append(score)
+            categories = self.get_categories_for_entry(competition, session_entry.competition_entry)
+            for category in categories:
+                category = session_entry.competition_entry.category()
+                if category not in results:
+                    results[category] = []
+                results[category].append(score)
         for category in results:
             results[category] = self.sort_results(results[category])
             for i, score in enumerate(results[category]):
@@ -358,10 +425,11 @@ class ByRound(BaseResultMode):
                 continue
             if not self.include_later_shoots_anyway and competition.exclude_later_shoots and session_entry.index > 1:
                 continue
-            category = self.get_category_for_entry(session_entry.competition_entry)
-            if category not in results:
-                results[category] = []
-            results[category].append(score)
+            categories = self.get_categories_for_entry(competition, session_entry.competition_entry)
+            for category in categories:
+                if category not in results:
+                    results[category] = []
+                results[category].append(score)
         for category in results:
             results[category] = self.sort_results(results[category])
             for i, score in enumerate(results[category]):
@@ -377,9 +445,6 @@ class ByRound(BaseResultMode):
                         placing=None,
                     )
         return results
-
-    def get_category_for_entry(self, entry):
-        return entry.category()
 
 
 class ByRoundAllShot(ByRound, BaseResultMode):
@@ -466,12 +531,13 @@ class DoubleRound(BaseResultMode):
             session_entry = score.target.session_entry
             if session_entry.session_round.shot_round.id is not round.id:
                 continue
-            category = session_entry.competition_entry.category()
-            if category not in results:
-                results[category] = {}
-            if session_entry.competition_entry not in results[category]:
-                results[category][session_entry.competition_entry] = []
-            results[category][session_entry.competition_entry].append(score)
+            categories = self.get_categories_for_entry(competition, session_entry.competition_entry)
+            for category in categories:
+                if category not in results:
+                    results[category] = {}
+                if session_entry.competition_entry not in results[category]:
+                    results[category][session_entry.competition_entry] = []
+                results[category][session_entry.competition_entry].append(score)
         for category, scores in results.items():
             scores = OrderedDict((entry, rounds) for entry, rounds in scores.items() if len(rounds) >= 2)
             if not scores:
@@ -522,11 +588,11 @@ class H2HSeedings(ByRound, BaseResultMode):
             self.get_round_results(competition, round, scores)
         ) for round in rounds)
 
-    def get_category_for_entry(self, entry):
+    def get_categories_for_entry(self, competition, entry):
         for category in self.categories:
             if entry.bowstyle in category.bowstyles.all():
                 if category.gender is None or category.gender == entry.archer.gender:
-                    return category
+                    return [category]
 
 
 class Team(BaseResultMode):

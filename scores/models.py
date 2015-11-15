@@ -23,6 +23,7 @@ class ScoreManager(models.Manager):
         return active_scores
 
     def results(self, session_round=None, category=None, qs=None):
+        """TODO: Now only used for olympic setup, should be removed in favour of result_modes.Seedings"""
         if qs:
             scores = qs
             if session_round:

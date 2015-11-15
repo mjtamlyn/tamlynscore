@@ -54,6 +54,7 @@ class Competition(models.Model):
     has_juniors = models.BooleanField(default=False)
     has_wa_age_groups = models.BooleanField(default=False)
     has_agb_age_groups = models.BooleanField(default=False)
+    novices_in_experienced_individual = models.BooleanField(default=False, help_text='Puts the novices in experienced results and their own category')
     novices_in_experienced_teams = models.BooleanField(default=False)
     exclude_later_shoots = models.BooleanField(default=False, help_text='Only the first session can count for results')
     use_county_teams = models.BooleanField(default=False)
@@ -272,6 +273,7 @@ class CompetitionEntry(models.Model):
         return gender + bowstyle
 
     def category(self):
+        """TODO: Remove this - used only by Score.objects.results."""
         junior = 'Junior ' if self.competition.has_juniors and self.age == 'J' else ''
         novice = 'Novice ' if self.competition.has_novices and self.novice == 'N' else ''
         if self.competition.has_agb_age_groups and self.agb_age:
