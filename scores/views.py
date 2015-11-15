@@ -127,7 +127,7 @@ class InputArrowsView(CompetitionMixin, TemplateView):
         context = super(InputArrowsView, self).get_context_data(**kwargs)
         session_id = self.kwargs['session_id']
         boss = self.kwargs['boss']
-        dozen = self.kwargs['boss']
+        dozen = self.kwargs['dozen']
         scores = Score.objects.filter(target__session_entry__session_round__session=session_id, target__boss=boss, target__session_entry__present=True).order_by('target__target').select_related()
         try:
             forms = get_arrow_formset(scores, session_id, boss, dozen, scores[0].target.session_entry.session_round.session.arrows_entered_per_end)
