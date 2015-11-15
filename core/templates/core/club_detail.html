@@ -7,7 +7,10 @@
     <div class="col6">
         {% if user.is_authenticated %}
         <div class="pull-right">
-            <p><a class="btn edit" href="{% url 'club_update' club_slug=club.slug %}">Edit</a></p>
+            <p>
+                <a class="btn edit" href="{% url 'club_update' club_slug=club.slug %}">Edit</a>
+                <a class="btn add" href="{% url 'archer_create' %}">Add Archer</a>
+            </p>
         </div>
         {% endif %}
         <ul class="names">

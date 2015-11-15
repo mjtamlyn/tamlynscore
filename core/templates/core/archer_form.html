@@ -1,16 +1,10 @@
 {% extends 'base.html' %}
+{% load floppyforms %}
 
 {% block scripts %}
 <script src="{{ STATIC_URL }}lib/jquery/jquery-2.1.3.min.js"></script>
 {% endblock %}
 
 {% block content %}
-    <h2>{% if form.instance.name %}{{ form.instance }}{% else %}Add archer{% endif %}</h2>
-    <form method="post">
-        {% csrf_token %}
-        <ul>
-            {{ form.as_ul }}
-            <li><input type="submit" class="btn"></li>
-        </ul>
-    </form>
+    {% form form using "core/form_layout.html" with form_title=form.instance.name|default:"Add archer" %}
 {% endblock %}

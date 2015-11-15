@@ -1,4 +1,4 @@
-from django import forms
+import floppyforms.__future__ as forms
 
 from .models import Archer
 
