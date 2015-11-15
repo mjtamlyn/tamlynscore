@@ -25,14 +25,14 @@
             <li><a href="{% url 'input_scores' slug=competition.slug %}">Input scores</a></li>
             {% endif %}
         {% endif %}
-        <li><p class="drop">Leaderboards</p>
+        <li><p class="drop"><a onclick="void(0)">Leaderboards</a></p>
             <ul>
             {% for mode in modes %}
                 <li><a href="{% url 'leaderboard' slug=competition.slug mode=mode.mode format='html' %}">{{ mode }}</a></li>
             {% endfor %}
             </ul>
         </li>
-        <li><p class="drop">Results</p>
+        <li><p class="drop"><a onclick="void(0)">Results</a></p>
             <ul>
             {% for mode in modes %}
             {% if not mode.leaderboard_only %}

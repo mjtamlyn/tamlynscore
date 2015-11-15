@@ -3784,28 +3784,28 @@ nav .nav-link:hover {
   border-left: 1px solid #CCCCCC;
   line-height: 30px;
   position: relative;
+  cursor: pointer;
 }
-/* line 20, ../../sass/_competition.sass */
+/* line 21, ../../sass/_competition.sass */
 .competition-nav li:last-child {
   border-right: 1px solid #CCCCCC;
 }
-/* line 22, ../../sass/_competition.sass */
+/* line 23, ../../sass/_competition.sass */
 .competition-nav li:hover {
   background-color: #F0F0F0;
 }
-/* line 24, ../../sass/_competition.sass */
+/* line 25, ../../sass/_competition.sass */
 .competition-nav li:hover p.drop:after {
   color: inherit;
 }
-/* line 26, ../../sass/_competition.sass */
+/* line 27, ../../sass/_competition.sass */
 .competition-nav li a {
   padding: 10px;
 }
-/* line 28, ../../sass/_competition.sass */
+/* line 29, ../../sass/_competition.sass */
 .competition-nav li p {
   margin: 0;
   padding: 0 10px;
-  cursor: pointer;
 }
 /* line 32, ../../sass/_competition.sass */
 .competition-nav li p.drop:after {
