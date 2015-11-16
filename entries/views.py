@@ -38,7 +38,7 @@ class CompetitionList(ListView):
     def get_context_data(self):
         context = super(CompetitionList, self).get_context_data()
         today = timezone.now().date
-        context['upcoming'] = context['object_list'].filter(date__gt=today)
+        context['upcoming'] = context['object_list'].filter(date__gt=today).order_by('date')
         context['current'] = context['object_list'].filter(date__lte=today, end_date__gte=today)
         context['past'] = context['object_list'].filter(end_date__lt=today)
         return context
