@@ -10,6 +10,6 @@
     <a class="pull-right btn add" href="{% url 'club_create' %}?next={{ request.path }}">Add club</a>
 </p>
 {% with object.archer|stringformat:"s" as title_suffix %}
-    {% form form using "core/form_layout.html" with form_title="Update entry for "|add:title_suffix %}
+    {% form form using "entries/entry_form_layout.html" with form_title="Update entry for "|add:title_suffix %}
 {% endwith %}
 {% endblock %}

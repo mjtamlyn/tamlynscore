@@ -1,0 +1,25 @@
+{% extends "floppyforms/layouts/p.html" %}
+{% load floppyforms %}
+
+{% block forms %}
+    {% if form_title %}
+        <h2>{{ form_title }}</h2>
+    {% endif %}
+    <form action="" method="post" class="page-form">
+        {% csrf_token %}
+        <div class="form-group">
+            <div class="form-group">
+                {% formrow form.agb_number form.guest using 'form-item.html' %}
+                {% formrow form.bowstyle form.update_bowstyle using 'form-item.html' %}
+                {% formrow form.club form.update_club using 'form-item.html' %}
+                {% formrow form.county using 'form-item.html' %}
+                {% formrow form.novice form.update_novice using 'form-item.html' %}
+                {% formrow form.age form.update_age using 'form-item.html' %}
+                {% formrow form.wa_age form.update_wa_age using 'form-item.html' %}
+                {% formrow form.agb_age form.update_agb_age using 'form-item.html' %}
+                {% formrow form.sessions using 'form-item.html' %}
+            </div>
+        </div>
+        <p><input type="submit" class="btn" {% if button_text %}value="{{ button_text }}"{% endif %}></p>
+    </form>
+{% endblock %}

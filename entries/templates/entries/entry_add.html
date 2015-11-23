@@ -14,6 +14,6 @@
     {% endif %}
 </p>
 {% with archer|stringformat:"s" as title_suffix %}
-    {% form form using "core/form_layout.html" with form_title="Create entry for "|add:title_suffix %}
+    {% form form using "entries/entry_form_layout.html" with form_title="Create entry for "|add:title_suffix %}
 {% endwith %}
 {% endblock %}
