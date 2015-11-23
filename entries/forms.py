@@ -37,6 +37,7 @@ class CompetitionForm(forms.Form):
     leaderboard_only_modes = forms.MultipleChoiceField(choices=get_result_modes, widget=forms.CheckboxSelectMultiple, required=False)
 
     # Fields about individual results
+    has_guests = forms.BooleanField(required=False, label='Allow guest entries')
     has_novices = forms.BooleanField(required=False, label='Use a novice category')
     has_juniors = forms.BooleanField(required=False, label='Use a general junior category')
     has_wa_age_groups = forms.BooleanField(required=False, label='Use WA style age groups')
@@ -197,7 +198,6 @@ class EntryCreateForm(forms.Form):
     )
     update_bowstyle = forms.BooleanField(required=False)
     agb_number = forms.IntegerField(required=False, label='ArcheryGB number')
-    guest = forms.BooleanField(required=False)
 
     def __init__(self, archer, competition, **kwargs):
         super(EntryCreateForm, self).__init__(**kwargs)
@@ -255,8 +255,8 @@ class EntryCreateForm(forms.Form):
                 queryset=self.session_rounds,
                 widget=forms.CheckboxSelectMultiple,
             )
-            # if cache.get('entry-form:sessions'):
-            #    self.initial['sessions'] = cache.get('entry-form:sessions')
+        if self.competition.has_guests:
+            self.fields['guest'] = forms.BooleanField(required=False)
 
     def get_current_obj(self):
         return self.archer
@@ -306,7 +306,6 @@ class EntryCreateForm(forms.Form):
 
     def set_entry_data(self, entry):
         default = self.get_current_obj()
-        entry.guest = self.cleaned_data['guest']
         if self.competition.use_county_teams:
             entry.county = self.cleaned_data['county'] or (default.club.county if default.club else None)
         else:
@@ -322,6 +321,8 @@ class EntryCreateForm(forms.Form):
             entry.agb_age = self.cleaned_data['agb_age']
             if entry.agb_age:
                 entry.age = 'J'
+        if self.competition.has_guests:
+            entry.guest = self.cleaned_data['guest']
 
     def create_session_entries(self, entry):
         if len(self.session_rounds) == 1:

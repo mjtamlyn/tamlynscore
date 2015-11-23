@@ -50,6 +50,7 @@ class Competition(models.Model):
 
     sponsors = models.ManyToManyField(Sponsor, blank=True)
 
+    has_guests = models.BooleanField(default=False)
     has_novices = models.BooleanField(default=False)
     has_juniors = models.BooleanField(default=False)
     has_wa_age_groups = models.BooleanField(default=False)
