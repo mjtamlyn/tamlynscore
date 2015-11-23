@@ -85,6 +85,7 @@ class TestCompetitionForm(TestCase):
             'strict_b_teams': False,
             'strict_c_teams': False,
             'novice_team_size': None,
+            'novices_in_experienced_individual': False,
             'novices_in_experienced_teams': False,
             'compound_team_size': None,
             'junior_team_size': None,

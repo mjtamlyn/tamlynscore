@@ -54,7 +54,8 @@ class CompetitionForm(forms.Form):
     strict_b_teams = forms.BooleanField(required=False, help_text='Allow two separate team entries from a club with predetermined archers')
     strict_c_teams = forms.BooleanField(required=False, help_text='Allow three separate team entries from a club with predetermined archers')
     novice_team_size = forms.IntegerField(required=False)
-    novices_in_experienced_teams = forms.BooleanField(required=False, help_text='Allow novice scores to count in experienced results')
+    novices_in_experienced_individual = forms.BooleanField(required=False, help_text='Allow novice scores to count in experienced results')
+    novices_in_experienced_teams = forms.BooleanField(required=False, help_text='Allow novice scores to count in experienced team results')
     compound_team_size = forms.IntegerField(required=False)
     junior_team_size = forms.IntegerField(required=False)
 
@@ -74,6 +75,7 @@ class CompetitionForm(forms.Form):
         'strict_b_teams',
         'strict_c_teams',
         'novice_team_size',
+        'novices_in_experienced_individual',
         'novices_in_experienced_teams',
         'compound_team_size',
         'junior_team_size',
