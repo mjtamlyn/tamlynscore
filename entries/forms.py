@@ -19,18 +19,18 @@ class CompetitionForm(forms.Form):
     scoring_system = forms.ChoiceField(choices=SCORING_SYSTEMS, initial=SCORING_FULL)
     archers_per_target = forms.IntegerField(initial=4)
     arrows_entered_per_end = forms.IntegerField(initial=12, help_text='Number of arrow values included on each running slip')
-    session_1_time = forms.DateTimeField()
-    session_1_rounds = forms.ModelMultipleChoiceField(Round.objects)
-    session_2_time = forms.DateTimeField(required=False)
-    session_2_rounds = forms.ModelMultipleChoiceField(Round.objects, required=False)
-    session_3_time = forms.DateTimeField(required=False)
-    session_3_rounds = forms.ModelMultipleChoiceField(Round.objects, required=False)
-    session_4_time = forms.DateTimeField(required=False)
-    session_4_rounds = forms.ModelMultipleChoiceField(Round.objects, required=False)
-    session_5_time = forms.DateTimeField(required=False)
-    session_5_rounds = forms.ModelMultipleChoiceField(Round.objects, required=False)
-    session_6_time = forms.DateTimeField(required=False)
-    session_6_rounds = forms.ModelMultipleChoiceField(Round.objects, required=False)
+    session_1_time = forms.DateTimeField(label='Session time')
+    session_1_rounds = forms.ModelMultipleChoiceField(Round.objects, label='Rounds')
+    session_2_time = forms.DateTimeField(required=False, label='Session time')
+    session_2_rounds = forms.ModelMultipleChoiceField(Round.objects, required=False, label='Rounds')
+    session_3_time = forms.DateTimeField(required=False, label='Session time')
+    session_3_rounds = forms.ModelMultipleChoiceField(Round.objects, required=False, label='Rounds')
+    session_4_time = forms.DateTimeField(required=False, label='Session time')
+    session_4_rounds = forms.ModelMultipleChoiceField(Round.objects, required=False, label='Rounds')
+    session_5_time = forms.DateTimeField(required=False, label='Session time')
+    session_5_rounds = forms.ModelMultipleChoiceField(Round.objects, required=False, label='Rounds')
+    session_6_time = forms.DateTimeField(required=False, label='Session time')
+    session_6_rounds = forms.ModelMultipleChoiceField(Round.objects, required=False, label='Rounds')
 
     # Fields about result types
     result_modes = forms.MultipleChoiceField(choices=get_result_modes, widget=forms.CheckboxSelectMultiple, initial=[ByRound.slug])
@@ -58,6 +58,27 @@ class CompetitionForm(forms.Form):
     compound_team_size = forms.IntegerField(required=False)
     junior_team_size = forms.IntegerField(required=False)
 
+    CONFIG_FIELDS = [
+        'has_guests',
+        'has_novices',
+        'has_juniors',
+        'has_wa_age_groups',
+        'has_agb_age_groups',
+        'exclude_later_shoots',
+        'team_size',
+        'allow_incomplete_teams',
+        'combine_rounds_for_team_scores',
+        'force_mixed_teams',
+        'split_gender_teams',
+        'use_county_teams',
+        'strict_b_teams',
+        'strict_c_teams',
+        'novice_team_size',
+        'novices_in_experienced_teams',
+        'compound_team_size',
+        'junior_team_size',
+    ]
+
     def __init__(self, instance=None, initial=None, **kwargs):
         if initial is None:
             initial = {}
@@ -83,6 +104,8 @@ class CompetitionForm(forms.Form):
             initial['session_%s_rounds' % i] = list(session.sessionround_set.values_list('shot_round', flat=True))
 
         initial['result_modes'] = list(instance.result_modes.values_list('mode', flat=True))
+        for field in self.CONFIG_FIELDS:
+            initial[field] = getattr(instance, field)
         return initial
 
     def clean(self):
@@ -128,6 +151,8 @@ class CompetitionForm(forms.Form):
         tournament.save()
         self.instance.tournament = tournament
         self.instance.date = self.cleaned_data['date']
+        for field in self.CONFIG_FIELDS:
+            setattr(self.instance, field, self.cleaned_data[field])
 
     def handle_session_fields(self):
         sessions = self.instance.session_set.order_by('start')

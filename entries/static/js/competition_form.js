@@ -1,6 +1,4 @@
 $(document).ready(function() {
-	var editing = $('h1#title').text() !== 'Add competition';
-
 	// Deal with session visibility
 	$('#session_group_2').hide(0);
 	$('#session_group_3').hide(0);
@@ -40,14 +38,22 @@ $(document).ready(function() {
 	});
 
 	// Set input fields to disabled if appropriate
-	$('#id_novice_team_size').prop('disabled', !$('#id_has_novices').checked);
-	$('#id_junior_team_size').prop('disabled', !$('#id_has_juniors').checked);
+	$('#id_novice_team_size').prop('disabled', !$('#id_has_novices').is(':checked'));
+    enableJuniorTeamSize();
 
 	// Enable/disable inputs when appropriate
 	$('#id_has_novices').change(function(e) {
 		$('#id_novice_team_size').prop('disabled', !this.checked);
 	});
-	$('#id_has_juniors').change(function(e) {
-		$('#id_junior_team_size').prop('disabled', !this.checked);
+	$('#id_has_juniors, #id_has_wa_age_groups, #id_has_agb_age_groups').change(function(e) {
+        enableJuniorTeamSize();
 	});
+
+    function enableJuniorTeamSize() {
+        var disabled = (
+            !$('#id_has_juniors').is(':checked') &&
+            !$('#id_has_wa_age_groups').is(':checked') &&
+            !$('#id_has_agb_age_groups').is(':checked'));
+        $('#id_junior_team_size').prop('disabled', disabled);
+    }
 });

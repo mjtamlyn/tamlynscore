@@ -16,6 +16,11 @@ $competition-mobile-breakpoint: 640px
 form.inline
   display: inline
 
+form.page-form
+  background-color: #fcfcfc
+  border-radius: 5px
+  padding: 10px
+
 div.form-group
 
   margin-bottom: 32px
@@ -27,7 +32,7 @@ div.form-group
     text-align: left
     line-height: 1.47
 
-    border-bottom: 2px solid rgba(0, 0, 0, 0.09)
+    border-bottom: 2px solid rgba(0, 0, 0, 0.1)
 
   div.form-flex-subgroup
     flex: 0.5
@@ -41,7 +46,7 @@ div.form-group
       text-align: left
       line-height: 1.47
 
-      border-bottom: 1px solid rgba(0, 0, 0, 0.05)
+      border-bottom: 1px solid rgba(0, 0, 0, 0.1)
 
     & > div.form-item
       margin-bottom: 8px
@@ -68,34 +73,36 @@ div.form-group
 
       margin: 0px 8px
 
-      & > ul > li > label > input
-        display: inline-block !important
-        width: auto !important
-
-      &.flex-0-5
-        flex: 0.5
-
-      &.flex-0-75
-        flex: 0.75
-
       label
+        opacity: 0.9
+        font-size: 16px
+        display: block
+
+      .help-text
+        opacity: 0.7
         font-size: 14px
 
-        select
-          -webkit-appearance: none
-          -moz-appearance: none
-          appearance: none
+      input, select
+        display: block
+        width: 100%
+        margin-top: 4px
 
-          background-color: transparent
+      input[type=checkbox]
+        display: inline
+        width: auto
 
-        &.single-select select
+      select
+        -webkit-appearance: none
+        -moz-appearance: none
+        appearance: none
+
+        background-color: white
+
+        &:not([multiple])
           background-repeat: no-repeat
           background-position: 100% center
           background-image: url(data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHZlcnNpb249IjEuMSIgeD0iMTJweCIgeT0iMHB4IiB3aWR0aD0iMjRweCIgaGVpZ2h0PSIzcHgiIHZpZXdCb3g9IjAgMCA2IDMiIGVuYWJsZS1iYWNrZ3JvdW5kPSJuZXcgMCAwIDYgMyIgeG1sOnNwYWNlPSJwcmVzZXJ2ZSI+PHBvbHlnb24gcG9pbnRzPSI1Ljk5MiwwIDIuOTkyLDMgLTAuMDA4LDAgIi8+PC9zdmc+)
 
-      label input,
-      label select
-        margin-top: 4px
 
     div.form-flex-subgroup
       & div.form-item
@@ -106,12 +113,6 @@ div.form-group
 
         &:last-of-type
           margin-bottom: 0px
-
-    div.form-item label:not(.has-checkbox) input,
-    div.form-item label:not(.has-checkbox) select
-      display: block
-
-      width: 100%
 
 @media only screen and (max-width: $competition-mobile-breakpoint)
   div.form-group

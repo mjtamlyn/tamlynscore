@@ -3442,120 +3442,121 @@ form.inline {
 }
 
 /* line 19, ../../sass/_forms.sass */
+form.page-form {
+  background-color: #fcfcfc;
+  border-radius: 5px;
+  padding: 10px;
+}
+
+/* line 24, ../../sass/_forms.sass */
 div.form-group {
   margin-bottom: 32px;
 }
-/* line 23, ../../sass/_forms.sass */
+/* line 28, ../../sass/_forms.sass */
 div.form-group button {
   margin: 0px 8px;
 }
-/* line 26, ../../sass/_forms.sass */
+/* line 31, ../../sass/_forms.sass */
 div.form-group h2 {
   text-align: left;
   line-height: 1.47;
-  border-bottom: 2px solid rgba(0, 0, 0, 0.09);
+  border-bottom: 2px solid rgba(0, 0, 0, 0.1);
 }
-/* line 32, ../../sass/_forms.sass */
+/* line 37, ../../sass/_forms.sass */
 div.form-group div.form-flex-subgroup {
   flex: 0.5;
   margin: 0px 8px;
 }
-/* line 37, ../../sass/_forms.sass */
+/* line 42, ../../sass/_forms.sass */
 div.form-group div.form-subgroup {
   margin-bottom: 16px;
 }
-/* line 40, ../../sass/_forms.sass */
+/* line 45, ../../sass/_forms.sass */
 div.form-group div.form-subgroup h3 {
   text-align: left;
   line-height: 1.47;
-  border-bottom: 1px solid rgba(0, 0, 0, 0.05);
+  border-bottom: 1px solid rgba(0, 0, 0, 0.1);
 }
-/* line 46, ../../sass/_forms.sass */
+/* line 51, ../../sass/_forms.sass */
 div.form-group div.form-subgroup > div.form-item {
   margin-bottom: 8px;
 }
-/* line 49, ../../sass/_forms.sass */
+/* line 54, ../../sass/_forms.sass */
 div.form-group div.form-subgroup > div.form-item:last-of-type {
   margin-bottom: 0px;
 }
-/* line 52, ../../sass/_forms.sass */
+/* line 57, ../../sass/_forms.sass */
 div.form-group div.form-flex-wrapper {
   display: flex;
   margin-bottom: 8px;
 }
-/* line 57, ../../sass/_forms.sass */
+/* line 62, ../../sass/_forms.sass */
 div.form-group div.form-flex-wrapper.contains-subgroup {
   display: flex;
 }
-/* line 60, ../../sass/_forms.sass */
+/* line 65, ../../sass/_forms.sass */
 div.form-group div.form-flex-wrapper.align-bottom {
   align-items: flex-end;
 }
-/* line 63, ../../sass/_forms.sass */
+/* line 68, ../../sass/_forms.sass */
 div.form-group div.form-flex-wrapper.align-center {
   align-items: flex-center;
 }
-/* line 66, ../../sass/_forms.sass */
+/* line 71, ../../sass/_forms.sass */
 div.form-group div.form-flex-wrapper div.form-item {
   flex: 1;
   margin: 0px 8px;
 }
-/* line 71, ../../sass/_forms.sass */
-div.form-group div.form-flex-wrapper div.form-item > ul > li > label > input {
-  display: inline-block !important;
-  width: auto !important;
-}
-/* line 75, ../../sass/_forms.sass */
-div.form-group div.form-flex-wrapper div.form-item.flex-0-5 {
-  flex: 0.5;
-}
-/* line 78, ../../sass/_forms.sass */
-div.form-group div.form-flex-wrapper div.form-item.flex-0-75 {
-  flex: 0.75;
+/* line 76, ../../sass/_forms.sass */
+div.form-group div.form-flex-wrapper div.form-item label {
+  opacity: 0.9;
+  font-size: 16px;
+  display: block;
 }
 /* line 81, ../../sass/_forms.sass */
-div.form-group div.form-flex-wrapper div.form-item label {
+div.form-group div.form-flex-wrapper div.form-item .help-text {
+  opacity: 0.7;
   font-size: 14px;
 }
-/* line 84, ../../sass/_forms.sass */
-div.form-group div.form-flex-wrapper div.form-item label select {
+/* line 85, ../../sass/_forms.sass */
+div.form-group div.form-flex-wrapper div.form-item input, div.form-group div.form-flex-wrapper div.form-item select {
+  display: block;
+  width: 100%;
+  margin-top: 4px;
+}
+/* line 90, ../../sass/_forms.sass */
+div.form-group div.form-flex-wrapper div.form-item input[type=checkbox] {
+  display: inline;
+  width: auto;
+}
+/* line 94, ../../sass/_forms.sass */
+div.form-group div.form-flex-wrapper div.form-item select {
   -webkit-appearance: none;
   -moz-appearance: none;
   appearance: none;
-  background-color: transparent;
+  background-color: white;
 }
-/* line 91, ../../sass/_forms.sass */
-div.form-group div.form-flex-wrapper div.form-item label.single-select select {
+/* line 101, ../../sass/_forms.sass */
+div.form-group div.form-flex-wrapper div.form-item select:not([multiple]) {
   background-repeat: no-repeat;
   background-position: 100% center;
   background-image: url(data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHZlcnNpb249IjEuMSIgeD0iMTJweCIgeT0iMHB4IiB3aWR0aD0iMjRweCIgaGVpZ2h0PSIzcHgiIHZpZXdCb3g9IjAgMCA2IDMiIGVuYWJsZS1iYWNrZ3JvdW5kPSJuZXcgMCAwIDYgMyIgeG1sOnNwYWNlPSJwcmVzZXJ2ZSI+PHBvbHlnb24gcG9pbnRzPSI1Ljk5MiwwIDIuOTkyLDMgLTAuMDA4LDAgIi8+PC9zdmc+);
 }
-/* line 96, ../../sass/_forms.sass */
-div.form-group div.form-flex-wrapper div.form-item label input,
-div.form-group div.form-flex-wrapper div.form-item label select {
-  margin-top: 4px;
-}
-/* line 101, ../../sass/_forms.sass */
+/* line 108, ../../sass/_forms.sass */
 div.form-group div.form-flex-wrapper div.form-flex-subgroup div.form-item {
   margin: 0px;
 }
-/* line 104, ../../sass/_forms.sass */
+/* line 111, ../../sass/_forms.sass */
 div.form-group div.form-flex-wrapper div.form-flex-subgroup > div.form-item {
   margin-bottom: 8px;
 }
-/* line 107, ../../sass/_forms.sass */
+/* line 114, ../../sass/_forms.sass */
 div.form-group div.form-flex-wrapper div.form-flex-subgroup > div.form-item:last-of-type {
   margin-bottom: 0px;
 }
-/* line 110, ../../sass/_forms.sass */
-div.form-group div.form-flex-wrapper div.form-item label:not(.has-checkbox) input,
-div.form-group div.form-flex-wrapper div.form-item label:not(.has-checkbox) select {
-  display: block;
-  width: 100%;
-}
 
 @media only screen and (max-width: 640px) {
-  /* line 118, ../../sass/_forms.sass */
+  /* line 119, ../../sass/_forms.sass */
   div.form-group div.form-flex-wrapper.contains-subgroup {
     display: block;
   }
