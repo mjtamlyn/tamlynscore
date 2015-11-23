@@ -323,6 +323,10 @@ class BaseResultMode(object):
         }
         if competition.has_juniors and entry.age == 'J':
             kwargs['junior'] = 'Junior'
+        if competition.has_wa_age_groups and entry.wa_age:
+            kwargs['junior'] = entry.get_wa_age_display()
+        if competition.has_agb_age_groups and entry.agb_age:
+            kwargs['junior'] = entry.get_agb_age_display()
         if competition.has_novices and entry.novice == 'N':
             kwargs['novice'] = 'Novice'
         categories = [ResultCategory(**kwargs)]
