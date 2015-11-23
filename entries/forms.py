@@ -197,6 +197,7 @@ class EntryCreateForm(forms.Form):
     )
     update_bowstyle = forms.BooleanField(required=False)
     agb_number = forms.IntegerField(required=False, label='ArcheryGB number')
+    guest = forms.BooleanField(required=False)
 
     def __init__(self, archer, competition, **kwargs):
         super(EntryCreateForm, self).__init__(**kwargs)
@@ -305,6 +306,7 @@ class EntryCreateForm(forms.Form):
 
     def set_entry_data(self, entry):
         default = self.get_current_obj()
+        entry.guest = self.cleaned_data['guest']
         if self.competition.use_county_teams:
             entry.county = self.cleaned_data['county'] or (default.club.county if default.club else None)
         else:
@@ -345,6 +347,7 @@ class EntryUpdateForm(EntryCreateForm):
             archer=instance.archer,
             **kwargs
         )
+        self.initial['guest'] = instance.guest
         self.initial['sessions'] = [se.session_round for se in self.instance.sessionentry_set.all()]
 
     def get_current_obj(self):
