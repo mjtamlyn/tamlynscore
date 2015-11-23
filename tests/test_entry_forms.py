@@ -22,6 +22,7 @@ class TestCompetitionForm(TestCase):
             'short_name': 'Test event',
             'date': '2015-01-01',
 
+            'team_size': 4,
             'archers_per_target': 4,
             'scoring_system': 'F',
             'arrows_entered_per_end': 12,
@@ -68,6 +69,25 @@ class TestCompetitionForm(TestCase):
             'session_1_rounds': [session_round.shot_round_id],
 
             'result_modes': [result_mode.mode],
+
+            'has_guests': False,
+            'has_novices': False,
+            'has_juniors': False,
+            'has_wa_age_groups': False,
+            'has_agb_age_groups': False,
+            'exclude_later_shoots': False,
+            'team_size': 4,
+            'allow_incomplete_teams': True,
+            'combine_rounds_for_team_scores': False,
+            'force_mixed_teams': False,
+            'split_gender_teams': False,
+            'use_county_teams': False,
+            'strict_b_teams': False,
+            'strict_c_teams': False,
+            'novice_team_size': None,
+            'novices_in_experienced_teams': False,
+            'compound_team_size': None,
+            'junior_team_size': None,
         })
         saving_form = CompetitionForm(instance=competition, data=form.initial)
         self.assertTrue(saving_form.is_valid(), saving_form.errors.as_json())
