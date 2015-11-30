@@ -380,7 +380,6 @@ class PDFResultsRenderer(object):
             for category, scores in categories.items():
                 elements.append(Paragraph(str(category), self.styles['h2']))
                 table_data = [section.headers]
-                print(section.headers)
                 for score in scores:
                     table_data += self.rows_from_score(scores, score, section)
                 table = Table(table_data)
@@ -419,8 +418,6 @@ class PDFResultsRenderer(object):
                     row.append(score.target.session_entry.competition_entry.get_wa_age_display())
                 else:
                     row.append(None)
-            else:
-                row.append(None)
         row += self.mode.score_details(score, section)
         return rows
 

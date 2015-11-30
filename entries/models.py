@@ -227,14 +227,24 @@ class SessionRound(models.Model):
                             allocation += (
                                 entry.get_novice_display(),
                             )
-                        if competition.has_wa_age_groups and entry.wa_age:
-                            allocation += (
-                                entry.get_wa_age_display(),
-                            )
-                        if competition.has_agb_age_groups and entry.agb_age:
-                            allocation += (
-                                entry.get_agb_age_display(),
-                            )
+                        if competition.has_wa_age_groups:
+                            if entry.wa_age:
+                                allocation += (
+                                    entry.get_wa_age_display(),
+                                )
+                            else:
+                                allocation += (
+                                    None,
+                                )
+                        if competition.has_agb_age_groups:
+                            if entry.agb_age:
+                                allocation += (
+                                    entry.get_agb_age_display(),
+                                )
+                            else:
+                                allocation += (
+                                    None,
+                                )
                     if whole_session:
                         allocation += (shot_round.name,)
                     targets.append((target,) + allocation)
