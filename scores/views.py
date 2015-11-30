@@ -430,21 +430,28 @@ class CSVResultsRenderer(object):
             for category, scores in categories.items():
                 for score in scores:
                     row = [str(section), str(category)]
-                    row += [
-                        score.target.session_entry.competition_entry.archer.name,
-                        score.target.session_entry.competition_entry.club.name + (' (Guest)' if score.guest else ''),
-                    ]
-                    if self.competition.has_novices:
-                        if score.target.session_entry.competition_entry.novice == 'N':
-                            row.append('Novice')
-                        else:
-                            row.append('')
-                    if self.competition.has_wa_age_groups:
-                        if score.target.session_entry.competition_entry.wa_age:
-                            row.append(score.target.session_entry.competition_entry.get_wa_age_display())
-                        else:
-                            row.append('')
-                    row += self.mode.score_details(score, section)
+                    if getattr(score, 'team', None):
+                        row += [score.club] + self.mode.score_details(score, section)
+                        for member in score.team:
+                            row += [
+                                member.target.session_entry.competition_entry.archer.name,
+                            ] + self.mode.score_details(member, section)
+                    else:
+                        row += [
+                            score.target.session_entry.competition_entry.archer.name,
+                            score.target.session_entry.competition_entry.club.name + (' (Guest)' if score.guest else ''),
+                        ]
+                        if self.competition.has_novices:
+                            if score.target.session_entry.competition_entry.novice == 'N':
+                                row.append('Novice')
+                            else:
+                                row.append('')
+                        if self.competition.has_wa_age_groups:
+                            if score.target.session_entry.competition_entry.wa_age:
+                                row.append(score.target.session_entry.competition_entry.get_wa_age_display())
+                            else:
+                                row.append('')
+                        row += self.mode.score_details(score, section)
                     data.append(row)
         writer = csv.writer(response)
         writer.writerows(data)
