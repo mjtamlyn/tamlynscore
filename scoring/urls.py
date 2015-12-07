@@ -7,6 +7,7 @@ from django.contrib.staticfiles.urls import staticfiles_urlpatterns
 
 urlpatterns = [
     url(r'', include('core.urls')),
+    url(r'^leagues/', include('leagues.urls')),
     url(r'^tournaments/', include('entries.urls')),
     url(r'^tournaments/', include('scores.urls')),
     url(r'^tournaments/olympic/', include('olympic.urls')),

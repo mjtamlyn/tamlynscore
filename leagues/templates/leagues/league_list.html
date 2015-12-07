@@ -1,0 +1,17 @@
+{% extends 'base.html' %}
+
+{% block content %}
+<header>
+    <h1>Leagues</h1>
+</header>
+
+<div class="row">
+    <div class="col6">
+        <ul class="link-list">
+            {% for league in object_list %}
+            <li><a href="{{ league.get_absolute_url }}">{{ league }}</a></li>
+            {% endfor %}
+        </ul>
+    </div>
+</div>
+{% endblock %}

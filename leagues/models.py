@@ -4,8 +4,11 @@ from django.db import models
 class League(models.Model):
     name = models.CharField(max_length=255)
 
-    def __unicode__(self):
+    def __str__(self):
         return self.name
+
+    class Meta:
+        ordering = ('name',)
 
 
 class Season(models.Model):
@@ -13,7 +16,7 @@ class Season(models.Model):
     league = models.ForeignKey('League')
     clubs = models.ManyToManyField('core.Club')
 
-    def __unicode__(self):
+    def __str__(self):
         return self.name
 
 
@@ -23,5 +26,5 @@ class Leg(models.Model):
     clubs = models.ManyToManyField('core.Club')
     index = models.PositiveIntegerField()
 
-    def __unicode__(self):
+    def __str__(self):
         return '%s Leg %s' (self.season, self.index)
