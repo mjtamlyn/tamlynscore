@@ -5,4 +5,5 @@ from . import views
 
 urlpatterns = [
     url('^$', views.LeagueList.as_view(), name='league-list'),
+    url('^(?P<league_slug>[\w-]+)/$', views.LeagueDetail.as_view(), name='league-detail'),
 ]
