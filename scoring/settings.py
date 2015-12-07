@@ -86,6 +86,7 @@ INSTALLED_APPS = (
 
     'scoring',
     'core',
+    'leagues',
     'entries',
     'scores',
     'olympic',
