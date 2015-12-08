@@ -526,10 +526,19 @@ class Leaderboard(CompetitionMixin, PDFResultsRenderer, CSVResultsRenderer, JSON
         return format
 
     def get_queryset(self):
-        # TODO: stop using blank select_related
         scores = Score.objects.filter(
             target__session_entry__competition_entry__competition=self.competition
-        ).select_related().order_by(
+        ).select_related(
+            'target',
+            'target__session_entry',
+            'target__session_entry__session_round',
+            'target__session_entry__session_round__shot_round',
+            'target__session_entry__competition_entry',
+            'target__session_entry__competition_entry__competition',
+            'target__session_entry__competition_entry__archer',
+            'target__session_entry__competition_entry__bowstyle',
+            'target__session_entry__competition_entry__club',
+        ).order_by(
             '-target__session_entry__competition_entry__age',
             '-target__session_entry__competition_entry__agb_age',
             'target__session_entry__competition_entry__novice',
