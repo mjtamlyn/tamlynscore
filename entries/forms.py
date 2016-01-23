@@ -1,3 +1,6 @@
+import csv
+import io
+
 from django.core.cache import cache
 from django.db import transaction
 from django import forms
@@ -193,6 +196,22 @@ class CompetitionForm(forms.Form):
                 self.instance.result_modes.filter(mode=mode).delete()
         for mode in modes:
             self.instance.result_modes.create(mode=mode)
+
+
+class CSVEntryForm(forms.Form):
+    data = forms.CharField(widget=forms.Textarea, help_text='Enter a CSV of archer data. First column must be the name to search on.')
+
+    def clean_data(self):
+        value = self.cleaned_data['data']
+        data = io.StringIO()
+        data.write(value)
+        data.seek(0)
+        try:
+            reader = csv.reader(data)
+            self.read_data = list(reader)
+        except csv.Error:
+            raise forms.ValidationError('Count not interpret csv file')
+        return value
 
 
 class ArcherSearchForm(forms.Form):

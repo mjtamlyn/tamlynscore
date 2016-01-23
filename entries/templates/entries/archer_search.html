@@ -6,6 +6,13 @@
 
 {% block competition_content %}
 <h2>Select archer to enter</h2>
+
+{% if batch %}
+<div class="batch-status">
+    Current row: <strong>{{ current_row }}</strong>. Rows to process: <strong>{{ batch_length }}</strong>.
+</div>
+{% endif %}
+
 <p>Enter an archer name:</p>
 <form method="GET" action="">
     {{ search_form.query }}

@@ -8,6 +8,7 @@ urlpatterns = [
     url(r'^(?P<slug>[\w-]+)/$', views.CompetitionDetail.as_view(), name='competition_detail'),
     url(r'^(?P<slug>[\w-]+)/edit/$', views.CompetitionUpdate.as_view(), name='competition_update'),
     url(r'^(?P<slug>[\w-]+)/entries/$', views.EntryList.as_view(), name='entry_list'),
+    url(r'^(?P<slug>[\w-]+)/entries/batch/$', views.BatchEntryStart.as_view(), name='batch_entry_start'),
     url(r'^(?P<slug>[\w-]+)/entries/search/$', views.ArcherSearch.as_view(), name='archer_search'),
     url(r'^(?P<slug>[\w-]+)/entries/add/(?P<archer_id>\d+)/$', views.EntryAdd.as_view(), name='entry_add'),
     url(r'^(?P<slug>[\w-]+)/entries/edit/(?P<entry_id>\d+)/?$', views.EntryUpdate.as_view(), name='entry_update'),

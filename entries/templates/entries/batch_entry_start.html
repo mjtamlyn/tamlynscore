@@ -1,0 +1,16 @@
+{% extends 'base.html' %}
+
+{% load floppyforms %}
+
+{% block content %}
+<form action="" method="post" class="page-form">
+    {% csrf_token %}
+
+	<div class="form-group">
+		<h2>Add a batch of entries</h2>
+
+        {% form form 'form.html' %}
+        <input type="submit" class="btn" />
+	</div>
+</form>
+{% endblock %}

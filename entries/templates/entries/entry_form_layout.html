@@ -5,6 +5,13 @@
     {% if form_title %}
         <h2>{{ form_title }}</h2>
     {% endif %}
+
+    {% if batch %}
+    <div class="batch-status">
+        Current Batch row: {{ current_row }}. Remaining rows: {{ batch_length }}.
+    </div>
+    {% endif %}
+
     <form action="" method="post" class="page-form">
         {% csrf_token %}
         <div class="form-group">

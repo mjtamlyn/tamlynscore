@@ -21,7 +21,7 @@ from reportlab.lib.units import inch
 
 from core.models import Archer
 
-from .forms import ArcherSearchForm, CompetitionForm, EntryCreateForm, EntryUpdateForm
+from .forms import ArcherSearchForm, CSVEntryForm, CompetitionForm, EntryCreateForm, EntryUpdateForm
 from .models import (
     Competition, Session, CompetitionEntry, SessionEntry, TargetAllocation,
     SessionRound, SCORING_FULL, SCORING_DOZENS
@@ -171,7 +171,42 @@ class EntryList(CompetitionMixin, ListView):
         return context
 
 
-class ArcherSearch(CompetitionMixin, TemplateView):
+class BatchEntryMixin(object):
+    BATCH_KEY = 'batch'
+
+    def get_context_data(self, **kwargs):
+        context = super(BatchEntryMixin, self).get_context_data(**kwargs)
+        context['batch'] = self.is_in_batch()
+        if context['batch']:
+            context['current_row'] = ', '.join(self.get_batch()[0])
+            context['batch_length'] = len(self.get_batch())
+        return context
+
+    def is_in_batch(self):
+        return self.BATCH_KEY in self.request.session
+
+    def get_batch(self):
+        return self.request.session[self.BATCH_KEY]
+
+    def url_for_next_in_batch(self):
+        next_name = self.get_batch()[0][0]
+        url = reverse('archer_search', kwargs={'slug': self.competition.slug})
+        return url + '?query=' + next_name
+
+
+class BatchEntryStart(BatchEntryMixin, CompetitionMixin, FormView):
+    form_class = CSVEntryForm
+    template_name = 'entries/batch_entry_start.html'
+
+    def form_valid(self, form):
+        self.request.session[self.BATCH_KEY] = form.read_data
+        return super(BatchEntryStart, self).form_valid(form)
+
+    def get_success_url(self):
+        return self.url_for_next_in_batch()
+
+
+class ArcherSearch(BatchEntryMixin, CompetitionMixin, TemplateView):
     template_name = 'entries/archer_search.html'
 
     def get(self, request, *args, **kwargs):
@@ -190,7 +225,7 @@ class ArcherSearch(CompetitionMixin, TemplateView):
         return self.render_to_response(context)
 
 
-class EntryAdd(CompetitionMixin, DetailView):
+class EntryAdd(BatchEntryMixin, CompetitionMixin, DetailView):
     model = Archer
     pk_url_kwarg = 'archer_id'
     template_name = 'entries/entry_add.html'
@@ -221,6 +256,13 @@ class EntryAdd(CompetitionMixin, DetailView):
             return self.render_to_response(context)
 
     def get_success_url(self):
+        if self.is_in_batch():
+            batch = self.request.session[self.BATCH_KEY][1:]
+            if batch:
+                self.request.session[self.BATCH_KEY] = batch
+                return self.url_for_next_in_batch()
+            else:
+                del self.request.session[self.BATCH_KEY]
         return reverse('entry_list', kwargs={'slug': self.competition.slug})
 
 
