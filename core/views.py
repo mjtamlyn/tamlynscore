@@ -9,6 +9,7 @@ from django.views.generic import TemplateView, ListView, DetailView, UpdateView,
 from braces.views import LoginRequiredMixin, SuperuserRequiredMixin
 
 from entries.models import CompetitionEntry
+from entries.views import BatchEntryMixin
 from scores.models import Score
 
 from .models import County, Club, Archer
@@ -125,7 +126,7 @@ class ArcherUpdate(LoginRequiredMixin, UpdateView):
         return self.request.GET.get('next') or self.request.path
 
 
-class ArcherCreate(LoginRequiredMixin, CreateView):
+class ArcherCreate(BatchEntryMixin, LoginRequiredMixin, CreateView):
     model = Archer
     form_class = ArcherForm
 

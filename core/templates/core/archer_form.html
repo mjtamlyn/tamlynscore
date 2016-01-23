@@ -6,5 +6,12 @@
 {% endblock %}
 
 {% block content %}
+
+{% if batch %}
+<div class="batch-status">
+    <p>Current row: <strong>{{ current_row }}</strong>. Rows to process: <strong>{{ batch_length }}</strong>.</p>
+</div>
+{% endif %}
+
     {% form form using "core/form_layout.html" with form_title=form.instance.name|default:"Add archer" %}
 {% endblock %}
