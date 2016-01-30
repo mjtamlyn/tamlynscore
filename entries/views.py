@@ -129,8 +129,8 @@ class EntryList(CompetitionMixin, ListView):
                     'competition_entry__bowstyle',
                     'competition_entry__archer',
                 ),
-            )
-        )
+            ),
+        ).order_by('start')
         for session in sessions:
             session_rounds = session.sessionround_set.all()
             session_round_stats = []
