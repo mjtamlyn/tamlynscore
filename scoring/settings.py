@@ -104,7 +104,7 @@ CACHES = {
     }
 }
 
-if not DEBUG:
+if not DEBUG and not os.environ.get('LOCAL'):
     SESSION_COOKIE_SECURE = True
     X_FRAME_OPTIONS = 'DENY'
     SECURE_HSTS_SECONDS = 31536000
