@@ -2,7 +2,7 @@ import csv
 import os
 import sys
 
-os.environ.setdefault('DJANGO_SETTINGS_MODULE', 'scoring.settings')
+os.environ.setdefault('DJANGO_SETTINGS_MODULE', 'scoring.settings')  # NOQA
 
 
 from entries.models import Competition, TargetAllocation

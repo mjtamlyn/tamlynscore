@@ -1,5 +1,5 @@
 import os
-os.environ.setdefault("DJANGO_SETTINGS_MODULE", "scoring.settings")
+os.environ.setdefault("DJANGO_SETTINGS_MODULE", "scoring.settings")  # NOQA
 
 
 from django.core.wsgi import get_wsgi_application

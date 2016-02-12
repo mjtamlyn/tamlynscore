@@ -86,14 +86,16 @@ class InputScores(TargetList):
                     combined_lookup[dozen] = True
                     for allocation in allocations:
                         if allocation.session_entry.present and not allocation.score.retired and (
-                            allocation.id not in target_lookup
-                            or dozen not in target_lookup[allocation.id]
-                            or not len(target_lookup[allocation.id][dozen]) == session_round.session.arrows_entered_per_end
+                            allocation.id not in target_lookup or
+                            dozen not in target_lookup[allocation.id] or
+                            not len(target_lookup[allocation.id][dozen]) == session_round.session.arrows_entered_per_end
                         ):
                             combined_lookup[dozen] = False
                 bosses.append((boss, combined_lookup))
-            combine = lambda x, y: x and y
-            session_complete = bosses and functools.reduce(combine, [functools.reduce(combine, b[1].values()) for b in bosses])
+            session_complete = bosses and functools.reduce(
+                lambda x, y: x and y,
+                [functools.reduce(lambda x, y: x and y, b[1].values()) for b in bosses],
+            )
             if session_complete:
                 cache.set(cache_key, bosses, 30000)
 

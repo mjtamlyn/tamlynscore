@@ -282,8 +282,8 @@ class BaseResultMode(object):
                 scores = []
                 individual_target_pks = [score[1] for score in json_category['scores'] if isinstance(score, list)]
                 team_target_pks = sum([
-                    [score[0] for score in place['team']]
-                for place in json_category['scores'] if isinstance(place, dict)], [])
+                    [score[0] for score in place['team']
+                ] for place in json_category['scores'] if isinstance(place, dict)], [])
                 targets = TargetAllocation.objects.filter(
                     pk__in=individual_target_pks + team_target_pks,
                 ).select_related(
@@ -739,15 +739,15 @@ class Team(BaseResultMode):
             return is_non_compound
         if type == 'Gents non-compound':
             if not competition.novices_in_experienced_teams:
-                return (is_non_compound
-                        and score.target.session_entry.competition_entry.novice == 'E'
-                        and score.target.session_entry.competition_entry.archer.gender == 'G')
+                return (is_non_compound and
+                        score.target.session_entry.competition_entry.novice == 'E' and
+                        score.target.session_entry.competition_entry.archer.gender == 'G')
             return is_non_compound and score.target.session_entry.competition_entry.archer.gender == 'G'
         if type == 'Ladies non-compound':
             if not competition.novices_in_experienced_teams:
-                return (is_non_compound
-                        and score.target.session_entry.competition_entry.novice == 'E'
-                        and score.target.session_entry.competition_entry.archer.gender == 'L')
+                return (is_non_compound and
+                        score.target.session_entry.competition_entry.novice == 'E' and
+                        score.target.session_entry.competition_entry.archer.gender == 'L')
             return is_non_compound and score.target.session_entry.competition_entry.archer.gender == 'L'
         if type == 'Compound':
             return not is_non_compound
@@ -766,9 +766,9 @@ class Team(BaseResultMode):
         return 'Team'
 
     def combine_rounds(self, club_scores):
-        ce_getter = lambda s: s.target.session_entry.competition_entry
         combined_scores = []
-        for competition_entry, scores in itertools.groupby(club_scores, ce_getter):
+        for competition_entry, scores in itertools.groupby(club_scores,
+                lambda s: s.target.session_entry.competition_entry):
             scores = list(scores)
             combined_scores.append(ScoreMock(
                 score=sum(s.score for s in scores),
