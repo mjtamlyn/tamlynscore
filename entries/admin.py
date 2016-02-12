@@ -4,7 +4,7 @@ from entries.models import Tournament, Sponsor, Competition, ResultsMode, Sessio
 
 
 class CompetitionAdmin(admin.ModelAdmin):
-    filter_horizontal = ('sponsors',)
+    filter_horizontal = ('admins', 'sponsors',)
 
 
 class CompetitionEntryAdmin(admin.ModelAdmin):

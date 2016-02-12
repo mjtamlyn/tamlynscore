@@ -56,7 +56,10 @@ AGB_AGE_CHOICES = (
 
 
 class User(AbstractEmailUser):
-    pass
+    name = models.CharField(max_length=255, default='')
+
+    def __str__(self):
+        return self.name
 
 
 class Subround(models.Model):
