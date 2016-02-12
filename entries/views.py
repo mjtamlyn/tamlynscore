@@ -7,7 +7,6 @@ import math
 from django.core.urlresolvers import reverse
 from django.db.models import Prefetch
 from django.http import HttpResponse, HttpResponseBadRequest, HttpResponseRedirect, Http404
-from django.utils.datastructures import SortedDict
 from django.views.generic import View, DetailView, ListView, TemplateView, UpdateView, DeleteView, FormView
 from django.shortcuts import get_object_or_404
 from django.utils import timezone
@@ -320,7 +319,7 @@ class TargetList(CompetitionMixin, ListView):
         )
 
     def get_empty_target_list(self):
-        target_list = SortedDict()
+        target_list = collections.OrderedDict()
         session_rounds = SessionRound.objects.filter(
             session__competition__slug=self.kwargs['slug'],
         ).select_related('session')

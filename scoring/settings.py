@@ -73,6 +73,14 @@ MIDDLEWARE_CLASSES = (
 ROOT_URLCONF = os.environ.get('ROOT_URLCONF', 'scoring.urls')
 
 INSTALLED_APPS = (
+    'scoring',
+    'core',
+    'leagues',
+    'entries',
+    'scores',
+    'olympic',
+    'accounts',
+
     'django.contrib.auth',
     'django.contrib.contenttypes',
     'django.contrib.sessions',
@@ -83,14 +91,7 @@ INSTALLED_APPS = (
     'gunicorn',
     'debug_toolbar',
     'floppyforms',
-
-    'scoring',
-    'core',
-    'leagues',
-    'entries',
-    'scores',
-    'olympic',
-    'accounts',
+    'custom_user',
 )
 
 TEST_RUNNER = 'tests.runner.ScoringRunner'
