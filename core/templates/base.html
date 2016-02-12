@@ -3,7 +3,12 @@
         <meta name="viewport" content="width=device-width, initial-scale=1">
         {% block head %}
             {% block meta %}
-            <title>{% block title %}Archery Tournaments{% endblock %}</title>
+            <title>{% block title %}{% if title %}{{ title }} | {% endif %}Archery Tournaments{% endblock %}</title>
+            <meta property="og:title" content="{% if title %}{{ title }}{% else %}Archery Tournaments{% endif %}" />
+            <meta property="og:site_name" content="TamlynScore" />
+            {% if meta_description %}
+                <meta property="og:description" content="{{ meta_description }}" />
+            {% endif %}
             {% endblock meta %}
             {% block styles %}
                 <link rel="stylesheet" href="{{ STATIC_URL }}css/main.css" />

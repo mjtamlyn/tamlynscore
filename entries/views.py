@@ -67,8 +67,18 @@ class CompetitionMixin(MessageMixin):
             return HttpResponseRedirect(reverse('competition_detail', kwargs={'slug': self.kwargs['slug']}))
         return super(CompetitionMixin, self).dispatch(request, *args, **kwargs)
 
+    def get_meta_description(self):
+        return '{} on {}, hosted on TamlynScore.'.format(self.competition, self.competition.date.strftime('%d %B %Y'))
+
     def get_context_data(self, **kwargs):
-        return super(CompetitionMixin, self).get_context_data(competition=self.competition, competition_admin=self.is_admin, **kwargs)
+        context = super(CompetitionMixin, self).get_context_data(**kwargs)
+        context.update({
+            'competition': self.competition,
+            'competition_admin': self.is_admin,
+            'title': str(self.competition),
+            'meta_description': self.get_meta_description(),
+        })
+        return context
 
 
 class CompetitionDetail(CompetitionMixin, DetailView):
