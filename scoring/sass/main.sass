@@ -7,26 +7,13 @@
 @import forms
 @import typography
 @import buttons
+@import components/header_nav
 @import components/link_list
 @import components/archer_block
 
 body
   color: $dark
-
-nav
-  background: $bg
-  border-bottom: 1px solid $bg
-  overflow: hidden
-  text-align: center
-  width: 100%
-  .nav-link
-    background-color: $oxford
-    color: white
-    display: inline-block
-    padding: 8px 8px 8px 8px
-    margin: 0 5px
-    &:hover
-      background-color: $hlblue
+  background-image: linear-gradient($bg 50px, rgba(0, 0, 0, 0) 150px)
 
 .clear
   @include clearfix

@@ -21,17 +21,27 @@
     <body class="{% block bodyclass %}{% endblock %}">
         <div id="{% block page_id %}{% endblock %}">
             {% block nav %}
-            <nav>
-                {% block nav_links %}
-                <a href="{% url 'index' %}" class="nav-link">Home</a>
-                <a href="{% url 'club_list' %}" class="nav-link">Clubs</a>
-                <a href="{% url 'tournaments_list' %}" class="nav-link">Tournaments</a>
-                {% if user.is_authenticated %}
-                <a href="{% url 'logout' %}" class="nav-link">Log Out</a>
-                {% else %}
-                <a href="{% url 'login' %}" class="nav-link">Log In</a>
-                {% endif %}
-                {% endblock nav_links %}
+            <nav class="header-nav">
+                <div class="container">
+                    <div class="home">
+                        <a href="{% url 'index' %}" class="wide">TamlynScore</a>
+                        <a href="{% url 'index' %}" class="narrow">TS</a>
+                    </div>
+                    <div class="nav-links">
+                        {% block nav_links %}
+                        <a href="{% url 'tournaments_list' %}" class="nav-link">Tournaments</a>
+                        <a href="{% url 'club_list' %}" class="nav-link">Clubs</a>
+                        {% endblock nav_links %}
+                    </div>
+                    <div class="user">
+                        {% if user.is_authenticated %}
+                        <span class="name">{{ user }}</span>
+                        <a href="{% url 'logout' %}" class="logout">Log Out</a>
+                        {% else %}
+                        <a href="{% url 'login' %}">Log In</a>
+                        {% endif %}
+                    </div>
+                </div>
             </nav>
             {% endblock nav %}
             <div class="container">
