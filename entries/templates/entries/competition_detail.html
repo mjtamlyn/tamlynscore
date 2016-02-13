@@ -1,13 +1,15 @@
 {% extends 'base.html' %}
 
-{% block content %}
-<header>
-    {% if competition_admin %}
-        <a class="pull-right btn edit" href="{% url 'competition_update' slug=competition.slug %}">Edit</a>
-    {% endif %}
-    <a href="{% url 'competition_detail' slug=competition.slug %}"><h1>{{ competition }}</h1></a>
+{% block precontent %}
+<header class="banner competition-banner">
+    <a href="{% url 'competition_detail' slug=competition.slug %}">
+        <h1>{{ competition.tournament }}</h1>
+        <p>{{ competition.date }}{% if competition.end_date > competition.date %} to {{ competition.end_date }}{% endif %}</p>
+    </a>
 </header>
+{% endblock %}
 
+{% block content %}
 {% block competition_nav %}
 <nav class="competition-nav">
     {% with competition.result_modes.all as modes %}
@@ -45,7 +47,12 @@
             {% if competition.has_olympic %}
                 <li><a href="{% url 'olympic_index' slug=competition.slug %}">Head to heads</a></li>
             {% endif %}
-            <li><a href="{% url 'rankings_export' slug=competition.slug %}">Rankings Export</a></li>
+            <li><p class="drop"><a onclick="voic(0)">Admin</a></p>
+                <ul>
+                    <li><a class="edit" href="{% url 'competition_update' slug=competition.slug %}">Edit</a></lu>
+                    <li><a href="{% url 'rankings_export' slug=competition.slug %}">Rankings Export</a></li>
+                </ul>
+            </li>
         {% endif %}
     </ul>
     {% endwith %}
