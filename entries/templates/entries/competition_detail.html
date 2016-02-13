@@ -2,63 +2,65 @@
 
 {% block precontent %}
 <header class="banner competition-banner">
-    <a href="{% url 'competition_detail' slug=competition.slug %}">
+    <a href="{% url 'competition_detail' slug=competition.slug %}" class="main">
         <h1>{{ competition.tournament }}</h1>
         <p>{{ competition.date }}{% if competition.end_date > competition.date %} to {{ competition.end_date }}{% endif %}</p>
     </a>
+
+    <span class="byline">Malcolm Rees</span>
+
+    {% block competition_nav %}
+    <nav class="banner-nav">
+        {% with competition.result_modes.all as modes %}
+        <ul>
+            {% if competition_admin %}
+                <li><a href="{% url 'entry_list' slug=competition.slug %}">Manage Entries</a></li>
+            {% endif %}
+            <li><a href="{% url 'target_list' slug=competition.slug %}">Target list</a></li>
+            {% if competition_admin %}
+                <li><a href="{% url 'score_sheets' slug=competition.slug %}">Score sheets</a></li>
+                <li><a href="{% url 'registration' slug=competition.slug %}">Registration</a></li>
+                {% if competition.use_county_teams %}
+                <li><a href="{% url 'input_scores_team' slug=competition.slug %}">Input scores</a></li>
+                {% else %}
+                <li><a href="{% url 'input_scores' slug=competition.slug %}">Input scores</a></li>
+                {% endif %}
+            {% endif %}
+            <li><p class="drop"><a onclick="void(0)">Leaderboards</a></p>
+                <ul>
+                {% for mode in modes %}
+                    <li><a href="{% url 'leaderboard' slug=competition.slug mode=mode.mode format='html' %}">{{ mode }}</a></li>
+                {% endfor %}
+                </ul>
+            </li>
+            <li><p class="drop"><a onclick="void(0)">Results</a></p>
+                <ul>
+                {% for mode in modes %}
+                {% if not mode.leaderboard_only %}
+                    <li><a href="{% url 'results' slug=competition.slug mode=mode.mode format='html' %}">{{ mode }}</a></li>
+                {% endif %}
+                {% endfor %}
+                </ul>
+            </li>
+            {% if competition_admin %}
+                {% if competition.has_olympic %}
+                    <li><a href="{% url 'olympic_index' slug=competition.slug %}">Head to heads</a></li>
+                {% endif %}
+                <li><p class="drop"><a onclick="voic(0)">Admin</a></p>
+                    <ul>
+                        <li><a class="edit" href="{% url 'competition_update' slug=competition.slug %}">Edit</a></lu>
+                        <li><a href="{% url 'rankings_export' slug=competition.slug %}">Rankings Export</a></li>
+                    </ul>
+                </li>
+            {% endif %}
+        </ul>
+        {% endwith %}
+    </nav>
+    {% endblock %}
 </header>
 {% endblock %}
 
 {% block content %}
-{% block competition_nav %}
-<nav class="competition-nav">
-    {% with competition.result_modes.all as modes %}
-    <ul>
-        {% if competition_admin %}
-            <li><a href="{% url 'entry_list' slug=competition.slug %}">Manage Entries</a></li>
-        {% endif %}
-        <li><a href="{% url 'target_list' slug=competition.slug %}">Target list</a></li>
-        {% if competition_admin %}
-            <li><a href="{% url 'score_sheets' slug=competition.slug %}">Score sheets</a></li>
-            <li><a href="{% url 'registration' slug=competition.slug %}">Registration</a></li>
-            {% if competition.use_county_teams %}
-            <li><a href="{% url 'input_scores_team' slug=competition.slug %}">Input scores</a></li>
-            {% else %}
-            <li><a href="{% url 'input_scores' slug=competition.slug %}">Input scores</a></li>
-            {% endif %}
-        {% endif %}
-        <li><p class="drop"><a onclick="void(0)">Leaderboards</a></p>
-            <ul>
-            {% for mode in modes %}
-                <li><a href="{% url 'leaderboard' slug=competition.slug mode=mode.mode format='html' %}">{{ mode }}</a></li>
-            {% endfor %}
-            </ul>
-        </li>
-        <li><p class="drop"><a onclick="void(0)">Results</a></p>
-            <ul>
-            {% for mode in modes %}
-            {% if not mode.leaderboard_only %}
-                <li><a href="{% url 'results' slug=competition.slug mode=mode.mode format='html' %}">{{ mode }}</a></li>
-            {% endif %}
-            {% endfor %}
-            </ul>
-        </li>
-        {% if competition_admin %}
-            {% if competition.has_olympic %}
-                <li><a href="{% url 'olympic_index' slug=competition.slug %}">Head to heads</a></li>
-            {% endif %}
-            <li><p class="drop"><a onclick="voic(0)">Admin</a></p>
-                <ul>
-                    <li><a class="edit" href="{% url 'competition_update' slug=competition.slug %}">Edit</a></lu>
-                    <li><a href="{% url 'rankings_export' slug=competition.slug %}">Rankings Export</a></li>
-                </ul>
-            </li>
-        {% endif %}
-    </ul>
-    {% endwith %}
-</nav>
-{% endblock %}
-
 {% block competition_content %}
 <div class="row">
     <div class="col6">
@@ -81,6 +83,5 @@
     </div>
 </div>
 {% endblock %}
-
 {% endblock %}
 

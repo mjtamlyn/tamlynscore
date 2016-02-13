@@ -1,13 +1,14 @@
 header.banner
-  height: 25vh
-  max-height: 300px
-  min-height: 150px
-  overflow: auto
+  color: white
+  height: 30vh
+  max-height: 350px
+  min-height: 180px
   background-image: url(../img/targets.jpg)
   background-position: 50%
   background-size: cover
   text-align: center
   position: relative
+  margin-bottom: 10px
 
   &:before
     content: ""
@@ -18,15 +19,15 @@ header.banner
     height: 100%
     background-color: rgba(0, 0, 0, 0.3)
 
-  &:after
-    color: white
-    content: "Malcolm Rees"
+  .byline
     font-size: 12px
     right: 10px
-    bottom: 10px
+    top: 10px
     position: absolute
+    @media (max-width: 500px)
+      display: none
 
-  a
+  a.main
     position: absolute
     left: 0
     top: 0
@@ -49,3 +50,64 @@ header.banner
     font-size: 22px
     @media (max-width: 500px)
       font-size: 18px
+
+  .banner-nav
+    position: absolute
+    left: 0
+    bottom: 0
+    width: 100%
+    background-color: rgba(0, 0, 0, 0.4)
+
+    ul
+      font-size: 16px
+      display: flex
+      justify-content: center
+      flex-wrap: wrap
+
+    li
+      line-height: 36px
+      position: relative
+      cursor: pointer
+      margin: 0 4px
+      padding: 0 10px
+      &:hover
+        background-color: black
+        p.drop:after
+          color: inherit
+      a
+        color: white
+      p
+        font-size: 16px
+        margin: 0
+        &.drop:after
+          @include fa-icon()
+          content: $fa-var-caret-down
+          color: $borders
+          margin-left: 5px
+
+      ul
+        display: none
+        position: absolute
+        top: 100%
+        left: -1px
+        min-width: 100%
+        background-color: #333
+        box-sizing: content-box
+        border-radius: 0 0 5px 5px
+        text-align: left
+        font-size: 14px
+
+        li
+          display: block
+          border: 0
+          margin: 0
+          white-space: nowrap
+          line-height: 30px
+          a
+            padding: 0
+            width: 100%
+            height: 100%
+            display: block
+      &:hover
+        ul
+          display: block
