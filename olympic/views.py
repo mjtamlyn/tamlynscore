@@ -28,7 +28,7 @@ class OlympicIndex(CompetitionMixin, View):
             session_round.session,
             session_round,
             session_round.seeding_set.all().select_related().order_by('seed').prefetch_related('result_set'),
-            Score.objects.results(session_round.ranking_round, category=session_round.category),
+            Score.objects.results(session_round.ranking_rounds.all(), category=session_round.category),
         ) for session_round in session_rounds]
         sessions = []
         for key, values in groupby(session_info, lambda x: x[0]):
@@ -127,7 +127,7 @@ class OlympicSeedingsPDF(PDFResultsRenderer, View):
             if session_round not in results:
                 results[section] = {}
             scores = Score.objects.results(
-                session_round.ranking_round,
+                session_round.ranking_rounds.all(),
                 category=session_round.category,
             ).select_related()
             seedings = Seeding.objects.filter(entry__competition=self.competition).select_related()

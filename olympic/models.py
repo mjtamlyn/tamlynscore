@@ -63,20 +63,20 @@ class Category(models.Model):
 class OlympicSessionRound(models.Model):
     session = models.ForeignKey(Session)
     shot_round = models.ForeignKey(OlympicRound)
-    ranking_round = models.ForeignKey(SessionRound)
+    ranking_rounds = models.ManyToManyField(SessionRound)
     category = models.ForeignKey(Category)
 
     def __str__(self):
         return u'{0}, {1} {2}'.format(self.session, self.shot_round, self.category.name)
 
     def set_seedings(self, scores):
-        scores = Score.objects.results(self.ranking_round, category=self.category).filter(pk__in=scores)
+        scores = Score.objects.results(self.ranking_rounds.all(), category=self.category).filter(pk__in=scores)
         scores = sorted(scores, key=lambda s: 0 - s.score)
         for score in scores:
             seeding = Seeding(
-                    entry=score.target.session_entry.competition_entry,
-                    session_round=self,
-                    seed=list(scores).index(score) + 1,
+                entry=score.target.session_entry.competition_entry,
+                session_round=self,
+                seed=list(scores).index(score) + 1,
             )
             seeding.save()
 
@@ -104,11 +104,11 @@ class OlympicSessionRound(models.Model):
         mapping = self._get_target_mapping(level, start, expanded, half_only, quarter_only, eighth_only, three_quarters)
         for match_id, target in mapping:
             match = Match(
-                    session_round=self,
-                    target=target,
-                    level=level,
-                    match=match_id,
-                    timing=timing,
+                session_round=self,
+                target=target,
+                level=level,
+                match=match_id,
+                timing=timing,
             )
             if expanded:
                 match.target_2 = match.target + 1
