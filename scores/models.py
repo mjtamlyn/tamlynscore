@@ -7,8 +7,8 @@ from itertools import groupby
 
 
 class ScoreManager(models.Manager):
-    def active(self, session_round, category=None):
-        active_targets = TargetAllocation.objects.filter(session_entry__session_round=session_round)
+    def active(self, session_rounds, category=None):
+        active_targets = TargetAllocation.objects.filter(session_entry__session_round__in=session_rounds)
         active_scores = self.filter(target__in=active_targets).select_related()
         targets_with_scores = [score.target for score in active_scores]
         for target in active_targets:
@@ -22,14 +22,14 @@ class ScoreManager(models.Manager):
                 active_scores = active_scores.filter(target__session_entry__competition_entry__archer__gender=category.gender)
         return active_scores
 
-    def results(self, session_round=None, category=None, qs=None):
+    def results(self, session_rounds=None, category=None, qs=None):
         """TODO: Now only used for olympic setup, should be removed in favour of result_modes.Seedings"""
         if qs:
             scores = qs
-            if session_round:
-                scores = scores.filter(target__session_entry__session_round=session_round)
+            if session_rounds:
+                scores = scores.filter(target__session_entry__session_round__in=session_rounds)
         else:
-            scores = self.active(session_round, category=category)
+            scores = self.active(session_rounds, category=category)
         scores = scores.select_related()
         if category:
             scores = scores.filter(target__session_entry__competition_entry__bowstyle__in=category.bowstyles.all(), target__session_entry__present=True)
@@ -63,7 +63,7 @@ class ScoreManager(models.Manager):
         return results
 
     def boss_groups(self, session_round):
-        active = self.active(session_round)
+        active = self.active([session_round])
         bosses = []
         for boss, entries in groupby(active, lambda s: s.target.boss):
             bosses.append((boss, list(entries)))
