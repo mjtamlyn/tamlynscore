@@ -122,6 +122,8 @@ class CompetitionForm(forms.Form):
             time = self.cleaned_data.get('session_%s_time' % i)
             rounds = self.cleaned_data.get('session_%s_rounds' % i)
             if (not time and rounds) or (time and not rounds):
+                if time and self.instance.pk and self.instance.session_set.get(start=time).olympicsessionround_set.all():
+                    continue
                 self.add_error('session_%s_time' % i,
                     forms.ValidationError('Must have start and rounds for a session', code='session_match')
                 )

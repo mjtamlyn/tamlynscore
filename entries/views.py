@@ -632,7 +632,7 @@ class ScoreSheetsPdf(CompetitionMixin, HeadedPdfView):
     col_widths = 7 * [box_size] + [wide_box] + 6 * [box_size] + 6 * [wide_box]
 
     def setMargins(self, doc):
-        doc.topMargin = 1.1 * inch
+        doc.topMargin = 0.9 * inch
 
     def update_style(self):
         self.title = self.session_round.shot_round
