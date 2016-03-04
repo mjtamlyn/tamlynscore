@@ -353,6 +353,7 @@ class OlympicScoreSheet(ScoreSheetsPdf):
 
 
 class OlympicResults(CompetitionMixin, HeadedPdfView):
+    admin_required = False
     title = 'Results'
 
     match_headers = ['1/64', '1/32', '1/16', '1/8', 'QF', 'SF', 'F']
@@ -413,6 +414,7 @@ class OlympicResults(CompetitionMixin, HeadedPdfView):
 
 
 class OlympicTree(OlympicResults):
+    admin_required = False
 
     PAGE_HEIGHT = defaultPageSize[0]
     PAGE_WIDTH = defaultPageSize[1]
