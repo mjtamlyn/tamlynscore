@@ -462,16 +462,12 @@ class OlympicTree(OlympicResults):
         level = int(level)
         nmatches = 2 ** (level - 1)
         block_size = int(self.rows / nmatches)
-        offset = int(self.rows / (2 ** level))
+        if level == self.total_levels:
+            offset = 0
+        else:
+            offset = 2 ** (self.total_levels - level - 1)
         blocks = [(i * block_size + offset, (i + 1) * block_size - offset) for i in range(nmatches)]
         return blocks
-
-    def name_rows(self, col):
-        level = self.total_levels - col / 3
-        rows = []
-        for start, end in self.match_blocks(level):
-            rows += [start, end - 1]
-        return rows
 
     def get_round_elements(self, olympic_round):
 
