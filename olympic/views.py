@@ -143,16 +143,16 @@ class OlympicSeedingsPDF(PDFResultsRenderer, View):
         return self.render_to_pdf({'results': results})
 
 
-class OlympicInput(TemplateView):
+class OlympicInput(CompetitionMixin, TemplateView):
     template_name = 'olympic/input.html'
 
     labels = ['Bronze', 'Final', 'Semi', '1/4', '1/8', '1/16', '1/32', '1/64']
 
-    def dispatch(self, request, slug, seed_pk):
-        self.seed = get_object_or_404(Seeding.objects.select_related(), pk=seed_pk)
+    def get_forms(self):
+        self.seed = get_object_or_404(Seeding.objects.select_related(), pk=self.kwargs['seed_pk'])
         self.results = self.seed.result_set.all()
         highest_level = Match.objects.filter(session_round=self.seed.session_round).order_by('-level')[0].level
-        self.forms = []
+        forms = []
         for i in range(1, highest_level + 1):
             try:
                 match = Match.objects.match_for_seed(self.seed, i)
@@ -163,10 +163,10 @@ class OlympicInput(TemplateView):
                     instance = Result.objects.get(match=match, seed=self.seed)
                 except Result.DoesNotExist:
                     instance = Result(match=match, seed=self.seed)
-                form = ResultForm(instance=instance, data=request.POST if request.method == 'POST' else None, prefix='level-%s' % i)
+                form = ResultForm(instance=instance, data=self.request.POST if self.request.method == 'POST' else None, prefix='level-%s' % i)
             else:
                 form = None
-            self.forms.insert(0, {
+            forms.insert(0, {
                 'form': form,
                 'match': match,
                 'label': self.labels[match.level] if match else None,
@@ -176,23 +176,27 @@ class OlympicInput(TemplateView):
             instance = Result.objects.get(match=bronze, seed=self.seed)
         except Result.DoesNotExist:
             instance = Result(match=bronze, seed=self.seed)
-        form = ResultForm(instance=instance, data=request.POST if request.method == 'POST' else None, prefix='bronze')
-        self.forms.append({
+        form = ResultForm(instance=instance, data=self.request.POST if self.request.method == 'POST' else None, prefix='bronze')
+        forms.append({
             'form': form,
             'match': bronze,
             'label': self.labels[0],
         })
-        return super(OlympicInput, self).dispatch(request, slug, seed_pk)
+        return forms
 
-    def get_context_data(self):
-        return {
+    def get_context_data(self, **kwargs):
+        context = super().get_context_data(**kwargs)
+        forms = self.get_forms()
+        context.update({
             'seed': self.seed,
             'results': self.results,
-            'forms': self.forms,
-        }
+            'forms': forms,
+        })
+        return context
 
     def post(self, request, *args, **kwargs):
-        for form in self.forms:
+        forms = self.get_forms()
+        for form in forms:
             if form['form']:
                 if form['form'].is_valid():
                     form['form'].save()
@@ -435,7 +439,7 @@ class OlympicTree(OlympicResults):
         vert_line = None
         for i in self.match_cols:
 
-            offset = 2 ** (i / 3 - 1) if i else 0
+            offset = int(2 ** (i / 3 - 1)) if i else 0
 
             for j in range(self.rows):
                 if (not i == 0 and not j % 2 ** (i / 3)) or (i == 0 and not j % 2):
@@ -453,9 +457,10 @@ class OlympicTree(OlympicResults):
         return TableStyle(properties)
 
     def match_blocks(self, level):
+        level = int(level)
         nmatches = 2 ** (level - 1)
-        block_size = self.rows / nmatches
-        offset = self.rows / (2 ** (level + 1))
+        block_size = int(self.rows / nmatches)
+        offset = int(self.rows / (2 ** level))
         blocks = [(i * block_size + offset, (i + 1) * block_size - offset) for i in range(nmatches)]
         return blocks
 
