@@ -79,7 +79,8 @@ class Competition(models.Model):
     def clean(self, *args, **kwargs):
         if self.end_date is None:
             self.end_date = self.date
-        self.slug = slugify('{0} {1}'.format(self.tournament, self.date.year))
+        if not self.slug:
+            self.slug = slugify('{0} {1}'.format(self.tournament, self.date.year))
         return super(Competition, self).clean(*args, **kwargs)
 
     def sessions_with_rounds(self):
