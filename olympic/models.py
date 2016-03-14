@@ -64,6 +64,7 @@ class OlympicSessionRound(models.Model):
     session = models.ForeignKey(Session)
     shot_round = models.ForeignKey(OlympicRound)
     ranking_rounds = models.ManyToManyField(SessionRound)
+    exclude_ranking_rounds = models.BooleanField(default=True)
     category = models.ForeignKey(Category)
 
     def __str__(self):
