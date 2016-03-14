@@ -1,6 +1,6 @@
 from django.db import models
 
-from core.models import Bowstyle, GENDER_CHOICES
+from core.models import Bowstyle, GENDER_CHOICES, NOVICE_CHOICES
 from entries.models import Session, SessionRound, CompetitionEntry
 from scores.models import Score
 
@@ -22,6 +22,7 @@ class OlympicRound(models.Model):
 class Category(models.Model):
     bowstyles = models.ManyToManyField(Bowstyle)
     gender = models.CharField(max_length=1, choices=GENDER_CHOICES, blank=True, null=True)
+    novice = models.CharField(max_length=1, choices=NOVICE_CHOICES, blank=True, null=True)
 
     class Meta:
         verbose_name_plural = 'categories'
@@ -30,33 +31,37 @@ class Category(models.Model):
         return u'Category: {0}'.format(self.name)
 
     def code(self):
+        code = ''
+        if self.novice:
+            code += self.novice
         if self.gender:
-            code = self.gender
-        else:
-            code = ''
+            code += self.gender
         return code + u''.join([str(b)[0] for b in self.bowstyles.all()])
 
     def short_code(self):
+        code = ''
+        if self.novice:
+            code += self.novice
         if self.gender:
-            code = self.gender
-        else:
-            code = ''
+            code += self.gender
         return code + str(self.bowstyles.all()[0])[0]
 
     @property
     def name(self):
+        name = ''
+        if self.novice:
+            name += self.get_novice_display() + ' '
         if self.gender:
             name = self.get_gender_display() + ' '
-        else:
-            name = ''
         return name + u', '.join([str(b) for b in self.bowstyles.all()])
 
     @property
     def short_name(self):
+        name = ''
+        if self.novice:
+            name += self.get_novice_display() + ' '
         if self.gender:
-            name = self.get_gender_display() + ' '
-        else:
-            name = ''
+            name += self.get_gender_display() + ' '
         return name + str(self.bowstyles.all()[0])
 
 

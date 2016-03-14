@@ -20,6 +20,8 @@ class ScoreManager(models.Manager):
             active_scores = active_scores.filter(target__session_entry__competition_entry__bowstyle__in=category.bowstyles.all())
             if category.gender:
                 active_scores = active_scores.filter(target__session_entry__competition_entry__archer__gender=category.gender)
+            if category.novice:
+                active_scores = active_scores.filter(target__session_entry__competition_entry__novice=category.novice)
         return active_scores
 
     def results(self, session_rounds=None, category=None, qs=None):
@@ -35,6 +37,8 @@ class ScoreManager(models.Manager):
             scores = scores.filter(target__session_entry__competition_entry__bowstyle__in=category.bowstyles.all(), target__session_entry__present=True)
             if category.gender:
                 scores = scores.filter(target__session_entry__competition_entry__archer__gender=category.gender)
+            if category.novice:
+                scores = scores.filter(target__session_entry__competition_entry__novice=category.novice)
         scores = scores.select_related()
         if category:
             scores = scores.order_by(
