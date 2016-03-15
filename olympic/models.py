@@ -52,7 +52,7 @@ class Category(models.Model):
         if self.novice:
             name += self.get_novice_display() + ' '
         if self.gender:
-            name = self.get_gender_display() + ' '
+            name += self.get_gender_display() + ' '
         return name + u', '.join([str(b) for b in self.bowstyles.all()])
 
     @property
