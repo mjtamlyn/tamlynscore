@@ -595,8 +595,10 @@ class H2HSeedings(ByRound, BaseResultMode):
     def get_categories_for_entry(self, competition, entry):
         for category in self.categories:
             if entry.bowstyle in category.bowstyles.all():
-                if category.gender is None or category.gender == entry.archer.gender:
+                if ((category.gender is None or category.gender == entry.archer.gender)
+                        and (category.novice is None or category.novice == entry.archer.novice)):
                     return [category]
+        return []
 
 
 class Team(BaseResultMode):
