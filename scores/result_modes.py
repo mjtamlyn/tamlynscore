@@ -622,7 +622,7 @@ class Team(BaseResultMode):
 
         clubs = {}
         round = None
-        session_rounds = SessionRound.objects.filter(session__competition=competition, olympicsessionround__isnull=True).order_by('session__start').select_related('shot_round')
+        session_rounds = SessionRound.objects.filter(session__competition=competition, olympicsessionround__exclude_ranking_rounds=True).order_by('session__start').select_related('shot_round')
         for score in scores:
             if not leaderboard and not score.score:
                 continue
