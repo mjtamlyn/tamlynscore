@@ -4,7 +4,7 @@ from django.core.urlresolvers import reverse
 from django.db.models import Max, Prefetch
 from django.http import HttpResponseRedirect
 from django.views.generic import View, TemplateView, FormView
-from django.shortcuts import render, get_object_or_404
+from django.shortcuts import get_object_or_404
 
 from reportlab.lib import colors
 from reportlab.lib.units import inch
@@ -21,8 +21,16 @@ from olympic.forms import ResultForm, SetupForm
 from itertools import groupby
 
 
-class OlympicIndex(CompetitionMixin, View):
-    def get(self, request, slug):
+class OlympicIndex(CompetitionMixin, TemplateView):
+    template_name = 'olympic_index.html'
+
+    def get(self, request, *args, **kwargs):
+        if 'remove-all' in request.GET:
+            Seeding.objects.filter(session_round__pk=request.GET['remove-all']).delete()
+        return super().get(request, *args, **kwargs)
+
+    def get_context_data(self, **kwargs):
+        context = super().get_context_data(**kwargs)
         session_rounds = OlympicSessionRound.objects.filter(session__competition=self.competition).order_by('session__start').select_related()
         session_info = [(
             session_round.session,
@@ -34,10 +42,11 @@ class OlympicIndex(CompetitionMixin, View):
         for key, values in groupby(session_info, lambda x: x[0]):
             sessions.append((key, [value[1] for value in values]))
 
-        if 'remove-all' in request.GET:
-            Seeding.objects.filter(session_round__pk=request.GET['remove-all']).delete()
-        competition = self.competition
-        return render(request, 'olympic_index.html', locals())
+        context.update({
+            'session_info': session_info,
+            'sessions': sessions,
+        })
+        return context
 
     def post(self, request, slug):
         session_round = OlympicSessionRound.objects.get(pk=request.POST['form-id'].replace('confirm-seedings-', ''))
@@ -211,13 +220,13 @@ class OlympicScoreSheet(ScoreSheetsPdf):
     title_position = 30
 
     match_names = [
-            'Final / Bronze',
-            'Semi Final',
-            'Quarter Final',
-            '1/8 Round',
-            '1/16 Round',
-            '1/32 Round',
-            '1/64 Round',
+        'Final / Bronze',
+        'Semi Final',
+        'Quarter Final',
+        '1/8 Round',
+        '1/16 Round',
+        '1/32 Round',
+        '1/64 Round',
     ]
 
     def set_options(self, slug=None, round_id=None):
@@ -265,17 +274,17 @@ class OlympicScoreSheet(ScoreSheetsPdf):
                 if timing is not None:
                     timing = self.Para('Pass %s' % 'xABCDEFGHIJK'[timing], 'h3')
                 table_data = [
-                        [match_title, None, None, None, boss, None, timing, None],
-                        ['Arrows' if match else self.Para('BYE', 'h3'), None, None, 'S',
-                            'Pts' if self.session_round.shot_round.match_type == 'T' else 'RT',
-                            'RT' if self.session_round.shot_round.match_type == 'T' else 'Opp.S',
-                            'Opponent seed', None],
-                        [None] * 6 + ['Your Signature', None],
-                        [None] * 8,
-                        [None] * 6 + ['Opponent Signature', None],
-                        [None] * 8,
-                        [None] * 6 + ['Win?', None],
-                        ['Shoot-off', None, None, 'Total', None, 'Opponent Total', None, None],
+                    [match_title, None, None, None, boss, None, timing, None],
+                    ['Arrows' if match else self.Para('BYE', 'h3'), None, None, 'S',
+                        'Pts' if self.session_round.shot_round.match_type == 'T' else 'RT',
+                        'RT' if self.session_round.shot_round.match_type == 'T' else 'Opp.S',
+                        'Opponent seed', None],
+                    [None] * 6 + ['Your Signature', None],
+                    [None] * 8,
+                    [None] * 6 + ['Opponent Signature', None],
+                    [None] * 8,
+                    [None] * 6 + ['Win?', None],
+                    ['Shoot-off', None, None, 'Total', None, 'Opponent Total', None, None],
                 ]
                 score_sheet = Table(table_data, self.col_widths, self.row_heights)
                 score_sheet.setStyle(self.scores_table_style if match else self.bye_style)
