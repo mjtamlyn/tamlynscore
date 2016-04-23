@@ -124,8 +124,6 @@ class BaseResultMode(object):
 
     def get_section_for_round(self, round, competition):
         headers = ['Pl.'] + self.get_main_headers(competition)
-        if competition.has_wa_age_groups:
-            headers.append(None)
         if self.include_distance_breakdown:
             subrounds = round.subrounds.all()
             if len(subrounds) > 1:

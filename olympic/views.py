@@ -506,8 +506,20 @@ class OlympicTree(OlympicResults):
                 old_matches = matches
                 matches = []
                 for j in range(len(old_matches)):
-                    if not j % 2:
-                        matches += [None, old_matches[j], None, None, None, None, old_matches[j + 1], None]
+                    if not j % 4:
+                        if not j % 8:
+                            matches += [None, old_matches[j], None, None]
+                        else:
+                            matches += [None, None, old_matches[j], None]
+            if (len(blocks) / len(matches) * 3) == 4:
+                old_matches = matches
+                matches = []
+                for j in range(len(old_matches)):
+                    if not j % 4:
+                        if not j % 8:
+                            matches += [None, old_matches[j], old_matches[j + 1], old_matches[j + 2]]
+                        else:
+                            matches += [old_matches[j], old_matches[j + 1], old_matches[j + 2], None]
             for m in range(len(blocks)):
                 match = matches[m]
                 if match is None:
