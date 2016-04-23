@@ -221,28 +221,31 @@ class InputArrowsArcher(TemplateView):
         }
 
 
-class InputDozens(CompetitionMixin, View):
-    template = 'input_dozens.html'
+class InputDozens(CompetitionMixin, TemplateView):
+    template_name = 'input_dozens.html'
     next_url_name = 'input_scores'
 
     def get_next_exists(self, session_id, boss):
         return Score.objects.filter(target__session_entry__session_round__session=session_id, target__boss=int(boss) + 1).order_by('target__target').exists()
 
-    def get(self, request, slug, session_id, boss, dozen):
-        competition = self.competition
+    def get_context_data(self, **kwargs):
+        context = super().get_context_data(**kwargs)
         scores = Score.objects.filter(
-            target__session_entry__session_round__session=session_id,
-            target__boss=boss,
+            target__session_entry__session_round__session=self.kwargs['session_id'],
+            target__boss=self.kwargs['boss'],
             target__session_entry__present=True,
             retired=False,
         ).order_by('target__target').select_related()
-        next_exists = self.get_next_exists(session_id, boss)
-        num_dozens = int(SessionRound.objects.filter(session__pk=session_id)[0].shot_round.arrows / 12)
+        next_exists = self.get_next_exists(self.kwargs['session_id'], self.kwargs['boss'])
+        num_dozens = int(SessionRound.objects.filter(session__pk=self.kwargs['session_id'])[0].shot_round.arrows / 12)
         try:
-            forms = get_dozen_formset(scores, num_dozens, dozen)
+            context['forms'] = get_dozen_formset(scores, num_dozens, self.kwargs['dozen'])
         except IndexError:
             pass
-        return render(request, self.template, locals())
+        context.update({
+            'next_exists': next_exists,
+        })
+        return context
 
     def post(self, request, slug, session_id, boss, dozen):
         competition = self.competition
