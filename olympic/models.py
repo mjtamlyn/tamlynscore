@@ -1,6 +1,7 @@
+from django.contrib.postgres.fields import ArrayField
 from django.db import models
 
-from core.models import Bowstyle, GENDER_CHOICES, NOVICE_CHOICES
+from core.models import Bowstyle, GENDER_CHOICES, NOVICE_CHOICES, WA_AGE_CHOICES
 from entries.models import Session, SessionRound, CompetitionEntry
 from scores.models import Score
 
@@ -21,6 +22,7 @@ class OlympicRound(models.Model):
 
 class Category(models.Model):
     bowstyles = models.ManyToManyField(Bowstyle)
+    wa_ages = ArrayField(models.CharField(max_length=1, choices=WA_AGE_CHOICES), blank=True, null=True)
     gender = models.CharField(max_length=1, choices=GENDER_CHOICES, blank=True, null=True)
     novice = models.CharField(max_length=1, choices=NOVICE_CHOICES, blank=True, null=True)
 
@@ -32,6 +34,8 @@ class Category(models.Model):
 
     def code(self):
         code = ''
+        if self.wa_ages:
+            code += ''.join(self.wa_ages)
         if self.novice:
             code += self.novice
         if self.gender:
@@ -40,6 +44,8 @@ class Category(models.Model):
 
     def short_code(self):
         code = ''
+        if self.wa_ages:
+            code += ''.join(self.wa_ages)
         if self.novice:
             code += self.novice
         if self.gender:
@@ -49,6 +55,8 @@ class Category(models.Model):
     @property
     def name(self):
         name = ''
+        if self.wa_ages:
+            name += ', '.join([dict(WA_AGE_CHOICES)[age] for age in self.wa_ages]) + ' '
         if self.novice:
             name += self.get_novice_display() + ' '
         if self.gender:
@@ -58,6 +66,8 @@ class Category(models.Model):
     @property
     def short_name(self):
         name = ''
+        if self.wa_ages:
+            name += ', '.join([dict(WA_AGE_CHOICES)[age] for age in self.wa_age_choices]) + ' '
         if self.novice:
             name += self.get_novice_display() + ' '
         if self.gender:

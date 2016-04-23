@@ -39,6 +39,8 @@ class ScoreManager(models.Manager):
                 scores = scores.filter(target__session_entry__competition_entry__archer__gender=category.gender)
             if category.novice:
                 scores = scores.filter(target__session_entry__competition_entry__novice=category.novice)
+            if category.wa_ages:
+                scores = scores.filter(target__session_entry__competition_entry__wa_age__in=category.wa_ages)
         scores = scores.select_related()
         if category:
             scores = scores.order_by(

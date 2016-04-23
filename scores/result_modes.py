@@ -596,7 +596,8 @@ class H2HSeedings(ByRound, BaseResultMode):
         for category in self.categories:
             if entry.bowstyle in category.bowstyles.all():
                 if ((category.gender is None or category.gender == entry.archer.gender) and
-                        (category.novice is None or category.novice == entry.archer.novice)):
+                        (category.novice is None or category.novice == entry.archer.novice) and
+                        (not category.wa_ages or entry.wa_age in category.wa_ages)):
                     return [category]
         return []
 
