@@ -218,3 +218,7 @@ class Archer(models.Model):
             'novice': self.novice,
             'agb_number': self.agb_number,
         })
+
+    def merge_into(self, other):
+        self.competitionentry_set.update(archer=other)
+        self.delete()
