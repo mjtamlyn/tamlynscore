@@ -13,7 +13,7 @@
 {% block main %}
 {% csrf_token %}
 {% for session, details in target_list.items %}
-<div class="row">
+<div class="row" data-focus="{{ focus }}">
     <div class="col6">
         <h4>{{ session.start|date:"l, jS F - f a" }}</h4>
 

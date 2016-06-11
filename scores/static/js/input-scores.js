@@ -71,7 +71,8 @@ window.addEvent('domready', function () {
         $$('a[href=' + document.location.hash.replace('#!', '#') + ']').fireEvent('click');
         $$('a[href=' + document.location.hash.replace('#!', '#').replace(/-round-\d/, '') + ']').fireEvent('click');
     }
-    if ('{{ focus }}') {
-        $$('[rel={{ focus }}]')[0].fireEvent('keydown', {key: 'right', stop: function () {}});
+    if ($$('[data-focus]')) {
+        var focus = $$('[data-focus]')[0].dataset['focus']
+        $$('[rel=' + focus + ']')[0].fireEvent('keydown', {key: 'right', stop: function () {}});
     }
 });
