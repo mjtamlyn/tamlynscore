@@ -107,6 +107,7 @@ class BaseResultMode(object):
                     xs=score.xs,
                     disqualified=score.disqualified,
                     retired=score.retired,
+                    source=score,
                 )
             if score.disqualified or score.guest:
                 score.placing = None
@@ -163,16 +164,17 @@ class BaseResultMode(object):
         scores = []
         subrounds = self.get_subrounds(score)
         if self.include_distance_breakdown and len(subrounds) > 1 and not score.target.session_entry.session_round.session.scoring_system == SCORING_TOTALS:
-            if score.disqualified or score.target.session_entry.session_round.session.scoring_system == SCORING_TOTALS or hasattr(score, 'is_mock'):
+            if score.disqualified or score.target.session_entry.session_round.session.scoring_system == SCORING_TOTALS or not hasattr(score, 'source'):
                 scores += [''] * len(subrounds)
             else:
+                score = score.source
                 subround_scores = []
 
                 if score.target.session_entry.session_round.session.scoring_system == SCORING_FULL:
                     # Arrow of round has been stored off by a dozen
                     counter = 13
                     for subround in subrounds:
-                        subround_scores.append(score.arrow_set.filter(arrow_of_round__in=range(counter, counter + subround.arrows)).aggregate(models.Sum('arrow_value'))['arrow_value__sum'])
+                        subround_scores.append(score.arrow_set.filter(arrow_of_round__in=range(counter, counter + subround.arrows)).aggregate(models.Sum('arrow_value'))['arrow_value__sum'] or 0)
                         counter += subround.arrows
 
                 elif score.target.session_entry.session_round.session.scoring_system == SCORING_DOZENS:
