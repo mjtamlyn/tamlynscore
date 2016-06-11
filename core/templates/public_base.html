@@ -1,12 +1,19 @@
 {% extends 'base.html' %}
 
 {% block nav %}
-<nav>
-    <a href="{% url 'summary' %}" class="nav-link">Summary</a>
-    {% for mode in modes %}
-    <a href="{% url 'mode-detail' mode=mode.mode %}" class="nav-link">{{ mode }}</a>
-    {% endfor %}
-</nav>
+    <nav class="header-nav">
+        <div class="container">
+            <div class="home">
+                <a href="{% url 'summary' %}" class="wide">TamlynScore</a>
+                <a href="{% url 'summary' %}" class="narrow">TS</a>
+            </div>
+            <div class="nav-links">
+                {% for mode in modes %}
+                <a href="{% url 'mode-detail' mode=mode.mode %}" class="nav-link">{{ mode }}</a>
+                {% endfor %}
+            </div>
+        </div>
+    </nav>
 {% endblock %}
 
 {% block content %}
