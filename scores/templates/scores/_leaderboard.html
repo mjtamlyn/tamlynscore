@@ -1,6 +1,9 @@
 <div class="row">
     {% for section, categories in results.items %}
     {% for category, scores in categories.items %}
+    {% if include_confirmation_form %}
+        <form action="." method="POST">
+    {% endif %}
     <div class="col3">
         <table class="table">
             {% ifchanged section %}
@@ -9,6 +12,11 @@
             <tr><th colspan="100%">{{ category }}</th></tr>
             {% for score in scores %}
                 <tr {% if score.team %}class="no-border"{% endif %}>
+                    {% if include_confirmation_form %}
+                    <td>
+                        <input type="checkbox" checked="checked" name="score-{{ score.target.pk }}" />
+                    </td>
+                    {% endif %}
                     {% if score.disqualified %}
                     <td></td>
                     {% else %}
@@ -42,8 +50,20 @@
                     {% endfor %}
                 {% endif %}
             {% endfor %}
+            {% if include_confirmation_form %}
+                <tr>
+                    <td colspan="7">
+                        {% csrf_token %}
+                        <input type="hidden" name="form-id" value="confirm-seedings-{{ section.round.pk }}">
+                        <input class="btn" type="submit" value="Confirm seedings">
+                    </td>
+                </tr>
+            {% endif %}
         </table>
     </div>
+    {% if include_confirmation_form %}
+        </form>
+    {% endif %}
     {% endfor %}
     {% endfor %}
 </div>

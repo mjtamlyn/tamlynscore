@@ -469,7 +469,35 @@ class JSONResultsRenderer(object):
         return HttpResponse(results, content_type='application/json')
 
 
-class Leaderboard(CompetitionMixin, PDFResultsRenderer, CSVResultsRenderer, JSONResultsRenderer, ListView):
+class ResultModeMixin(object):
+    def get_scores(self):
+        scores = Score.objects.filter(
+            target__session_entry__competition_entry__competition=self.competition
+        ).select_related(
+            'target',
+            'target__session_entry',
+            'target__session_entry__session_round',
+            'target__session_entry__session_round__shot_round',
+            'target__session_entry__competition_entry',
+            'target__session_entry__competition_entry__competition',
+            'target__session_entry__competition_entry__archer',
+            'target__session_entry__competition_entry__bowstyle',
+            'target__session_entry__competition_entry__club',
+        ).order_by(
+            '-target__session_entry__competition_entry__age',
+            '-target__session_entry__competition_entry__agb_age',
+            'target__session_entry__competition_entry__novice',
+            'target__session_entry__competition_entry__bowstyle',
+            'target__session_entry__competition_entry__archer__gender',
+            'disqualified',
+            '-score',
+            '-golds',
+            '-xs'
+        )
+        return scores
+
+
+class Leaderboard(ResultModeMixin, CompetitionMixin, PDFResultsRenderer, CSVResultsRenderer, JSONResultsRenderer, ListView):
     """General leaderboard/results generation.
 
     Strategy:
@@ -531,30 +559,7 @@ class Leaderboard(CompetitionMixin, PDFResultsRenderer, CSVResultsRenderer, JSON
         return format
 
     def get_queryset(self):
-        scores = Score.objects.filter(
-            target__session_entry__competition_entry__competition=self.competition
-        ).select_related(
-            'target',
-            'target__session_entry',
-            'target__session_entry__session_round',
-            'target__session_entry__session_round__shot_round',
-            'target__session_entry__competition_entry',
-            'target__session_entry__competition_entry__competition',
-            'target__session_entry__competition_entry__archer',
-            'target__session_entry__competition_entry__bowstyle',
-            'target__session_entry__competition_entry__club',
-        ).order_by(
-            '-target__session_entry__competition_entry__age',
-            '-target__session_entry__competition_entry__agb_age',
-            'target__session_entry__competition_entry__novice',
-            'target__session_entry__competition_entry__bowstyle',
-            'target__session_entry__competition_entry__archer__gender',
-            'disqualified',
-            '-score',
-            '-golds',
-            '-xs'
-        )
-        return scores
+        return self.get_scores()
 
     def get_context_data(self, **kwargs):
         kwargs['results'] = self.mode.get_results(self.competition, kwargs['object_list'], leaderboard=self.leaderboard, request=self.request)

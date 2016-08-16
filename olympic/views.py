@@ -13,15 +13,13 @@ from reportlab.rl_config import defaultPageSize
 
 from entries.views import CompetitionMixin, ScoreSheetsPdf, HeadedPdfView
 from scores.models import Score
-from scores.result_modes import BaseResultMode
-from scores.views import PDFResultsRenderer
+from scores.result_modes import BaseResultMode, H2HSeedings
+from scores.views import PDFResultsRenderer, ResultModeMixin
 from olympic.models import OlympicSessionRound, Seeding, Match, Result
 from olympic.forms import ResultForm, SetupForm
 
-from itertools import groupby
 
-
-class OlympicIndex(CompetitionMixin, TemplateView):
+class OlympicIndex(CompetitionMixin, ResultModeMixin, TemplateView):
     template_name = 'olympic_index.html'
 
     def get(self, request, *args, **kwargs):
@@ -31,28 +29,25 @@ class OlympicIndex(CompetitionMixin, TemplateView):
 
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
-        session_rounds = OlympicSessionRound.objects.filter(session__competition=self.competition).order_by('session__start').select_related()
-        session_info = [(
-            session_round.session,
-            session_round,
-            session_round.seeding_set.all().select_related().order_by('seed').prefetch_related('result_set'),
-            Score.objects.results(session_round.ranking_rounds.all(), category=session_round.category),
-        ) for session_round in session_rounds]
-        sessions = []
-        for key, values in groupby(session_info, lambda x: x[0]):
-            sessions.append((key, [value[1] for value in values]))
-
+        scores = self.get_scores()
+        mode = H2HSeedings(include_distance_breakdown=False, hide_golds=False)
+        results = mode.get_results(self.competition, scores)
+        for section in results:
+            for category in results[section]:
+                for score in results[section][category]:
+                    score.details = mode.score_details(score, section)
         context.update({
-            'session_info': session_info,
-            'sessions': sessions,
+            'results': results,
         })
         return context
 
     def post(self, request, slug):
         session_round = OlympicSessionRound.objects.get(pk=request.POST['form-id'].replace('confirm-seedings-', ''))
         score_ids = map(lambda s: int(s.replace('score-', '')), filter(lambda s: s.startswith('score-'), request.POST))
-        scores = Score.objects.filter(pk__in=score_ids)
-        session_round.set_seedings(scores)
+        scores = Score.objects.filter(target_id__in=score_ids)
+        mode = H2HSeedings(include_distance_breakdown=False, hide_golds=False)
+        results = mode.get_results(self.competition, scores)
+        session_round.set_seedings(list(list(results.values())[0].values())[0])
         return self.get(request, slug)
 
 
@@ -70,7 +65,9 @@ class FieldPlanMixin(CompetitionMixin):
         if len(matches) == 0:
             return None
         max_timing = (max(matches, key=lambda m: m.timing)).timing
-        max_target = (max(matches, key=lambda m: m.target)).target  # slight assumption max target will never be target 2
+        max_target = (max(matches, key=lambda m: m.target)).target
+        if matches[0].session_round.shot_round.team_type:
+            max_target += 1
         levels = ['Finals', 'Semis', 'Quarters', '1/8', '1/16', '1/32', '1/64', '1/128']
         passes = 'ABCDEFGHIJK'
 
@@ -253,7 +250,7 @@ class OlympicScoreSheet(ScoreSheetsPdf):
         for seeding in seedings:
             entry = seeding.entry
             header_table_data = [
-                [self.Para(entry.archer, 'h2'), self.Para(entry.club.name, 'h2')],
+                [self.Para(entry.archer, 'h2'), self.Para(entry.team_name(), 'h2')],
                 [self.Para(u'{0} {1}'.format(entry.archer.get_gender_display(), entry.bowstyle), 'h2'), self.Para(u'Seed {0}'.format(seeding.seed), 'h2')],
             ]
 

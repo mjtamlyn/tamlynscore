@@ -24,50 +24,6 @@ class ScoreManager(models.Manager):
                 active_scores = active_scores.filter(target__session_entry__competition_entry__novice=category.novice)
         return active_scores
 
-    def results(self, session_rounds=None, category=None, qs=None):
-        """TODO: Now only used for olympic setup, should be removed in favour of result_modes.Seedings"""
-        if qs:
-            scores = qs
-            if session_rounds:
-                scores = scores.filter(target__session_entry__session_round__in=session_rounds)
-        else:
-            scores = self.active(session_rounds, category=category)
-        scores = scores.select_related()
-        if category:
-            scores = scores.filter(target__session_entry__competition_entry__bowstyle__in=category.bowstyles.all(), target__session_entry__present=True)
-            if category.gender:
-                scores = scores.filter(target__session_entry__competition_entry__archer__gender=category.gender)
-            if category.novice:
-                scores = scores.filter(target__session_entry__competition_entry__novice=category.novice)
-            if category.wa_ages:
-                scores = scores.filter(target__session_entry__competition_entry__wa_age__in=category.wa_ages)
-        scores = scores.select_related()
-        if category:
-            scores = scores.order_by(
-                    'disqualified',
-                    '-score',
-                    '-golds',
-                    '-xs',
-                    )
-        else:
-            scores = scores.order_by(
-                    'target__session_entry__competition_entry__bowstyle',
-                    '-target__session_entry__competition_entry__age',
-                    'target__session_entry__competition_entry__archer__gender',
-                    'target__session_entry__competition_entry__guest',
-                    'disqualified',
-                    '-score',
-                    '-golds',
-                    '-xs',
-                    )
-        if category:
-            results = scores
-        else:
-            results = []
-            for category, scores in groupby(scores, lambda s: s.target.session_entry.competition_entry.category()):
-                results.append((category, list(scores)))
-        return results
-
     def boss_groups(self, session_round):
         active = self.active([session_round])
         bosses = []

@@ -572,17 +572,11 @@ class H2HSeedings(ByRound, BaseResultMode):
     name = 'Seedings'
 
     def get_rounds(self, competition):
-        from entries.models import SessionRound
-        from olympic.models import Category
+        from olympic.models import OlympicSessionRound
 
-        self.categories = Category.objects.filter(olympicsessionround__session__competition=competition).prefetch_related('bowstyles')
-
-        session_rounds = SessionRound.objects.filter(session__competition=competition, olympicsessionround__isnull=False).order_by('session__start')
-        rounds = []
-        for round in session_rounds:
-            if round.shot_round not in rounds:
-                rounds.append(round.shot_round)
-        return rounds
+        session_rounds = OlympicSessionRound.objects.filter(session__competition=competition)
+        self.categories = [session_round.category for session_round in session_rounds]
+        return session_rounds
 
     def get_results(self, competition, scores, leaderboard=False, request=None):
         self.leaderboard = leaderboard
@@ -591,6 +585,14 @@ class H2HSeedings(ByRound, BaseResultMode):
             self.get_section_for_round(round, competition),
             self.get_round_results(competition, round, scores)
         ) for round in rounds)
+
+    def get_round_results(self, competition, round, scores):
+        if True or not round.shot_round.team_type:
+            return ByRound.get_round_results(self, competition, round.ranking_rounds.all()[0].shot_round, scores)
+        return None
+
+    def label_for_round(self, round):
+        return str(round.shot_round)
 
     def get_categories_for_entry(self, competition, entry):
         for category in self.categories:

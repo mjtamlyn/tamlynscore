@@ -3,7 +3,6 @@ from django.db import models
 
 from core.models import Bowstyle, GENDER_CHOICES, NOVICE_CHOICES, WA_AGE_CHOICES
 from entries.models import Session, SessionRound, CompetitionEntry
-from scores.models import Score
 
 
 MATCH_TYPES = (
@@ -12,12 +11,20 @@ MATCH_TYPES = (
 )
 
 
+TEAM_TYPES = (
+    ('', 'Individual'),
+    ('T', 'Team'),
+    ('X', 'Mixed team'),
+)
+
+
 class OlympicRound(models.Model):
     distance = models.PositiveIntegerField()
     match_type = models.CharField(max_length=1, choices=MATCH_TYPES)
+    team_type = models.CharField(max_length=1, blank=True, default='', choices=TEAM_TYPES)
 
     def __str__(self):
-        return 'Olympic Round at {0}m ({1})'.format(self.distance, self.get_match_type_display())
+        return '{} Olympic Round at {}m ({})'.format(self.get_team_type_display(), self.distance, self.get_match_type_display())
 
 
 class Category(models.Model):
@@ -85,16 +92,16 @@ class OlympicSessionRound(models.Model):
     def __str__(self):
         return u'{0}, {1} {2}'.format(self.session, self.shot_round, self.category.name)
 
+    @property
+    def scoring_type(self):
+        return self.ranking_rounds.all()[0].shot_round.scoring_type
+
     def set_seedings(self, scores):
-        scores = Score.objects.results(self.ranking_rounds.all(), category=self.category).filter(pk__in=scores)
-        scores = sorted(scores, key=lambda s: 0 - s.score)
-        for score in scores:
-            seeding = Seeding(
+        for i, score in enumerate(scores):
+            self.seeding_set.create(
                 entry=score.target.session_entry.competition_entry,
-                session_round=self,
-                seed=list(scores).index(score) + 1,
+                seed=i + 1,
             )
-            seeding.save()
 
     def _get_match_layout(self, level, half_only=False, quarter_only=False, eighth_only=False, three_quarters=False):
         seedings = [1, 2]
@@ -199,6 +206,8 @@ class OlympicSessionRound(models.Model):
 
 class Seeding(models.Model):
     entry = models.ForeignKey(CompetitionEntry)
+    entry_2 = models.ForeignKey(CompetitionEntry, blank=True, null=True, related_name='+')
+    entry_3 = models.ForeignKey(CompetitionEntry, blank=True, null=True, related_name='+')
     session_round = models.ForeignKey(OlympicSessionRound)
     seed = models.PositiveIntegerField()
 
