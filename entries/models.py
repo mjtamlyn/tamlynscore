@@ -61,6 +61,7 @@ class Competition(models.Model):
     use_county_teams = models.BooleanField(default=False)
     strict_b_teams = models.BooleanField(default=False, help_text='e.g. BUTC')
     strict_c_teams = models.BooleanField(default=False, help_text='e.g. BUTC')
+    use_custom_teams = models.BooleanField(default=False)
     allow_incomplete_teams = models.BooleanField(default=True)
     team_size = models.PositiveIntegerField(default=4)
     novice_team_size = models.PositiveIntegerField(blank=True, null=True)
@@ -270,6 +271,7 @@ class CompetitionEntry(models.Model):
     novice = models.CharField(max_length=1, choices=NOVICE_CHOICES, default='E')
 
     guest = models.BooleanField(default=False)
+    custom_team_name = models.CharField(max_length=200, default='', blank=True)
     b_team = models.BooleanField(default=False)
     c_team = models.BooleanField(default=False)
 
@@ -297,6 +299,8 @@ class CompetitionEntry(models.Model):
             name = self.club.short_name if short_form else self.club.name
         elif self.county_id:
             name = self.county.short_name if short_form else self.county.name
+        elif self.custom_team_name:
+            return self.custom_team_name
         else:
             return ''
         if self.b_team or self.c_team:

@@ -123,8 +123,9 @@
 		<div class="form-subgroup">
 			<h3>Team Results</h3>
 
-            {% formrow form.allow_incomplete_teams form.combine_rounds_for_team_scores form.force_mixed_teams form.split_gender_teams using 'form-item.html' %}
-            {% formrow form.use_county_teams form.strict_b_teams form.strict_c_teams form.novices_in_experienced_teams using 'form-item.html' %}
+            {% formrow form.allow_incomplete_teams form.combine_rounds_for_team_scores form.novices_in_experienced_teams using 'form-item.html' %}
+            {% formrow form.force_mixed_teams form.strict_b_teams form.strict_c_teams using 'form-item.html' %}
+            {% formrow form.split_gender_teams form.use_county_teams form.use_custom_teams using 'form-item.html' %}
 		</div>
 	</div>
 

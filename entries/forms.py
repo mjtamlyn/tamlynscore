@@ -56,6 +56,7 @@ class CompetitionForm(forms.Form):
     use_county_teams = forms.BooleanField(required=False, help_text='Group teams by county instead of club')
     strict_b_teams = forms.BooleanField(required=False, help_text='Allow two separate team entries from a club with predetermined archers')
     strict_c_teams = forms.BooleanField(required=False, help_text='Allow three separate team entries from a club with predetermined archers')
+    use_custom_teams = forms.BooleanField(required=False, help_text='Allow custom team names to be specified for this event only')
     novice_team_size = forms.IntegerField(required=False)
     novices_in_experienced_individual = forms.BooleanField(required=False, help_text='Allow novice scores to count in experienced results')
     novices_in_experienced_teams = forms.BooleanField(required=False, help_text='Allow novice scores to count in experienced team results')
@@ -77,6 +78,7 @@ class CompetitionForm(forms.Form):
         'use_county_teams',
         'strict_b_teams',
         'strict_c_teams',
+        'use_custom_teams',
         'novice_team_size',
         'novices_in_experienced_individual',
         'novices_in_experienced_teams',
@@ -305,6 +307,10 @@ class EntryCreateForm(forms.Form):
             )
         if self.competition.has_guests:
             self.fields['guest'] = forms.BooleanField(required=False)
+        if self.competition.use_custom_teams:
+            self.fields['custom_team_name'] = forms.CharField(required=True)
+            self.fields.pop('club')
+            self.fields.pop('update_club')
 
     def get_current_obj(self):
         return self.archer
@@ -319,7 +325,7 @@ class EntryCreateForm(forms.Form):
 
     def update_archer(self):
         changed = False
-        if not self.competition.use_county_teams and self.cleaned_data['club'] and self.cleaned_data['update_club']:
+        if not self.competition.use_county_teams and self.cleaned_data.get('club') and self.cleaned_data.get('update_club'):
             self.archer.club = self.cleaned_data['club']
             changed = True
         if self.cleaned_data['bowstyle'] and self.cleaned_data['update_bowstyle']:
@@ -356,6 +362,8 @@ class EntryCreateForm(forms.Form):
         default = self.get_current_obj()
         if self.competition.use_county_teams:
             entry.county = self.cleaned_data['county'] or (default.club.county if default.club else None)
+        elif self.competition.use_custom_teams:
+            entry.custom_team_name = self.cleaned_data['custom_team_name']
         else:
             entry.club = self.cleaned_data['club'] or default.club
         entry.bowstyle = self.cleaned_data['bowstyle'] or default.bowstyle
@@ -398,6 +406,8 @@ class EntryUpdateForm(EntryCreateForm):
         )
         self.initial['guest'] = instance.guest
         self.initial['sessions'] = [se.session_round for se in self.instance.sessionentry_set.all()]
+        if self.competition.use_custom_teams:
+            self.initial['custom_team_name'] = instance.custom_team_name
 
     def get_current_obj(self):
         return self.instance
