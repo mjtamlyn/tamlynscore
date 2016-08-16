@@ -125,7 +125,7 @@ class BaseResultMode(object):
 
     def get_section_for_round(self, round, competition):
         headers = ['Pl.'] + self.get_main_headers(competition)
-        if self.include_distance_breakdown:
+        if self.include_distance_breakdown and hasattr(round, 'subrounds'):
             subrounds = round.subrounds.all()
             if len(subrounds) > 1:
                 for subround in round.subrounds.all():
@@ -581,12 +581,33 @@ class H2HSeedings(ByRound, BaseResultMode):
     def get_results(self, competition, scores, leaderboard=False, request=None):
         self.leaderboard = leaderboard
         rounds = self.get_rounds(competition)
-        return OrderedDict((
-            self.get_section_for_round(round, competition),
-            self.get_round_results(competition, round, scores)
-        ) for round in rounds)
+        results = OrderedDict()
+        for round in rounds:
+            section = self.get_section_for_round(round, competition)
+            section.seedings_confirmed = round.seeding_set.exists()
+            scores = self.get_round_results(competition, round, scores, section.seedings_confirmed)
+            results[section] = scores
+        return results
 
-    def get_round_results(self, competition, round, scores):
+    def get_round_results(self, competition, round, scores, seedings_confirmed):
+        if seedings_confirmed:
+            results = []
+            score_lookup = {score.target.session_entry.competition_entry: score for score in scores}
+            for seeding in round.seeding_set.order_by('seed'):
+                score = score_lookup[seeding.entry]
+                score = ScoreMock(
+                    target=score.target,
+                    score=score.score,
+                    hits=score.hits,
+                    golds=score.golds,
+                    xs=score.xs,
+                    disqualified=score.disqualified,
+                    retired=score.retired,
+                    source=score,
+                    placing=seeding.seed,
+                )
+                results.append(score)
+            return {round.category: results}
         if True or not round.shot_round.team_type:
             return ByRound.get_round_results(self, competition, round.ranking_rounds.all()[0].shot_round, scores)
         return None

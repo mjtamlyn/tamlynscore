@@ -15,6 +15,11 @@
         <a class="btn" href="{% url 'olympic_tree' slug=competition.slug %}">Tree (no results)</a>
         <a class="btn" href="{% url 'olympic_results' slug=competition.slug %}">Results</a>
     </p>
+    <p>
+        {% for round in rounds %}
+        <a class="btn" href="{% url 'olympic_score_sheet' slug=competition.slug round_id=round.pk %}">Score sheets for {{ round }}</a>
+        {% endfor %}
+    </p>
     {% include 'scores/_leaderboard.html' with include_confirmation_form=True %}
 </div>
 {% endblock %}

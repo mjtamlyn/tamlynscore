@@ -1,10 +1,8 @@
-from collections import OrderedDict
-
 from django.core.urlresolvers import reverse
 from django.db.models import Max, Prefetch
 from django.http import HttpResponseRedirect
-from django.views.generic import View, TemplateView, FormView
-from django.shortcuts import get_object_or_404
+from django.views.generic import TemplateView, FormView
+from django.shortcuts import get_object_or_404, redirect
 
 from reportlab.lib import colors
 from reportlab.lib.units import inch
@@ -13,19 +11,14 @@ from reportlab.rl_config import defaultPageSize
 
 from entries.views import CompetitionMixin, ScoreSheetsPdf, HeadedPdfView
 from scores.models import Score
-from scores.result_modes import BaseResultMode, H2HSeedings
-from scores.views import PDFResultsRenderer, ResultModeMixin
+from scores.result_modes import H2HSeedings
+from scores.views import ResultModeMixin
 from olympic.models import OlympicSessionRound, Seeding, Match, Result
 from olympic.forms import ResultForm, SetupForm
 
 
 class OlympicIndex(CompetitionMixin, ResultModeMixin, TemplateView):
     template_name = 'olympic_index.html'
-
-    def get(self, request, *args, **kwargs):
-        if 'remove-all' in request.GET:
-            Seeding.objects.filter(session_round__pk=request.GET['remove-all']).delete()
-        return super().get(request, *args, **kwargs)
 
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
@@ -38,17 +31,21 @@ class OlympicIndex(CompetitionMixin, ResultModeMixin, TemplateView):
                     score.details = mode.score_details(score, section)
         context.update({
             'results': results,
+            'rounds': OlympicSessionRound.objects.filter(session__competition=self.competition),
         })
         return context
 
     def post(self, request, slug):
         session_round = OlympicSessionRound.objects.get(pk=request.POST['form-id'].replace('confirm-seedings-', ''))
-        score_ids = map(lambda s: int(s.replace('score-', '')), filter(lambda s: s.startswith('score-'), request.POST))
-        scores = Score.objects.filter(target_id__in=score_ids)
-        mode = H2HSeedings(include_distance_breakdown=False, hide_golds=False)
-        results = mode.get_results(self.competition, scores)
-        session_round.set_seedings(list(list(results.values())[0].values())[0])
-        return self.get(request, slug)
+        if 'remove-all' in request.POST:
+            session_round.seeding_set.all().delete()
+        else:
+            score_ids = map(lambda s: int(s.replace('score-', '')), filter(lambda s: s.startswith('score-'), request.POST))
+            scores = Score.objects.filter(target_id__in=score_ids)
+            mode = H2HSeedings(include_distance_breakdown=False, hide_golds=False)
+            results = mode.get_results(self.competition, scores)
+            session_round.set_seedings(list(list(results.values())[0].values())[0])
+        return redirect('olympic_index', slug=self.competition.slug)
 
 
 class FieldPlanMixin(CompetitionMixin):
@@ -119,34 +116,6 @@ class OlympicSetup(FieldPlanMixin, FormView):
 
     def get_success_url(self):
         return self.request.get_full_path()
-
-
-class OlympicSeedingsPDF(PDFResultsRenderer, View):
-    def get(self, request, slug):
-        self.title = 'Seedings'
-        session_rounds = OlympicSessionRound.objects.filter(session__competition=self.competition).order_by('session__start').select_related()
-        results = OrderedDict()
-        self.mode = result_mode = BaseResultMode()
-        for session_round in session_rounds:
-            shot_round = session_round.ranking_round.shot_round
-            section = result_mode.get_section_for_round(shot_round)
-            if session_round not in results:
-                results[section] = {}
-            scores = Score.objects.results(
-                session_round.ranking_rounds.all(),
-                category=session_round.category,
-            ).select_related()
-            seedings = Seeding.objects.filter(entry__competition=self.competition).select_related()
-            scores_by_comp_entry = {score.target.session_entry.competition_entry_id: score for score in scores}
-            these_results = []
-            for seed in seedings:
-                score = scores_by_comp_entry.get(seed.entry_id, None)
-                if not score:
-                    continue
-                score.placing = seed.seed
-                these_results.append(score)
-            results[section][session_round.category] = sorted(these_results, key=lambda s: s.placing)
-        return self.render_to_pdf({'results': results})
 
 
 class OlympicInput(CompetitionMixin, TemplateView):
