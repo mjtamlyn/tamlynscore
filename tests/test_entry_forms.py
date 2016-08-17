@@ -82,6 +82,7 @@ class TestCompetitionForm(TestCase):
             'force_mixed_teams': False,
             'split_gender_teams': False,
             'use_county_teams': False,
+            'use_custom_teams': False,
             'strict_b_teams': False,
             'strict_c_teams': False,
             'novice_team_size': None,
