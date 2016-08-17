@@ -1,7 +1,7 @@
 from django.core.urlresolvers import reverse
 from django.db.models import Max, Prefetch
 from django.http import HttpResponseRedirect
-from django.views.generic import TemplateView, FormView
+from django.views.generic import DetailView, TemplateView, FormView
 from django.shortcuts import get_object_or_404, redirect
 
 from reportlab.lib import colors
@@ -17,7 +17,16 @@ from olympic.models import OlympicSessionRound, Seeding, Match, Result
 from olympic.forms import ResultForm, SetupForm
 
 
-class OlympicIndex(CompetitionMixin, ResultModeMixin, TemplateView):
+class OlympicMixin(CompetitionMixin):
+    def get_context_data(self, **kwargs):
+        context = super().get_context_data(**kwargs)
+        context.update({
+            'rounds': OlympicSessionRound.objects.filter(session__competition=self.competition),
+        })
+        return context
+
+
+class OlympicIndex(OlympicMixin, ResultModeMixin, TemplateView):
     template_name = 'olympic_index.html'
 
     def get_context_data(self, **kwargs):
@@ -31,7 +40,6 @@ class OlympicIndex(CompetitionMixin, ResultModeMixin, TemplateView):
                     score.details = mode.score_details(score, section)
         context.update({
             'results': results,
-            'rounds': OlympicSessionRound.objects.filter(session__competition=self.competition),
         })
         return context
 
@@ -101,7 +109,7 @@ class FieldPlanMixin(CompetitionMixin):
         return context
 
 
-class OlympicSetup(FieldPlanMixin, FormView):
+class OlympicSetup(OlympicMixin, FieldPlanMixin, FormView):
     form_class = SetupForm
     template_name = 'olympic/setup.html'
 
@@ -118,7 +126,48 @@ class OlympicSetup(FieldPlanMixin, FormView):
         return self.request.get_full_path()
 
 
-class OlympicInput(CompetitionMixin, TemplateView):
+class OlympicInputIndex(OlympicMixin, DetailView):
+    template_name = 'olympic/input_index.html'
+    model = OlympicSessionRound
+    pk_url_kwarg = 'round_id'
+    context_object_name = 'round'
+    labels = ['Bronze', 'Final', 'Semi', '1/4', '1/8', '1/16', '1/32', '1/64']
+
+    def get_context_data(self, **kwargs):
+        context = super().get_context_data(**kwargs)
+        highest_level = Match.objects.filter(session_round=self.object).order_by('-level')[0].level
+        seedings = self.object.seeding_set.order_by('seed')
+        # TODO: Make this less slow
+        for seeding in seedings:
+            results = []
+            for level in range(1, highest_level + 1):
+                result = None
+                try:
+                    match = Match.objects.match_for_seed(seeding, level)
+                except Match.DoesNotExist:
+                    match = None
+                if match:
+                    try:
+                        result = Result.objects.get(match=match, seed=seeding)
+                    except Result.DoesNotExist:
+                        pass
+                results.append(result)
+            seeding.results = list(reversed(results))
+            bronze = Match.objects.get(session_round=self.object, level=1, match=2)
+            result = None
+            try:
+                result = Result.objects.get(match=bronze, seed=seeding)
+            except Result.DoesNotExist:
+                pass
+            seeding.results.append(result)
+        context.update({
+            'seedings': seedings,
+            'levels': reversed(self.labels[:highest_level + 1]),
+        })
+        return context
+
+
+class OlympicInput(OlympicMixin, TemplateView):
     template_name = 'olympic/input.html'
 
     labels = ['Bronze', 'Final', 'Semi', '1/4', '1/8', '1/16', '1/32', '1/64']
@@ -177,7 +226,7 @@ class OlympicInput(CompetitionMixin, TemplateView):
                     form['form'].save()
                 elif form['form'].instance.pk:
                     form['form'].instance.delete()
-        return HttpResponseRedirect(reverse('olympic_index', kwargs={'slug': self.competition.slug}))
+        return HttpResponseRedirect(reverse('olympic_input_index', kwargs={'slug': self.competition.slug, 'round_id': self.seed.session_round_id}))
 
 
 class OlympicScoreSheet(ScoreSheetsPdf):

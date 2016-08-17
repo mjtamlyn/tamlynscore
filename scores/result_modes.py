@@ -574,7 +574,7 @@ class H2HSeedings(ByRound, BaseResultMode):
     def get_rounds(self, competition):
         from olympic.models import OlympicSessionRound
 
-        session_rounds = OlympicSessionRound.objects.filter(session__competition=competition)
+        session_rounds = OlympicSessionRound.objects.filter(session__competition=competition).select_related('category').prefetch_related('ranking_rounds')
         self.categories = [session_round.category for session_round in session_rounds]
         return session_rounds
 
@@ -585,15 +585,15 @@ class H2HSeedings(ByRound, BaseResultMode):
         for round in rounds:
             section = self.get_section_for_round(round, competition)
             section.seedings_confirmed = round.seeding_set.exists()
-            scores = self.get_round_results(competition, round, scores, section.seedings_confirmed)
-            results[section] = scores
+            section_scores = self.get_round_results(competition, round, scores, section.seedings_confirmed)
+            results[section] = section_scores
         return results
 
     def get_round_results(self, competition, round, scores, seedings_confirmed):
         if seedings_confirmed:
             results = []
             score_lookup = {score.target.session_entry.competition_entry: score for score in scores}
-            for seeding in round.seeding_set.order_by('seed'):
+            for seeding in round.seeding_set.order_by('seed').select_related('entry'):
                 score = score_lookup[seeding.entry]
                 score = ScoreMock(
                     target=score.target,

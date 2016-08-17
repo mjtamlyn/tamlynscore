@@ -1,0 +1,32 @@
+{% extends 'olympic_index.html' %}
+
+{% block olympic_content %}
+<h4>{{ round }}</h4>
+
+<table>
+    <tr>
+        <th>Seed</th>
+        <th>Archer</th>
+        {% for level in levels %}
+        <th>{{ level }}</th>
+        {% endfor %}
+        <th>Edit</th>
+    </tr>
+    {% for seeding in seedings %}
+    <tr>
+        <td>{{ seeding.seed }}</td>
+        <td>{{ seeding.label }}</td>
+        {% for result in seeding.results %}
+        <td>
+            {% if result %}
+                {{ result.total }} {{ result.win|yesno:"✔️,✖️" }}
+            {% else %}
+                -
+            {% endif %}
+        </td>
+        {% endfor %}
+        <td><a class="btn btn-small edit" href="{% url 'olympic_input' slug=competition.slug seed_pk=seeding.pk %}">Edit</a></td>
+    </tr>
+    {% endfor %}
+</table>
+{% endblock %}

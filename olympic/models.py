@@ -1,5 +1,6 @@
 from django.contrib.postgres.fields import ArrayField
 from django.db import models
+from django.utils.functional import cached_property
 
 from core.models import Bowstyle, GENDER_CHOICES, NOVICE_CHOICES, WA_AGE_CHOICES
 from entries.models import Session, SessionRound, CompetitionEntry
@@ -92,7 +93,7 @@ class OlympicSessionRound(models.Model):
     def __str__(self):
         return u'{0}, {1} {2}'.format(self.session, self.shot_round, self.category.name)
 
-    @property
+    @cached_property
     def scoring_type(self):
         return self.ranking_rounds.all()[0].shot_round.scoring_type
 
@@ -213,6 +214,11 @@ class Seeding(models.Model):
 
     def __str__(self):
         return u'Seed {0} - {1} {2}'.format(self.seed, self.session_round.shot_round, self.entry)
+
+    def label(self):
+        if self.entry_2:
+            return self.entry.team_name()
+        return str(self.entry.archer)
 
 
 class MatchManager(models.Manager):

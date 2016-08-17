@@ -10,16 +10,21 @@
 <div class="module olympic">
     <h4>Head to Heads</h4>
     <p>
+        <a class="btn" href="{% url 'olympic_index' slug=competition.slug %}">Home</a>
         <a class="btn" href="{% url 'olympic_setup' slug=competition.slug %}">Setup</a>
         <a class="btn" href="{% url 'olympic_field_plan' slug=competition.slug %}">Field plan</a>
         <a class="btn" href="{% url 'olympic_tree' slug=competition.slug %}">Tree (no results)</a>
         <a class="btn" href="{% url 'olympic_results' slug=competition.slug %}">Results</a>
     </p>
+    {% for round in rounds %}
     <p>
-        {% for round in rounds %}
-        <a class="btn" href="{% url 'olympic_score_sheet' slug=competition.slug round_id=round.pk %}">Score sheets for {{ round }}</a>
-        {% endfor %}
+        {{ round }}<br>
+        <a class="btn" href="{% url 'olympic_score_sheet' slug=competition.slug round_id=round.pk %}">Score sheets</a>
+        <a class="btn" href="{% url 'olympic_input_index' slug=competition.slug round_id=round.pk %}">Enter scores</a>
     </p>
+    {% endfor %}
+    {% block olympic_content %}
     {% include 'scores/_leaderboard.html' with include_confirmation_form=True %}
+    {% endblock %}
 </div>
 {% endblock %}
