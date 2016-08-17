@@ -24,6 +24,20 @@ class OlympicRound(models.Model):
     match_type = models.CharField(max_length=1, choices=MATCH_TYPES)
     team_type = models.CharField(max_length=1, blank=True, default='', choices=TEAM_TYPES)
 
+    @property
+    def arrows_per_end(self):
+        if self.team_type == 'T':
+            return 6
+        elif self.team_type == 'X':
+            return 4
+        return 3
+
+    @property
+    def ends(self):
+        if self.team_type:
+            return 4
+        return 5
+
     def __str__(self):
         return '{} Olympic Round at {}m ({})'.format(self.get_team_type_display(), self.distance, self.get_match_type_display())
 

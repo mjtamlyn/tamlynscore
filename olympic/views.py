@@ -233,7 +233,7 @@ class OlympicInput(OlympicMixin, TemplateView):
 
 
 class OlympicScoreSheet(ScoreSheetsPdf):
-    box_size = 0.35 * inch
+    box_size = 0.32 * inch
     wide_box = box_size * 1.3
     title_position = 30
 
@@ -257,8 +257,11 @@ class OlympicScoreSheet(ScoreSheetsPdf):
 
     def update_style(self):
         super(OlympicScoreSheet, self).update_style()
-        self.col_widths = 3 * [self.box_size] + 3 * [self.wide_box] + [self.box_size * 3, self.box_size]
-        self.row_heights = 8 * [self.box_size * 0.85]
+        arrows = self.session_round.shot_round.arrows_per_end
+        ends = self.session_round.shot_round.ends
+        total_cols = 3 if self.session_round.shot_round.match_type == 'T' else 2
+        self.col_widths = arrows * [self.box_size] + total_cols * [self.wide_box] + [self.box_size * 3.2, self.wide_box]
+        self.row_heights = (3 + ends) * [self.box_size]
 
     def setMargins(self, doc):
         doc.topMargin = 0.4 * inch
@@ -270,12 +273,20 @@ class OlympicScoreSheet(ScoreSheetsPdf):
         highest_seed = list(seedings)[-1].seed
         for seeding in seedings:
             entry = seeding.entry
-            header_table_data = [
-                [self.Para(entry.archer, 'h2'), self.Para(entry.team_name(), 'h2')],
-                [self.Para(u'{0} {1}'.format(entry.archer.get_gender_display(), entry.bowstyle), 'h2'), self.Para(u'Seed {0}'.format(seeding.seed), 'h2')],
-            ]
-
+            header_table_data = []
+            if self.session_round.shot_round.team_type:
+                header_table_data.append([self.Para(seeding.label(), 'h2'), None])
+            else:
+                header_table_data.append([self.Para(entry.archer, 'h2'), self.Para(entry.team_name(), 'h2')])
+            header_table_data.append([
+                self.Para(self.session_round.category.name, 'h2'),
+                self.Para(u'Seed {0}'.format(seeding.seed), 'h2'),
+            ])
             header_table = Table(header_table_data, [3 * inch, 4 * inch])
+            if self.session_round.shot_round.team_type:
+                header_table.setStyle(TableStyle([
+                    ('SPAN', (0, 0), (-1, 0)),
+                ]))
 
             matches = Match.objects.matches_for_seed(seeding, highest_seed=highest_seed)
 
@@ -284,28 +295,39 @@ class OlympicScoreSheet(ScoreSheetsPdf):
                 match, timing = matches[i]
                 match_title = self.Para(self.match_names[i], 'h3')
                 if match and i > 0:
-                    boss = self.Para('T. {0}'.format(match), 'h3')
+                    boss = 'T.{}'.format(match)
                 elif match:
-                    boss = self.Para('T. {0} / {1}'.format(match, match + 2), 'h3')
+                    boss = 'T.{0}/{1}'.format(match, match + 2)
                 else:
                     boss = None
                 if timing is not None:
-                    timing = self.Para('Pass %s' % 'xABCDEFGHIJK'[timing], 'h3')
+                    timing = 'Pass %s' % 'ABCDEFGHIJK'[timing - 1]
+                arrows = self.session_round.shot_round.arrows_per_end
+                total_cols = 3 if self.session_round.shot_round.match_type == 'T' else 2
+                ends = self.session_round.shot_round.ends
                 table_data = [
-                    [match_title, None, None, None, boss, None, timing, None],
-                    ['Arrows' if match else self.Para('BYE', 'h3'), None, None, 'S',
+                    [match_title] + [None] * arrows + [self.Para('{} {}'.format(boss, timing), 'h3')],
+                    ['Arrows' if match else self.Para('BYE', 'h3')] + [None] * (arrows - 1) + [
+                        'S',
                         'Pts' if self.session_round.shot_round.match_type == 'T' else 'RT',
-                        'RT' if self.session_round.shot_round.match_type == 'T' else 'Opp.S',
-                        'Opponent seed', None],
-                    [None] * 6 + ['Your Signature', None],
-                    [None] * 8,
-                    [None] * 6 + ['Opponent Signature', None],
-                    [None] * 8,
-                    [None] * 6 + ['Win?', None],
-                    ['Shoot-off', None, None, 'Total', None, 'Opponent Total', None, None],
+                    ] + (['RT'] if self.session_round.shot_round.match_type == 'T' else []) + [
+                        'Opponent seed',
+                        None
+                    ],
+                    [None] * (arrows + total_cols) + ['Your Signature', None],
+                    [None] * (arrows + total_cols + 2),
+                    [None] * (arrows + total_cols) + ['Opponent Signature', None],
+                    [None] * (arrows + total_cols + 2),
+                ]
+                if ends == 5:
+                    table_data += [
+                        [None] * (arrows + total_cols) + [None, None],
+                    ]
+                table_data += [
+                    ['Shoot-off'] + [None] * (arrows - 1) + ['Total', None, 'Opponent Total'] + [None] * (total_cols - 1)
                 ]
                 score_sheet = Table(table_data, self.col_widths, self.row_heights)
-                score_sheet.setStyle(self.scores_table_style if match else self.bye_style)
+                score_sheet.setStyle(self.get_scores_table_style(self.session_round.shot_round) if match else self.bye_style)
 
                 score_sheet_elements.append(score_sheet)
 
@@ -322,42 +344,51 @@ class OlympicScoreSheet(ScoreSheetsPdf):
             elements.append(PageBreak())
         return elements
 
-    scores_table_style = TableStyle([
-        # alignment
-        ('ALIGN', (0, 0), (-1, -1), 'CENTER'),
-        ('VALIGN', (0, 0), (-1, -1), 'MIDDLE'),
+    def get_scores_table_style(self, shot_round):
+        arrows = shot_round.arrows_per_end
+        ends = shot_round.ends
+        total_cols = 3 if self.session_round.shot_round.match_type == 'T' else 2
+        rules = [
+            # alignment
+            ('ALIGN', (0, 0), (-1, -1), 'CENTER'),
+            ('VALIGN', (0, 0), (-1, -1), 'MIDDLE'),
 
-        ('BOX', (0, 0), (-1, -1), 2, colors.black),
+            ('BOX', (0, 0), (-1, -1), 2, colors.black),
 
-        # wrapping grid
-        ('BOX', (0, 1), (5, -2), 2, colors.black),
-        ('INNERGRID', (0, 1), (5, -2), 0.25, colors.black),
+            # wrapping grid
+            ('BOX', (0, 1), (arrows + total_cols - 1, -2), 2, colors.black),
+            ('INNERGRID', (0, 1), (arrows + total_cols - 1, -2), 0.25, colors.black),
 
-        # arrows grid
-        ('BOX', (0, 2), (2, -2), 2, colors.black),
+            # arrows grid
+            ('BOX', (0, 2), (arrows - 1, -2), 2, colors.black),
 
-        # totals grid
-        ('BOX', (3, 1), (5, 1), 2, colors.black),
-        ('BOX', (3, 2), (5, -2), 2, colors.black),
-        ('BOX', (0, -1), (-1, -1), 2, colors.black),
-        ('INNERGRID', (0, -1), (-1, -1), 2, colors.black),
+            # totals grid
+            ('BOX', (arrows, 1), (arrows + total_cols - 1, 1), 2, colors.black),
+            ('BOX', (arrows, 2), (arrows + total_cols - 1, -2), 2, colors.black),
+            ('BOX', (0, -1), (-1, -1), 2, colors.black),
+            ('INNERGRID', (0, -1), (-1, -1), 2, colors.black),
 
-        # details
-        ('BOX', (6, 1), (7, -2), 2, colors.black),
-        ('INNERGRID', (6, 1), (7, -2), 2, colors.black),
+            # details
+            ('BOX', (arrows + total_cols, 1), (arrows + total_cols + 1, -2), 2, colors.black),
+            ('INNERGRID', (arrows + total_cols, 1), (arrows + total_cols + 1, -2), 2, colors.black),
 
-        # spans
-        ('SPAN', (0, 0), (3, 0)),
-        ('SPAN', (4, 0), (5, 0)),
-        ('SPAN', (6, 0), (7, 0)),
-        ('SPAN', (0, 1), (2, 1)),
-        ('SPAN', (0, -1), (1, -1)),
-        ('SPAN', (5, -1), (6, -1)),
-        ('SPAN', (6, 2), (7, 2)),
-        ('SPAN', (6, 3), (7, 3)),
-        ('SPAN', (6, 4), (7, 4)),
-        ('SPAN', (6, 5), (7, 5)),
-    ])
+            # spans
+            ('SPAN', (0, 0), (arrows, 0)),
+            ('SPAN', (arrows + 1, 0), (-1, 0)),
+            ('SPAN', (0, 1), (arrows - 1, 1)),
+            ('SPAN', (0, -1), (arrows - 2, -1)),
+            ('SPAN', (arrows + 2, -1), (arrows + total_cols, -1)),
+            ('SPAN', (arrows + total_cols, 2), (arrows + total_cols + 1, 2)),
+            ('SPAN', (arrows + total_cols, 3), (arrows + total_cols + 1, 3)),
+            ('SPAN', (arrows + total_cols, 4), (arrows + total_cols + 1, 4)),
+            ('SPAN', (arrows + total_cols, 5), (arrows + total_cols + 1, 5)),
+        ]
+        if ends == 5:
+            rules += [
+                ('SPAN', (arrows + total_cols, -2), (arrows + total_cols + 1, -2)),
+                ('BACKGROUND', (arrows + total_cols, -2), (arrows + total_cols + 1, -2), colors.lightgrey),
+            ]
+        return TableStyle(rules)
 
     bye_style = TableStyle([
         # alignment
