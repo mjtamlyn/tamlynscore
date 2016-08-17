@@ -99,10 +99,23 @@ class OlympicSessionRound(models.Model):
 
     def set_seedings(self, scores):
         for i, score in enumerate(scores):
-            self.seeding_set.create(
-                entry=score.target.session_entry.competition_entry,
-                seed=i + 1,
-            )
+            if score.is_team:
+                entry, entry_2, entry_3 = None, None, None
+                entry = score.team[0].target.session_entry.competition_entry
+                entry_2 = score.team[1].target.session_entry.competition_entry
+                if len(score.team) > 2:
+                    entry_3 = score.team[2].target.session_entry.competition_entry
+                self.seeding_set.create(
+                    entry=entry,
+                    entry_2=entry_2,
+                    entry_3=entry_3,
+                    seed=i + 1,
+                )
+            else:
+                self.seeding_set.create(
+                    entry=score.target.session_entry.competition_entry,
+                    seed=i + 1,
+                )
 
     def _get_match_layout(self, level, half_only=False, quarter_only=False, eighth_only=False, three_quarters=False):
         seedings = [1, 2]

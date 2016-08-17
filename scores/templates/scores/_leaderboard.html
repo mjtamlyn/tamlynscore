@@ -14,7 +14,14 @@
                 <tr {% if score.team %}class="no-border"{% endif %}>
                     {% if include_confirmation_form and not section.seedings_confirmed %}
                     <td>
-                        <input type="checkbox" checked="checked" name="score-{{ score.target.pk }}" />
+                        {% if score.team %}
+                            {# TODO add a bit of JS to make this a single checkbox #}
+                            {% for member in score.team %}
+                                <input type="checkbox" checked="checked" name="score-{{ member.target.pk }}" />
+                            {% endfor %}
+                        {% else %}
+                            <input type="checkbox" checked="checked" name="score-{{ score.target.pk }}" />
+                        {% endif %}
                     </td>
                     {% endif %}
                     {% if score.disqualified %}
@@ -41,6 +48,9 @@
                 {% if score.team %}
                     {% for member in score.team %}
                     <tr {% if not forloop.last %}class="no-border"{% endif %}>
+                        {% if include_confirmation_form and not section.seedings_confirmed %}
+                        <td></td>
+                        {% endif %}
                         <td></td>
                         <td>{{ member.target.session_entry.competition_entry.archer }}</td>
                         {% for detail in member.details %}

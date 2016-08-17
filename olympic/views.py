@@ -38,6 +38,9 @@ class OlympicIndex(OlympicMixin, ResultModeMixin, TemplateView):
             for category in results[section]:
                 for score in results[section][category]:
                     score.details = mode.score_details(score, section)
+                    if getattr(score, 'team', None):
+                        for archer in score.team:
+                            archer.details = mode.score_details(archer, section)
         context.update({
             'results': results,
         })
@@ -417,7 +420,7 @@ class OlympicResults(CompetitionMixin, HeadedPdfView):
             table_data.append([
                 seeding.rank,
                 seeding.seed,
-                seeding.entry.archer.name,
+                seeding.label(),
             ] + self.format_results(seeding.results, total_levels))
 
         table = Table(table_data)
@@ -554,10 +557,10 @@ class OlympicTree(OlympicResults):
                     if seeds[1] in seedings_dict or level == self.total_levels:
                         table_data[blocks[m][1] - 1][i] = str(seeds[1])
                     if seeds[0] in seedings_dict:
-                        table_data[blocks[m][0]][i + 1] = seedings_dict[seeds[0]].entry.archer.name
+                        table_data[blocks[m][0]][i + 1] = seedings_dict[seeds[0]].label()
                         seedings_dict.pop(seeds[0])
                     if seeds[1] in seedings_dict:
-                        table_data[blocks[m][1] - 1][i + 1] = seedings_dict[seeds[1]].entry.archer.name
+                        table_data[blocks[m][1] - 1][i + 1] = seedings_dict[seeds[1]].label()
                         seedings_dict.pop(seeds[1])
                 results = match.result_set.all()
                 if not results:
@@ -574,11 +577,11 @@ class OlympicTree(OlympicResults):
                         results = [None, r]
                 if results[0]:
                     table_data[blocks[m][0]][i] = results[0].seed.seed
-                    table_data[blocks[m][0]][i + 1] = results[0].seed.entry.archer
+                    table_data[blocks[m][0]][i + 1] = results[0].seed.label()
                     table_data[blocks[m][0]][i + 2] = results[0].display()
                 if results[1]:
                     table_data[blocks[m][1] - 1][i] = results[1].seed.seed
-                    table_data[blocks[m][1] - 1][i + 1] = results[1].seed.entry.archer
+                    table_data[blocks[m][1] - 1][i + 1] = results[1].seed.label()
                     table_data[blocks[m][1] - 1][i + 2] = results[1].display()
 
         table = Table(table_data)
