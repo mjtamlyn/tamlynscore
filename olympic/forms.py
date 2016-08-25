@@ -59,6 +59,8 @@ class SetupForm(forms.Form):
             'start': self.cleaned_data['start'],
             'timing': self.cleaned_data['timing'],
         }
+        if sr.shot_round.team_type:
+            kwargs['expanded'] = True
         if self.cleaned_data['spread'] == 'expanded':
             kwargs['expanded'] = True
         if self.cleaned_data['spread'] == 'half':
