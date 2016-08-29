@@ -584,7 +584,7 @@ class Team(BaseResultMode):
             - aggregate and order
         - repeat for each team type
         """
-        clubs = self.split_by_club(scores, competition, leaderboard)
+        clubs, round = self.split_by_club(scores, competition, leaderboard)
         if not clubs:
             return {}
         results = OrderedDict()
@@ -616,7 +616,7 @@ class Team(BaseResultMode):
             if club not in clubs:
                 clubs[club] = []
             clubs[club].append(score)
-        return clubs
+        return clubs, round
 
     def get_team_types(self, competition):
         # TODO: support team types properly
@@ -796,8 +796,13 @@ class H2HSeedings(ByRound, Team, BaseResultMode):
                     results.append(score)
                 return {round.category: results}
             return ByRound.get_round_results(self, competition, round.ranking_rounds.all()[0].shot_round, scores)
-        clubs = self.split_by_club(scores, competition, leaderboard)
-        team_scores = self.get_team_scores(competition, clubs, 'Non-compound')
+        clubs, _ = self.split_by_club(scores, competition, leaderboard)
+        # This is pretty hack because team scores aren't bound to categories
+        bowstyles = round.category.bowstyles.values_list('name', flat=True)
+        if 'Compound' in bowstyles:
+            team_scores = self.get_team_scores(competition, clubs, 'Compound')
+        else:
+            team_scores = self.get_team_scores(competition, clubs, 'Non-compound')
         if seedings_confirmed:
             team_seedings = []
             team_lookup = {score.club: score for score in team_scores}
