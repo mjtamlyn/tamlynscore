@@ -347,6 +347,11 @@ class OlympicScoreSheet(ScoreSheetsPdf):
         arrows = shot_round.arrows_per_end
         ends = shot_round.ends
         total_cols = 3 if self.session_round.shot_round.match_type == 'T' else 2
+        shoot_off_arrows = 1
+        if self.session_round.shot_round.team_type == 'X':
+            shoot_off_arrows = 2
+        if self.session_round.shot_round.team_type == 'T':
+            shoot_off_arrows = 3
         rules = [
             # alignment
             ('ALIGN', (0, 0), (-1, -1), 'CENTER'),
@@ -375,7 +380,7 @@ class OlympicScoreSheet(ScoreSheetsPdf):
             ('SPAN', (0, 0), (arrows, 0)),
             ('SPAN', (arrows + 1, 0), (-1, 0)),
             ('SPAN', (0, 1), (arrows - 1, 1)),
-            ('SPAN', (0, -1), (arrows - 2, -1)),
+            ('SPAN', (0, -1), (arrows - (shoot_off_arrows + 1), -1)),
             ('SPAN', (arrows + 2, -1), (arrows + total_cols, -1)),
             ('SPAN', (arrows + total_cols, 2), (arrows + total_cols + 1, 2)),
             ('SPAN', (arrows + total_cols, 3), (arrows + total_cols + 1, 3)),
