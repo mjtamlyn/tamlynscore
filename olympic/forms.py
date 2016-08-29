@@ -17,6 +17,8 @@ class SetupForm(forms.Form):
         ('quarter', 'Only allocate 1/4 of the matches'),
         ('eighth', 'Only allocate 1/8 of the matches'),
         ('three-quarter', 'Only allocate 3/4 of the matches'),
+        ('first-half', 'Only allocate first half of the matches'),
+        ('second-half', 'Only allocate second half of the matches'),
     )
     LEVEL_CHOICES = (
         (1, 'Finals'),
@@ -71,6 +73,10 @@ class SetupForm(forms.Form):
             kwargs['eighth_only'] = True
         if self.cleaned_data['spread'] == 'three-quarter':
             kwargs['three_quarters'] = True
+        if self.cleaned_data['spread'] == 'first-half':
+            kwargs['first_half_only'] = True
+        if self.cleaned_data['spread'] == 'second-half':
+            kwargs['second_half_only'] = True
         if self.cleaned_data['delete']:
             sr.remove_matches(self.cleaned_data['level'])
         else:
