@@ -546,7 +546,7 @@ class OlympicTree(OlympicResults):
         for i in self.match_cols:
             level = self.total_levels - i / 3
             blocks = self.match_blocks(level)
-            matches = olympic_round.match_set.filter(level=level).order_by('target').prefetch_related(
+            matches = olympic_round.match_set.filter(level=level).order_by('timing', 'target').prefetch_related(
                 Prefetch('result_set', queryset=Result.objects.select_related())
             )
             if (len(blocks) / len(matches)) == 2:
