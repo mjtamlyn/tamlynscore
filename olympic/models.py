@@ -250,7 +250,7 @@ class Seeding(models.Model):
         return u'Seed {0} - {1} {2}'.format(self.seed, self.session_round.shot_round, self.entry)
 
     def label(self):
-        if self.entry_2:
+        if self.entry_2_id:
             return self.entry.team_name()
         return str(self.entry.archer)
 

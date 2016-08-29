@@ -147,29 +147,20 @@ class OlympicInputIndex(OlympicMixin, DetailView):
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
         highest_level = Match.objects.filter(session_round=self.object).order_by('-level')[0].level
-        seedings = self.object.seeding_set.order_by('seed')
-        # TODO: Make this less slow
+        seedings = self.object.seeding_set.select_related('entry', 'entry__archer').order_by('seed')
+        matches = self.object.match_set.prefetch_related('result_set')
+        lookup = {}
+        for match in matches:
+            for result in match.result_set.all():
+                lookup[(result.seed_id, match.level, match.match)] = result
         for seeding in seedings:
             results = []
             for level in range(1, highest_level + 1):
-                result = None
-                try:
-                    match = Match.objects.match_for_seed(seeding, level)
-                except Match.DoesNotExist:
-                    match = None
-                if match:
-                    try:
-                        result = Result.objects.get(match=match, seed=seeding)
-                    except Result.DoesNotExist:
-                        pass
+                match_number = Match.objects._match_number_for_seed(seeding.seed, level)
+                result = lookup.get((seeding.pk, level, match_number))
                 results.append(result)
             seeding.results = list(reversed(results))
-            bronze = Match.objects.get(session_round=self.object, level=1, match=2)
-            result = None
-            try:
-                result = Result.objects.get(match=bronze, seed=seeding)
-            except Result.DoesNotExist:
-                pass
+            result = lookup.get((seeding.pk, 1, 2))
             seeding.results.append(result)
         context.update({
             'seedings': seedings,
