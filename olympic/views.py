@@ -574,7 +574,10 @@ class OlympicTree(OlympicResults):
                         else:
                             matches += [old_matches[j], old_matches[j + 1], old_matches[j + 2], None]
             for m in range(len(blocks)):
-                match = matches[m]
+                try:
+                    match = matches[m]
+                except IndexError:
+                    match = None
                 if match is None:
                     continue
                 seeds = [match.match, (2 ** match.level) + 1 - match.match]

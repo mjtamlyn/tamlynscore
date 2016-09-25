@@ -781,7 +781,9 @@ class H2HSeedings(ByRound, Team, BaseResultMode):
                 results = []
                 score_lookup = {score.target.session_entry.competition_entry: score for score in scores}
                 for seeding in round.seeding_set.order_by('seed').select_related('entry'):
-                    score = score_lookup[seeding.entry]
+                    score = score_lookup.get(seeding.entry)
+                    if not score:
+                        continue
                     score = ScoreMock(
                         target=score.target,
                         score=score.score,
