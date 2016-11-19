@@ -289,14 +289,14 @@ class EntryCreateForm(forms.Form):
         if self.competition.has_wa_age_groups:
             self.fields['wa_age'] = forms.ChoiceField(
                 label='Age Group (%s)' % current.get_wa_age_display(),
-                choices=WA_AGE_CHOICES,
+                choices=(('', '---------'),) + WA_AGE_CHOICES,
                 required=False,
             )
             self.fields['update_wa_age'] = forms.BooleanField(required=False)
         if self.competition.has_agb_age_groups:
             self.fields['agb_age'] = forms.ChoiceField(
                 label='Age Group (%s)' % current.get_agb_age_display(),
-                choices=AGB_AGE_CHOICES,
+                choices=(('', '---------'),) + AGB_AGE_CHOICES,
                 required=False,
             )
             self.fields['update_agb_age'] = forms.BooleanField(required=False)
