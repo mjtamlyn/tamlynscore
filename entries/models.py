@@ -80,7 +80,7 @@ class Competition(models.Model):
         if self.end_date is None:
             self.end_date = self.date
         if not self.slug:
-            self.slug = generate_slug('{0} {1}'.format(self.tournament, self.date.year))
+            self.slug = generate_slug(Competition, '{0} {1}'.format(self.tournament, self.date.year))
         return super(Competition, self).clean(*args, **kwargs)
 
     def sessions_with_rounds(self):
