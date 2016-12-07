@@ -1,11 +1,10 @@
 import math
 
 from django.db import models
-from django.template.defaultfilters import slugify
 
 from core.models import Archer, Bowstyle, Club, County, Round, AGE_CHOICES, WA_AGE_CHOICES, AGB_AGE_CHOICES, NOVICE_CHOICES
-
 from scores.result_modes import get_result_modes
+from scoring.utils import generate_slug
 
 
 SCORING_FULL = 'F'
@@ -81,7 +80,7 @@ class Competition(models.Model):
         if self.end_date is None:
             self.end_date = self.date
         if not self.slug:
-            self.slug = slugify('{0} {1}'.format(self.tournament, self.date.year))
+            self.slug = generate_slug('{0} {1}'.format(self.tournament, self.date.year))
         return super(Competition, self).clean(*args, **kwargs)
 
     def sessions_with_rounds(self):
