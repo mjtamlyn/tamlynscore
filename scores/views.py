@@ -105,18 +105,6 @@ class InputScores(TargetList):
         return context
 
 
-class InputScoresTeam(CompetitionMixin, TemplateView):
-    template_name = 'scores/input_scores_team.html'
-
-    def get_context_data(self, **kwargs):
-        context = super(InputScoresTeam, self).get_context_data(**kwargs)
-        entries = CompetitionEntry.objects.filter(competition=self.competition).select_related('county').filter(county__isnull=False)
-        teams = set(entry.county for entry in entries)
-        context['teams'] = sorted(teams, key=lambda t: str(t))
-        context['dozens'] = range(1, 13)
-        return context
-
-
 class InputScoresMobile(InputScores):
     template_name = 'scores/input_scores_mobile.html'
 

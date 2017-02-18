@@ -5,7 +5,6 @@ from scores import views
 
 urlpatterns = [
     url(r'^(?P<slug>(\w+-?)+)/input-scores/$', views.InputScores.as_view(), name='input_scores'),
-    url(r'^(?P<slug>(\w+-?)+)/input-scores/team/$', views.InputScoresTeam.as_view(), name='input_scores_team'),
     url(r'^(?P<slug>(\w+-?)+)/input-scores/mobile/$', views.InputScoresMobile.as_view(), name='input_scores_mobile'),
     url(r'^(?P<slug>(\w+-?)+)/input-arrows/(?P<session_id>\d+)/doz(?P<dozen>\d+)/boss(?P<boss>\d+)/$', views.InputArrowsView.as_view(), name='input_arrows'),
     url(r'^(?P<slug>(\w+-?)+)/input-arrows/archer/(?P<score_id>\d+)/$', views.InputArrowsArcher.as_view(), name='input_arrows_archer'),
