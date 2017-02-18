@@ -589,7 +589,9 @@ class Team(BaseResultMode):
             return {}
         results = OrderedDict()
         for type in self.get_team_types(competition):
-            results[type] = self.get_team_scores(competition, clubs, type)
+            type_results = self.get_team_scores(competition, clubs, type)
+            if type_results:
+                results[type] = type_results
         return {self.get_section_for_round(round, competition): results}
 
     def split_by_club(self, scores, competition, leaderboard):
@@ -653,9 +655,12 @@ class Team(BaseResultMode):
                 team_size = competition.novice_team_size
             if type == 'Compound' and competition.compound_team_size:
                 team_size = competition.compound_team_size
+            if type in ['Longbow', 'Barebow'] and competition.compound_team_size:
+                # bit of a hack to treat compound team size as "minor team size"
+                team_size = competition.compound_team_size
             if type == 'Junior' and competition.junior_team_size:
                 team_size = competition.junior_team_size
-            if competition.force_mixed_teams:
+            if competition.force_mixed_teams or (competition.force_mixed_teams_recurve_only and type == 'Recurve'):
                 gent_found = False
                 lady_found = False
                 mixed_team_found = False

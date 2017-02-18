@@ -67,6 +67,7 @@ class Competition(models.Model):
     compound_team_size = models.PositiveIntegerField(blank=True, null=True, default=None)
     junior_team_size = models.PositiveIntegerField(blank=True, null=True, default=None)
     force_mixed_teams = models.BooleanField(default=False)
+    force_mixed_teams_recurve_only = models.BooleanField(default=False)
     split_gender_teams = models.BooleanField(default=False, help_text='Does not affect novice teams')
     combine_rounds_for_team_scores = models.BooleanField(default=False)
 
