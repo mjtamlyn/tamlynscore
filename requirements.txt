@@ -6,7 +6,7 @@ django-custom-user==0.5
 django-debug-toolbar==1.4
 django-floppyforms==1.6.1
 django-sslify==0.2.7
-factory-boy==2.6.1
+factory-boy==2.8.1
 flake8==2.5.4
 gunicorn==19.4.5
 mccabe==0.4.0
