@@ -6,7 +6,7 @@
 </header>
 
 <div class="row">
-    <div class="col3">
+    <div class="col6">
         <h3>Legs</h3>
         {% for leg in season.leg_set.all %}
             <h4>{{ leg }}</h4>
@@ -16,14 +16,6 @@
                 {% endfor %}
             </ul>
         {% endfor %}
-        </ul>
-    </div>
-    <div class="col3">
-        <h3>Clubs</h3>
-        <ul class="link-list">
-            {% for club in season.clubs.all %}
-            <li><a href="{{ club.get_absolute_url }}">{{ club }}</a></li>
-            {% endfor %}
         </ul>
     </div>
 </div>

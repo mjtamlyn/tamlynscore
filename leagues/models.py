@@ -1,6 +1,7 @@
 from django.core.urlresolvers import reverse
 from django.db import models
 
+from entries.models import ResultsFormatFields
 from scores.result_modes import get_result_modes
 
 
@@ -22,7 +23,6 @@ class Season(models.Model):
     name = models.CharField(max_length=255)
     slug = models.SlugField()
     league = models.ForeignKey('League')
-    clubs = models.ManyToManyField('core.Club')
     start_date = models.DateField()
     end_date = models.DateField()
 
@@ -36,10 +36,9 @@ class Season(models.Model):
         return reverse('season-detail', kwargs={'league_slug': self.league.slug, 'season_slug': self.slug})
 
 
-class Leg(models.Model):
+class Leg(ResultsFormatFields, models.Model):
     season = models.ForeignKey('Season')
     competitions = models.ManyToManyField('entries.Competition')
-    clubs = models.ManyToManyField('core.Club')
     index = models.PositiveIntegerField()
 
     def __str__(self):
@@ -49,10 +48,18 @@ class Leg(models.Model):
 class ResultsMode(models.Model):
     leg = models.ForeignKey('Leg', related_name='result_modes')
     mode = models.CharField(max_length=31, choices=tuple(get_result_modes()))
-    leaderboard_only = models.BooleanField(default=False)
 
     class Meta:
         unique_together = ('leg', 'mode')
 
     def __str__(self):
         return str(self.get_mode_display())
+
+    def get_absolute_url(self):
+        return reverse('leg-results', kwargs={
+            'mode': self.mode,
+            'format': 'html',
+            'leg_index': self.leg.index,
+            'season_slug': self.leg.season.slug,
+            'league_slug': self.leg.season.league.slug,
+        })

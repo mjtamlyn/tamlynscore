@@ -35,20 +35,7 @@ class Sponsor(models.Model):
         return self.name
 
 
-class Competition(models.Model):
-    tournament = models.ForeignKey(Tournament)
-    admins = models.ManyToManyField('core.User', blank=True)
-
-    date = models.DateField()
-    end_date = models.DateField(blank=True, null=True)
-
-    slug = models.SlugField(editable=False, unique=True)
-
-    created = models.DateTimeField(auto_now_add=True)
-    modified = models.DateTimeField(auto_now=True)
-
-    sponsors = models.ManyToManyField(Sponsor, blank=True)
-
+class ResultsFormatFields(models.Model):
     has_guests = models.BooleanField(default=False)
     has_novices = models.BooleanField(default=False)
     has_juniors = models.BooleanField(default=False)
@@ -70,6 +57,24 @@ class Competition(models.Model):
     force_mixed_teams_recurve_only = models.BooleanField(default=False)
     split_gender_teams = models.BooleanField(default=False, help_text='Does not affect novice teams')
     combine_rounds_for_team_scores = models.BooleanField(default=False)
+
+    class Meta:
+        abstract = True
+
+
+class Competition(ResultsFormatFields, models.Model):
+    tournament = models.ForeignKey(Tournament)
+    admins = models.ManyToManyField('core.User', blank=True)
+
+    date = models.DateField()
+    end_date = models.DateField(blank=True, null=True)
+
+    slug = models.SlugField(editable=False, unique=True)
+
+    created = models.DateTimeField(auto_now_add=True)
+    modified = models.DateTimeField(auto_now=True)
+
+    sponsors = models.ManyToManyField(Sponsor, blank=True)
 
     class Meta:
         unique_together = ('date', 'tournament')

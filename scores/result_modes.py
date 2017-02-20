@@ -412,9 +412,13 @@ class ByRound(BaseResultMode):
         ) for round in rounds)
 
     def get_rounds(self, competition):
-        from entries.models import SessionRound
+        from entries.models import Competition, SessionRound
 
-        session_rounds = SessionRound.objects.filter(session__competition=competition).exclude(olympicsessionround__exclude_ranking_rounds=True).order_by('session__start').select_related('shot_round')
+        if isinstance(competition, Competition):
+            session_rounds = SessionRound.objects.filter(session__competition=competition).exclude(olympicsessionround__exclude_ranking_rounds=True).order_by('session__start').select_related('shot_round')
+        else:
+            # We have a league leg
+            session_rounds = SessionRound.objects.filter(session__competition__in=competition.competitions.all()).exclude(olympicsessionround__exclude_ranking_rounds=True).order_by('session__start').select_related('shot_round')
         rounds = []
         for round in session_rounds:
             if round.shot_round not in rounds:
@@ -595,9 +599,13 @@ class Team(BaseResultMode):
         return {self.get_section_for_round(round, competition): results}
 
     def split_by_club(self, scores, competition, leaderboard):
-        from entries.models import SessionRound
+        from entries.models import Competition, SessionRound
 
-        session_rounds = SessionRound.objects.exclude(session__competition=competition, olympicsessionround__exclude_ranking_rounds=True).order_by('session__start').select_related('shot_round')
+        if isinstance(competition, Competition):
+            session_rounds = SessionRound.objects.exclude(session__competition=competition, olympicsessionround__exclude_ranking_rounds=True).order_by('session__start').select_related('shot_round')
+        else:
+            # We have a league leg
+            session_rounds = SessionRound.objects.exclude(session__competition__in=competition.competitions.all(), olympicsessionround__exclude_ranking_rounds=True).order_by('session__start').select_related('shot_round')
         round = None
         clubs = {}
         for score in scores:
@@ -644,7 +652,6 @@ class Team(BaseResultMode):
 
     def get_team_scores(self, competition, clubs, type):
         club_results = []
-        sessions = competition.session_set.filter(sessionround__isnull=False).distinct()
         for club, club_scores in clubs.items():
             club_scores = [s for s in club_scores if self.is_valid_for_type(s, type, competition)]
             if competition.combine_rounds_for_team_scores:
@@ -686,8 +693,10 @@ class Team(BaseResultMode):
                 continue
             if getattr(club_scores[0], 'components', None):
                 club_scores = sum((s.components for s in club_scores), [])
-            if competition.combine_rounds_for_team_scores and not competition.allow_incomplete_teams and len(club_scores) < (team_size * len(sessions)):
-                continue
+            if competition.combine_rounds_for_team_scores and not competition.allow_incomplete_teams:
+                sessions = competition.session_set.filter(sessionround__isnull=False).distinct()
+                if len(club_scores) < (team_size * len(sessions)):
+                    continue
             team = ScoreMock(
                 score=sum(s.score for s in club_scores),
                 hits=sum(s.hits for s in club_scores),

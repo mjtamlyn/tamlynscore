@@ -1,0 +1,10 @@
+{% extends 'base.html' %}
+
+
+{% block content %}
+<header>
+    <h1>{{ mode }} results for {{ leg }}</h1>
+</header>
+
+{% include 'scores/_leaderboard.html' %}
+{% endblock %}
