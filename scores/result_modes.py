@@ -415,10 +415,14 @@ class ByRound(BaseResultMode):
         from entries.models import Competition, SessionRound
 
         if isinstance(competition, Competition):
-            session_rounds = SessionRound.objects.filter(session__competition=competition).exclude(olympicsessionround__exclude_ranking_rounds=True).order_by('session__start').select_related('shot_round')
+            session_rounds = SessionRound.objects.filter(
+                session__competition=competition,
+            ).exclude(olympicsessionround__exclude_ranking_rounds=True).order_by('session__start').select_related('shot_round')
         else:
             # We have a league leg
-            session_rounds = SessionRound.objects.filter(session__competition__in=competition.competitions.all()).exclude(olympicsessionround__exclude_ranking_rounds=True).order_by('session__start').select_related('shot_round')
+            session_rounds = SessionRound.objects.filter(
+                session__competition__in=competition.competitions.all(),
+            ).exclude(olympicsessionround__exclude_ranking_rounds=True).order_by('session__start').select_related('shot_round')
         rounds = []
         for round in session_rounds:
             if round.shot_round not in rounds:
@@ -602,10 +606,16 @@ class Team(BaseResultMode):
         from entries.models import Competition, SessionRound
 
         if isinstance(competition, Competition):
-            session_rounds = SessionRound.objects.exclude(session__competition=competition, olympicsessionround__exclude_ranking_rounds=True).order_by('session__start').select_related('shot_round')
+            session_rounds = SessionRound.objects.exclude(
+                session__competition=competition,
+                olympicsessionround__exclude_ranking_rounds=True,
+            ).order_by('session__start').select_related('shot_round')
         else:
             # We have a league leg
-            session_rounds = SessionRound.objects.exclude(session__competition__in=competition.competitions.all(), olympicsessionround__exclude_ranking_rounds=True).order_by('session__start').select_related('shot_round')
+            session_rounds = SessionRound.objects.exclude(
+                session__competition__in=competition.competitions.all(),
+                olympicsessionround__exclude_ranking_rounds=True,
+            ).order_by('session__start').select_related('shot_round')
         round = None
         clubs = {}
         for score in scores:
