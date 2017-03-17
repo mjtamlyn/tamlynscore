@@ -784,7 +784,7 @@ class H2HSeedings(ByRound, Team, BaseResultMode):
     def get_rounds(self, competition):
         from olympic.models import OlympicSessionRound
 
-        session_rounds = OlympicSessionRound.objects.filter(session__competition=competition).select_related('category').prefetch_related('ranking_rounds')
+        session_rounds = OlympicSessionRound.objects.filter(session__competition=competition).select_related('category').prefetch_related('ranking_rounds', 'category__bowstyles')
         self.categories = [session_round.category for session_round in session_rounds]
         return session_rounds
 
@@ -795,8 +795,9 @@ class H2HSeedings(ByRound, Team, BaseResultMode):
         for round in rounds:
             section = self.get_section_for_round(round, competition)
             section.seedings_confirmed = round.seeding_set.exists()
-            section_scores = self.get_round_results(competition, round, scores, section.seedings_confirmed, leaderboard)
-            results[section] = section_scores
+            section_scores = self.filter_scores(competition, scores, round.category)
+            section_results = self.get_round_results(competition, round, section_scores, section.seedings_confirmed, leaderboard)
+            results[section] = section_results
         return results
 
     def get_round_results(self, competition, round, scores, seedings_confirmed, leaderboard):
@@ -821,6 +822,7 @@ class H2HSeedings(ByRound, Team, BaseResultMode):
                     )
                     results.append(score)
                 return {round.category: results}
+            print(competition, round, len(scores), seedings_confirmed, leaderboard)
             return ByRound.get_round_results(self, competition, round.ranking_rounds.all()[0].shot_round, scores)
         clubs, _ = self.split_by_club(scores, competition, leaderboard)
         # This is pretty hack because team scores aren't bound to categories
@@ -840,6 +842,15 @@ class H2HSeedings(ByRound, Team, BaseResultMode):
 
     def label_for_round(self, round):
         return str(round.shot_round)
+
+    def filter_scores(self, competition, scores, category):
+        filtered = []
+        for score in scores:
+            competition_entry = score.target.session_entry.competition_entry
+            categories = self.get_categories_for_entry(competition, competition_entry)
+            if category in categories:
+                filtered.append(score)
+        return filtered
 
     def get_categories_for_entry(self, competition, entry):
         for category in self.categories:
