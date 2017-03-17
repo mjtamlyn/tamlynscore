@@ -408,7 +408,7 @@ class ByRound(BaseResultMode):
         rounds = self.get_rounds(competition)
         return OrderedDict((
             self.get_section_for_round(round, competition),
-            self.get_round_results(competition, round, scores)
+            self.get_round_results(competition, [round], scores)
         ) for round in rounds)
 
     def get_rounds(self, competition):
@@ -429,11 +429,11 @@ class ByRound(BaseResultMode):
                 rounds.append(round.shot_round)
         return rounds
 
-    def get_round_results(self, competition, round, scores):
+    def get_round_results(self, competition, rounds, scores):
         results = OrderedDict()
         for score in scores:
             session_entry = score.target.session_entry
-            if session_entry.session_round.shot_round.id is not round.id:
+            if session_entry.session_round.shot_round.id not in [round.id for round in rounds]:
                 continue
             if not self.include_later_shoots_anyway and competition.exclude_later_shoots and session_entry.index > 1:
                 continue
@@ -822,8 +822,7 @@ class H2HSeedings(ByRound, Team, BaseResultMode):
                     )
                     results.append(score)
                 return {round.category: results}
-            print(competition, round, len(scores), seedings_confirmed, leaderboard)
-            return ByRound.get_round_results(self, competition, round.ranking_rounds.all()[0].shot_round, scores)
+            return ByRound.get_round_results(self, competition, [round.shot_round for round in round.ranking_rounds.all()], scores)
         clubs, _ = self.split_by_club(scores, competition, leaderboard)
         # This is pretty hack because team scores aren't bound to categories
         bowstyles = round.category.bowstyles.values_list('name', flat=True)
