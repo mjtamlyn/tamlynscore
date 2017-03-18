@@ -59,9 +59,10 @@ class OlympicIndex(OlympicMixin, ResultModeMixin, TemplateView):
             seedings = []
             while not seedings:
                 for category in categories:
-                    seedings = list(category.values())[0]
-                    if seedings:
-                        break
+                    if category:
+                        seedings = list(category.values())[0]
+                        if seedings:
+                            break
                 break
             session_round.set_seedings(seedings)
         return redirect('olympic_index', slug=self.competition.slug)
@@ -543,6 +544,8 @@ class OlympicTree(OlympicResults):
 
         table_data = [[None for i in range(self.cols)] for j in range(self.rows)]
 
+        previous_matches = None
+
         for i in self.match_cols:
             level = self.total_levels - i / 3
             blocks = self.match_blocks(level)
@@ -601,26 +604,51 @@ class OlympicTree(OlympicResults):
                         table_data[blocks[m][1] - 1][i + 1] = seedings_dict[seeds[1]].label()
                         seedings_dict.pop(seeds[1])
                 results = match.result_set.all()
-                if not results:
+                if results:
+                    results = sorted(results, key=lambda r: Match.objects._effective_seed(r.seed.seed, level))
+                    if m % 2:
+                        results.reverse()
+                    if len(results) == 1:
+                        r = results[0]
+                        seed = Match.objects._effective_seed(r.seed.seed, level)
+                        if seed == seeds[0]:
+                            results = [r, None]
+                        else:
+                            results = [None, r]
+                    if results[0]:
+                        table_data[blocks[m][0]][i] = results[0].seed.seed
+                        table_data[blocks[m][0]][i + 1] = results[0].seed.label()
+                        table_data[blocks[m][0]][i + 2] = results[0].display()
+                    if results[1]:
+                        table_data[blocks[m][1] - 1][i] = results[1].seed.seed
+                        table_data[blocks[m][1] - 1][i + 1] = results[1].seed.label()
+                        table_data[blocks[m][1] - 1][i + 2] = results[1].display()
+                elif previous_matches:
+                    qualified_seeds = []
+                    for previous in previous_matches:
+                        for r in previous.result_set.all():
+                            if Match.objects._effective_seed(r.seed.seed, level) in seeds and r.win:
+                                qualified_seeds.append(r)
+                    if not qualified_seeds:
+                        continue
+                    if len(qualified_seeds) == 1:
+                        r = qualified_seeds[0]
+                        seed = Match.objects._effective_seed(r.seed.seed, level)
+                        if seed == seeds[0]:
+                            qualified_seeds = [r, None]
+                        else:
+                            qualified_seeds = [None, r]
+                    if qualified_seeds[0]:
+                        table_data[blocks[m][0]][i] = qualified_seeds[0].seed.seed
+                        table_data[blocks[m][0]][i + 1] = qualified_seeds[0].seed.label()
+                    if qualified_seeds[1]:
+                        table_data[blocks[m][1] - 1][i] = qualified_seeds[1].seed.seed
+                        table_data[blocks[m][1] - 1][i + 1] = qualified_seeds[1].seed.label()
+                else:
                     continue
-                results = sorted(results, key=lambda r: Match.objects._effective_seed(r.seed.seed, level))
-                if m % 2:
-                    results.reverse()
-                if len(results) == 1:
-                    r = results[0]
-                    seed = Match.objects._effective_seed(r.seed.seed, level)
-                    if seed == seeds[0]:
-                        results = [r, None]
-                    else:
-                        results = [None, r]
-                if results[0]:
-                    table_data[blocks[m][0]][i] = results[0].seed.seed
-                    table_data[blocks[m][0]][i + 1] = results[0].seed.label()
-                    table_data[blocks[m][0]][i + 2] = results[0].display()
-                if results[1]:
-                    table_data[blocks[m][1] - 1][i] = results[1].seed.seed
-                    table_data[blocks[m][1] - 1][i + 1] = results[1].seed.label()
-                    table_data[blocks[m][1] - 1][i + 2] = results[1].display()
+
+            # Set up the previous matches so we can carry that data through
+            previous_matches = matches
 
         table = Table(table_data)
         table.setStyle(self.get_table_style())
