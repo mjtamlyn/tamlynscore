@@ -13,7 +13,7 @@
         <a class="btn" href="{% url 'olympic_index' slug=competition.slug %}">Home</a>
         <a class="btn" href="{% url 'olympic_setup' slug=competition.slug %}">Setup</a>
         <a class="btn" href="{% url 'olympic_field_plan' slug=competition.slug %}">Field plan</a>
-        <a class="btn" href="{% url 'olympic_tree' slug=competition.slug %}">Tree (no results)</a>
+        <a class="btn" href="{% url 'olympic_tree' slug=competition.slug %}">Tree</a>
         <a class="btn" href="{% url 'olympic_results' slug=competition.slug %}">Results</a>
     </p>
     {% for round in rounds %}
