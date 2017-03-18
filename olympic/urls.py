@@ -11,5 +11,6 @@ urlpatterns = [
     url(r'^(?P<slug>[\w-]+)/score-sheets/(?P<round_id>\d+)/$', views.OlympicScoreSheet.as_view(), name='olympic_score_sheet'),
     url(r'^(?P<slug>[\w-]+)/results/$', views.OlympicResults.as_view(), name='olympic_results'),
     url(r'^(?P<slug>[\w-]+)/tree/$', views.OlympicTree.as_view(), name='olympic_tree'),
+    url(r'^(?P<slug>[\w-]+)/tree/pdf/$', views.OlympicTreePdf.as_view(), name='olympic_tree_pdf'),
     url(r'^(?P<slug>[\w-]+)/field-plan/$', views.FieldPlan.as_view(), name='olympic_field_plan'),
 ]

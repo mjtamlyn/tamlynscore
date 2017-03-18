@@ -476,57 +476,10 @@ class OlympicResults(CompetitionMixin, HeadedPdfView):
     ))
 
 
-class OlympicTree(OlympicResults):
-    admin_required = False
-
-    PAGE_HEIGHT = defaultPageSize[0]
-    PAGE_WIDTH = defaultPageSize[1]
-    do_sponsors = False
-
-    def setMargins(self, doc):
-        doc.bottomMargin = 0.4 * inch
-
+class OlympicTreeMixin(object):
     @property
     def match_cols(self):
         return [i for i in range(self.cols) if i % 3 is 0]
-
-    def get_table_style(self):
-        properties = [
-            ('SIZE', (0, 0), (-1, -1), 8),
-            ('LEFTPADDING', (0, 0), (-1, -1), 2),
-            ('RIGHTPADDING', (0, 0), (-1, -1), 2),
-            ('TOPPADDING', (0, 0), (-1, -1), 1),
-            ('BOTTOMPADDING', (0, 0), (-1, -1), 1),
-
-            ('LINEAFTER', (2, 0), (2, self.rows - 1), 1, colors.black),
-            ('LINEBELOW', (0, self.rows - 1), (2, self.rows - 1), 1, colors.black),
-        ]
-        vert_line = None
-        for i in self.match_cols:
-
-            offset = int(2 ** (i / 3 - 1)) if i else 0
-
-            for j in range(self.rows):
-                if (not i == 0 and not j % 2 ** (i / 3)) or (i == 0 and not j % 2):
-                    properties.append(
-                        ('LINEABOVE', (i, j + offset), (i + 2, j + offset), 1, colors.black),
-                    )
-                    if vert_line is not None:
-                        properties.append(
-                            ('LINEAFTER', (i + 2, vert_line + offset), (i + 2, j + offset - 1), 1, colors.black)
-                        )
-                        vert_line = None
-                    else:
-                        vert_line = j
-
-        if self.total_levels >= 3:
-            properties += [
-                ('LINEAFTER', (-1, -2), (-1, -1), 1, colors.black),
-                ('LINEBELOW', (-3, -3), (-1, -3), 1, colors.black),
-                ('LINEBELOW', (-3, -1), (-1, -1), 1, colors.black),
-            ]
-
-        return TableStyle(properties)
 
     def match_blocks(self, level):
         level = int(level)
@@ -539,9 +492,8 @@ class OlympicTree(OlympicResults):
         blocks = [(i * block_size + offset, (i + 1) * block_size - offset) for i in range(nmatches)]
         return blocks
 
-    def get_round_elements(self, olympic_round):
+    def get_round_table(self, olympic_round):
 
-        elements = []
         self.total_levels = olympic_round.match_set.aggregate(Max('level'))['level__max']
         seedings = olympic_round.seeding_set.select_related('entry__archer')
         seedings_dict = {s.seed: s for s in seedings}
@@ -712,15 +664,125 @@ class OlympicTree(OlympicResults):
             # Set up the previous matches so we can carry that data through
             previous_matches = matches
 
+        return table_data
+
+
+class OlympicTree(OlympicTreeMixin, CompetitionMixin, TemplateView):
+    template_name = 'olympic/tree.html'
+    admin_required = False
+
+    def add_borders(self, table, round):
+        tree = []
+
+        right_borders = []
+        top_borders = []
+        vert_line = None
+        for i in self.match_cols:
+            offset = int(2 ** (i / 3 - 1)) if i else 0
+
+            for j in range((2 ** (len(table[0]) // 3)) + 1):
+                if (not i == 0 and not j % 2 ** (i / 3)) or (i == 0 and not j % 2):
+                    top_borders.append(((i, i + 2), j + offset))
+                    if vert_line is not None:
+                        right_borders.append((i + 2, (vert_line + offset, j + offset - 1)))
+                        vert_line = None
+                    else:
+                        vert_line = j
+
+        main_rows = 2 ** (len(table[0]) // 3)
+        for i, row in enumerate(table):
+            tree_row = []
+            for j, cell in enumerate(row):
+                borders = []
+                for x, y in top_borders:
+                    if j >= x[0] and j <= x[1] and i == y and i <= main_rows:
+                        borders.append('border-top')
+                if j >= len(row) - 3 and i == len(table) - 2:
+                    borders.append('border-top')
+                if j >= len(row) - 3 and i == len(table) - 1:
+                    borders.append('border-bottom')
+                # if not (j + 1) % 3:
+                    # TODO
+                    # if i in right_borders:
+                    #     borders.append('border-right')
+                tree_row.append((cell, ' '.join(borders)))
+            tree.append(tree_row)
+        return tree
+
+    def get_context_data(self, **kwargs):
+        context = super(OlympicTree, self).get_context_data(**kwargs)
+        olympic_rounds = OlympicSessionRound.objects.filter(session__competition=self.competition).order_by('id')
+        rounds = []
+        for round in olympic_rounds:
+            table = self.get_round_table(round)
+            tree = self.add_borders(table, round)
+            rounds.append({
+                'round': round,
+                'tree': tree
+            })
+        context['rounds'] = rounds
+        return context
+
+class OlympicTreePdf(OlympicTreeMixin, OlympicResults):
+    admin_required = False
+
+    PAGE_HEIGHT = defaultPageSize[0]
+    PAGE_WIDTH = defaultPageSize[1]
+    do_sponsors = False
+
+    def setMargins(self, doc):
+        doc.bottomMargin = 0.4 * inch
+
+    def get_table_style(self):
+        properties = [
+            ('SIZE', (0, 0), (-1, -1), 8),
+            ('LEFTPADDING', (0, 0), (-1, -1), 2),
+            ('RIGHTPADDING', (0, 0), (-1, -1), 2),
+            ('TOPPADDING', (0, 0), (-1, -1), 1),
+            ('BOTTOMPADDING', (0, 0), (-1, -1), 1),
+
+            ('LINEAFTER', (2, 0), (2, self.rows - 1), 1, colors.black),
+            ('LINEBELOW', (0, self.rows - 1), (2, self.rows - 1), 1, colors.black),
+        ]
+        vert_line = None
+        for i in self.match_cols:
+
+            offset = int(2 ** (i / 3 - 1)) if i else 0
+
+            for j in range(self.rows):
+                if (not i == 0 and not j % 2 ** (i / 3)) or (i == 0 and not j % 2):
+                    properties.append(
+                        ('LINEABOVE', (i, j + offset), (i + 2, j + offset), 1, colors.black),
+                    )
+                    if vert_line is not None:
+                        properties.append(
+                            ('LINEAFTER', (i + 2, vert_line + offset), (i + 2, j + offset - 1), 1, colors.black)
+                        )
+                        vert_line = None
+                    else:
+                        vert_line = j
+
+        if self.total_levels >= 3:
+            properties += [
+                ('LINEAFTER', (-1, -2), (-1, -1), 1, colors.black),
+                ('LINEBELOW', (-3, -3), (-1, -3), 1, colors.black),
+                ('LINEBELOW', (-3, -1), (-1, -1), 1, colors.black),
+            ]
+
+        return TableStyle(properties)
+
+    def get_round_elements(self, olympic_round):
+        table_data = self.get_round_table(olympic_round)
+
         table = Table(table_data)
         table.setStyle(self.get_table_style())
 
+        elements = []
         elements.append(KeepTogether([
             self.Para(u'{1}m: {0}'.format(olympic_round.category.name, olympic_round.shot_round.distance), 'h2'),
             table,
         ]))
         return elements
-
 
 class FieldPlan(FieldPlanMixin, HeadedPdfView):
     title = 'Field plan'

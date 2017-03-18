@@ -1,0 +1,18 @@
+{% extends 'entries/competition_detail.html' %}
+
+{% block competition_content %}
+<h2>Head to Head Results</h2>
+
+{% for round in rounds %}
+    <h3>{{ round.round.shot_round }} - {{ round.round.category }}</h3>
+    <table class="tree">
+        {% for row in round.tree %}
+            <tr>
+                {% for cell, borders in row %}
+                    <td class="{{ borders }}">{% if not cell == None %}{{ cell }}{% endif %}</td>
+                {% endfor %}
+            </tr>
+        {% endfor %}
+    </table>
+{% endfor %}
+{% endblock %}

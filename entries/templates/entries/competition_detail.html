@@ -38,6 +38,9 @@
                 {% endfor %}
                 </ul>
             </li>
+            {% if competition.has_olympic %}
+                <li><a href="{% url 'olympic_tree' slug=competition.slug %}">H2H Results</a></li>
+            {% endif %}
             {% if competition_admin %}
                 {% if competition.has_olympic %}
                     <li><a href="{% url 'olympic_index' slug=competition.slug %}">Head to heads</a></li>

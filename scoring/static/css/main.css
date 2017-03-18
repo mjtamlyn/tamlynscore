@@ -5573,3 +5573,29 @@ table.field-plan td.empty, table.field-plan th.empty {
 table.table .missed-cut {
   background-color: #e3e3e3;
 }
+
+/* line 17, ../../sass/_olympic.sass */
+table.tree {
+  margin: 0 auto;
+  border-collapse: collapse;
+}
+/* line 20, ../../sass/_olympic.sass */
+table.tree td {
+  padding: 5px 8px;
+}
+/* line 22, ../../sass/_olympic.sass */
+table.tree td:nth-child(3n) {
+  padding-right: 30px;
+}
+/* line 24, ../../sass/_olympic.sass */
+table.tree td.border-top {
+  border-top: 1px solid #bbb;
+}
+/* line 26, ../../sass/_olympic.sass */
+table.tree td.border-bottom {
+  border-bottom: 1px solid #bbb;
+}
+/* line 28, ../../sass/_olympic.sass */
+table.tree td.border-right {
+  border-right: 1px solid #bbb;
+}
