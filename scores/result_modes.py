@@ -826,7 +826,7 @@ class H2HSeedings(ByRound, Team, BaseResultMode):
             if round.cut:
                 for category, provisional_seedings in results.items():
                     for seed in provisional_seedings:
-                        if seed.placing > round.cut:
+                        if seed.placing and seed.placing > round.cut:
                             seed.missed_cut = True
             return results
         clubs, _ = self.split_by_club(scores, competition, leaderboard)
