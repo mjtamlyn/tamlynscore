@@ -519,6 +519,13 @@ class OlympicTree(OlympicResults):
                     else:
                         vert_line = j
 
+        if self.total_levels >= 3:
+            properties += [
+                ('LINEAFTER', (-1, -2), (-1, -1), 1, colors.black),
+                ('LINEBELOW', (-3, -3), (-1, -3), 1, colors.black),
+                ('LINEBELOW', (-3, -1), (-1, -1), 1, colors.black),
+            ]
+
         return TableStyle(properties)
 
     def match_blocks(self, level):
@@ -629,23 +636,72 @@ class OlympicTree(OlympicResults):
                         for r in previous.result_set.all():
                             if Match.objects._effective_seed(r.seed.seed, level) in seeds and r.win:
                                 qualified_seeds.append(r)
-                    if not qualified_seeds:
+                    if qualified_seeds:
+                        if len(qualified_seeds) == 1:
+                            r = qualified_seeds[0]
+                            seed = Match.objects._effective_seed(r.seed.seed, level)
+                            if seed == seeds[0]:
+                                qualified_seeds = [r, None]
+                            else:
+                                qualified_seeds = [None, r]
+                        if qualified_seeds[0]:
+                            table_data[blocks[m][0]][i] = qualified_seeds[0].seed.seed
+                            table_data[blocks[m][0]][i + 1] = qualified_seeds[0].seed.label()
+                        if qualified_seeds[1]:
+                            table_data[blocks[m][1] - 1][i] = qualified_seeds[1].seed.seed
+                            table_data[blocks[m][1] - 1][i + 1] = qualified_seeds[1].seed.label()
+
+                if self.total_levels >= 3 and level == 1:
+                    bronze = olympic_round.match_set.filter(level=1, match=2)
+                    if not bronze:
                         continue
-                    if len(qualified_seeds) == 1:
-                        r = qualified_seeds[0]
-                        seed = Match.objects._effective_seed(r.seed.seed, level)
-                        if seed == seeds[0]:
-                            qualified_seeds = [r, None]
-                        else:
-                            qualified_seeds = [None, r]
-                    if qualified_seeds[0]:
-                        table_data[blocks[m][0]][i] = qualified_seeds[0].seed.seed
-                        table_data[blocks[m][0]][i + 1] = qualified_seeds[0].seed.label()
-                    if qualified_seeds[1]:
-                        table_data[blocks[m][1] - 1][i] = qualified_seeds[1].seed.seed
-                        table_data[blocks[m][1] - 1][i + 1] = qualified_seeds[1].seed.label()
-                else:
-                    continue
+                    bronze = bronze[0]
+                    results = bronze.result_set.select_related()
+                    results = sorted(results, key=lambda r: Match.objects._effective_seed(r.seed.seed, level))
+                    table_data[-2][-2] = '              ' * 2
+                    table_data[-2][-1] = 'Target: ' + str(match.target)
+                    table_data[-1][-1] = 'Target: ' + str(match.target)
+                    if match.target_2:
+                        table_data[-1][-1] = 'Target: ' + str(match.target_2)
+
+                    seeds = [1, 2]
+                    if results:
+                        if len(results) == 1:
+                            r = results[0]
+                            seed = Match.objects._effective_seed(r.seed.seed, level)
+                            if seed == seeds[0]:
+                                results = [r, None]
+                            else:
+                                results = [None, r]
+                        if results[0]:
+                            table_data[-2][-3] = results[0].seed.seed
+                            table_data[-2][-2] = results[0].seed.label()
+                            table_data[-2][-1] = results[0].display()
+                        if results[1]:
+                            table_data[-1][-3] = results[1].seed.seed
+                            table_data[-1][-2] = results[1].seed.label()
+                            table_data[-1][-1] = results[1].display()
+                    elif previous_matches:
+                        qualified_seeds = []
+                        for previous in previous_matches:
+                            for r in previous.result_set.all():
+                                if Match.objects._effective_seed(r.seed.seed, level) in seeds and not r.win:
+                                    qualified_seeds.append(r)
+                        if not qualified_seeds:
+                            continue
+                        if len(qualified_seeds) == 1:
+                            r = qualified_seeds[0]
+                            seed = Match.objects._effective_seed(r.seed.seed, level)
+                            if seed == seeds[0]:
+                                qualified_seeds = [r, None]
+                            else:
+                                qualified_seeds = [None, r]
+                        if qualified_seeds[0]:
+                            table_data[-2][-3] = qualified_seeds[0].seed.seed
+                            table_data[-2][-2] = qualified_seeds[0].seed.label()
+                        if qualified_seeds[1]:
+                            table_data[-1][-3] = qualified_seeds[1].seed.seed
+                            table_data[-1][-2] = qualified_seeds[1].seed.label()
 
             # Set up the previous matches so we can carry that data through
             previous_matches = matches
