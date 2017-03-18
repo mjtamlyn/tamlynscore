@@ -113,6 +113,9 @@ class InputArrowsView(CompetitionMixin, TemplateView):
     template_name = 'input_arrows.html'
     next_url_name = 'input_scores'
 
+    def get_next_exists(self, session_id, boss):
+        return Score.objects.filter(target__session_entry__session_round__session=session_id, target__boss=int(boss) + 1).order_by('target__target').exists()
+
     def get_context_data(self, **kwargs):
         context = super(InputArrowsView, self).get_context_data(**kwargs)
         session_id = self.kwargs['session_id']
@@ -131,6 +134,7 @@ class InputArrowsView(CompetitionMixin, TemplateView):
             'round': round,
             'dozen': dozen,
             'boss': boss,
+            'next_exists': self.get_next_exists(session_id, boss),
         })
         return context
 
@@ -152,7 +156,12 @@ class InputArrowsView(CompetitionMixin, TemplateView):
             for score in scores:
                 score.update_score()
                 score.save(force_update=True)
-            return HttpResponseRedirect(reverse(self.next_url_name, kwargs={'slug': slug}) + '?fd={0}&ft={1}&fs={2}'.format(dozen, boss, session_id))
+            if self.request.POST.get('next'):
+                success_url = reverse('input_arrows', kwargs={'slug': slug, 'session_id': session_id, 'boss': int(boss) + 1, 'dozen': dozen})
+            else:
+                success_url = reverse(self.next_url_name, kwargs={'slug': slug}) + '?fd={0}&ft={1}&fs={2}'.format(dozen, boss, session_id)
+            return HttpResponseRedirect(success_url)
+        next_exists = self.get_next_exists(session_id, boss)
         return render(request, self.template, locals())
 
 

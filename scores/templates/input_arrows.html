@@ -55,6 +55,9 @@
         </table>
         <div class="save">
             <input type="submit" value="Save" class="btn" />
+            {% if next_exists %}
+            <input type="submit" value="Save and go to next target" name="next" class="btn" />
+            {% endif %}
         </div>
         {% csrf_token %}
     </form>
