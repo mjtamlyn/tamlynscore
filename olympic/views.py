@@ -493,13 +493,13 @@ class OlympicTree(OlympicResults):
     def get_table_style(self):
         properties = [
             ('SIZE', (0, 0), (-1, -1), 8),
-            ('LEFTPADDING', (0, 0), (-1, -1), 1),
-            ('RIGHTPADDING', (0, 0), (-1, -1), 1),
+            ('LEFTPADDING', (0, 0), (-1, -1), 2),
+            ('RIGHTPADDING', (0, 0), (-1, -1), 2),
             ('TOPPADDING', (0, 0), (-1, -1), 1),
             ('BOTTOMPADDING', (0, 0), (-1, -1), 1),
 
-            ('LINEAFTER', (2, 0), (2, -1), 1, colors.black),
-            ('LINEBELOW', (0, -1), (2, -1), 1, colors.black),
+            ('LINEAFTER', (2, 0), (2, self.rows - 1), 1, colors.black),
+            ('LINEBELOW', (0, self.rows - 1), (2, self.rows - 1), 1, colors.black),
         ]
         vert_line = None
         for i in self.match_cols:
@@ -594,7 +594,7 @@ class OlympicTree(OlympicResults):
                 if m % 2:
                     seeds.reverse()
                 seeds_remaining = len(set(seeds).intersection(set(seedings_dict.keys())))
-                if self.total_levels - match.level > 0 or seeds_remaining == 2:
+                if self.total_levels - match.level > 0 or seeds_remaining == 2 or (self.total_levels == match.level and not seedings):
                     table_data[blocks[m][0]][i + 1] = '              ' * 2
                     table_data[blocks[m][0]][i + 2] = 'Target: ' + str(match.target)
                     table_data[blocks[m][1] - 1][i + 2] = 'Target: ' + str(match.target)
@@ -652,6 +652,12 @@ class OlympicTree(OlympicResults):
                             table_data[blocks[m][1] - 1][i + 1] = qualified_seeds[1].seed.label()
 
                 if self.total_levels >= 3 and level == 1:
+                    if self.total_levels == 3:
+                        table_data.append([None for i in range(self.cols)])
+                        table_data.append([None for i in range(self.cols)])
+                    if self.total_levels == 4:
+                        table_data.append([None for i in range(self.cols)])
+
                     bronze = olympic_round.match_set.filter(level=1, match=2)
                     if not bronze:
                         continue
@@ -659,10 +665,10 @@ class OlympicTree(OlympicResults):
                     results = bronze.result_set.select_related()
                     results = sorted(results, key=lambda r: Match.objects._effective_seed(r.seed.seed, level))
                     table_data[-2][-2] = '              ' * 2
-                    table_data[-2][-1] = 'Target: ' + str(match.target)
-                    table_data[-1][-1] = 'Target: ' + str(match.target)
+                    table_data[-2][-1] = 'Target: ' + str(bronze.target)
+                    table_data[-1][-1] = 'Target: ' + str(bronze.target)
                     if match.target_2:
-                        table_data[-1][-1] = 'Target: ' + str(match.target_2)
+                        table_data[-1][-1] = 'Target: ' + str(bronze.target_2)
 
                     seeds = [1, 2]
                     if results:
