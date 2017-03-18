@@ -784,7 +784,7 @@ class H2HSeedings(ByRound, Team, BaseResultMode):
     def get_rounds(self, competition):
         from olympic.models import OlympicSessionRound
 
-        session_rounds = OlympicSessionRound.objects.filter(session__competition=competition).select_related('category').prefetch_related('ranking_rounds', 'category__bowstyles')
+        session_rounds = OlympicSessionRound.objects.filter(session__competition=competition).select_related('category').prefetch_related('ranking_rounds', 'category__bowstyles').order_by('id')
         self.categories = [session_round.category for session_round in session_rounds]
         return session_rounds
 
