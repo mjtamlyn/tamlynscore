@@ -723,6 +723,7 @@ class OlympicTree(OlympicTreeMixin, CompetitionMixin, TemplateView):
         context['rounds'] = rounds
         return context
 
+
 class OlympicTreePdf(OlympicTreeMixin, OlympicResults):
     admin_required = False
 
@@ -783,6 +784,7 @@ class OlympicTreePdf(OlympicTreeMixin, OlympicResults):
             table,
         ]))
         return elements
+
 
 class FieldPlan(FieldPlanMixin, HeadedPdfView):
     title = 'Field plan'
