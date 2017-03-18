@@ -822,7 +822,13 @@ class H2HSeedings(ByRound, Team, BaseResultMode):
                     )
                     results.append(score)
                 return {round.category: results}
-            return ByRound.get_round_results(self, competition, [round.shot_round for round in round.ranking_rounds.all()], scores)
+            results = ByRound.get_round_results(self, competition, [round.shot_round for round in round.ranking_rounds.all()], scores)
+            if round.cut:
+                for category, provisional_seedings in results.items():
+                    for seed in provisional_seedings:
+                        if seed.placing > round.cut:
+                            seed.missed_cut = True
+            return results
         clubs, _ = self.split_by_club(scores, competition, leaderboard)
         # This is pretty hack because team scores aren't bound to categories
         bowstyles = round.category.bowstyles.values_list('name', flat=True)
@@ -841,6 +847,11 @@ class H2HSeedings(ByRound, Team, BaseResultMode):
 
     def label_for_round(self, round):
         return str(round.shot_round)
+
+    def get_main_headers(self, competition):
+        if competition.use_county_teams:
+            return ['Archer', 'County']
+        return ['Archer', 'Club']
 
     def filter_scores(self, competition, scores, category):
         filtered = []

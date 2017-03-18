@@ -371,10 +371,11 @@ class PDFResultsRenderer(object):
             elements.append(Paragraph(str(section), self.styles['h1']))
 
             for category, scores in categories.items():
+                category_table_style = copy.copy(table_style)
                 elements.append(Paragraph(str(category), self.styles['h2']))
                 table_data = [section.headers]
-                for score in scores:
-                    table_data += self.rows_from_score(scores, score, section)
+                for i, score in enumerate(scores):
+                    table_data += self.rows_from_score(scores, score, section, i, category_table_style)
                 table = Table(table_data)
                 table.setStyle(table_style)
                 elements.append(table)
@@ -383,9 +384,12 @@ class PDFResultsRenderer(object):
 
         return elements
 
-    def rows_from_score(self, scores, score, section):
+    def rows_from_score(self, scores, score, section, index, table_style):
         row = [score.placing]
         rows = [row]
+
+        if getattr(score, 'missed_cut', None):
+            table_style.add('BACKGROUND', (0, index + 1), (-1, index + 2), colors.lightgrey),
 
         team_style = copy.copy(self.styles['Normal'])
         team_style.fontName = 'Helvetica-Bold'

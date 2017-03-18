@@ -5568,3 +5568,8 @@ table.field-plan td, table.field-plan th {
 table.field-plan td.empty, table.field-plan th.empty {
   background-color: #CCCCCC;
 }
+
+/* line 14, ../../sass/_olympic.sass */
+table.table .missed-cut {
+  background-color: #e3e3e3;
+}

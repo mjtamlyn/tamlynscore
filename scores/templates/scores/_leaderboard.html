@@ -11,7 +11,7 @@
             {% endifchanged %}
             <tr><th colspan="100%">{{ category }}</th></tr>
             {% for score in scores %}
-                <tr {% if score.team %}class="no-border"{% endif %}>
+                <tr class="{% if score.team %}no-border{% endif %} {% if score.missed_cut %}missed-cut{% endif %}">
                     {% if include_confirmation_form and not section.seedings_confirmed %}
                     <td>
                         {% if score.team %}
@@ -20,7 +20,7 @@
                                 <input type="checkbox" checked="checked" name="score-{{ member.target.pk }}" />
                             {% endfor %}
                         {% else %}
-                            <input type="checkbox" checked="checked" name="score-{{ score.target.pk }}" />
+                            <input type="checkbox" {% if not score.missed_cut %}checked="checked"{% endif %} name="score-{{ score.target.pk }}" />
                         {% endif %}
                     </td>
                     {% endif %}

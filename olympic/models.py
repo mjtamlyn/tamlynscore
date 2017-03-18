@@ -103,6 +103,7 @@ class OlympicSessionRound(models.Model):
     ranking_rounds = models.ManyToManyField(SessionRound)
     exclude_ranking_rounds = models.BooleanField(default=True)
     category = models.ForeignKey(Category)
+    cut = models.IntegerField(blank=True, null=True)
 
     def __str__(self):
         return u'{0}, {1} {2}'.format(self.session, self.shot_round, self.category.name)
