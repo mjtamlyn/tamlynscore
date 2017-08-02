@@ -95,6 +95,9 @@
                         {% if competition.has_agb_age_groups and entry.agb_age %}
                         <span class="pill junior">{{ entry.get_agb_age_display }}</span>
                         {% endif %}
+                        {% if competition.has_junior_masters_age_groups and entry.junior_masters_age %}
+                        <span class="pill junior">{{ entry.get_junior_masters_age_display }}</span>
+                        {% endif %}
                         {% if entry.archer.agb_number %}
                             {{ entry.archer.agb_number }}
                         {% else %}

@@ -422,6 +422,12 @@ class EntryUpdateForm(EntryCreateForm):
         self.initial['sessions'] = [se.session_round for se in self.instance.sessionentry_set.all()]
         if self.competition.use_custom_teams:
             self.initial['custom_team_name'] = instance.custom_team_name
+        if self.competition.has_agb_age_groups:
+            self.initial['agb_age'] = instance.agb_age
+        if self.competition.has_wa_age_groups:
+            self.initial['wa_age'] = instance.wa_age
+        if self.competition.has_junior_masters_age_groups:
+            self.initial['junior_masters_age'] = instance.junior_masters_age
 
     def get_current_obj(self):
         return self.instance
