@@ -152,14 +152,14 @@ class EntryList(CompetitionMixin, ListView):
                 novice_count = len([e for e in sr.sessionentry_set.all() if e.competition_entry.novice == 'N'])
                 junior_count = len([e for e in sr.sessionentry_set.all() if e.competition_entry.age == 'J'])
                 wa_age_groups = collections.Counter(
-                    e.competition_entry.archer.get_wa_age_display() for e in
-                    sr.sessionentry_set.all() if e.competition_entry.archer.wa_age)
+                    e.competition_entry.get_wa_age_display() for e in
+                    sr.sessionentry_set.all() if e.competition_entry.wa_age)
                 agb_age_groups = collections.Counter(
-                    e.competition_entry.archer.get_agb_age_display() for e in
-                    sr.sessionentry_set.all() if e.competition_entry.archer.agb_age)
+                    e.competition_entry.get_agb_age_display() for e in
+                    sr.sessionentry_set.all() if e.competition_entry.agb_age)
                 junior_masters_age_groups = collections.Counter(
-                    e.competition_entry.archer.get_junior_masters_age_display() for e in
-                    sr.sessionentry_set.all() if e.competition_entry.archer.junior_masters_age)
+                    e.competition_entry.get_junior_masters_age_display() for e in
+                    sr.sessionentry_set.all() if e.competition_entry.junior_masters_age)
                 session_round_stats.append({
                     'session_round': sr,
                     'total_entries': len(sr.sessionentry_set.all()),
