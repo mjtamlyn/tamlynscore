@@ -2,7 +2,7 @@ import math
 
 from django.db import models
 
-from core.models import Archer, Bowstyle, Club, County, Round, AGE_CHOICES, WA_AGE_CHOICES, AGB_AGE_CHOICES, NOVICE_CHOICES
+from core.models import Archer, Bowstyle, Club, County, Round, AGE_CHOICES, WA_AGE_CHOICES, AGB_AGE_CHOICES, JUNIOR_MASTERS_AGE_CHOICES, NOVICE_CHOICES
 from scores.result_modes import get_result_modes
 from scoring.utils import generate_slug
 
@@ -41,6 +41,7 @@ class ResultsFormatFields(models.Model):
     has_juniors = models.BooleanField(default=False)
     has_wa_age_groups = models.BooleanField(default=False)
     has_agb_age_groups = models.BooleanField(default=False)
+    has_junior_masters_age_groups = models.BooleanField(default=False)
     novices_in_experienced_individual = models.BooleanField(default=False, help_text='Puts the novices in experienced results and their own category')
     novices_in_experienced_teams = models.BooleanField(default=False)
     exclude_later_shoots = models.BooleanField(default=False, help_text='Only the first session can count for results')
@@ -252,6 +253,15 @@ class SessionRound(models.Model):
                                 allocation += (
                                     None,
                                 )
+                        if competition.has_junior_masters_age_groups:
+                            if entry.junior_masters_age:
+                                allocation += (
+                                    entry.get_junior_masters_age_display(),
+                                )
+                            else:
+                                allocation += (
+                                    None,
+                                )
                     if whole_session:
                         allocation += (shot_round.name,)
                     targets.append((target,) + allocation)
@@ -273,6 +283,7 @@ class CompetitionEntry(models.Model):
     age = models.CharField(max_length=1, choices=AGE_CHOICES, default='S')
     wa_age = models.CharField(max_length=1, choices=WA_AGE_CHOICES, default='', blank=True)
     agb_age = models.CharField(max_length=3, choices=AGB_AGE_CHOICES, default='', blank=True)
+    junior_masters_age = models.CharField(max_length=3, choices=JUNIOR_MASTERS_AGE_CHOICES, default='', blank=True)
     novice = models.CharField(max_length=1, choices=NOVICE_CHOICES, default='E')
 
     guest = models.BooleanField(default=False)
@@ -297,6 +308,8 @@ class CompetitionEntry(models.Model):
         novice = 'Novice ' if self.competition.has_novices and self.novice == 'N' else ''
         if self.competition.has_agb_age_groups and self.agb_age:
             junior = '%s ' % self.get_agb_age_display()
+        if self.competition.has_junior_masters_age_groups and self.junior_masters_age:
+            junior = '%s ' % self.get_junior_masters_age_display()
         return u'{2}{3}{0} {1}'.format(self.archer.get_gender_display(), self.bowstyle, junior, novice)
 
     def team_name(self, short_form=True):

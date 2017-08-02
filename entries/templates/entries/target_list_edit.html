@@ -77,6 +77,9 @@
                                     {% if competition.has_agb_age_groups and entry.session_entry.competition_entry.agb_age %}
                                     <span class="pill junior">{{ entry.session_entry.competition_entry.get_agb_age_display }}</span>
                                     {% endif %}
+                                    {% if competition.has_junior_masters_age_groups and entry.session_entry.competition_entry.junior_masters_age %}
+                                    <span class="pill junior">{{ entry.session_entry.competition_entry.get_junior_masters_age_display }}</span>
+                                    {% endif %}
                                 </p>
                             {% endif %}
                         </div>

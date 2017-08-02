@@ -46,6 +46,14 @@ WA_AGE_CHOICES = (
     ('M', 'Master'),
 )
 
+JUNIOR_MASTERS_AGE_CHOICES = (
+    ('', 'None'),
+    ('U21', 'U21'),
+    ('U18', 'U18'),
+    ('U14', 'U14'),
+    ('U12', 'U12'),
+)
+
 AGB_AGE_CHOICES = (
     ('', 'Senior'),
     ('U18', 'U18'),
@@ -198,6 +206,7 @@ class Archer(models.Model):
     age = models.CharField(max_length=1, choices=AGE_CHOICES, default='S')
     wa_age = models.CharField(max_length=1, choices=WA_AGE_CHOICES, default='', blank=True)
     agb_age = models.CharField(max_length=3, choices=AGB_AGE_CHOICES, default='', blank=True)
+    junior_masters_age = models.CharField(max_length=3, choices=JUNIOR_MASTERS_AGE_CHOICES, default='', blank=True)
     novice = models.CharField(max_length=1, choices=NOVICE_CHOICES, default='E')
     agb_number = models.BigIntegerField(blank=True, null=True)
     archived = models.BooleanField(default=False)

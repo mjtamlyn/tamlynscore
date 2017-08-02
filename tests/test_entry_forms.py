@@ -75,6 +75,7 @@ class TestCompetitionForm(TestCase):
             'has_juniors': False,
             'has_wa_age_groups': False,
             'has_agb_age_groups': False,
+            'has_junior_masters_age_groups': False,
             'exclude_later_shoots': False,
             'team_size': 4,
             'allow_incomplete_teams': True,

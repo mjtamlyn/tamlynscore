@@ -46,6 +46,11 @@
                         <span class="pill {{ age_group|slugify }}">{{ count }} {{ age_group }}</span>
                         {% endfor %}<br>
                     {% endif %}
+                    {% if competition.has_junior_masters_age_groups %}
+                        {% for age_group, count in sr.junior_masters_age_groups %}
+                        <span class="pill {{ age_group|slugify }}">{{ count }} {{ age_group }}</span>
+                        {% endfor %}<br>
+                    {% endif %}
                 {% endif %}
             {% endfor %}
             </div>

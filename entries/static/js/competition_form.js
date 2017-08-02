@@ -45,7 +45,7 @@ $(document).ready(function() {
 	$('#id_has_novices').change(function(e) {
 		$('#id_novice_team_size').prop('disabled', !this.checked);
 	});
-	$('#id_has_juniors, #id_has_wa_age_groups, #id_has_agb_age_groups').change(function(e) {
+	$('#id_has_juniors, #id_has_wa_age_groups, #id_has_junior_masters_age_groups, #id_has_agb_age_groups').change(function(e) {
         enableJuniorTeamSize();
 	});
 

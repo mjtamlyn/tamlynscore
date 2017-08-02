@@ -5,7 +5,7 @@ from django.core.cache import cache
 from django.db import transaction
 from django import forms
 
-from core.models import Archer, Bowstyle, Club, County, Round, NOVICE_CHOICES, AGE_CHOICES, WA_AGE_CHOICES, AGB_AGE_CHOICES
+from core.models import Archer, Bowstyle, Club, County, Round, NOVICE_CHOICES, AGE_CHOICES, WA_AGE_CHOICES, AGB_AGE_CHOICES, JUNIOR_MASTERS_AGE_CHOICES
 from scores.result_modes import get_result_modes, ByRound
 
 from .models import Tournament, Competition, CompetitionEntry, Session, SessionRound, SessionEntry, SCORING_SYSTEMS, SCORING_FULL
@@ -45,6 +45,7 @@ class CompetitionForm(forms.Form):
     has_juniors = forms.BooleanField(required=False, label='Use a general junior category')
     has_wa_age_groups = forms.BooleanField(required=False, label='Use WA style age groups')
     has_agb_age_groups = forms.BooleanField(required=False, label='Use ArcheryGB style age groups')
+    has_junior_masters_age_groups = forms.BooleanField(required=False, label='Use Junior Masters style age groups')
     exclude_later_shoots = forms.BooleanField(required=False, help_text='Only the first session can count for results')
 
     # Fields about team results
@@ -69,6 +70,7 @@ class CompetitionForm(forms.Form):
         'has_juniors',
         'has_wa_age_groups',
         'has_agb_age_groups',
+        'has_junior_masters_age_groups',
         'exclude_later_shoots',
         'team_size',
         'allow_incomplete_teams',
@@ -300,6 +302,13 @@ class EntryCreateForm(forms.Form):
                 required=False,
             )
             self.fields['update_agb_age'] = forms.BooleanField(required=False)
+        if self.competition.has_junior_masters_age_groups:
+            self.fields['junior_masters_age'] = forms.ChoiceField(
+                label='Age Group (%s)' % current.get_junior_masters_age_display(),
+                choices=(('', '---------'),) + JUNIOR_MASTERS_AGE_CHOICES,
+                required=False,
+            )
+            self.fields['update_junior_masters_age'] = forms.BooleanField(required=False)
         if len(self.session_rounds) > 1:
             self.fields['sessions'] = forms.ModelMultipleChoiceField(
                 queryset=self.session_rounds,
@@ -343,6 +352,9 @@ class EntryCreateForm(forms.Form):
         if self.competition.has_agb_age_groups and self.cleaned_data['agb_age'] and self.cleaned_data['update_agb_age']:
             self.archer.agb_age = self.cleaned_data['agb_age']
             changed = True
+        if self.competition.has_junior_masters_age_groups and self.cleaned_data['junior_masters_age'] and self.cleaned_data['update_junior_masters_age']:
+            self.archer.junior_masters_age = self.cleaned_data['junior_masters_age']
+            changed = True
         if not self.cleaned_data['agb_number'] == self.archer.agb_number:
             self.archer.agb_number = self.cleaned_data['agb_number']
             changed = True
@@ -373,6 +385,8 @@ class EntryCreateForm(forms.Form):
             entry.age = self.cleaned_data['age'] or default.age
         if self.competition.has_wa_age_groups:
             entry.wa_age = self.cleaned_data['wa_age']
+        if self.competition.has_junior_masters_age_groups:
+            entry.junior_masters_age = self.cleaned_data['junior_masters_age']
         if self.competition.has_agb_age_groups:
             entry.agb_age = self.cleaned_data['agb_age']
             if entry.agb_age:
