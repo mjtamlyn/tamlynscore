@@ -2,7 +2,7 @@ from django.contrib.postgres.fields import ArrayField
 from django.db import models
 from django.utils.functional import cached_property
 
-from core.models import Bowstyle, GENDER_CHOICES, NOVICE_CHOICES, WA_AGE_CHOICES
+from core.models import Bowstyle, GENDER_CHOICES, NOVICE_CHOICES, WA_AGE_CHOICES, JUNIOR_MASTERS_AGE_CHOICES
 from entries.models import Session, SessionRound, CompetitionEntry
 
 
@@ -45,6 +45,7 @@ class OlympicRound(models.Model):
 class Category(models.Model):
     bowstyles = models.ManyToManyField(Bowstyle)
     wa_ages = ArrayField(models.CharField(max_length=1, choices=WA_AGE_CHOICES), blank=True, null=True)
+    junior_masters_age = models.CharField(max_length=3, choices=JUNIOR_MASTERS_AGE_CHOICES, blank=True, null=True)
     gender = models.CharField(max_length=1, choices=GENDER_CHOICES, blank=True, null=True)
     novice = models.CharField(max_length=1, choices=NOVICE_CHOICES, blank=True, null=True)
 
@@ -58,6 +59,8 @@ class Category(models.Model):
         code = ''
         if self.wa_ages:
             code += ''.join(self.wa_ages)
+        if self.junior_masters_age:
+            code += ''.join(self.junior_masters_age)
         if self.novice:
             code += self.novice
         if self.gender:
@@ -90,6 +93,8 @@ class Category(models.Model):
         name = ''
         if self.wa_ages:
             name += ', '.join([dict(WA_AGE_CHOICES)[age] for age in self.wa_age_choices]) + ' '
+        if self.junior_masters_age:
+            name += self.get_junior_masters_age_display() + ' '
         if self.novice:
             name += self.get_novice_display() + ' '
         if self.gender:
