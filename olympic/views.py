@@ -82,7 +82,8 @@ class FieldPlanMixin(CompetitionMixin):
         if len(matches) == 0:
             return None
         max_timing = (max(matches, key=lambda m: m.timing)).timing
-        max_target = (max(matches, key=lambda m: m.target)).target
+        last_match = max(matches, key=lambda m: (m.target_2 or m.target))
+        max_target = last_match.target_2 or last_match.target
         if matches[0].session_round.shot_round.team_type:
             max_target += 1
         levels = ['Finals', 'Semis', 'Quarters', '1/8', '1/16', '1/32', '1/64', '1/128']
