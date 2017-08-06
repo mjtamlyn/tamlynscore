@@ -82,6 +82,8 @@ class Category(models.Model):
         name = ''
         if self.wa_ages:
             name += ', '.join([dict(WA_AGE_CHOICES)[age] for age in self.wa_ages]) + ' '
+        if self.junior_masters_age:
+            name += self.get_junior_masters_age_display() + ' '
         if self.novice:
             name += self.get_novice_display() + ' '
         if self.gender:
