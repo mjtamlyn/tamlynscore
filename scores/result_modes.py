@@ -604,20 +604,22 @@ class Team(BaseResultMode):
                 results[type] = type_results
         return {self.get_section_for_round(round, competition): results}
 
-    def split_by_club(self, scores, competition, leaderboard):
+    def split_by_club(self, scores, competition, leaderboard, valid_rounds=None):
         from entries.models import Competition, SessionRound
 
-        if isinstance(competition, Competition):
+        if isinstance(competition, Competition) and not valid_rounds:
             session_rounds = SessionRound.objects.exclude(
                 session__competition=competition,
                 olympicsessionround__exclude_ranking_rounds=True,
             ).order_by('session__start').select_related('shot_round')
-        else:
+        elif not valid_rounds:
             # We have a league leg
             session_rounds = SessionRound.objects.exclude(
                 session__competition__in=competition.competitions.all(),
                 olympicsessionround__exclude_ranking_rounds=True,
             ).order_by('session__start').select_related('shot_round')
+        else:
+            session_rounds = valid_rounds
         round = None
         clubs = {}
         for score in scores:
@@ -831,7 +833,7 @@ class H2HSeedings(ByRound, Team, BaseResultMode):
                         if seed.placing and seed.placing > round.cut:
                             seed.missed_cut = True
             return results
-        clubs, _ = self.split_by_club(scores, competition, leaderboard)
+        clubs, _ = self.split_by_club(scores, competition, leaderboard, round.ranking_rounds.all())
         # This is pretty hack because team scores aren't bound to categories
         bowstyles = round.category.bowstyles.values_list('name', flat=True)
         if 'Compound' in bowstyles:
