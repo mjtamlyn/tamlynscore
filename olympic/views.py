@@ -585,7 +585,7 @@ class OlympicTreeMixin(object):
                         table_data[blocks[m][1] - 1][i + 2] = results[1].display()
                 elif previous_matches:
                     qualified_seeds = []
-                    for previous in previous_matches:
+                    for previous in filter(None, previous_matches):
                         for r in previous.result_set.all():
                             if Match.objects._effective_seed(r.seed.seed, level) in seeds and r.win:
                                 qualified_seeds.append(r)
