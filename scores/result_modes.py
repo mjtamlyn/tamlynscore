@@ -532,7 +532,9 @@ class DoubleRound(BaseResultMode):
     def get_rounds(self, competition):
         from entries.models import SessionRound
 
-        session_rounds = SessionRound.objects.filter(session__competition=competition).order_by('session__start')
+        session_rounds = SessionRound.objects.filter(session__competition=competition).order_by('session__start').exclude(
+            olympicsessionround__exclude_ranking_rounds=True,
+        )
         rounds = []
         for round in session_rounds:
             if round.shot_round not in rounds:
