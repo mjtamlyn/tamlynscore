@@ -146,7 +146,7 @@ class BaseResultMode(object):
     def get_main_headers(self, competition):
         if competition.use_county_teams:
             return ['Archer', 'County']
-        return ['Archer', 'Club', None]
+        return ['Archer', 'Club']
 
     def label_for_round(self, round):
         return str(round)
@@ -352,10 +352,20 @@ class BySession(BaseResultMode):
         """
         self.leaderboard = leaderboard
         sessions = self.get_sessions(competition)
+        headers = ['Pl.'] + self.get_main_headers(competition)
+        round = scores[0].target.session_entry.session_round.shot_round
+        headers.append('Score')
+        if round.scoring_type == 'X':
+            headers += ['10s', 'Xs']
+        elif round.scoring_type == 'I':
+            headers += ['10s']
+        else:
+            headers += ['Hits', 'Golds']
         return OrderedDict((
             ResultSection(
                 session.start.strftime('%Y/%m/%d %I:%M %p'),
-                round=scores[0].target.session_entry.session_round.shot_round,
+                round=round,
+                headers=headers,
             ),
             self.get_session_results(competition, session, scores),
         ) for session in sessions)
@@ -523,10 +533,10 @@ class DoubleRound(BaseResultMode):
         - need to add a quacking score object which is the double
         """
         self.leaderboard = leaderboard
-        rounds = self.get_rounds(competition)
+        rounds, valid_session_rounds = self.get_rounds(competition)
         return OrderedDict((
             self.get_section_for_round(round, competition),
-            self.get_round_results(competition, round, scores)
+            self.get_round_results(competition, round, valid_session_rounds, scores)
         ) for round in rounds)
 
     def get_rounds(self, competition):
@@ -535,17 +545,22 @@ class DoubleRound(BaseResultMode):
         session_rounds = SessionRound.objects.filter(session__competition=competition).order_by('session__start').exclude(
             olympicsessionround__exclude_ranking_rounds=True,
         )
+        print(session_rounds)
         rounds = []
+        valid_session_rounds = []
         for round in session_rounds:
             if round.shot_round not in rounds:
                 rounds.append(round.shot_round)
-        return rounds
+            valid_session_rounds.append(round)
+        return rounds, valid_session_rounds
 
-    def get_round_results(self, competition, round, scores):
+    def get_round_results(self, competition, round, valid_session_rounds, scores):
         results = OrderedDict()
         for score in scores:
             session_entry = score.target.session_entry
             if session_entry.session_round.shot_round.id is not round.id:
+                continue
+            if session_entry.session_round not in valid_session_rounds:
                 continue
             categories = self.get_categories_for_entry(competition, session_entry.competition_entry)
             for category in categories:
