@@ -1,5 +1,23 @@
 {% extends 'base.html' %}
 
+{% load static from staticfiles %}
+
 {% block content %}
-<h1>Archery Tournaments</h1>
+<h1>TamlynScore</h1>
+
+<div class="hero">
+    <p>TamlynScore is an online platform for running archery competitions.<br>If you'd like to use TamlynScore for your event, please <a href="mailto:marc.tamlyn@gmail.com?subject=TamlynScore" class="link">contact us</a>.</p>
+</div>
+
+<h2>Leagues</h2>
+<div class="leagues">
+{% for league in leagues %}
+<a href="{% firstof league.get_current_season.get_absolute_url league.get_absolute_url %}">
+    <div class="leagues__block">
+        <img class="leagues__img" src="{% static 'leagues/logos/'|add:league.slug|add:'.png' %}">
+        <h3>{{ league }}</h3>
+    </div>
+</a>
+{% endfor %}
+</div>
 {% endblock %}

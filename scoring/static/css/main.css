@@ -3608,21 +3608,25 @@ a {
   color: #000F1F;
   text-decoration: none;
 }
-
 /* line 23, ../../sass/_typography.sass */
+a.link {
+  color: #004ca2;
+}
+
+/* line 26, ../../sass/_typography.sass */
 p {
   margin: 5px 0;
   padding: 0;
 }
 
-/* line 27, ../../sass/_typography.sass */
+/* line 30, ../../sass/_typography.sass */
 ul {
   list-style-type: none;
   margin: 0;
   padding: 0;
 }
 
-/* line 32, ../../sass/_typography.sass */
+/* line 35, ../../sass/_typography.sass */
 li {
   display: block;
 }
@@ -4085,24 +4089,54 @@ ul.link-list li a:hover {
   background-color: #000F1F;
 }
 
-/* line 15, ../../sass/main.sass */
+/* line 1, ../../sass/components/_index.sass */
+.hero {
+  margin: 30px auto;
+  max-width: 700px;
+  padding: 20px;
+  border-radius: 12px;
+  background-color: #eee;
+  text-align: center;
+}
+
+/* line 9, ../../sass/components/_index.sass */
+.leagues {
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: center;
+}
+/* line 14, ../../sass/components/_index.sass */
+.leagues__block {
+  margin: 15px;
+  width: 400px;
+  border-radius: 2px;
+  box-shadow: 1px 2px 7px rgba(0, 0, 0, 0.2);
+  padding: 10px;
+}
+/* line 21, ../../sass/components/_index.sass */
+.leagues__img {
+  max-height: 400px;
+  max-width: 100%;
+}
+
+/* line 16, ../../sass/main.sass */
 body {
   color: #000F1F;
   background-image: linear-gradient(#f7f7f7 50px, rgba(0, 0, 0, 0) 150px);
 }
 
-/* line 19, ../../sass/main.sass */
+/* line 20, ../../sass/main.sass */
 .clear {
   overflow: hidden;
   *zoom: 1;
 }
 
-/* line 22, ../../sass/main.sass */
+/* line 23, ../../sass/main.sass */
 .hidden {
   display: none;
 }
 
-/* line 25, ../../sass/main.sass */
+/* line 26, ../../sass/main.sass */
 .text-right {
   text-align: right;
 }

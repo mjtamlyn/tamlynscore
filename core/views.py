@@ -10,6 +10,7 @@ from braces.views import LoginRequiredMixin, SuperuserRequiredMixin
 
 from entries.models import CompetitionEntry
 from entries.views import BatchEntryMixin
+from leagues.models import League
 from scores.models import Score
 
 from .models import County, Club, Archer
@@ -35,6 +36,11 @@ class ClubMixin(object):
 
 class Index(TemplateView):
     template_name = 'index.html'
+
+    def get_context_data(self, **kwargs):
+        context = super().get_context_data(**kwargs)
+        context['leagues'] = League.objects.order_by('?')
+        return context
 
 
 class ClubList(ListView):

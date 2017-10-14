@@ -18,6 +18,9 @@ class League(models.Model):
     def get_absolute_url(self):
         return reverse('league-detail', kwargs={'league_slug': self.slug})
 
+    def get_current_season(self):
+        return self.season_set.order_by('start_date').last()
+
 
 class Season(models.Model):
     name = models.CharField(max_length=255)
