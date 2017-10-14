@@ -545,7 +545,6 @@ class DoubleRound(BaseResultMode):
         session_rounds = SessionRound.objects.filter(session__competition=competition).order_by('session__start').exclude(
             olympicsessionround__exclude_ranking_rounds=True,
         )
-        print(session_rounds)
         rounds = []
         valid_session_rounds = []
         for round in session_rounds:
@@ -625,14 +624,16 @@ class Team(BaseResultMode):
         from entries.models import Competition, SessionRound
 
         if isinstance(competition, Competition) and not valid_rounds:
-            session_rounds = SessionRound.objects.exclude(
+            session_rounds = SessionRound.objects.filter(
                 session__competition=competition,
+            ).exclude(
                 olympicsessionround__exclude_ranking_rounds=True,
             ).order_by('session__start').select_related('shot_round')
         elif not valid_rounds:
             # We have a league leg
-            session_rounds = SessionRound.objects.exclude(
+            session_rounds = SessionRound.objects.filter(
                 session__competition__in=competition.competitions.all(),
+            ).exclude(
                 olympicsessionround__exclude_ranking_rounds=True,
             ).order_by('session__start').select_related('shot_round')
         else:
