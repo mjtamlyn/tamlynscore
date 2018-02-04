@@ -7,6 +7,8 @@ BASE_DIR = os.path.dirname(os.path.dirname(__file__))
 
 DEBUG = not os.environ.get('PRODUCTION')
 ALLOWED_HOSTS = [
+    'tamlynscore.co.uk',
+    'www.tamlynscore.co.uk',
     'archery-scoring.herokuapp.com',
     'archery-scoring-public.herokuapp.com',
     'archery-scoring.mjtamlyn.co.uk',
