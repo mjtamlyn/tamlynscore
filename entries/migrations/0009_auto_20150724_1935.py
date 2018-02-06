@@ -20,7 +20,7 @@ class Migration(migrations.Migration):
         migrations.AddField(
             model_name='competitionentry',
             name='county',
-            field=models.ForeignKey(to='core.County', blank=True, null=True),
+            field=models.ForeignKey(to='core.County', blank=True, null=True, on_delete=models.CASCADE),
         ),
         migrations.AlterField(
             model_name='competition',
@@ -50,7 +50,7 @@ class Migration(migrations.Migration):
         migrations.AlterField(
             model_name='competitionentry',
             name='club',
-            field=models.ForeignKey(to='core.Club', blank=True, null=True),
+            field=models.ForeignKey(to='core.Club', blank=True, null=True, on_delete=models.CASCADE),
         ),
         migrations.AlterField(
             model_name='competitionentry',

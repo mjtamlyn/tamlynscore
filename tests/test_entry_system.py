@@ -1,5 +1,5 @@
-from django.core.urlresolvers import reverse
 from django.test import TestCase
+from django.urls import reverse
 
 from core.models import Archer
 from entries.forms import ArcherSearchForm, EntryCreateForm

@@ -1,7 +1,7 @@
 import json
 
 from django.contrib import messages
-from django.core.urlresolvers import reverse
+from django.urls import reverse
 
 from .factories import UserFactory
 

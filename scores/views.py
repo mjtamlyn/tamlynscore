@@ -6,10 +6,10 @@ import math
 
 from django.conf import settings
 from django.core.cache import cache
-from django.core.urlresolvers import reverse
 from django.http import HttpResponse, HttpResponseRedirect, Http404
 from django.shortcuts import render, get_object_or_404
 from django.views.generic import View, ListView, TemplateView
+from django.urls import reverse
 
 from reportlab.lib import colors
 from reportlab.lib.styles import getSampleStyleSheet

@@ -47,10 +47,10 @@ class Migration(migrations.Migration):
                 ('guest', models.BooleanField(default=False)),
                 ('b_team', models.BooleanField(default=False)),
                 ('c_team', models.BooleanField(default=False)),
-                ('archer', models.ForeignKey(to='core.Archer')),
-                ('bowstyle', models.ForeignKey(to='core.Bowstyle')),
-                ('club', models.ForeignKey(to='core.Club')),
-                ('competition', models.ForeignKey(to='entries.Competition')),
+                ('archer', models.ForeignKey(to='core.Archer', on_delete=models.CASCADE)),
+                ('bowstyle', models.ForeignKey(to='core.Bowstyle', on_delete=models.CASCADE)),
+                ('club', models.ForeignKey(to='core.Club', on_delete=models.CASCADE)),
+                ('competition', models.ForeignKey(to='entries.Competition', on_delete=models.CASCADE)),
             ],
             options={
                 'verbose_name_plural': 'competition entries',
@@ -63,7 +63,7 @@ class Migration(migrations.Migration):
                 ('id', models.AutoField(verbose_name='ID', serialize=False, auto_created=True, primary_key=True)),
                 ('mode', models.CharField(max_length=31, choices=[(b'by-session', b'By session'), (b'by-round', b'By round'), (b'by-round-progressional', b'By round (progressional)'), (b'double-round', b'Double round'), (b'seedings', b'Seedings'), (b'team', b'Teams'), (b'weekend', b'Weekend (Masters style)')])),
                 ('leaderboard_only', models.BooleanField(default=False)),
-                ('competition', models.ForeignKey(related_name='result_modes', to='entries.Competition')),
+                ('competition', models.ForeignKey(related_name='result_modes', to='entries.Competition', on_delete=models.CASCADE)),
             ],
             options={
             },
@@ -77,7 +77,7 @@ class Migration(migrations.Migration):
                 ('scoring_system', models.CharField(max_length=1, choices=[(b'F', b'Full running slips'), (b'D', b'Dozen running slips'), (b'T', b'Totals only')])),
                 ('archers_per_target', models.IntegerField()),
                 ('arrows_entered_per_end', models.IntegerField(default=12)),
-                ('competition', models.ForeignKey(to='entries.Competition')),
+                ('competition', models.ForeignKey(to='entries.Competition', on_delete=models.CASCADE)),
             ],
             options={
             },
@@ -89,7 +89,7 @@ class Migration(migrations.Migration):
                 ('id', models.AutoField(verbose_name='ID', serialize=False, auto_created=True, primary_key=True)),
                 ('present', models.BooleanField(default=False)),
                 ('index', models.PositiveIntegerField(default=1)),
-                ('competition_entry', models.ForeignKey(to='entries.CompetitionEntry')),
+                ('competition_entry', models.ForeignKey(to='entries.CompetitionEntry', on_delete=models.CASCADE)),
             ],
             options={
                 'verbose_name_plural': 'session entries',
@@ -100,8 +100,8 @@ class Migration(migrations.Migration):
             name='SessionRound',
             fields=[
                 ('id', models.AutoField(verbose_name='ID', serialize=False, auto_created=True, primary_key=True)),
-                ('session', models.ForeignKey(to='entries.Session')),
-                ('shot_round', models.ForeignKey(to='core.Round')),
+                ('session', models.ForeignKey(to='entries.Session', on_delete=models.CASCADE)),
+                ('shot_round', models.ForeignKey(to='core.Round', on_delete=models.CASCADE)),
             ],
             options={
             },
@@ -124,7 +124,7 @@ class Migration(migrations.Migration):
                 ('id', models.AutoField(verbose_name='ID', serialize=False, auto_created=True, primary_key=True)),
                 ('boss', models.PositiveIntegerField()),
                 ('target', models.CharField(max_length=1)),
-                ('session_entry', models.OneToOneField(to='entries.SessionEntry')),
+                ('session_entry', models.OneToOneField(to='entries.SessionEntry', on_delete=models.CASCADE)),
             ],
             options={
             },
@@ -136,7 +136,7 @@ class Migration(migrations.Migration):
                 ('id', models.AutoField(verbose_name='ID', serialize=False, auto_created=True, primary_key=True)),
                 ('full_name', models.CharField(unique=True, max_length=300)),
                 ('short_name', models.CharField(max_length=20)),
-                ('host_club', models.ForeignKey(to='core.Club')),
+                ('host_club', models.ForeignKey(to='core.Club', on_delete=models.CASCADE)),
             ],
             options={
             },
@@ -145,7 +145,7 @@ class Migration(migrations.Migration):
         migrations.AddField(
             model_name='sessionentry',
             name='session_round',
-            field=models.ForeignKey(to='entries.SessionRound'),
+            field=models.ForeignKey(to='entries.SessionRound', on_delete=models.CASCADE),
             preserve_default=True,
         ),
         migrations.AlterUniqueTogether(
@@ -161,7 +161,7 @@ class Migration(migrations.Migration):
         migrations.AddField(
             model_name='competition',
             name='tournament',
-            field=models.ForeignKey(to='entries.Tournament'),
+            field=models.ForeignKey(to='entries.Tournament', on_delete=models.CASCADE),
             preserve_default=True,
         ),
         migrations.AlterUniqueTogether(

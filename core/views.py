@@ -1,10 +1,10 @@
 import copy
 
 from django.core.cache import cache
-from django.core.urlresolvers import reverse
 from django.db.models import Prefetch
 from django.shortcuts import get_object_or_404
 from django.views.generic import TemplateView, ListView, DetailView, UpdateView, CreateView
+from django.urls import reverse
 
 from braces.views import LoginRequiredMixin, SuperuserRequiredMixin
 

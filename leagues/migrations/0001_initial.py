@@ -37,12 +37,12 @@ class Migration(migrations.Migration):
                 ('id', models.AutoField(auto_created=True, serialize=False, primary_key=True, verbose_name='ID')),
                 ('name', models.CharField(max_length=255)),
                 ('clubs', models.ManyToManyField(to='core.Club')),
-                ('league', models.ForeignKey(to='leagues.League')),
+                ('league', models.ForeignKey(to='leagues.League', on_delete=models.CASCADE)),
             ],
         ),
         migrations.AddField(
             model_name='leg',
             name='season',
-            field=models.ForeignKey(to='leagues.Season'),
+            field=models.ForeignKey(to='leagues.Season', on_delete=models.CASCADE),
         ),
     ]

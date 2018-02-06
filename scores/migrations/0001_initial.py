@@ -44,7 +44,7 @@ class Migration(migrations.Migration):
                 ('alteration', models.IntegerField(default=0)),
                 ('retired', models.BooleanField(default=False)),
                 ('disqualified', models.BooleanField(default=False)),
-                ('target', models.OneToOneField(to='entries.TargetAllocation')),
+                ('target', models.OneToOneField(to='entries.TargetAllocation', on_delete=models.CASCADE)),
             ],
             options={
             },
@@ -53,13 +53,13 @@ class Migration(migrations.Migration):
         migrations.AddField(
             model_name='dozen',
             name='score',
-            field=models.ForeignKey(to='scores.Score'),
+            field=models.ForeignKey(to='scores.Score', on_delete=models.CASCADE),
             preserve_default=True,
         ),
         migrations.AddField(
             model_name='arrow',
             name='score',
-            field=models.ForeignKey(to='scores.Score'),
+            field=models.ForeignKey(to='scores.Score', on_delete=models.CASCADE),
             preserve_default=True,
         ),
     ]

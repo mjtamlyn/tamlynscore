@@ -96,7 +96,7 @@ class Migration(migrations.Migration):
             fields=[
                 ('id', models.AutoField(verbose_name='ID', serialize=False, auto_created=True, primary_key=True)),
                 ('name', models.CharField(unique=True, max_length=50)),
-                ('country', models.ForeignKey(to='core.Country')),
+                ('country', models.ForeignKey(to='core.Country', on_delete=models.CASCADE)),
             ],
             options={
             },
@@ -136,25 +136,25 @@ class Migration(migrations.Migration):
         migrations.AddField(
             model_name='county',
             name='region',
-            field=models.ForeignKey(to='core.Region'),
+            field=models.ForeignKey(to='core.Region', on_delete=models.CASCADE),
             preserve_default=True,
         ),
         migrations.AddField(
             model_name='club',
             name='county',
-            field=models.ForeignKey(blank=True, to='core.County', null=True),
+            field=models.ForeignKey(blank=True, to='core.County', null=True, on_delete=models.CASCADE),
             preserve_default=True,
         ),
         migrations.AddField(
             model_name='archer',
             name='bowstyle',
-            field=models.ForeignKey(to='core.Bowstyle'),
+            field=models.ForeignKey(to='core.Bowstyle', on_delete=models.CASCADE),
             preserve_default=True,
         ),
         migrations.AddField(
             model_name='archer',
             name='club',
-            field=models.ForeignKey(to='core.Club'),
+            field=models.ForeignKey(to='core.Club', on_delete=models.CASCADE),
             preserve_default=True,
         ),
     ]

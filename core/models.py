@@ -1,8 +1,8 @@
 import json
 
-from django.core.urlresolvers import reverse
 from django.db import models
 from django.template.defaultfilters import slugify
+from django.urls import reverse
 
 from custom_user.models import AbstractEmailUser
 
@@ -150,7 +150,7 @@ class Country(models.Model):
 
 class Region(models.Model):
     name = models.CharField(max_length=50, unique=True)
-    country = models.ForeignKey(Country)
+    country = models.ForeignKey(Country, on_delete=models.CASCADE)
 
     def __str__(self):
         return self.name
@@ -159,7 +159,7 @@ class Region(models.Model):
 class County(models.Model):
     name = models.CharField(max_length=500, unique=True)
     short_name = models.CharField(max_length=50, unique=True)
-    region = models.ForeignKey(Region)
+    region = models.ForeignKey(Region, on_delete=models.CASCADE)
 
     class Meta:
         verbose_name_plural = 'counties'
@@ -173,7 +173,7 @@ class Club(models.Model):
     name = models.CharField(max_length=500, unique=True)
     short_name = models.CharField(max_length=50, unique=True)
 
-    county = models.ForeignKey(County, blank=True, null=True)
+    county = models.ForeignKey(County, blank=True, null=True, on_delete=models.CASCADE)
 
     slug = models.SlugField(editable=False, unique=True)
 
@@ -201,8 +201,8 @@ class Club(models.Model):
 class Archer(models.Model):
     name = models.CharField(max_length=200)
     gender = models.CharField(max_length=1, choices=GENDER_CHOICES)
-    club = models.ForeignKey(Club, blank=True, null=True)
-    bowstyle = models.ForeignKey(Bowstyle)
+    club = models.ForeignKey(Club, blank=True, null=True, on_delete=models.CASCADE)
+    bowstyle = models.ForeignKey(Bowstyle, on_delete=models.CASCADE)
     age = models.CharField(max_length=1, choices=AGE_CHOICES, default='S')
     wa_age = models.CharField(max_length=1, choices=WA_AGE_CHOICES, default='', blank=True)
     agb_age = models.CharField(max_length=3, choices=AGB_AGE_CHOICES, default='', blank=True)

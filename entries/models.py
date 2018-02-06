@@ -21,7 +21,7 @@ class Tournament(models.Model):
     full_name = models.CharField(max_length=300, unique=True)
     short_name = models.CharField(max_length=20)
 
-    host_club = models.ForeignKey(Club, blank=True, null=True)
+    host_club = models.ForeignKey(Club, blank=True, null=True, on_delete=models.CASCADE)
 
     def __str__(self):
         return self.short_name
@@ -64,7 +64,7 @@ class ResultsFormatFields(models.Model):
 
 
 class Competition(ResultsFormatFields, models.Model):
-    tournament = models.ForeignKey(Tournament)
+    tournament = models.ForeignKey(Tournament, on_delete=models.CASCADE)
     admins = models.ManyToManyField('core.User', blank=True)
 
     date = models.DateField()
@@ -110,7 +110,7 @@ class Competition(ResultsFormatFields, models.Model):
 
 
 class ResultsMode(models.Model):
-    competition = models.ForeignKey(Competition, related_name='result_modes')
+    competition = models.ForeignKey(Competition, related_name='result_modes', on_delete=models.CASCADE)
     mode = models.CharField(max_length=31, choices=tuple(get_result_modes()))
     leaderboard_only = models.BooleanField(default=False)
     json = models.TextField(blank=True, default='')
@@ -123,7 +123,7 @@ class ResultsMode(models.Model):
 
 
 class Session(models.Model):
-    competition = models.ForeignKey(Competition)
+    competition = models.ForeignKey(Competition, on_delete=models.CASCADE)
     start = models.DateTimeField()
 
     scoring_system = models.CharField(max_length=1, choices=SCORING_SYSTEMS)
@@ -168,8 +168,8 @@ class Session(models.Model):
 
 
 class SessionRound(models.Model):
-    session = models.ForeignKey(Session)
-    shot_round = models.ForeignKey(Round)
+    session = models.ForeignKey(Session, on_delete=models.CASCADE)
+    shot_round = models.ForeignKey(Round, on_delete=models.CASCADE)
 
     def target_list(self):
         entries = self.sessionentry_set.count()
@@ -274,12 +274,12 @@ class SessionRound(models.Model):
 
 
 class CompetitionEntry(models.Model):
-    competition = models.ForeignKey(Competition)
+    competition = models.ForeignKey(Competition, on_delete=models.CASCADE)
 
-    archer = models.ForeignKey(Archer)
-    club = models.ForeignKey(Club, blank=True, null=True)
-    county = models.ForeignKey(County, blank=True, null=True)
-    bowstyle = models.ForeignKey(Bowstyle)
+    archer = models.ForeignKey(Archer, on_delete=models.CASCADE)
+    club = models.ForeignKey(Club, blank=True, null=True, on_delete=models.CASCADE)
+    county = models.ForeignKey(County, blank=True, null=True, on_delete=models.CASCADE)
+    bowstyle = models.ForeignKey(Bowstyle, on_delete=models.CASCADE)
     age = models.CharField(max_length=1, choices=AGE_CHOICES, default='S')
     wa_age = models.CharField(max_length=1, choices=WA_AGE_CHOICES, default='', blank=True)
     agb_age = models.CharField(max_length=3, choices=AGB_AGE_CHOICES, default='', blank=True)
@@ -327,8 +327,8 @@ class CompetitionEntry(models.Model):
 
 
 class SessionEntry(models.Model):
-    competition_entry = models.ForeignKey(CompetitionEntry)
-    session_round = models.ForeignKey(SessionRound)
+    competition_entry = models.ForeignKey(CompetitionEntry, on_delete=models.CASCADE)
+    session_round = models.ForeignKey(SessionRound, on_delete=models.CASCADE)
 
     present = models.BooleanField(default=False)
     index = models.PositiveIntegerField(default=1)
@@ -341,7 +341,7 @@ class SessionEntry(models.Model):
 
 
 class TargetAllocation(models.Model):
-    session_entry = models.OneToOneField('SessionEntry')
+    session_entry = models.OneToOneField('SessionEntry', on_delete=models.CASCADE)
     boss = models.PositiveIntegerField()
     target = models.CharField(max_length=1)
 

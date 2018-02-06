@@ -28,6 +28,7 @@ MANAGERS = ADMINS
 DATABASES = {'default': dj_database_url.config(default='postgres://localhost/archery')}
 
 TIME_ZONE = 'Europe/London'
+USE_TZ = True
 LANGUAGE_CODE = 'en-gb'
 USE_I18N = True
 USE_L10N = True
@@ -61,15 +62,15 @@ TEMPLATES = [{
     },
 }]
 
-MIDDLEWARE_CLASSES = (
+MIDDLEWARE = (
     'django.middleware.common.CommonMiddleware',
     'django.contrib.sessions.middleware.SessionMiddleware',
     'django.middleware.csrf.CsrfViewMiddleware',
     'django.contrib.auth.middleware.AuthenticationMiddleware',
     'django.contrib.messages.middleware.MessageMiddleware',
-    'django.contrib.auth.middleware.SessionAuthenticationMiddleware',
     'django.middleware.clickjacking.XFrameOptionsMiddleware',
     'django.middleware.security.SecurityMiddleware',
+    'debug_toolbar.middleware.DebugToolbarMiddleware',
 )
 
 ROOT_URLCONF = os.environ.get('ROOT_URLCONF', 'scoring.urls')
@@ -113,7 +114,7 @@ if not DEBUG and not os.environ.get('LOCAL'):
     SECURE_HSTS_SECONDS = 31536000
     SECURE_HSTS_INCLUDE_SUBDOMAINS = False
     SECURE_PROXY_SSL_HEADER = ('HTTP_X_FORWARDED_PROTO', 'https')
-    MIDDLEWARE_CLASSES = ('sslify.middleware.SSLifyMiddleware',) + MIDDLEWARE_CLASSES
+    MIDDLEWARE = ('sslify.middleware.SSLifyMiddleware',) + MIDDLEWARE
 
 LOGGING = {
     'version': 1,

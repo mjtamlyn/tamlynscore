@@ -12,7 +12,7 @@ urlpatterns = [
     url(r'^tournaments/', include('scores.urls')),
     url(r'^tournaments/olympic/', include('olympic.urls')),
     url(r'^accounts/', include('accounts.urls')),
-    url(r'^admin/', include(admin.site.urls)),
+    url(r'^admin/', admin.site.urls),
 ]
 
 urlpatterns += staticfiles_urlpatterns() + static(settings.MEDIA_URL, document_root=settings.MEDIA_ROOT)

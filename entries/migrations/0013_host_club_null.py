@@ -14,6 +14,6 @@ class Migration(migrations.Migration):
         migrations.AlterField(
             model_name='tournament',
             name='host_club',
-            field=models.ForeignKey(null=True, to='core.Club', blank=True),
+            field=models.ForeignKey(null=True, to='core.Club', blank=True, on_delete=models.CASCADE),
         ),
     ]

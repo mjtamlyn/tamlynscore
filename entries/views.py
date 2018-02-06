@@ -5,12 +5,12 @@ import itertools
 import json
 import math
 
-from django.core.urlresolvers import reverse
 from django.db.models import Prefetch
 from django.http import HttpResponse, HttpResponseBadRequest, HttpResponseRedirect, Http404
 from django.views.generic import View, DetailView, ListView, TemplateView, UpdateView, DeleteView, FormView
 from django.shortcuts import get_object_or_404
 from django.utils import timezone
+from django.urls import reverse
 
 from braces.views import MessageMixin, SuperuserRequiredMixin
 from reportlab.platypus import SimpleDocTemplate, Paragraph, Spacer, Table, PageBreak, TableStyle, KeepTogether

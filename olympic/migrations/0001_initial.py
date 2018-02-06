@@ -53,10 +53,10 @@ class Migration(migrations.Migration):
             name='OlympicSessionRound',
             fields=[
                 ('id', models.AutoField(verbose_name='ID', serialize=False, auto_created=True, primary_key=True)),
-                ('category', models.ForeignKey(to='olympic.Category')),
-                ('ranking_round', models.ForeignKey(to='entries.SessionRound')),
-                ('session', models.ForeignKey(to='entries.Session')),
-                ('shot_round', models.ForeignKey(to='olympic.OlympicRound')),
+                ('category', models.ForeignKey(to='olympic.Category', on_delete=models.CASCADE)),
+                ('ranking_round', models.ForeignKey(to='entries.SessionRound', on_delete=models.CASCADE)),
+                ('session', models.ForeignKey(to='entries.Session', on_delete=models.CASCADE)),
+                ('shot_round', models.ForeignKey(to='olympic.OlympicRound', on_delete=models.CASCADE)),
             ],
             options={
             },
@@ -71,7 +71,7 @@ class Migration(migrations.Migration):
                 ('win', models.BooleanField(default=False)),
                 ('dns', models.BooleanField(default=False)),
                 ('win_by_forfeit', models.BooleanField(default=False)),
-                ('match', models.ForeignKey(to='olympic.Match')),
+                ('match', models.ForeignKey(to='olympic.Match', on_delete=models.CASCADE)),
             ],
             options={
             },
@@ -82,8 +82,8 @@ class Migration(migrations.Migration):
             fields=[
                 ('id', models.AutoField(verbose_name='ID', serialize=False, auto_created=True, primary_key=True)),
                 ('seed', models.PositiveIntegerField()),
-                ('entry', models.ForeignKey(to='entries.CompetitionEntry')),
-                ('session_round', models.ForeignKey(to='olympic.OlympicSessionRound')),
+                ('entry', models.ForeignKey(to='entries.CompetitionEntry', on_delete=models.CASCADE)),
+                ('session_round', models.ForeignKey(to='olympic.OlympicSessionRound', on_delete=models.CASCADE)),
             ],
             options={
             },
@@ -92,13 +92,13 @@ class Migration(migrations.Migration):
         migrations.AddField(
             model_name='result',
             name='seed',
-            field=models.ForeignKey(to='olympic.Seeding'),
+            field=models.ForeignKey(to='olympic.Seeding', on_delete=models.CASCADE),
             preserve_default=True,
         ),
         migrations.AddField(
             model_name='match',
             name='session_round',
-            field=models.ForeignKey(to='olympic.OlympicSessionRound'),
+            field=models.ForeignKey(to='olympic.OlympicSessionRound', on_delete=models.CASCADE),
             preserve_default=True,
         ),
     ]

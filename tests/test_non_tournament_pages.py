@@ -1,5 +1,5 @@
-from django.core.urlresolvers import reverse
 from django.test import TestCase
+from django.urls import reverse
 from django.utils.http import urlencode
 
 from core.models import Archer, Club

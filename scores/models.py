@@ -33,7 +33,7 @@ class ScoreManager(models.Manager):
 
 
 class Score(models.Model):
-    target = models.OneToOneField('entries.TargetAllocation')
+    target = models.OneToOneField('entries.TargetAllocation', on_delete=models.CASCADE)
 
     score = models.PositiveIntegerField(default=0, db_index=True)
     hits = models.PositiveIntegerField(default=0)
@@ -90,7 +90,7 @@ class Score(models.Model):
 
 
 class Arrow(models.Model):
-    score = models.ForeignKey(Score)
+    score = models.ForeignKey(Score, on_delete=models.CASCADE)
     arrow_value = models.PositiveIntegerField()
     arrow_of_round = models.PositiveIntegerField()
     is_x = models.BooleanField(default=False)
@@ -104,7 +104,7 @@ class Arrow(models.Model):
 
 
 class Dozen(models.Model):
-    score = models.ForeignKey(Score)
+    score = models.ForeignKey(Score, on_delete=models.CASCADE)
     total = models.PositiveIntegerField()
     dozen = models.PositiveIntegerField()
 

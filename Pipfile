@@ -1,0 +1,32 @@
+[[source]]
+
+verify_ssl = true
+url = "https://pypi.python.org/simple"
+name = "pypi"
+
+
+[packages]
+
+dj-database-url = "*"
+dj-static = "*"
+django = "*"
+django-braces = "*"
+django-debug-toolbar = "*"
+django-custom-user = "*"
+django-floppyforms = "*"
+django-sslify = "*"
+factory-boy = "*"
+gunicorn = "*"
+pillow = "*"
+"psycopg2" = "*"
+pyflakes = "*"
+reportlab = "*"
+
+
+[dev-packages]
+
+
+
+[requires]
+
+python_version = "3.6"

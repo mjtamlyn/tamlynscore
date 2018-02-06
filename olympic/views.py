@@ -1,8 +1,8 @@
-from django.core.urlresolvers import reverse
 from django.db.models import Max, Prefetch
 from django.http import HttpResponseRedirect
 from django.views.generic import DetailView, TemplateView, FormView
 from django.shortcuts import get_object_or_404, redirect
+from django.urls import reverse
 
 from reportlab.lib import colors
 from reportlab.lib.units import inch

@@ -105,11 +105,11 @@ class Category(models.Model):
 
 
 class OlympicSessionRound(models.Model):
-    session = models.ForeignKey(Session)
-    shot_round = models.ForeignKey(OlympicRound)
+    session = models.ForeignKey(Session, on_delete=models.CASCADE)
+    shot_round = models.ForeignKey(OlympicRound, on_delete=models.CASCADE)
     ranking_rounds = models.ManyToManyField(SessionRound)
     exclude_ranking_rounds = models.BooleanField(default=True)
-    category = models.ForeignKey(Category)
+    category = models.ForeignKey(Category, on_delete=models.CASCADE)
     cut = models.IntegerField(blank=True, null=True)
 
     def __str__(self):
@@ -248,10 +248,10 @@ class OlympicSessionRound(models.Model):
 
 
 class Seeding(models.Model):
-    entry = models.ForeignKey(CompetitionEntry)
-    entry_2 = models.ForeignKey(CompetitionEntry, blank=True, null=True, related_name='+')
-    entry_3 = models.ForeignKey(CompetitionEntry, blank=True, null=True, related_name='+')
-    session_round = models.ForeignKey(OlympicSessionRound)
+    entry = models.ForeignKey(CompetitionEntry, on_delete=models.CASCADE)
+    entry_2 = models.ForeignKey(CompetitionEntry, blank=True, null=True, related_name='+', on_delete=models.CASCADE)
+    entry_3 = models.ForeignKey(CompetitionEntry, blank=True, null=True, related_name='+', on_delete=models.CASCADE)
+    session_round = models.ForeignKey(OlympicSessionRound, on_delete=models.CASCADE)
     seed = models.PositiveIntegerField()
 
     def __str__(self):
@@ -314,7 +314,7 @@ class MatchManager(models.Manager):
 
 
 class Match(models.Model):
-    session_round = models.ForeignKey(OlympicSessionRound)
+    session_round = models.ForeignKey(OlympicSessionRound, on_delete=models.CASCADE)
     target = models.PositiveIntegerField()
     # for later matches spread across 2 bosses
     target_2 = models.PositiveIntegerField(blank=True, null=True)
@@ -332,8 +332,8 @@ class Match(models.Model):
 
 
 class Result(models.Model):
-    match = models.ForeignKey(Match)
-    seed = models.ForeignKey(Seeding)
+    match = models.ForeignKey(Match, on_delete=models.CASCADE)
+    seed = models.ForeignKey(Seeding, on_delete=models.CASCADE)
 
     total = models.PositiveIntegerField()
     arrow_total = models.PositiveIntegerField(default=0)

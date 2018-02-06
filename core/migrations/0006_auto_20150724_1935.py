@@ -19,7 +19,7 @@ class Migration(migrations.Migration):
         migrations.AlterField(
             model_name='archer',
             name='club',
-            field=models.ForeignKey(to='core.Club', blank=True, null=True),
+            field=models.ForeignKey(to='core.Club', blank=True, null=True, on_delete=models.CASCADE),
         ),
         migrations.AlterField(
             model_name='archer',

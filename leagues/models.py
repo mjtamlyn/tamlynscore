@@ -1,5 +1,5 @@
-from django.core.urlresolvers import reverse
 from django.db import models
+from django.urls import reverse
 
 from entries.models import ResultsFormatFields
 from scores.result_modes import get_result_modes
@@ -25,7 +25,7 @@ class League(models.Model):
 class Season(models.Model):
     name = models.CharField(max_length=255)
     slug = models.SlugField()
-    league = models.ForeignKey('League')
+    league = models.ForeignKey('League', on_delete=models.CASCADE)
     start_date = models.DateField()
     end_date = models.DateField()
 
@@ -40,7 +40,7 @@ class Season(models.Model):
 
 
 class Leg(ResultsFormatFields, models.Model):
-    season = models.ForeignKey('Season')
+    season = models.ForeignKey('Season', on_delete=models.CASCADE)
     competitions = models.ManyToManyField('entries.Competition')
     index = models.PositiveIntegerField()
 
@@ -49,7 +49,7 @@ class Leg(ResultsFormatFields, models.Model):
 
 
 class ResultsMode(models.Model):
-    leg = models.ForeignKey('Leg', related_name='result_modes')
+    leg = models.ForeignKey('Leg', related_name='result_modes', on_delete=models.CASCADE)
     mode = models.CharField(max_length=31, choices=tuple(get_result_modes()))
 
     class Meta:
