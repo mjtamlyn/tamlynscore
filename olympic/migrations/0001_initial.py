@@ -15,7 +15,7 @@ class Migration(migrations.Migration):
             name='Category',
             fields=[
                 ('id', models.AutoField(verbose_name='ID', serialize=False, auto_created=True, primary_key=True)),
-                ('gender', models.CharField(blank=True, max_length=1, null=True, choices=[(b'G', b'Gent'), (b'L', b'Lady')])),
+                ('gender', models.CharField(blank=True, max_length=1, null=True, choices=[('G', 'Gent'), ('L', 'Lady')])),
                 ('bowstyles', models.ManyToManyField(to='core.Bowstyle')),
             ],
             options={
@@ -43,7 +43,7 @@ class Migration(migrations.Migration):
             fields=[
                 ('id', models.AutoField(verbose_name='ID', serialize=False, auto_created=True, primary_key=True)),
                 ('distance', models.PositiveIntegerField()),
-                ('match_type', models.CharField(max_length=1, choices=[(b'T', b'Sets'), (b'C', b'Score')])),
+                ('match_type', models.CharField(max_length=1, choices=[('T', 'Sets'), ('C', 'Score')])),
             ],
             options={
             },

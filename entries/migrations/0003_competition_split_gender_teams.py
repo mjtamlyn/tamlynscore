@@ -13,7 +13,7 @@ class Migration(migrations.Migration):
         migrations.AddField(
             model_name='competition',
             name='split_gender_teams',
-            field=models.BooleanField(default=False, help_text=b'Does not affect novice teams'),
+            field=models.BooleanField(default=False, help_text='Does not affect novice teams'),
             preserve_default=True,
         ),
     ]
