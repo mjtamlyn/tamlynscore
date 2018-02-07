@@ -243,19 +243,8 @@ jobs:
                 environment:
                     BUILD_DIR: /home/circleci/project
                 command: |
-                    mkdir -p /tmp/artifacts/
-                    PATH=$PATH:/home/circleci/project/local/exiv2/0.24/bin
                     source .venv/bin/activate
-                    coverage run manage.py test -k 2>&1 | tee /tmp/artifacts/test_report.txt
-                    cat /tmp/artifacts/test_report.txt
-            - run:
-                name: Report django coverage
-                command: |
-                    source .venv/bin/activate
-                    coverage report > /tmp/artifacts/coverage_report.txt
-                    cat /tmp/artifacts/coverage_report.txt
-            - store_artifacts:
-                 path: /tmp/artifacts
+                    python manage.py test -k 2>&1
             - *report_failure
             # Since this job depends on all others we know they have succeeded
             - *report_overall_success
