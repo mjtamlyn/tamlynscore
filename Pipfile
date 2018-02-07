@@ -13,7 +13,7 @@ django = "*"
 django-braces = "*"
 django-debug-toolbar = "*"
 django-custom-user = "*"
-django-floppyforms = "*"
+django-floppyforms = {git = "https://github.com/rtpg/django-floppyforms", editable = true, ref = "e118e79c77664ea08ae72f59ea02412da7d9b3a8"}
 django-sslify = {git = "https://github.com/rdegges/django-sslify", editable = true, ref = "2ee081b009b7f540edaa88584c78f3aa1ff5da65"}
 factory-boy = "*"
 gunicorn = "*"

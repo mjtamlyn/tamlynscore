@@ -14,12 +14,15 @@ class UserFactory(factory.DjangoModelFactory):
     email = factory.Sequence(lambda n: 'user-{0}@example.com'.format(n).lower())
 
     @classmethod
-    def _prepare(cls, create, **kwargs):
+    def _create(cls, model_class, *args, **kwargs):
+        email = kwargs.pop('email')
         password = kwargs.pop('password', 'password')
-        user = super(UserFactory, cls)._prepare(create=False, **kwargs)
-        user.set_password(password)
+        manager = cls._get_manager(model_class)
+        user = manager.create_user(email=email, password=password)
         user.plain_password = password
-        if create:
+        if kwargs:
+            for k, v in kwargs.items():
+                setattr(user, k, v)
             user.save()
         return user
 

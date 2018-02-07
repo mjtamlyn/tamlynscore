@@ -1,7 +1,7 @@
 {
     "_meta": {
         "hash": {
-            "sha256": "e05efd051fae9152a5c1defec54ce722a0e1de511321ecc952fdf5fa93816ea9"
+            "sha256": "ef837c373184e77a25eda89fdc14bef4ba5a60c7f449ddf2af628fdc7519eea8"
         },
         "host-environment-markers": {
             "implementation_name": "cpython",
@@ -71,10 +71,9 @@
             "version": "==1.9.1"
         },
         "django-floppyforms": {
-            "hashes": [
-                "sha256:155f94a2b6341b02de16a1d8efea0ab77f1869d3185c2f07381cca0cafffe2dd"
-            ],
-            "version": "==1.7.0"
+            "editable": true,
+            "git": "https://github.com/rtpg/django-floppyforms",
+            "ref": "e118e79c77664ea08ae72f59ea02412da7d9b3a8"
         },
         "django-sslify": {
             "editable": true,
