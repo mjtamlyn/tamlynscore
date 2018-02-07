@@ -19,8 +19,8 @@ factory-boy = "*"
 gunicorn = "*"
 pillow = "*"
 "psycopg2" = "*"
-pyflakes = "*"
 reportlab = "*"
+"flake8" = "*"
 
 
 [dev-packages]
