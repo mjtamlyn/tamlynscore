@@ -204,11 +204,11 @@ jobs:
                 command: |
                     source .venv/bin/activate
                     flake8 .
-            - run:
-                name: Run isort
-                command: |
-                    source .venv/bin/activate
-                    isort -c -rc -df .
+#            - run:
+#                name: Run isort
+#                command: |
+#                    source .venv/bin/activate
+#                    isort -c -rc -df .
             - *report_failure
 
     python_test:
