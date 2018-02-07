@@ -1,7 +1,7 @@
 {
     "_meta": {
         "hash": {
-            "sha256": "9c5af2c944b934bf0d94bcdb6d33d7e81e66f8fa07a6d589019db4bdf8487963"
+            "sha256": "1f5f06fdad8317a31a903f4779ae37443b85340573f54c8369818c8f442c6d34"
         },
         "host-environment-markers": {
             "implementation_name": "cpython",
@@ -77,10 +77,9 @@
             "version": "==1.7.0"
         },
         "django-sslify": {
-            "hashes": [
-                "sha256:f6bfd21048c7dfc95b39659a3da77775d6db1c1f7a745805ccc6c6138f783b6d"
-            ],
-            "version": "==0.2.7"
+            "editable": true,
+            "git": "https://github.com/rdegges/django-sslify",
+            "ref": "2ee081b009b7f540edaa88584c78f3aa1ff5da65"
         },
         "factory-boy": {
             "hashes": [

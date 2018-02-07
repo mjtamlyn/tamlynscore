@@ -14,7 +14,7 @@ django-braces = "*"
 django-debug-toolbar = "*"
 django-custom-user = "*"
 django-floppyforms = "*"
-django-sslify = "*"
+django-sslify = {git = "https://github.com/rdegges/django-sslify", editable = true, ref = "2ee081b009b7f540edaa88584c78f3aa1ff5da65"}
 factory-boy = "*"
 gunicorn = "*"
 pillow = "*"
