@@ -102,7 +102,7 @@ class Competition(ResultsFormatFields, models.Model):
         return self.session_set.filter(olympicsessionround__isnull=False).exists()
 
     def is_admin(self, user):
-        if user.is_anonymous():
+        if user.is_anonymous:
             return False
         if user.is_superuser:
             return True
