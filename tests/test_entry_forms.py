@@ -1,6 +1,7 @@
 import datetime
 
 from django.test import TestCase
+from django.utils import timezone
 
 from entries.forms import CompetitionForm
 from entries.models import Competition
@@ -41,7 +42,7 @@ class TestCompetitionForm(TestCase):
     def assert_session_fields(self, competition, data):
         self.assertEqual(competition.session_set.count(), 1)
         session = competition.session_set.get()
-        self.assertEqual(session.start, datetime.datetime(2015, 1, 1, 9))
+        self.assertEqual(session.start, datetime.datetime(2015, 1, 1, 9, tzinfo=timezone.utc))
         self.assertEqual(session.archers_per_target, data['archers_per_target'])
         self.assertEqual(session.scoring_system, data['scoring_system'])
         self.assertEqual(session.arrows_entered_per_end, data['arrows_entered_per_end'])
@@ -142,8 +143,8 @@ class TestCompetitionForm(TestCase):
         competition = Competition.objects.get()
         self.assertEqual(competition.session_set.count(), 2)
         sessions = competition.session_set.all()
-        self.assertEqual(sessions[0].start, datetime.datetime(2015, 1, 1, 9))
-        self.assertEqual(sessions[1].start, datetime.datetime(2015, 1, 1, 12))
+        self.assertEqual(sessions[0].start, datetime.datetime(2015, 1, 1, 9, tzinfo=timezone.utc))
+        self.assertEqual(sessions[1].start, datetime.datetime(2015, 1, 1, 12, tzinfo=timezone.utc))
         for session in sessions:
             self.assertEqual(session.archers_per_target, data['archers_per_target'])
             self.assertEqual(session.scoring_system, data['scoring_system'])
@@ -165,8 +166,8 @@ class TestCompetitionForm(TestCase):
         form.save()
         self.assertEqual(competition.session_set.count(), 2)
         sessions = competition.session_set.all()
-        self.assertEqual(sessions[0].start, datetime.datetime(2015, 1, 1, 9))
-        self.assertEqual(sessions[1].start, datetime.datetime(2015, 1, 1, 12))
+        self.assertEqual(sessions[0].start, datetime.datetime(2015, 1, 1, 9, tzinfo=timezone.utc))
+        self.assertEqual(sessions[1].start, datetime.datetime(2015, 1, 1, 12, tzinfo=timezone.utc))
         for session in sessions:
             self.assertEqual(session.archers_per_target, data['archers_per_target'])
             self.assertEqual(session.scoring_system, data['scoring_system'])

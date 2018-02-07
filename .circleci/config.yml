@@ -1,0 +1,298 @@
+version: 2
+
+# Wait for docker images?
+# https://discuss.circleci.com/t/prevent-race-conditions-by-waiting-for-services-with-dockerize/11215
+
+references:
+
+    container_config: &container_config
+        docker:
+            # Currently no tag for 3.6.4 without browsers
+            # Node version is v8.9.2
+            - image: circleci/python:3.6.4-node-browsers
+              environment:
+                  PIPENV_VENV_IN_PROJECT: "true"
+                  PIPENV_IGNORE_VIRTUALENVS: "true"
+
+    workspace_root: &workspace_root
+        /tmp/workspace
+
+    attach_workspace: &attach_workspace
+        attach_workspace:
+            at: *workspace_root
+
+    restore_repo: &restore_repo
+        restore_cache:
+            keys:
+                - v1-repo-{{ .Branch }}-{{ .Revision }}
+                - v1-repo-{{ .Branch }}
+                - v1-repo
+
+    pip_cache_key: &pip_cache_key
+        v6-pip-cache
+
+    restore_pip: &restore_pip
+        restore_cache:
+            keys:
+                - *pip_cache_key
+
+    pipenv_cache_key: &pipenv_cache_key
+        v1-pipenv-cache-{{ checksum "Pipfile.lock" }}
+    pipenv_backup_cache_key: &pipenv_backup_cache_key
+        v1-pipenv-cache
+
+    restore_pipenv: &restore_pipenv
+        restore_cache:
+            keys:
+                - *pipenv_cache_key
+                - *pipenv_backup_cache_key
+
+#    npm_cache_key: &npm_cache_key
+#        v3-npm-cache-{{ checksum "yarn.lock" }}
+#    npm_backup_cache_key: &npm_backup_cache_key
+#        v3-npm-cache
+#
+#    restore_node_modules: &restore_node_modules
+#        restore_cache:
+#            keys:
+#                - *npm_cache_key
+#                - *npm_backup_cache_key
+
+    report_failure: &report_failure
+        run:
+            name: Report failure to slack
+            when: on_fail
+            command: |
+                commit=$(git log -1 --pretty=format:%s)
+                sha1=$(echo $CIRCLE_SHA1 | cut -c -7)
+                timestamp=$(date +%s)
+                message="$CIRCLE_USERNAME's build ( <$CIRCLE_BUILD_URL|#$CIRCLE_BUILD_NUM> )
+                *$CIRCLE_BRANCH*
+                $commit ( <$CIRCLE_COMPARE_URL|$sha1> )
+                "
+                chmod +x ./tools/slackr
+                ./tools/slackr -w $SLACK_WEBHOOK_URL \
+                -c danger \
+                -t "Failed: $CIRCLE_JOB" \
+                -f "$(date)" \
+                "$message"
+
+    report_overall_success: &report_overall_success
+        run:
+            name: Report overall success to slack
+            command: |
+                commit=$(git log -1 --pretty=format:%s)
+                sha1=$(echo $CIRCLE_SHA1 | cut -c -7)
+                timestamp=$(date +%s)
+                message="$CIRCLE_USERNAME's build ( <$CIRCLE_BUILD_URL|#$CIRCLE_BUILD_NUM> )
+                *$CIRCLE_BRANCH*
+                $commit ( <$CIRCLE_COMPARE_URL|$sha1> )
+                "
+                ./tools/slackr -w $SLACK_WEBHOOK_URL \
+                -c good \
+                -t "Success!" \
+                -f "$(date)" \
+                "$message"
+
+
+jobs:
+
+    checkout_code:
+        <<: *container_config
+        steps:
+            - *restore_repo
+            - checkout
+            - save_cache:
+                key: v1-repo-{{ .Branch }}-{{ .Revision }}
+                paths:
+                    - .
+            - *report_failure
+
+    pipenv_dependencies:
+        <<: *container_config
+        steps:
+            - *restore_repo
+            - *restore_pip
+            - *restore_pipenv
+            - run:
+                name: Install pipenv dependencies
+                command: |
+                    python3 -m venv .pip_venv
+                    source .pip_venv/bin/activate
+                    pip install pipenv
+                    pipenv install --ignore-pipfile
+            - save_cache:
+                key: *pip_cache_key
+                paths:
+                    - .pip_venv
+            - save_cache:
+                key: *pipenv_cache_key
+                paths:
+                    - .venv
+                    - ~/.cache/pip
+            - *report_failure
+
+#    npm_dependencies:
+#        <<: *container_config
+#        steps:
+#            - *restore_repo
+#            - *restore_node_modules
+#            - run:
+#                name: Install npm dependencies
+#                command: |
+#                    sudo npm config set -g production false
+#                    yarn install
+#            - save_cache:
+#                key: *npm_cache_key
+#                paths:
+#                    - node_modules
+#            - *report_failure
+#
+#    node_build:
+#        <<: *container_config
+#        steps:
+#            - *restore_repo
+#            - *restore_node_modules
+#            - run:
+#                name: Build js
+#                command: |
+#                    npm run build
+#                    mkdir -p /tmp/workspace
+#                    cp -r ./build /tmp/workspace/build
+#            - persist_to_workspace:
+#                root: *workspace_root
+#                paths:
+#                    - build
+#            - *report_failure
+#
+#    node_lint:
+#        <<: *container_config
+#        steps:
+#            - *restore_repo
+#            - *restore_node_modules
+#            - run:
+#                name: Check less compiles
+#                command: ./tools/lintless.sh
+#            - run:
+#                name: Run stylelint
+#                command: npm run -s lint-style
+#            - run:
+#                name: Run eslint
+#                command: |
+#                    npm run -s lint-js -- --quiet
+#                    npm run -s lint-jsx -- --quiet
+#                    npm run -s lint-html -- --quiet
+#            - *report_failure
+#
+#    node_test:
+#        <<: *container_config
+#        steps:
+#            - *restore_repo
+#            - *restore_node_modules
+#            - run:
+#                name: Run npm test
+#                command: npm test
+#            - *report_failure
+
+    python_lint:
+        <<: *container_config
+        steps:
+            - *restore_repo
+            - *restore_pipenv
+            - run:
+                name: Run flake8
+                command: |
+                    source .venv/bin/activate
+                    flake8 .
+#            - run:
+#                name: Run isort
+#                command: |
+#                    source .venv/bin/activate
+#                    isort -c -rc -df .
+            - *report_failure
+
+    python_test:
+        docker:
+            - image: circleci/python:3.6.4-node-browsers
+            - image: circleci/postgres:9.4.15-alpine
+              environment:
+                  POSTGRES_USER: postgres
+                  POSTGRES_DB: circle_test
+                  POSTGRES_PASSWORD: ""
+            - image: redis:3.2-alpine
+            - image: memcached:1.5-alpine
+        environment:
+            - DATABASE_URL: "postgresql://postgres:@127.0.0.1:5432/circle_test"
+        steps:
+            - *attach_workspace
+            - *restore_repo
+            - *restore_pipenv
+#            - *restore_node_modules
+#            - run:
+#                name: Restore built js
+#                command: |
+#                    mkdir build
+#                    cp -r /tmp/workspace/build .
+            - run:
+                name: Check migrations
+                command: |
+                    source .venv/bin/activate
+                    python manage.py makemigrations --check
+            - run:
+                name: Run django tests
+                environment:
+                    BUILD_DIR: /home/circleci/project
+                command: |
+                    source .venv/bin/activate
+                    python manage.py test -k 2>&1
+            - *report_failure
+            # Since this job depends on all others we know they have succeeded
+            - *report_overall_success
+
+
+    deploy:
+        <<: *container_config
+        steps:
+            - *restore_repo
+            - run:
+                name: Run setup script
+                command: bash .circleci/setup-heroku.sh
+            - add_ssh_keys:
+                fingerprints:
+                    - "1f:c7:66:0b:78:4e:87:b8:17:35:97:ab:14:6e:7c:b1"
+            - *report_failure
+
+workflows:
+    version: 2
+    build_and_test:
+        jobs:
+            - checkout_code
+            - pipenv_dependencies:
+                requires:
+                    - checkout_code
+#            - npm_dependencies:
+#                requires:
+#                    - checkout_code
+#            - node_build:
+#                requires:
+#                    - npm_dependencies
+            - python_lint:
+                requires:
+                    - pipenv_dependencies
+#            - node_lint:
+#                requires:
+#                    - npm_dependencies
+#            - node_test:
+#                requires:
+#                    - npm_dependencies
+            - python_test:
+                # This job must be downstream of all other jobs (save deploy), as it also handles final success reporting
+                requires:
+                    - python_lint
+            - deploy:
+                requires:
+                    - python_test
+                filters:
+                    branches:
+                        only: master
+

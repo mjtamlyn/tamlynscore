@@ -18,6 +18,6 @@ class Migration(migrations.Migration):
         migrations.AddField(
             model_name='competitionentry',
             name='wa_age',
-            field=models.CharField(default=b'', max_length=1, choices=[(b'C', b'Cadet'), (b'J', b'Junior'), (b'', b'Senior'), (b'M', b'Master')]),
+            field=models.CharField(default='', max_length=1, choices=[('C', 'Cadet'), ('J', 'Junior'), ('', 'Senior'), ('M', 'Master')]),
         ),
     ]

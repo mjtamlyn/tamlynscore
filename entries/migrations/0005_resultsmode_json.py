@@ -13,6 +13,6 @@ class Migration(migrations.Migration):
         migrations.AddField(
             model_name='resultsmode',
             name='json',
-            field=models.TextField(default=b'', editable=False, blank=True),
+            field=models.TextField(default='', editable=False, blank=True),
         ),
     ]

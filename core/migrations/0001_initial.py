@@ -36,9 +36,9 @@ class Migration(migrations.Migration):
             fields=[
                 ('id', models.AutoField(verbose_name='ID', serialize=False, auto_created=True, primary_key=True)),
                 ('name', models.CharField(max_length=200)),
-                ('gender', models.CharField(max_length=1, choices=[(b'G', b'Gent'), (b'L', b'Lady')])),
-                ('age', models.CharField(default=b'S', max_length=1, choices=[(b'J', b'Junior'), (b'S', b'Senior')])),
-                ('novice', models.CharField(default=b'E', max_length=1, choices=[(b'N', b'Novice'), (b'E', b'Experienced')])),
+                ('gender', models.CharField(max_length=1, choices=[('G', 'Gent'), ('L', 'Lady')])),
+                ('age', models.CharField(default='S', max_length=1, choices=[('J', 'Junior'), ('S', 'Senior')])),
+                ('novice', models.CharField(default='E', max_length=1, choices=[('N', 'Novice'), ('E', 'Experienced')])),
                 ('gnas_no', models.BigIntegerField(null=True, blank=True)),
             ],
             options={
@@ -61,7 +61,7 @@ class Migration(migrations.Migration):
                 ('id', models.AutoField(verbose_name='ID', serialize=False, auto_created=True, primary_key=True)),
                 ('name', models.CharField(unique=True, max_length=500)),
                 ('short_name', models.CharField(unique=True, max_length=50)),
-                ('abbreviation', models.CharField(default=b'', max_length=10, blank=True)),
+                ('abbreviation', models.CharField(default='', max_length=10, blank=True)),
                 ('slug', models.SlugField(unique=True, editable=False)),
             ],
             options={
@@ -107,7 +107,7 @@ class Migration(migrations.Migration):
             fields=[
                 ('id', models.AutoField(verbose_name='ID', serialize=False, auto_created=True, primary_key=True)),
                 ('name', models.CharField(unique=True, max_length=100)),
-                ('scoring_type', models.CharField(max_length=1, choices=[(b'F', b'Five Zone Imperial'), (b'T', b'AGB Indoor - Ten Zone, no Xs, with hits'), (b'X', b'WA Outdoor - Ten Zone, with Xs, no hits'), (b'I', b'WA Indoor - Ten Zone, no Xs, no hits'), (b'W', b'Worcester')])),
+                ('scoring_type', models.CharField(max_length=1, choices=[('F', 'Five Zone Imperial'), ('T', 'AGB Indoor - Ten Zone, no Xs, with hits'), ('X', 'WA Outdoor - Ten Zone, with Xs, no hits'), ('I', 'WA Indoor - Ten Zone, no Xs, no hits'), ('W', 'Worcester')])),
             ],
             options={
             },
@@ -119,7 +119,7 @@ class Migration(migrations.Migration):
                 ('id', models.AutoField(verbose_name='ID', serialize=False, auto_created=True, primary_key=True)),
                 ('arrows', models.PositiveIntegerField()),
                 ('distance', models.PositiveIntegerField()),
-                ('unit', models.CharField(max_length=1, choices=[(b'm', b'metres'), (b'y', b'yards')])),
+                ('unit', models.CharField(max_length=1, choices=[('m', 'metres'), ('y', 'yards')])),
                 ('target_face', models.PositiveIntegerField()),
             ],
             options={

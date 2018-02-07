@@ -23,9 +23,9 @@ class Migration(migrations.Migration):
                 ('has_juniors', models.BooleanField(default=False)),
                 ('has_teams', models.BooleanField(default=False)),
                 ('novices_in_experienced_teams', models.BooleanField(default=False)),
-                ('exclude_later_shoots', models.BooleanField(default=False, help_text=b'Only the first session can count for results')),
-                ('strict_b_teams', models.BooleanField(default=False, help_text=b'e.g. BUTC')),
-                ('strict_c_teams', models.BooleanField(default=False, help_text=b'e.g. BUTC')),
+                ('exclude_later_shoots', models.BooleanField(default=False, help_text='Only the first session can count for results')),
+                ('strict_b_teams', models.BooleanField(default=False, help_text='e.g. BUTC')),
+                ('strict_c_teams', models.BooleanField(default=False, help_text='e.g. BUTC')),
                 ('allow_incomplete_teams', models.BooleanField(default=True)),
                 ('team_size', models.PositiveIntegerField(default=4)),
                 ('novice_team_size', models.PositiveIntegerField(default=3)),
@@ -42,8 +42,8 @@ class Migration(migrations.Migration):
             name='CompetitionEntry',
             fields=[
                 ('id', models.AutoField(verbose_name='ID', serialize=False, auto_created=True, primary_key=True)),
-                ('age', models.CharField(default=b'S', max_length=1, choices=[(b'J', b'Junior'), (b'S', b'Senior')])),
-                ('novice', models.CharField(default=b'E', max_length=1, choices=[(b'N', b'Novice'), (b'E', b'Experienced')])),
+                ('age', models.CharField(default='S', max_length=1, choices=[('J', 'Junior'), ('S', 'Senior')])),
+                ('novice', models.CharField(default='E', max_length=1, choices=[('N', 'Novice'), ('E', 'Experienced')])),
                 ('guest', models.BooleanField(default=False)),
                 ('b_team', models.BooleanField(default=False)),
                 ('c_team', models.BooleanField(default=False)),
@@ -61,7 +61,7 @@ class Migration(migrations.Migration):
             name='ResultsMode',
             fields=[
                 ('id', models.AutoField(verbose_name='ID', serialize=False, auto_created=True, primary_key=True)),
-                ('mode', models.CharField(max_length=31, choices=[(b'by-session', b'By session'), (b'by-round', b'By round'), (b'by-round-progressional', b'By round (progressional)'), (b'double-round', b'Double round'), (b'seedings', b'Seedings'), (b'team', b'Teams'), (b'weekend', b'Weekend (Masters style)')])),
+                ('mode', models.CharField(max_length=31, choices=[('by-session', 'By session'), ('by-round', 'By round'), ('by-round-progressional', 'By round (progressional)'), ('double-round', 'Double round'), ('seedings', 'Seedings'), ('team', 'Teams'), ('weekend', 'Weekend (Masters style)')])),
                 ('leaderboard_only', models.BooleanField(default=False)),
                 ('competition', models.ForeignKey(related_name='result_modes', to='entries.Competition', on_delete=models.CASCADE)),
             ],
@@ -74,7 +74,7 @@ class Migration(migrations.Migration):
             fields=[
                 ('id', models.AutoField(verbose_name='ID', serialize=False, auto_created=True, primary_key=True)),
                 ('start', models.DateTimeField()),
-                ('scoring_system', models.CharField(max_length=1, choices=[(b'F', b'Full running slips'), (b'D', b'Dozen running slips'), (b'T', b'Totals only')])),
+                ('scoring_system', models.CharField(max_length=1, choices=[('F', 'Full running slips'), ('D', 'Dozen running slips'), ('T', 'Totals only')])),
                 ('archers_per_target', models.IntegerField()),
                 ('arrows_entered_per_end', models.IntegerField(default=12)),
                 ('competition', models.ForeignKey(to='entries.Competition', on_delete=models.CASCADE)),
@@ -112,7 +112,7 @@ class Migration(migrations.Migration):
             fields=[
                 ('id', models.AutoField(verbose_name='ID', serialize=False, auto_created=True, primary_key=True)),
                 ('name', models.CharField(max_length=200)),
-                ('logo', models.ImageField(upload_to=b'sponsors')),
+                ('logo', models.ImageField(upload_to='sponsors')),
             ],
             options={
             },

@@ -1,8 +1,9 @@
 import os
 os.environ.setdefault("DJANGO_SETTINGS_MODULE", "scoring.settings")  # NOQA
 
-
 from django.core.wsgi import get_wsgi_application
 from dj_static import Cling, MediaCling
 
-application = Cling(MediaCling(get_wsgi_application()))
+from .wsgi_middleware import DomainRedirect
+
+application = DomainRedirect(Cling(MediaCling(get_wsgi_application())))

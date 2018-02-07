@@ -13,6 +13,6 @@ class Migration(migrations.Migration):
         migrations.AlterField(
             model_name='archer',
             name='wa_age',
-            field=models.CharField(default=b'', max_length=1, blank=True, choices=[(b'C', b'Cadet'), (b'J', b'Junior'), (b'', b'Senior'), (b'M', b'Master')]),
+            field=models.CharField(default='', max_length=1, blank=True, choices=[('C', 'Cadet'), ('J', 'Junior'), ('', 'Senior'), ('M', 'Master')]),
         ),
     ]
