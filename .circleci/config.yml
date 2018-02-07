@@ -249,19 +249,6 @@ jobs:
             # Since this job depends on all others we know they have succeeded
             - *report_overall_success
 
-
-    deploy:
-        <<: *container_config
-        steps:
-            - *restore_repo
-            - run:
-                name: Run setup script
-                command: bash .circleci/setup-heroku.sh
-            - add_ssh_keys:
-                fingerprints:
-                    - "1f:c7:66:0b:78:4e:87:b8:17:35:97:ab:14:6e:7c:b1"
-            - *report_failure
-
 workflows:
     version: 2
     build_and_test:
@@ -286,13 +273,6 @@ workflows:
 #                requires:
 #                    - npm_dependencies
             - python_test:
-                # This job must be downstream of all other jobs (save deploy), as it also handles final success reporting
+                # This job must be downstream of all other jobs, as it also handles final success reporting
                 requires:
                     - python_lint
-            - deploy:
-                requires:
-                    - python_test
-                filters:
-                    branches:
-                        only: master
-
