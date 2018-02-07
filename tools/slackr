@@ -1,0 +1,97 @@
+#!/bin/bash
+
+# From https://github.com/a-sync/slackr
+
+WEBHOOK_URL=""
+
+usage() { echo "Usage: $(basename "$0") [options] <text>
+
+Options:
+    [-r <channel or @user>]
+    [-i <bot icon emoji>]
+    [-n <bot name>]
+    [-c <good|warning|danger|#hex color>]
+    [-a <author name>]
+    [-t <title>]
+    [-l <title link url>]
+    [-f <footer text>]
+    [-w <webhook url>]
+
+Examples:
+    $(basename "$0") some text
+    $(basename "$0") -c good -n friendlybot -i :cat: hello
+    $(basename "$0") -r general < logfile.txt
+    ls -la /etc/ | $(basename "$0") -r @smith -f \"\$(history 1)\"
+    tail -n 10 /var/log/syslog | $(basename "$0") -a \"\$(id -un) \$(hostname -f)\"
+" 1>&2; exit 1; }
+
+json_escape () {
+    printf '%s' "$1" | python -c 'import json,sys; print(json.dumps(sys.stdin.read()))'
+}
+
+recipient=""
+boticon=""
+botname=""
+color=""
+authorname=""
+title=""
+titlelink=""
+footer=""
+while getopts ":r:i:n:c:a:t:l:f:w:" o; do
+    case "${o}" in
+        r)
+            recipient="\"channel\":$(json_escape "${OPTARG}"),"
+            ;;
+        i)
+            boticon="\"icon_emoji\":$(json_escape "${OPTARG}"),"
+            ;;
+        n)
+            botname="\"username\":$(json_escape "${OPTARG}"),"
+            ;;
+        c)
+            color="\"color\":$(json_escape "${OPTARG}"),"
+            ;;
+        a)
+            authorname="\"author_name\":$(json_escape "${OPTARG}"),"
+            ;;
+        t)
+            title="\"title\":$(json_escape "${OPTARG}"),"
+            ;;
+        l)
+            titlelink="\"title_link\":$(json_escape "${OPTARG}"),"
+            ;;
+        f)
+            footer="\"footer\":$(json_escape "${OPTARG}"),"
+            ;;
+        w)
+            WEBHOOK_URL="${OPTARG}"
+            ;;
+        *)
+            echo "Illegal option: ${OPTARG}"$'\n'
+            usage
+            ;;
+    esac
+done
+shift $((OPTIND-1))
+
+if [[ "$WEBHOOK_URL" == "" ]]; then
+    echo "No webhook URL specified. Please set WEBHOOK_URL in $(readlink -f "$0") or use the -w option."$'\n'
+    usage
+fi
+
+text=$*
+if [[ $text == "" ]]; then
+    if [ -t 0 ]; then
+        echo "No text specified"$'\n'
+        usage
+    else
+        while IFS= read -r line || [ -n "$line" ]; do
+            text="$text$line"$'\n'
+        done
+    fi
+fi
+
+payload="payload={$recipient$boticon$botname\"attachments\":[{$color$authorname$title$titlelink$footer\"text\":$(json_escape "$text"),\"mrkdwn_in\":[\"text\"]}]}"
+
+curl -s --data-urlencode "$payload" "$WEBHOOK_URL" 2>&1
+echo
