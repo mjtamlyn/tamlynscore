@@ -23,7 +23,7 @@ class DomainRedirect(object):
             url += '?' + environ['QUERY_STRING']
 
         status = "301 Moved Permanently"
-        headers = [('Location', url),('Content-Length', '0')]
+        headers = [('Location', url), ('Content-Length', '0')]
 
         start_response(status, headers)
 
