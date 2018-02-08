@@ -73,10 +73,10 @@ MIDDLEWARE = (
     'debug_toolbar.middleware.DebugToolbarMiddleware',
 )
 
-ROOT_URLCONF = os.environ.get('ROOT_URLCONF', 'scoring.urls')
+ROOT_URLCONF = os.environ.get('ROOT_URLCONF', 'tamlynscore.urls')
 
 INSTALLED_APPS = (
-    'scoring',
+    'tamlynscore',
     'core',
     'leagues',
     'entries',

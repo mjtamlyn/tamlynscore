@@ -1,5 +1,5 @@
 import os
-os.environ.setdefault("DJANGO_SETTINGS_MODULE", "scoring.settings")  # NOQA
+os.environ.setdefault("DJANGO_SETTINGS_MODULE", "tamlynscore.settings")  # NOQA
 
 from django.core.wsgi import get_wsgi_application
 from dj_static import Cling, MediaCling

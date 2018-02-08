@@ -2,10 +2,10 @@
 
 # Set this to the root of your project when deployed:
 http_path = "/"
-css_dir = "scoring/static/css"
-sass_dir = "scoring/sass"
-images_dir = "scoring/static/img"
-javascripts_dir = "scoring/static/js"
+css_dir = "tamlynscore/static/css"
+sass_dir = "tamlynscore/sass"
+images_dir = "tamlynscore/static/img"
+javascripts_dir = "tamlynscore/static/js"
 
 # You can select your preferred output style here (can be overridden via the command line):
 # output_style = :expanded or :nested or :compact or :compressed

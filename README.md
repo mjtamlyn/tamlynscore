@@ -19,7 +19,7 @@ Assuming that the requirements have been fulfilled, the installation procedure i
 
 1. Clone the repository,
 2. Run `pip install -r requirements.txt` from the repositories root,
-3. Set up the config file (scoring/settings.py),
+3. Set up the config file (tamlynscore/settings.py),
   * This should include a secret key and the correct database access URI.
 4. Run the program using `make run`
 
