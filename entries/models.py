@@ -4,7 +4,7 @@ from django.db import models
 
 from core.models import Archer, Bowstyle, Club, County, Round, AGE_CHOICES, WA_AGE_CHOICES, AGB_AGE_CHOICES, JUNIOR_MASTERS_AGE_CHOICES, NOVICE_CHOICES
 from scores.result_modes import get_result_modes
-from scoring.utils import generate_slug
+from tamlynscore.utils import generate_slug
 
 
 SCORING_FULL = 'F'

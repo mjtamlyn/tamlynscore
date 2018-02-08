@@ -9,10 +9,6 @@ DEBUG = not os.environ.get('PRODUCTION')
 ALLOWED_HOSTS = [
     'tamlynscore.co.uk',
     'www.tamlynscore.co.uk',
-    'archery-scoring.herokuapp.com',
-    'archery-scoring-public.herokuapp.com',
-    'archery-scoring.mjtamlyn.co.uk',
-    'live.mjtamlyn.co.uk',
     '127.0.0.1',
     'localhost',
     '192.168.1.101',
@@ -25,7 +21,7 @@ ADMINS = (
 
 MANAGERS = ADMINS
 
-DATABASES = {'default': dj_database_url.config(default='postgres://localhost/archery')}
+DATABASES = {'default': dj_database_url.config(default='postgres://localhost/tamlynscore')}
 
 TIME_ZONE = 'Europe/London'
 USE_TZ = True
@@ -73,10 +69,10 @@ MIDDLEWARE = (
     'debug_toolbar.middleware.DebugToolbarMiddleware',
 )
 
-ROOT_URLCONF = os.environ.get('ROOT_URLCONF', 'scoring.urls')
+ROOT_URLCONF = os.environ.get('ROOT_URLCONF', 'tamlynscore.urls')
 
 INSTALLED_APPS = (
-    'scoring',
+    'tamlynscore',
     'core',
     'leagues',
     'entries',
