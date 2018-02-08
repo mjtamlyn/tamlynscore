@@ -21,7 +21,7 @@ ADMINS = (
 
 MANAGERS = ADMINS
 
-DATABASES = {'default': dj_database_url.config(default='postgres://localhost/archery')}
+DATABASES = {'default': dj_database_url.config(default='postgres://localhost/tamlynscore')}
 
 TIME_ZONE = 'Europe/London'
 USE_TZ = True
