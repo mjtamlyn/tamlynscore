@@ -21,6 +21,7 @@ pillow = "*"
 "psycopg2" = "*"
 reportlab = "*"
 "flake8" = "*"
+raven = "*"
 
 
 [dev-packages]

@@ -95,6 +95,7 @@ INSTALLED_APPS = (
     'debug_toolbar',
     'floppyforms',
     'custom_user',
+    'raven.contrib.django.raven_compat',
 )
 
 TEST_RUNNER = 'tests.runner.ScoringRunner'
@@ -116,33 +117,13 @@ if not DEBUG and not os.environ.get('LOCAL'):
     SECURE_PROXY_SSL_HEADER = ('HTTP_X_FORWARDED_PROTO', 'https')
     MIDDLEWARE = ('sslify.middleware.SSLifyMiddleware',) + MIDDLEWARE
 
-LOGGING = {
-    'version': 1,
-    'disable_existing_loggers': True,
-    'formatters': {
-        'console': {
-            'format': '[%(asctime)s][%(levelname)s] %(name)s %(filename)s:%(funcName)s:%(lineno)d | %(message)s',
-            'datefmt': '%Y-%m-%dT%H:%M:%S',
-        },
-    },
-    'handlers': {
-        'console': {
-            'level': 'DEBUG',
-            'class': 'logging.StreamHandler',
-            'formatter': 'console',
-        },
-    },
-    'loggers': {
-        'django.request': {
-            'handlers': ['console'],
-            'level': 'ERROR',
-            'propagate': True,
-        },
-    }
-}
-
 DEBUG_TOOLBAR_CONFIG = {
     'JQUERY_URL': STATIC_URL + 'lib/jquery/jquery-2.1.3.min.js',
 }
+
+if os.environ.get('RAVEN_DSN'):
+    RAVEN_CONFIG = {
+        'dsn': os.environ['RAVEN_DSN'],
+    }
 
 CURRENT_EVENT = os.environ.get('CURRENT_EVENT', 'bucs-outdoors-2014')
