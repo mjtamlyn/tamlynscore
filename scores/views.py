@@ -40,8 +40,12 @@ class InputScores(TargetList):
     def get_context_data(self, **kwargs):
         context = super(InputScores, self).get_context_data(**kwargs)
 
+        modified = False
         for allocation in self.allocations.filter(score__isnull=True):
             Score.objects.create(target=allocation)
+            modified = True
+        if modified:
+            context['target_list'] = self.get_target_list()
 
         allocations = self.allocations.select_related('score')
 
