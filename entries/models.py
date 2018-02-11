@@ -180,7 +180,7 @@ class SessionRound(models.Model):
         minimum_boss = current_target_allocations.aggregate(models.Min('boss'))['boss__min']
         if not minimum_boss:
             minimum_boss = 1
-        current_bosses = current_target_allocations.aggregate(models.Max('boss'))['boss__max']
+        current_bosses = current_target_allocations.aggregate(models.Max('boss'))['boss__max'] or 1
         bosses = range(minimum_boss, max(needed_bosses, current_bosses) + 1)
 
         details = self.session.details
