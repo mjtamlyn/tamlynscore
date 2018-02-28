@@ -42,7 +42,7 @@ class SetupForm(forms.Form):
         (9, 'Pass I'),
         (10, 'Pass J'),
     )
-    session_round = forms.ModelChoiceField(SessionRound)
+    session_round = forms.ModelChoiceField(SessionRound.objects)
     start = forms.IntegerField(label='Start target')
     level = forms.TypedChoiceField(coerce=int, choices=LEVEL_CHOICES)
     timing = forms.TypedChoiceField(label='Pass', coerce=int, choices=TIMING_CHOICES)
