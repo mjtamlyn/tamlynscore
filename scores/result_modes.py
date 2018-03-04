@@ -671,9 +671,16 @@ class Team(BaseResultMode):
                 'Junior Recurve',
                 'Junior Compound',
             ]
-        team_types = ['Non-compound']
-        if competition.split_gender_teams:
-            team_types = ['Gents non-compound', 'Ladies non-compound']
+        team_types = []
+        if competition.team_size:
+            if competition.split_gender_teams:
+                team_types += ['Gents non-compound', 'Ladies non-compound']
+            else:
+                team_types.append('Non-compound')
+        if competition.recurve_team_size is not None:
+            team_types.append('Recurve')
+        if competition.barebow_team_size is not None:
+            team_types.append('Barebow')
         if competition.compound_team_size is not None:
             team_types.append('Compound')
         if competition.junior_team_size is not None:
@@ -694,9 +701,13 @@ class Team(BaseResultMode):
                 team_size = competition.novice_team_size
             if type == 'Compound' and competition.compound_team_size:
                 team_size = competition.compound_team_size
-            if type in ['Longbow', 'Barebow'] and competition.compound_team_size:
+            if type in ['Longbow', 'Barebow'] and competition.use_county_teams:
                 # bit of a hack to treat compound team size as "minor team size"
                 team_size = competition.compound_team_size
+            if type == 'Recurve' and competition.recurve_team_size:
+                team_size = competition.recurve_team_size
+            if type == 'Barebow' and competition.barebow_team_size:
+                team_size = competition.barebow_team_size
             if type == 'Junior' and competition.junior_team_size:
                 team_size = competition.junior_team_size
             if competition.force_mixed_teams or (competition.force_mixed_teams_recurve_only and type == 'Recurve'):
@@ -767,8 +778,9 @@ class Team(BaseResultMode):
                         score.target.session_entry.competition_entry.novice == 'E' and
                         score.target.session_entry.competition_entry.archer.gender == 'L')
             return is_non_compound and score.target.session_entry.competition_entry.archer.gender == 'L'
-        if type == 'Compound':
-            return not is_non_compound
+        if type in ['Recurve', 'Compound', 'Barebow', 'Longbow']:
+            bowstyle = score.target.session_entry.competition_entry.bowstyle.name
+            return bowstyle == type
         if type == 'Novice':
             return is_non_compound and score.target.session_entry.competition_entry.novice == 'N'
         if type == 'Junior':
