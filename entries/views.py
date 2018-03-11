@@ -327,7 +327,7 @@ class TargetList(CompetitionMixin, ListView):
         target_list = collections.OrderedDict()
         session_rounds = SessionRound.objects.filter(
             session__competition__slug=self.kwargs['slug'],
-        ).select_related('session')
+        ).select_related('session').order_by('session__start')
         for session_round in session_rounds:
             session = session_round.session
             if session not in target_list:
