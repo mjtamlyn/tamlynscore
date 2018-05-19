@@ -875,7 +875,8 @@ class H2HSeedings(ByRound, Team, BaseResultMode):
             team_lookup = {score.club: score for score in team_scores}
             if team_lookup:
                 for seeding in round.seeding_set.order_by('seed').select_related('entry'):
-                    team_seedings.append(team_lookup[seeding.entry.team_name()])
+                    if seeding.entry.team_name() in team_lookup:
+                        team_seedings.append(team_lookup[seeding.entry.team_name()])
             return {round.category: team_seedings}
         return {round.category: team_scores}
 
