@@ -333,10 +333,14 @@ class OlympicScoreSheet(ScoreSheetsPdf):
                 score_sheet_elements.append(score_sheet)
 
             table_of_score_sheets = []
-            while len(score_sheet_elements) >= 2:
-                table_of_score_sheets.append((score_sheet_elements.pop(), score_sheet_elements.pop()))
-            if len(score_sheet_elements):
-                table_of_score_sheets.append((score_sheet_elements.pop(), Spacer(self.box_size, self.box_size)))
+            if self.session_round.shot_round.arrows_per_end <= 4:
+                while len(score_sheet_elements) >= 2:
+                    table_of_score_sheets.append((score_sheet_elements.pop(), score_sheet_elements.pop()))
+                if len(score_sheet_elements):
+                    table_of_score_sheets.append((score_sheet_elements.pop(), Spacer(self.box_size, self.box_size)))
+            else:
+                while score_sheet_elements:
+                    table_of_score_sheets.append((score_sheet_elements.pop(),))
 
             table_of_score_sheets = Table(table_of_score_sheets)
             table_of_score_sheets.setStyle(self.big_table_style)
