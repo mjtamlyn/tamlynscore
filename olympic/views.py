@@ -467,7 +467,7 @@ class OlympicResults(CompetitionMixin, HeadedPdfView):
         table = Table(table_data)
         table.setStyle(self.table_style)
         elements.append(KeepTogether([
-            self.Para(u'{1}m: {0}'.format(olympic_round.category.name, olympic_round.shot_round.distance), 'h2'),
+            self.Para(u'{2} {1}m: {0}'.format(olympic_round.category.name, olympic_round.shot_round.distance, olympic_round.shot_round.get_team_type_display()), 'h2'),
             table,
         ]))
         return elements
@@ -785,7 +785,7 @@ class OlympicTreePdf(OlympicTreeMixin, OlympicResults):
 
         elements = []
         elements.append(KeepTogether([
-            self.Para(u'{1}m: {0}'.format(olympic_round.category.name, olympic_round.shot_round.distance), 'h2'),
+            self.Para(u'{2} {1}m: {0}'.format(olympic_round.category.name, olympic_round.shot_round.distance, olympic_round.shot_round.get_team_type_display()), 'h2'),
             table,
         ]))
         return elements
