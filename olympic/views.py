@@ -516,30 +516,13 @@ class OlympicTreeMixin(object):
             matches = olympic_round.match_set.filter(level=level).order_by('timing', 'target').prefetch_related(
                 Prefetch('result_set', queryset=Result.objects.select_related())
             )
-            if (len(blocks) / len(matches)) == 2:
+            if len(blocks) != len(matches) and level != 1:
                 old_matches = matches
-                matches = []
-                for j in range(len(old_matches)):
-                    if not j % 2:
-                        matches += [None, old_matches[j], old_matches[j + 1], None]
-            if (len(blocks) / len(matches)) == 4:
-                old_matches = matches
-                matches = []
-                for j in range(len(old_matches)):
-                    if not j % 4:
-                        if not j % 8:
-                            matches += [None, old_matches[j], None, None]
-                        else:
-                            matches += [None, None, old_matches[j], None]
-            if (len(blocks) / len(matches) * 3) == 4:
-                old_matches = matches
-                matches = []
-                for j in range(len(old_matches)):
-                    if not j % 4:
-                        if not j % 8:
-                            matches += [None, old_matches[j], old_matches[j + 1], old_matches[j + 2]]
-                        else:
-                            matches += [old_matches[j], old_matches[j + 1], old_matches[j + 2], None]
+                matches = [None] * int(level ** 2)
+                layout = olympic_round._get_match_layout(int(level))
+                for match in old_matches:
+                    index = layout.index(match.match)
+                    matches[index] = match
             for m in range(len(blocks)):
                 try:
                     match = matches[m]
