@@ -293,22 +293,55 @@ class OlympicScoreSheet(ScoreSheetsPdf):
 
             score_sheet_elements = []
             for i in range(len(matches)):
-                match, timing = matches[i]
-                match_title = self.Para(self.match_names[i], 'h3')
-                if match and i > 0:
-                    boss = 'T.{}'.format(match)
-                elif match:
-                    boss = 'T.{0}/{1}'.format(match, match + 2)
+                if i == 0:
+                    # Finals need special casing
+                    # This is a final, potentially with no bronze match
+                    # available for the top seed(s) if there are less than 3
+                    # people
+                    has_match = True
+                    final_target, final_timing = matches[0]
+                    bronze_match = Match.objects.get(level=1, session_round=seeding.session_round, match=2)
+                    bronze_target, bronze_timing = bronze_match.target, bronze_match.timing
+                    effective_seed = Match.objects._effective_seed(seeding.seed, 1)
+                    if bronze_match.target_2 and effective_seed == 2:
+                        bronze_target = bronze_match.target_2
+
+                    if highest_seed <= 3:
+                        match_title = 'Final'
+                        location_label = 'T.{} Pass {}'.format(final_target, 'ABCDEFGHIJK'[final_timing - 1])
+                    elif bronze_timing != final_timing:
+                        match_title = self.match_names[0]
+                        location_label = 'T.{} Pass {} / T.{} Pass {}'.format(
+                            final_target,
+                            'ABCDEFGHIJK'[final_timing - 1],
+                            bronze_target,
+                            'ABCDEFGHIJK'[bronze_timing - 1],
+                        )
+                    else:
+                        match_title = self.match_names[0]
+                        location_label = 'T.{} / T.{} Pass {}'.format(
+                            final_target,
+                            bronze_target,
+                            'ABCDEFGHIJK'[final_timing - 1],
+                        )
                 else:
-                    boss = None
-                if timing is not None:
-                    timing = 'Pass %s' % 'ABCDEFGHIJK'[timing - 1]
+                    match, timing = matches[i]
+                    has_match = bool(match)
+                    match_title = self.match_names[i]
+                    if match:
+                        boss = 'T.{}'.format(match)
+                    else:
+                        boss = None
+                    if timing is not None:
+                        timing = 'Pass %s' % 'ABCDEFGHIJK'[timing - 1]
+                    location_label = '{} {}'.format(boss, timing)
+
                 arrows = self.session_round.shot_round.arrows_per_end
                 total_cols = 3 if self.session_round.shot_round.match_type == 'T' else 2
                 ends = self.session_round.shot_round.ends
                 table_data = [
-                    [match_title] + [None] * arrows + [self.Para('{} {}'.format(boss, timing), 'h3')],
-                    ['Arrows' if match else self.Para('BYE', 'h3')] + [None] * (arrows - 1) + [
+                    [self.Para(match_title, 'h3')] + [None] * arrows + [self.Para(location_label, 'h3')],
+                    ['Arrows' if has_match else self.Para('BYE', 'h3')] + [None] * (arrows - 1) + [
                         'S',
                         'Pts' if self.session_round.shot_round.match_type == 'T' else 'RT',
                     ] + (['RT'] if self.session_round.shot_round.match_type == 'T' else []) + [
@@ -328,7 +361,7 @@ class OlympicScoreSheet(ScoreSheetsPdf):
                     ['Shoot-off'] + [None] * (arrows - 1) + ['Total', None, 'Opponent Total'] + [None] * (total_cols - 1)
                 ]
                 score_sheet = Table(table_data, self.col_widths, self.row_heights)
-                score_sheet.setStyle(self.get_scores_table_style(self.session_round.shot_round) if match else self.bye_style)
+                score_sheet.setStyle(self.get_scores_table_style(self.session_round.shot_round) if has_match else self.bye_style)
 
                 score_sheet_elements.append(score_sheet)
 
