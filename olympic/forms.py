@@ -13,12 +13,15 @@ class SetupForm(forms.Form):
     SPREAD_CHOICES = (
         ('', 'No special options'),
         ('expanded', 'One target per archer'),
+    )
+    MATCH_CHOICES = (
+        ('', 'All matches'),
         ('half', 'Only allocate half of the matches'),
         ('quarter', 'Only allocate 1/4 of the matches'),
         ('eighth', 'Only allocate 1/8 of the matches'),
         ('three-quarter', 'Only allocate 3/4 of the matches'),
-        ('first-half', 'Only allocate first half of the matches'),
-        ('second-half', 'Only allocate second half of the matches'),
+        ('first-half', 'Only allocate first half of the matches / Final only'),
+        ('second-half', 'Only allocate second half of the matches / Bronze only'),
     )
     LEVEL_CHOICES = (
         (1, 'Finals'),
@@ -47,6 +50,7 @@ class SetupForm(forms.Form):
     level = forms.TypedChoiceField(coerce=int, choices=LEVEL_CHOICES)
     timing = forms.TypedChoiceField(label='Pass', coerce=int, choices=TIMING_CHOICES)
     spread = forms.ChoiceField(label='Target spread', choices=SPREAD_CHOICES, required=False)
+    matches = forms.ChoiceField(label='Matches', choices=MATCH_CHOICES, required=False)
     delete = forms.BooleanField(required=False)
 
     def __init__(self, session_rounds, **kwargs):
@@ -65,17 +69,17 @@ class SetupForm(forms.Form):
             kwargs['expanded'] = True
         if self.cleaned_data['spread'] == 'expanded':
             kwargs['expanded'] = True
-        if self.cleaned_data['spread'] == 'half':
+        if self.cleaned_data['matches'] == 'half':
             kwargs['half_only'] = True
-        if self.cleaned_data['spread'] == 'quarter':
+        if self.cleaned_data['matches'] == 'quarter':
             kwargs['quarter_only'] = True
-        if self.cleaned_data['spread'] == 'eighth':
+        if self.cleaned_data['matches'] == 'eighth':
             kwargs['eighth_only'] = True
-        if self.cleaned_data['spread'] == 'three-quarter':
+        if self.cleaned_data['matches'] == 'three-quarter':
             kwargs['three_quarters'] = True
-        if self.cleaned_data['spread'] == 'first-half':
+        if self.cleaned_data['matches'] == 'first-half':
             kwargs['first_half_only'] = True
-        if self.cleaned_data['spread'] == 'second-half':
+        if self.cleaned_data['matches'] == 'second-half':
             kwargs['second_half_only'] = True
         if self.cleaned_data['delete']:
             sr.remove_matches(self.cleaned_data['level'])
