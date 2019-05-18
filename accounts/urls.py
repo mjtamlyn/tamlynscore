@@ -1,8 +1,8 @@
-from django.conf.urls import url
+from django.urls import path, reverse_lazy
 import django.contrib.auth.views as auth_views
 
 
 urlpatterns = [
-    url(r'^login/$', auth_views.login, name='login'),
-    url(r'^logout/$', auth_views.logout_then_login, name='logout'),
+    path('login/', auth_views.LoginView.as_view(), name='login'),
+    path('logout/', auth_views.LogoutView.as_view(next_page=reverse_lazy('login')), name='logout'),
 ]
