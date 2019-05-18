@@ -300,11 +300,15 @@ class OlympicScoreSheet(ScoreSheetsPdf):
                     # people
                     has_match = True
                     final_target, final_timing = matches[0]
-                    bronze_match = Match.objects.get(level=1, session_round=seeding.session_round, match=2)
-                    bronze_target, bronze_timing = bronze_match.target, bronze_match.timing
-                    effective_seed = Match.objects._effective_seed(seeding.seed, 1)
-                    if bronze_match.target_2 and effective_seed == 2:
-                        bronze_target = bronze_match.target_2
+                    try:
+                        bronze_match = Match.objects.get(level=1, session_round=seeding.session_round, match=2)
+                    except Match.DoesNotExist:
+                        bronze_target = bronze_timing = None
+                    else:
+                        bronze_target, bronze_timing = bronze_match.target, bronze_match.timing
+                        effective_seed = Match.objects._effective_seed(seeding.seed, 1)
+                        if bronze_match.target_2 and effective_seed == 2:
+                            bronze_target = bronze_match.target_2
 
                     if highest_seed <= 3:
                         match_title = 'Final'
