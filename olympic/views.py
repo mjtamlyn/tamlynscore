@@ -560,6 +560,9 @@ class OlympicTreeMixin(object):
                 for match in old_matches:
                     index = layout.index(match.match)
                     matches[index] = match
+            elif level == 1:
+                # Handle when bronze and final are separated
+                matches = list(filter(lambda m: m.match == 1, matches))
             for m in range(len(blocks)):
                 try:
                     match = matches[m]
