@@ -521,7 +521,7 @@ class OlympicResults(CompetitionMixin, HeadedPdfView):
 class OlympicTreeMixin(object):
     @property
     def match_cols(self):
-        return [i for i in range(self.cols) if i % 3 is 0]
+        return [i for i in range(self.cols) if i % 3 == 0]
 
     def match_blocks(self, level):
         level = int(level)

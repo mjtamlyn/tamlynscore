@@ -710,7 +710,7 @@ class ScoreSheetsPdf(CompetitionMixin, HeadedPdfView):
             table_data = [['J', subround_title] + [None] * 5 + ['ET'] + [None] * 6 + scoring_labels]
             table_data += [[None for i in range(self.total_cols)] for j in range(total_rows - 1)]
             scores_table_style = copy.deepcopy(self.scores_table_style)
-            if extra is 6:
+            if extra == 6:
                 total_rows += 1
                 table_data += [[None for i in range(self.total_cols)]]
                 scores_table_style._cmds.append(('INNERGRID', (0, -2), (7, -2), 0.25, colors.black))
