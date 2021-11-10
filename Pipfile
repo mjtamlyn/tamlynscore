@@ -1,12 +1,9 @@
 [[source]]
-
 verify_ssl = true
 url = "https://pypi.python.org/simple"
 name = "pypi"
 
-
 [packages]
-
 dj-database-url = "*"
 dj-static = "*"
 django = "*"
@@ -21,12 +18,9 @@ pillow = "*"
 reportlab = "*"
 "flake8" = "*"
 raven = "*"
-
+whitenoise = "*"
 
 [dev-packages]
 
-
-
 [requires]
-
 python_version = "3.9"
