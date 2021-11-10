@@ -59,17 +59,18 @@ TEMPLATES = [{
 }]
 
 MIDDLEWARE = (
+    'django.middleware.security.SecurityMiddleware',
     'django.middleware.common.CommonMiddleware',
     'django.contrib.sessions.middleware.SessionMiddleware',
     'django.middleware.csrf.CsrfViewMiddleware',
     'django.contrib.auth.middleware.AuthenticationMiddleware',
     'django.contrib.messages.middleware.MessageMiddleware',
     'django.middleware.clickjacking.XFrameOptionsMiddleware',
-    'django.middleware.security.SecurityMiddleware',
     'debug_toolbar.middleware.DebugToolbarMiddleware',
 )
 
 ROOT_URLCONF = os.environ.get('ROOT_URLCONF', 'tamlynscore.urls')
+WSGI_APPLICATION = 'tamlynscore.wsgi.application'
 
 INSTALLED_APPS = (
     'tamlynscore',
