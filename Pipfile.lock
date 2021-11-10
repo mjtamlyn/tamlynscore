@@ -1,7 +1,7 @@
 {
     "_meta": {
         "hash": {
-            "sha256": "86058847e527ab409ec062f5712d42b3dff486e28202ea88fa65f9602bbe0825"
+            "sha256": "169c27221dc7b7dd88266d75464412ecd6572fce9049fcfefb62641e06e81f7f"
         },
         "pipfile-spec": 6,
         "requires": {
@@ -72,14 +72,12 @@
             "version": "==3.2.2"
         },
         "django-floppyforms": {
-            "editable": true,
-            "git": "https://github.com/rtpg/django-floppyforms",
-            "ref": "e118e79c77664ea08ae72f59ea02412da7d9b3a8"
-        },
-        "django-sslify": {
-            "editable": true,
-            "git": "https://github.com/rdegges/django-sslify",
-            "ref": "2ee081b009b7f540edaa88584c78f3aa1ff5da65"
+            "hashes": [
+                "sha256:5b3f6891463149b83c44d2bd6109ce32de3d848e2ff7dbc02c41c65562ddf633",
+                "sha256:d620f1ed7ae3fc0377803e5ba2df4afb2d4cdda7b13fdf0a71840da0b5e5aae8"
+            ],
+            "index": "pypi",
+            "version": "==1.9.0"
         },
         "factory-boy": {
             "hashes": [

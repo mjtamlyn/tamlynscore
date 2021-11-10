@@ -110,8 +110,8 @@ if not DEBUG and not os.environ.get('LOCAL'):
     X_FRAME_OPTIONS = 'DENY'
     SECURE_HSTS_SECONDS = 31536000
     SECURE_HSTS_INCLUDE_SUBDOMAINS = False
+    SECURE_SSL_REDIRECT = True
     SECURE_PROXY_SSL_HEADER = ('HTTP_X_FORWARDED_PROTO', 'https')
-    MIDDLEWARE = ('sslify.middleware.SSLifyMiddleware',) + MIDDLEWARE
 
 DEBUG_TOOLBAR_CONFIG = {
     'JQUERY_URL': STATIC_URL + 'lib/jquery/jquery-2.1.3.min.js',
