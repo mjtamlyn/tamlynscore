@@ -95,6 +95,9 @@ class Arrow(models.Model):
     arrow_of_round = models.PositiveIntegerField()
     is_x = models.BooleanField(default=False)
 
+    class Meta:
+        unique_together = [('arrow_of_round', 'score')]
+
     def __str__(self):
         if self.is_x:
             return u'X'
