@@ -55,11 +55,13 @@ JUNIOR_MASTERS_AGE_CHOICES = (
 )
 
 AGB_AGE_CHOICES = (
+    ('50+', '50+'),
     ('', 'Senior'),
     ('U18', 'U18'),
     ('U16', 'U16'),
     ('U14', 'U14'),
     ('U12', 'U12'),
+    ('U10', 'U10'),
 )
 
 
