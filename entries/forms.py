@@ -311,7 +311,7 @@ class EntryCreateForm(forms.Form):
             self.fields['update_junior_masters_age'] = forms.BooleanField(required=False)
         if len(self.session_rounds) > 1:
             self.fields['sessions'] = forms.ModelMultipleChoiceField(
-                queryset=self.session_rounds,
+                queryset=self.session_rounds.order_by('session__start'),
                 widget=forms.CheckboxSelectMultiple,
             )
         if self.competition.has_guests:
