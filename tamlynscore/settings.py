@@ -22,6 +22,7 @@ ADMINS = (
 MANAGERS = ADMINS
 
 DATABASES = {'default': dj_database_url.config(default='postgres://localhost/tamlynscore')}
+DEFAULT_AUTO_FIELD = 'django.db.models.AutoField'
 
 TIME_ZONE = 'Europe/London'
 USE_TZ = True
