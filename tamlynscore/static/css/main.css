@@ -3298,44 +3298,53 @@ footer p {
   margin-right: -10px;
   margin-bottom: 10px;
 }
+/* line 31, ../../sass/_layout.sass */
+.row--flex {
+  display: flex;
+  flex-wrap: wrap;
+}
+/* line 34, ../../sass/_layout.sass */
+.row--flex > .col1, .row--flex .col2, .row--flex .col3, .row--flex .col4, .row--flex .col5, .row--flex .col6 {
+  float: none;
+}
 
-/* line 32, ../../sass/_layout.sass */
+/* line 37, ../../sass/_layout.sass */
 .col1, .col2, .col3, .col4, .col5, .col6 {
   float: left;
   padding: 0 10px;
 }
 
-/* line 36, ../../sass/_layout.sass */
+/* line 41, ../../sass/_layout.sass */
 .col6 {
   width: 100%;
 }
 
-/* line 39, ../../sass/_layout.sass */
+/* line 44, ../../sass/_layout.sass */
 .col5 {
   width: 83.33333%;
 }
 
-/* line 42, ../../sass/_layout.sass */
+/* line 47, ../../sass/_layout.sass */
 .col4 {
   width: 66.66667%;
 }
 
-/* line 45, ../../sass/_layout.sass */
+/* line 50, ../../sass/_layout.sass */
 .col3 {
   width: 50%;
 }
 
-/* line 48, ../../sass/_layout.sass */
+/* line 53, ../../sass/_layout.sass */
 .col2 {
   width: 33.33333%;
 }
 
-/* line 51, ../../sass/_layout.sass */
+/* line 56, ../../sass/_layout.sass */
 .col1 {
   width: 16.66667%;
 }
 
-/* line 54, ../../sass/_layout.sass */
+/* line 59, ../../sass/_layout.sass */
 .flex {
   display: -webkit-flex;
   display: flex;
@@ -3343,24 +3352,24 @@ footer p {
   flex-wrap: wrap;
 }
 
-/* line 60, ../../sass/_layout.sass */
+/* line 65, ../../sass/_layout.sass */
 .pull-right {
   float: right;
 }
 
 @media (max-width: 1200px) {
-  /* line 64, ../../sass/_layout.sass */
+  /* line 69, ../../sass/_layout.sass */
   .container {
     width: 920px;
   }
 }
 @media (max-width: 950px) {
-  /* line 68, ../../sass/_layout.sass */
+  /* line 73, ../../sass/_layout.sass */
   .container {
     width: 100%;
   }
 
-  /* line 71, ../../sass/_layout.sass */
+  /* line 76, ../../sass/_layout.sass */
   .col1, .col2, .col3, .col4, .col5 {
     width: 100%;
   }
