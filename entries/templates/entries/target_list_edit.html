@@ -36,7 +36,7 @@
         </div>
     </div>
 
-    <div class="row">
+    <div class="row row--flex">
     {% for session, details in target_list.items %}
     <div class="session col{% if target_list|length == 2 %}3{% else %}2{% endif %}" id="session-{{ session.pk }}" data-archers="{{ details.entries_json }}">
         <h4>{{ session.start|date:"l, jS F - f a" }}</h4>
