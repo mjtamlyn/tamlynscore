@@ -5581,7 +5581,7 @@ body {
 }
 /* line 25, ../../sass/_target_list.sass */
 .target-list .archer-block .bottom {
-  height: 52px;
+  min-height: 53px;
   overflow: auto;
 }
 /* line 29, ../../sass/_target_list.sass */
