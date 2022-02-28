@@ -486,7 +486,7 @@ class ScoreSheets(CompetitionMixin, ListView):
     def get_queryset(self):
         return SessionRound.objects.filter(
             session__competition=self.competition,
-        ).select_related('session', 'shot_round', 'session__competition__tournament')
+        ).select_related('session', 'shot_round', 'session__competition__tournament').order_by('session__start', 'shot_round_id')
 
 
 # PDF views
