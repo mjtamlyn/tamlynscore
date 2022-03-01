@@ -5,10 +5,10 @@
     <h1>{{ season }}</h1>
 </header>
 
-<div class="row">
-    <div class="col6">
+<div class="row row--flex">
+    <div class="col4">
         <h3>Legs</h3>
-        {% for leg in season.leg_set.all %}
+        {% for leg in legs %}
             <h4>{{ leg }}</h4>
             <ul class="link-list">
                 {% for mode in leg.result_modes.all %}
@@ -16,6 +16,14 @@
                 {% endfor %}
             </ul>
         {% endfor %}
+        </ul>
+    </div>
+    <div class="col2">
+        <h3>Editions</h3>
+        <ul class="link-list">
+            {% for edition in editions %}
+            <li><a href="{{ edition.get_absolute_url }}">{{ edition }}</a></li>
+            {% endfor %}
         </ul>
     </div>
 </div>
