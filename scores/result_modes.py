@@ -125,11 +125,21 @@ class BaseResultMode(object):
 
     def get_section_for_round(self, round, competition):
         headers = ['Pl.'] + self.get_main_headers(competition)
+        if competition.has_juniors or competition.has_wa_age_groups or competition.has_junior_masters_age_groups:
+            headers += ['']
+        if competition.has_novices:
+            headers += ['']
         if self.include_distance_breakdown and hasattr(round, 'subrounds'):
             subrounds = round.subrounds.all()
             if len(subrounds) > 1:
                 for subround in round.subrounds.all():
                     headers += ['%s%s' % (subround.distance, subround.unit)]
+            elif round.can_split:
+                subround = subrounds[0]
+                headers += [
+                    '%s%s-1' % (subround.distance, subround.unit),
+                    '%s%s-2' % (subround.distance, subround.unit),
+                ]
         headers.append('Score')
         if round.scoring_type == 'X':
             headers += ['10s', 'Xs']
@@ -162,28 +172,40 @@ class BaseResultMode(object):
     def score_details(self, score, section):
         from entries.models import SCORING_TOTALS, SCORING_DOZENS, SCORING_FULL
         scores = []
-        subrounds = self.get_subrounds(score)
-        if self.include_distance_breakdown and len(subrounds) > 1 and not score.target.session_entry.session_round.session.scoring_system == SCORING_TOTALS:
-            if score.disqualified or score.target.session_entry.session_round.session.scoring_system == SCORING_TOTALS or not hasattr(score, 'source'):
-                scores += [''] * len(subrounds)
-            else:
-                score = score.source
-                subround_scores = []
+        if self.include_distance_breakdown:
+            shot_round = score.target.session_entry.session_round.shot_round
+            subrounds = self.get_subrounds(score)
+            if len(subrounds) > 1 and not score.target.session_entry.session_round.session.scoring_system == SCORING_TOTALS:
+                if score.disqualified or score.target.session_entry.session_round.session.scoring_system == SCORING_TOTALS or not hasattr(score, 'source'):
+                    scores += [''] * len(subrounds)
+                else:
+                    score = score.source
+                    subround_scores = []
 
-                if score.target.session_entry.session_round.session.scoring_system == SCORING_FULL:
-                    # Arrow of round has been stored off by a dozen
-                    counter = 13
-                    for subround in subrounds:
-                        subround_scores.append(score.arrow_set.filter(arrow_of_round__in=range(counter, counter + subround.arrows)).aggregate(models.Sum('arrow_value'))['arrow_value__sum'] or 0)
-                        counter += subround.arrows
+                    if score.target.session_entry.session_round.session.scoring_system == SCORING_FULL:
+                        # Arrow of round has been stored off by a dozen
+                        counter = 13
+                        for subround in subrounds:
+                            subround_scores.append(score.arrow_set.filter(arrow_of_round__in=range(counter, counter + subround.arrows)).aggregate(models.Sum('arrow_value'))['arrow_value__sum'] or 0)
+                            counter += subround.arrows
 
-                elif score.target.session_entry.session_round.session.scoring_system == SCORING_DOZENS:
-                    counter = 1
-                    for subround in subrounds:
-                        subround_scores.append(score.dozen_set.filter(dozen__in=range(counter, counter + int(subround.arrows / 12))).aggregate(models.Sum('total'))['total__sum'])
-                        counter += int(subround.arrows / 12)
+                    elif score.target.session_entry.session_round.session.scoring_system == SCORING_DOZENS:
+                        counter = 1
+                        for subround in subrounds:
+                            subround_scores.append(score.dozen_set.filter(dozen__in=range(counter, counter + int(subround.arrows / 12))).aggregate(models.Sum('total'))['total__sum'])
+                            counter += int(subround.arrows / 12)
 
-                scores += subround_scores
+                    scores += subround_scores
+            elif shot_round.can_split:
+                if score.disqualified or score.target.session_entry.session_round.session.scoring_system == SCORING_TOTALS or not hasattr(score, 'source'):
+                    scores += ['', '']
+                else:
+                    score = score.source
+                    arrows = score.arrow_set.order_by('arrow_of_round').values_list('arrow_value', flat=True)
+                    scores += [
+                        sum(arrows[:(shot_round.arrows / 2)], 0),
+                        sum(arrows[(shot_round.arrows / 2):]),
+                    ]
         if score.disqualified:
             scores += ['DSQ', '', '']
         elif score.retired:

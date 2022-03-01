@@ -94,6 +94,13 @@ class Round(models.Model):
     name = models.CharField(max_length=100, unique=True)
     subrounds = models.ManyToManyField(Subround)
     scoring_type = models.CharField(max_length=1, choices=SCORING_TYPES)
+    can_split = models.BooleanField(
+        default=False, help_text=(
+            'If the round does not have multiple subrounds, but it makes sense '
+            'to talk about two halves of the round (e.g. a WA18m or WA70m), then '
+            'tick this box and the split can be used in exports.'
+        ),
+    )
 
     def __str__(self):
         return self.name
