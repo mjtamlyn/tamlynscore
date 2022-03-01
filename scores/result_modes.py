@@ -579,7 +579,7 @@ class DoubleRound(BaseResultMode):
         results = OrderedDict()
         for score in scores:
             session_entry = score.target.session_entry
-            if session_entry.session_round.shot_round.id is not round.id:
+            if session_entry.session_round.shot_round.id != round.id:
                 continue
             if session_entry.session_round not in valid_session_rounds:
                 continue
