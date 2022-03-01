@@ -399,7 +399,7 @@ class BySession(BaseResultMode):
         results = OrderedDict()
         for score in scores:
             session_entry = score.target.session_entry
-            if session_entry.session_round.session_id is not session.id:
+            if session_entry.session_round.session_id != session.id:
                 continue
             categories = self.get_categories_for_entry(competition, session_entry.competition_entry)
             for category in categories:
