@@ -1,8 +1,5 @@
 version: 2
 
-# Wait for docker images?
-# https://discuss.circleci.com/t/prevent-race-conditions-by-waiting-for-services-with-dockerize/11215
-
 references:
 
     container_config: &container_config
@@ -44,17 +41,6 @@ references:
             keys:
                 - *pipenv_cache_key
                 - *pipenv_backup_cache_key
-
-#    npm_cache_key: &npm_cache_key
-#        v3-npm-cache-{{ checksum "yarn.lock" }}
-#    npm_backup_cache_key: &npm_backup_cache_key
-#        v3-npm-cache
-#
-#    restore_node_modules: &restore_node_modules
-#        restore_cache:
-#            keys:
-#                - *npm_cache_key
-#                - *npm_backup_cache_key
 
     report_failure: &report_failure
         run:
@@ -130,68 +116,6 @@ jobs:
                     - ~/.cache/pip
             - *report_failure
 
-#    npm_dependencies:
-#        <<: *container_config
-#        steps:
-#            - *restore_repo
-#            - *restore_node_modules
-#            - run:
-#                name: Install npm dependencies
-#                command: |
-#                    sudo npm config set -g production false
-#                    yarn install
-#            - save_cache:
-#                key: *npm_cache_key
-#                paths:
-#                    - node_modules
-#            - *report_failure
-#
-#    node_build:
-#        <<: *container_config
-#        steps:
-#            - *restore_repo
-#            - *restore_node_modules
-#            - run:
-#                name: Build js
-#                command: |
-#                    npm run build
-#                    mkdir -p /tmp/workspace
-#                    cp -r ./build /tmp/workspace/build
-#            - persist_to_workspace:
-#                root: *workspace_root
-#                paths:
-#                    - build
-#            - *report_failure
-#
-#    node_lint:
-#        <<: *container_config
-#        steps:
-#            - *restore_repo
-#            - *restore_node_modules
-#            - run:
-#                name: Check less compiles
-#                command: ./tools/lintless.sh
-#            - run:
-#                name: Run stylelint
-#                command: npm run -s lint-style
-#            - run:
-#                name: Run eslint
-#                command: |
-#                    npm run -s lint-js -- --quiet
-#                    npm run -s lint-jsx -- --quiet
-#                    npm run -s lint-html -- --quiet
-#            - *report_failure
-#
-#    node_test:
-#        <<: *container_config
-#        steps:
-#            - *restore_repo
-#            - *restore_node_modules
-#            - run:
-#                name: Run npm test
-#                command: npm test
-#            - *report_failure
-
     python_lint:
         <<: *container_config
         steps:
@@ -211,8 +135,8 @@ jobs:
 
     python_test:
         docker:
-            - image: circleci/python:3.6.4-node-browsers
-            - image: circleci/postgres:9.4.15-alpine
+            - image: cimg/python:3.6.4-node-browsers
+            - image: cimg/postgres:9.4.15-alpine
               environment:
                   POSTGRES_USER: postgres
                   POSTGRES_DB: circle_test
@@ -225,12 +149,6 @@ jobs:
             - *attach_workspace
             - *restore_repo
             - *restore_pipenv
-#            - *restore_node_modules
-#            - run:
-#                name: Restore built js
-#                command: |
-#                    mkdir build
-#                    cp -r /tmp/workspace/build .
             - run:
                 name: Check migrations
                 command: |
@@ -255,22 +173,9 @@ workflows:
             - pipenv_dependencies:
                 requires:
                     - checkout_code
-#            - npm_dependencies:
-#                requires:
-#                    - checkout_code
-#            - node_build:
-#                requires:
-#                    - npm_dependencies
             - python_lint:
                 requires:
                     - pipenv_dependencies
-#            - node_lint:
-#                requires:
-#                    - npm_dependencies
-#            - node_test:
-#                requires:
-#                    - npm_dependencies
             - python_test:
-                # This job must be downstream of all other jobs, as it also handles final success reporting
                 requires:
-                    - python_lint
+                    - checkout_code
