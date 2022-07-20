@@ -178,4 +178,4 @@ workflows:
                     - pipenv_dependencies
             - python_test:
                 requires:
-                    - checkout_code
+                    - pipenv_dependencies
