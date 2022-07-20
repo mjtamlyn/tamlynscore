@@ -855,8 +855,7 @@ class RunningSlipsPdf(ScoreSheetsPdf):
             for dozen in range(1, int(dozens) + 1):
                 for entries in entries_group:
                     table_data = [(
-                        ['Dozen {0}'.format(dozen)] + [None] * 6 + ['ET'] + [None] * 6 +
-                        ['ET', 'S'] + headings + ['RT' if dozen > 1 else 'Inits.']
+                        ['Dozen {0}'.format(dozen)] + [None] * 6 + ['ET'] + [None] * 6 + ['ET', 'S'] + headings + ['RT' if dozen > 1 else 'Inits.']
                     )]
                     for entry in entries:
                         table_data.append([entry[0]] + [None for i in range(self.total_cols - 1)])
