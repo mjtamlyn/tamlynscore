@@ -1,16 +1,16 @@
-from django.conf.urls import url
+from django.urls import path
 
 from . import views
 
 
 urlpatterns = [
-    url(r'^(?P<slug>[\w-]+)/$', views.OlympicIndex.as_view(), name='olympic_index'),
-    url(r'^(?P<slug>[\w-]+)/setup/$', views.OlympicSetup.as_view(), name='olympic_setup'),
-    url(r'^(?P<slug>[\w-]+)/(?P<round_id>\d+)/$', views.OlympicInputIndex.as_view(), name='olympic_input_index'),
-    url(r'^(?P<slug>[\w-]+)/input/(?P<seed_pk>\d+)/$', views.OlympicInput.as_view(), name='olympic_input'),
-    url(r'^(?P<slug>[\w-]+)/score-sheets/(?P<round_id>\d+)/$', views.OlympicScoreSheet.as_view(), name='olympic_score_sheet'),
-    url(r'^(?P<slug>[\w-]+)/results/$', views.OlympicResults.as_view(), name='olympic_results'),
-    url(r'^(?P<slug>[\w-]+)/tree/$', views.OlympicTree.as_view(), name='olympic_tree'),
-    url(r'^(?P<slug>[\w-]+)/tree/pdf/$', views.OlympicTreePdf.as_view(), name='olympic_tree_pdf'),
-    url(r'^(?P<slug>[\w-]+)/field-plan/$', views.FieldPlan.as_view(), name='olympic_field_plan'),
+    path('<slug:slug>/', views.OlympicIndex.as_view(), name='olympic_index'),
+    path('<slug:slug>/setup/', views.OlympicSetup.as_view(), name='olympic_setup'),
+    path('<slug:slug>/<int:round_id>/', views.OlympicInputIndex.as_view(), name='olympic_input_index'),
+    path('<slug:slug>/input/<int:seed_pk>/', views.OlympicInput.as_view(), name='olympic_input'),
+    path('<slug:slug>/score-sheets/<int:round_id>/', views.OlympicScoreSheet.as_view(), name='olympic_score_sheet'),
+    path('<slug:slug>/results/', views.OlympicResults.as_view(), name='olympic_results'),
+    path('<slug:slug>/tree/', views.OlympicTree.as_view(), name='olympic_tree'),
+    path('<slug:slug>/tree/pdf/', views.OlympicTreePdf.as_view(), name='olympic_tree_pdf'),
+    path('<slug:slug>/field-plan/', views.FieldPlan.as_view(), name='olympic_field_plan'),
 ]
