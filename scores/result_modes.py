@@ -463,7 +463,7 @@ class ByRound(BaseResultMode):
                 rounds.append(round.shot_round)
         return rounds
 
-    def get_round_results(self, competition, rounds, scores):
+    def get_round_results(self, competition, rounds, scores, category=None):
         results = OrderedDict()
         for score in scores:
             session_entry = score.target.session_entry
@@ -471,7 +471,10 @@ class ByRound(BaseResultMode):
                 continue
             if not self.include_later_shoots_anyway and competition.exclude_later_shoots and session_entry.index > 1:
                 continue
-            categories = self.get_categories_for_entry(competition, session_entry.competition_entry)
+            if category:  # passed in from Seedings
+                categories = [category]
+            else:
+                categories = self.get_categories_for_entry(competition, session_entry.competition_entry)
             for category in categories:
                 if category not in results:
                     results[category] = []
@@ -851,7 +854,7 @@ class H2HSeedings(ByRound, Team, BaseResultMode):
         for round in rounds:
             section = self.get_section_for_round(round, competition)
             section.seedings_confirmed = round.seeding_set.exists()
-            section_scores = self.filter_scores(competition, scores, round.category)
+            section_scores = self.filter_scores(competition, scores, round)
             section_results = self.get_round_results(competition, round, section_scores, section.seedings_confirmed, leaderboard)
             results[section] = section_results
         return results
@@ -878,7 +881,7 @@ class H2HSeedings(ByRound, Team, BaseResultMode):
                     )
                     results.append(score)
                 return {round.category: results}
-            results = ByRound.get_round_results(self, competition, [round.shot_round for round in round.ranking_rounds.all()], scores)
+            results = ByRound.get_round_results(self, competition, [round.shot_round for round in round.ranking_rounds.all()], scores, category=round.category)
             if round.cut:
                 for category, provisional_seedings in results.items():
                     for seed in provisional_seedings:
@@ -910,12 +913,13 @@ class H2HSeedings(ByRound, Team, BaseResultMode):
             return ['Archer', 'County']
         return ['Archer', 'Club']
 
-    def filter_scores(self, competition, scores, category):
+    def filter_scores(self, competition, scores, round):
         filtered = []
+        ranking_rounds = round.ranking_rounds.all()
         for score in scores:
             competition_entry = score.target.session_entry.competition_entry
             categories = self.get_categories_for_entry(competition, competition_entry)
-            if category in categories:
+            if round.category in categories and score.target.session_entry.session_round in ranking_rounds:
                 filtered.append(score)
         return filtered
 
