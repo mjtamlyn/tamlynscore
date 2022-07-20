@@ -160,7 +160,7 @@ jobs:
                     BUILD_DIR: /home/circleci/project
                 command: |
                     source .venv/bin/activate
-                    python manage.py test -k 2>&1
+                    python manage.py test
             - *report_failure
             # Since this job depends on all others we know they have succeeded
             - *report_overall_success

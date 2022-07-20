@@ -6,9 +6,10 @@ from scores.result_modes import ByRound
 
 import factory
 from factory import fuzzy
+from factory.django import DjangoModelFactory
 
 
-class UserFactory(factory.DjangoModelFactory):
+class UserFactory(DjangoModelFactory):
     class Meta:
         model = core_models.User
     email = factory.Sequence(lambda n: 'user-{0}@example.com'.format(n).lower())
@@ -31,13 +32,13 @@ class SuperuserFactory(UserFactory):
     is_superuser = True
 
 
-class BowstyleFactory(factory.DjangoModelFactory):
+class BowstyleFactory(DjangoModelFactory):
     class Meta:
         model = core_models.Bowstyle
     name = factory.Sequence(lambda n: 'Bowstyle %s' % n)
 
 
-class ClubFactory(factory.DjangoModelFactory):
+class ClubFactory(DjangoModelFactory):
     class Meta:
         model = core_models.Club
     name = factory.Sequence(lambda n: 'Club %s Company of Archers' % n)
@@ -45,7 +46,7 @@ class ClubFactory(factory.DjangoModelFactory):
     slug = factory.Sequence(lambda n: 'club-%s' % n)
 
 
-class ArcherFactory(factory.DjangoModelFactory):
+class ArcherFactory(DjangoModelFactory):
     class Meta:
         model = core_models.Archer
     name = fuzzy.FuzzyText(prefix='Archer ')
@@ -53,7 +54,7 @@ class ArcherFactory(factory.DjangoModelFactory):
     bowstyle = factory.SubFactory(BowstyleFactory)
 
 
-class TournamentFactory(factory.DjangoModelFactory):
+class TournamentFactory(DjangoModelFactory):
     class Meta:
         model = entries_models.Tournament
     full_name = factory.Sequence(lambda n: 'Tournament %s Archery Championship' % n)
@@ -61,7 +62,7 @@ class TournamentFactory(factory.DjangoModelFactory):
     host_club = factory.SubFactory(ClubFactory)
 
 
-class CompetitionFactory(factory.DjangoModelFactory):
+class CompetitionFactory(DjangoModelFactory):
     class Meta:
         model = entries_models.Competition
     tournament = factory.SubFactory(TournamentFactory)
@@ -69,7 +70,7 @@ class CompetitionFactory(factory.DjangoModelFactory):
     slug = factory.Sequence(lambda n: 'competition-%s' % n)
 
 
-class SessionFactory(factory.DjangoModelFactory):
+class SessionFactory(DjangoModelFactory):
     class Meta:
         model = entries_models.Session
     competition = factory.SubFactory(CompetitionFactory)
@@ -78,20 +79,20 @@ class SessionFactory(factory.DjangoModelFactory):
     scoring_system = entries_models.SCORING_FULL
 
 
-class RoundFactory(factory.DjangoModelFactory):
+class RoundFactory(DjangoModelFactory):
     class Meta:
         model = core_models.Round
     name = factory.Sequence(lambda n: 'Round %s' % n)
 
 
-class SessionRoundFactory(factory.DjangoModelFactory):
+class SessionRoundFactory(DjangoModelFactory):
     class Meta:
         model = entries_models.SessionRound
     session = factory.SubFactory(SessionFactory)
     shot_round = factory.SubFactory(RoundFactory)
 
 
-class CompetitionEntryFactory(factory.DjangoModelFactory):
+class CompetitionEntryFactory(DjangoModelFactory):
     class Meta:
         model = entries_models.CompetitionEntry
     competition = factory.SubFactory(CompetitionFactory)
@@ -102,14 +103,14 @@ class CompetitionEntryFactory(factory.DjangoModelFactory):
     novice = 'E'
 
 
-class SessionEntryFactory(factory.DjangoModelFactory):
+class SessionEntryFactory(DjangoModelFactory):
     class Meta:
         model = entries_models.SessionEntry
     competition_entry = factory.SubFactory(CompetitionEntryFactory)
     session_round = factory.SubFactory(SessionRoundFactory)
 
 
-class ResultsModeFactory(factory.DjangoModelFactory):
+class ResultsModeFactory(DjangoModelFactory):
     class Meta:
         model = entries_models.ResultsMode
     competition = factory.SubFactory(CompetitionFactory)
