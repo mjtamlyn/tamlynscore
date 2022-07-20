@@ -19,6 +19,7 @@ reportlab = "*"
 "flake8" = "*"
 raven = "*"
 whitenoise = "*"
+isort = "*"
 
 [dev-packages]
 
