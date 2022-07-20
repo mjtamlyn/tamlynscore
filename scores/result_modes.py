@@ -920,14 +920,15 @@ class H2HSeedings(ByRound, Team, BaseResultMode):
         return filtered
 
     def get_categories_for_entry(self, competition, entry):
+        categories = []
         for category in self.categories:
             if entry.bowstyle in category.bowstyles.all():
                 if ((category.gender is None or category.gender == entry.archer.gender) and
                         (category.novice is None or category.novice == entry.novice) and
                         (category.junior_masters_age is None or category.junior_masters_age == entry.junior_masters_age) and
                         (not category.wa_ages or entry.wa_age in category.wa_ages)):
-                    return [category]
-        return []
+                    categories.append(category)
+        return categories
 
 
 class Weekend(BaseResultMode):
