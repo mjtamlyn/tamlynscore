@@ -135,8 +135,8 @@ jobs:
 
     python_test:
         docker:
-            - image: cimg/python:3.6.4-node-browsers
-            - image: cimg/postgres:9.4.15-alpine
+            - image: cimg/python:3.9
+            - image: cimg/postgres:14.4
               environment:
                   POSTGRES_USER: postgres
                   POSTGRES_DB: circle_test
