@@ -2,9 +2,11 @@
     {% for section, categories in results.items %}
     {% for category, scores in categories.items %}
     {% if include_confirmation_form %}
-        <form action="." method="POST">
-    {% endif %}
+        <form class="col3" action="." method="POST">
+            <div>
+    {% else %}
     <div class="col3">
+    {% endif %}
         <table class="table">
             {% ifchanged section %}
             <tr><th colspan="100%">{{ section }}</th></tr>
