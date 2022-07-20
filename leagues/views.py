@@ -5,7 +5,7 @@ from django.views.generic import DetailView, ListView, TemplateView
 from scores.models import Score
 from scores.result_modes import get_mode
 
-from .models import League, Season, Leg, ResultsMode
+from .models import League, Leg, ResultsMode, Season
 
 
 class LeagueList(ListView):

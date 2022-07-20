@@ -3,8 +3,10 @@ import copy
 from django.core.cache import cache
 from django.db.models import Prefetch
 from django.shortcuts import get_object_or_404
-from django.views.generic import TemplateView, ListView, DetailView, UpdateView, CreateView
 from django.urls import reverse
+from django.views.generic import (
+    CreateView, DetailView, ListView, TemplateView, UpdateView,
+)
 
 from braces.views import LoginRequiredMixin, SuperuserRequiredMixin
 
@@ -13,8 +15,8 @@ from entries.views import BatchEntryMixin
 from leagues.models import League
 from scores.models import Score
 
-from .models import County, Club, Archer
 from .forms import ArcherForm, ClubArcherForm
+from .models import Archer, Club, County
 
 
 class ClubMixin(object):

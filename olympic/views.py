@@ -1,20 +1,22 @@
 from django.db.models import Max, Prefetch
 from django.http import HttpResponseRedirect
-from django.views.generic import DetailView, TemplateView, FormView
 from django.shortcuts import get_object_or_404, redirect
 from django.urls import reverse
+from django.views.generic import DetailView, FormView, TemplateView
 
 from reportlab.lib import colors
 from reportlab.lib.units import inch
-from reportlab.platypus import KeepTogether, PageBreak, Spacer, Table, TableStyle
+from reportlab.platypus import (
+    KeepTogether, PageBreak, Spacer, Table, TableStyle,
+)
 from reportlab.rl_config import defaultPageSize
 
-from entries.views import CompetitionMixin, ScoreSheetsPdf, HeadedPdfView
+from entries.views import CompetitionMixin, HeadedPdfView, ScoreSheetsPdf
+from olympic.forms import ResultForm, SetupForm
+from olympic.models import Match, OlympicSessionRound, Result, Seeding
 from scores.models import Score
 from scores.result_modes import H2HSeedings
 from scores.views import ResultModeMixin
-from olympic.models import OlympicSessionRound, Seeding, Match, Result
-from olympic.forms import ResultForm, SetupForm
 
 
 class OlympicMixin(CompetitionMixin):

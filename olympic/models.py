@@ -2,9 +2,11 @@ from django.contrib.postgres.fields import ArrayField
 from django.db import models
 from django.utils.functional import cached_property
 
-from core.models import Bowstyle, GENDER_CHOICES, NOVICE_CHOICES, WA_AGE_CHOICES, JUNIOR_MASTERS_AGE_CHOICES
-from entries.models import Session, SessionRound, CompetitionEntry
-
+from core.models import (
+    GENDER_CHOICES, JUNIOR_MASTERS_AGE_CHOICES, NOVICE_CHOICES, WA_AGE_CHOICES,
+    Bowstyle,
+)
+from entries.models import CompetitionEntry, Session, SessionRound
 
 MATCH_TYPES = (
     ('T', 'Sets'),

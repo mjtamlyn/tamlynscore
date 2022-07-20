@@ -1,6 +1,6 @@
 from django.contrib import admin
 
-from scores.models import Score, Arrow, Dozen
+from scores.models import Arrow, Dozen, Score
 
 
 class ArrowAdmin(admin.ModelAdmin):

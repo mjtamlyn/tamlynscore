@@ -6,25 +6,35 @@ import json
 import math
 
 from django.db.models import Prefetch
-from django.http import HttpResponse, HttpResponseBadRequest, HttpResponseRedirect, Http404
-from django.views.generic import View, DetailView, ListView, TemplateView, UpdateView, DeleteView, FormView
+from django.http import (
+    Http404, HttpResponse, HttpResponseBadRequest, HttpResponseRedirect,
+)
 from django.shortcuts import get_object_or_404
-from django.utils import timezone
 from django.urls import reverse
+from django.utils import timezone
+from django.views.generic import (
+    DeleteView, DetailView, FormView, ListView, TemplateView, UpdateView, View,
+)
 
 from braces.views import MessageMixin, SuperuserRequiredMixin
-from reportlab.platypus import SimpleDocTemplate, Paragraph, Spacer, Table, PageBreak, TableStyle, KeepTogether
-from reportlab.lib.styles import getSampleStyleSheet
-from reportlab.rl_config import defaultPageSize
 from reportlab.lib import colors
+from reportlab.lib.styles import getSampleStyleSheet
 from reportlab.lib.units import inch
+from reportlab.platypus import (
+    KeepTogether, PageBreak, Paragraph, SimpleDocTemplate, Spacer, Table,
+    TableStyle,
+)
+from reportlab.rl_config import defaultPageSize
 
 from core.models import Archer
 
-from .forms import ArcherSearchForm, CSVEntryForm, CompetitionForm, EntryCreateForm, EntryUpdateForm
+from .forms import (
+    ArcherSearchForm, CompetitionForm, CSVEntryForm, EntryCreateForm,
+    EntryUpdateForm,
+)
 from .models import (
-    Competition, Session, CompetitionEntry, SessionEntry, TargetAllocation,
-    SessionRound, SCORING_FULL, SCORING_DOZENS
+    SCORING_DOZENS, SCORING_FULL, Competition, CompetitionEntry, Session,
+    SessionEntry, SessionRound, TargetAllocation,
 )
 
 

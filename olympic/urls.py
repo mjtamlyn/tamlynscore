@@ -2,7 +2,6 @@ from django.urls import path
 
 from . import views
 
-
 urlpatterns = [
     path('<slug:slug>/', views.OlympicIndex.as_view(), name='olympic_index'),
     path('<slug:slug>/setup/', views.OlympicSetup.as_view(), name='olympic_setup'),

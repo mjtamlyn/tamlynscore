@@ -1,6 +1,8 @@
 from django.contrib import admin
 
-from olympic.models import OlympicRound, Category, OlympicSessionRound, Match, Result, Seeding
+from olympic.models import (
+    Category, Match, OlympicRound, OlympicSessionRound, Result, Seeding,
+)
 
 
 class MatchAdmin(admin.ModelAdmin):

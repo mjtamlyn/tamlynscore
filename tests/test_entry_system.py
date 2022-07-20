@@ -6,7 +6,7 @@ from entries.forms import ArcherSearchForm, EntryCreateForm
 from entries.models import CompetitionEntry
 
 from . import factories
-from .cases import ViewCase, LoggedInViewCase
+from .cases import LoggedInViewCase, ViewCase
 
 
 class CompetitionViewCase(ViewCase):

@@ -1,8 +1,8 @@
 from django.core.management import BaseCommand
 
-from olympic.models import OlympicSessionRound, Seeding, Result, Match
-
 import xlrd
+
+from olympic.models import Match, OlympicSessionRound, Result, Seeding
 
 
 class Command(BaseCommand):

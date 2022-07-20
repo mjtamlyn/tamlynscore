@@ -1,14 +1,20 @@
 import csv
 import io
 
+from django import forms
 from django.core.cache import cache
 from django.db import transaction
-from django import forms
 
-from core.models import Archer, Bowstyle, Club, County, Round, NOVICE_CHOICES, AGE_CHOICES, WA_AGE_CHOICES, AGB_AGE_CHOICES, JUNIOR_MASTERS_AGE_CHOICES
-from scores.result_modes import get_result_modes, ByRound
+from core.models import (
+    AGB_AGE_CHOICES, AGE_CHOICES, JUNIOR_MASTERS_AGE_CHOICES, NOVICE_CHOICES,
+    WA_AGE_CHOICES, Archer, Bowstyle, Club, County, Round,
+)
+from scores.result_modes import ByRound, get_result_modes
 
-from .models import Tournament, Competition, CompetitionEntry, Session, SessionRound, SessionEntry, SCORING_SYSTEMS, SCORING_FULL
+from .models import (
+    SCORING_FULL, SCORING_SYSTEMS, Competition, CompetitionEntry, Session,
+    SessionEntry, SessionRound, Tournament,
+)
 
 
 class CompetitionForm(forms.Form):

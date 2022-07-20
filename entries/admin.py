@@ -1,6 +1,9 @@
 from django.contrib import admin
 
-from entries.models import Tournament, Sponsor, Competition, ResultsMode, Session, SessionRound, CompetitionEntry, SessionEntry, TargetAllocation
+from entries.models import (
+    Competition, CompetitionEntry, ResultsMode, Session, SessionEntry,
+    SessionRound, Sponsor, TargetAllocation, Tournament,
+)
 
 
 class CompetitionAdmin(admin.ModelAdmin):

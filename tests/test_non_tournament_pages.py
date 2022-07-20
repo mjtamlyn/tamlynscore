@@ -5,7 +5,7 @@ from django.utils.http import urlencode
 from core.models import Archer, Club
 
 from . import factories
-from .cases import ViewCase, LoggedInViewCase
+from .cases import LoggedInViewCase, ViewCase
 
 
 class TestIndex(ViewCase, TestCase):

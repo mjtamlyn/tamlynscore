@@ -1,12 +1,12 @@
 from django.utils import timezone
 
-from core import models as core_models
-from entries import models as entries_models
-from scores.result_modes import ByRound
-
 import factory
 from factory import fuzzy
 from factory.django import DjangoModelFactory
+
+from core import models as core_models
+from entries import models as entries_models
+from scores.result_modes import ByRound
 
 
 class UserFactory(DjangoModelFactory):

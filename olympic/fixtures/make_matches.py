@@ -1,6 +1,5 @@
 from olympic.models import OlympicSessionRound
 
-
 # OA 2014
 gr, lr, gc, lc = OlympicSessionRound.objects.all()[21:]
 

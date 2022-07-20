@@ -2,7 +2,6 @@ from django.urls import path
 
 from . import views
 
-
 urlpatterns = [
     path('', views.LeagueList.as_view(), name='league-list'),
     path('<slug:league_slug>/', views.LeagueDetail.as_view(), name='league-detail'),

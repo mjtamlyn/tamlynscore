@@ -1,9 +1,9 @@
+from itertools import groupby
+
 from django.db import models
 from django.utils.functional import cached_property
 
-from entries.models import SCORING_FULL, SCORING_DOZENS, TargetAllocation
-
-from itertools import groupby
+from entries.models import SCORING_DOZENS, SCORING_FULL, TargetAllocation
 
 
 class ScoreManager(models.Manager):

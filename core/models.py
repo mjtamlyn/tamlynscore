@@ -6,7 +6,6 @@ from django.urls import reverse
 
 from custom_user.models import AbstractEmailUser
 
-
 DISTANCE_UNITS = (
     ('m', 'metres'),
     ('y', 'yards'),

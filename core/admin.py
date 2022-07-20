@@ -3,7 +3,9 @@ from django.contrib import admin
 from custom_user.admin import EmailUserAdmin
 from custom_user.forms import EmailUserCreationForm
 
-from core.models import User, Country, Region, County, Club, Archer, Bowstyle, Round, Subround
+from core.models import (
+    Archer, Bowstyle, Club, Country, County, Region, Round, Subround, User,
+)
 
 
 class UserCreationForm(EmailUserCreationForm):

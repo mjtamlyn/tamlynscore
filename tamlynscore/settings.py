@@ -2,7 +2,6 @@ import os
 
 import dj_database_url
 
-
 BASE_DIR = os.path.dirname(os.path.dirname(__file__))
 
 DEBUG = not os.environ.get('PRODUCTION')

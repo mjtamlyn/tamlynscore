@@ -1,6 +1,6 @@
 from django import forms
 
-from scores.models import Arrow, Score, Dozen
+from scores.models import Arrow, Dozen, Score
 
 
 class RetiringForm(forms.ModelForm):

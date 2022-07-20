@@ -7,7 +7,7 @@ from optparse import make_option
 
 from django.core.management import BaseCommand
 
-from core.models import Archer, Club, Bowstyle
+from core.models import Archer, Bowstyle, Club
 from entries.models import Competition, SessionRound, TargetAllocation
 
 

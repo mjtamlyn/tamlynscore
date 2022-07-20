@@ -8,7 +8,7 @@ from entries.models import Competition
 
 from .factories import (
     CompetitionFactory, ResultsModeFactory, RoundFactory, SessionRoundFactory,
-    TournamentFactory
+    TournamentFactory,
 )
 
 

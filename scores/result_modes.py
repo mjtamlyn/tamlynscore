@@ -1,9 +1,9 @@
-from collections import OrderedDict
 import itertools
 import json
+from collections import OrderedDict
 
 from django.core.exceptions import ImproperlyConfigured
-from django.db import models, connection
+from django.db import connection, models
 
 
 class ScoreMock(object):
@@ -170,7 +170,7 @@ class BaseResultMode(object):
         return self.subrounds[shot_round]
 
     def score_details(self, score, section):
-        from entries.models import SCORING_TOTALS, SCORING_DOZENS, SCORING_FULL
+        from entries.models import SCORING_DOZENS, SCORING_FULL, SCORING_TOTALS
         scores = []
         if self.include_distance_breakdown:
             shot_round = score.target.session_entry.session_round.shot_round

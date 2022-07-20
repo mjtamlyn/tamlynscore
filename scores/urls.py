@@ -2,7 +2,6 @@ from django.urls import path
 
 from scores import views
 
-
 urlpatterns = [
     path('<slug:slug>/input-scores/', views.InputScores.as_view(), name='input_scores'),
     path('<slug:slug>/input-scores/mobile/', views.InputScoresMobile.as_view(), name='input_scores_mobile'),

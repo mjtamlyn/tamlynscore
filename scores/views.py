@@ -1,31 +1,35 @@
 import copy
 import csv
-from itertools import groupby
 import functools
 import math
+from itertools import groupby
 
 from django.conf import settings
 from django.core.cache import cache
 from django.db.models import Count, Max
-from django.http import HttpResponse, HttpResponseRedirect, Http404
-from django.shortcuts import render, get_object_or_404
-from django.views.generic import View, ListView, TemplateView
+from django.http import Http404, HttpResponse, HttpResponseRedirect
+from django.shortcuts import get_object_or_404, render
 from django.urls import reverse
+from django.views.generic import ListView, TemplateView, View
 
 from reportlab.lib import colors
 from reportlab.lib.styles import getSampleStyleSheet
 from reportlab.lib.units import inch
-from reportlab.platypus import SimpleDocTemplate, Spacer, Table, TableStyle, Paragraph
+from reportlab.platypus import (
+    Paragraph, SimpleDocTemplate, Spacer, Table, TableStyle,
+)
 from reportlab.rl_config import defaultPageSize
 
 from core.models import County
-from entries.models import Competition, SessionRound, CompetitionEntry, ResultsMode
-from entries.views import TargetList, CompetitionMixin
+from entries.models import (
+    Competition, CompetitionEntry, ResultsMode, SessionRound,
+)
+from entries.views import CompetitionMixin, TargetList
 from olympic.models import OlympicSessionRound
 
 from .forms import get_arrow_formset, get_dozen_formset
-from .models import Score, Arrow, Dozen
-from .result_modes import get_mode, ByRound
+from .models import Arrow, Dozen, Score
+from .result_modes import ByRound, get_mode
 
 
 class InputScores(TargetList):

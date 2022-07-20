@@ -2,10 +2,12 @@ import math
 
 from django.db import models
 
-from core.models import Archer, Bowstyle, Club, County, Round, AGE_CHOICES, WA_AGE_CHOICES, AGB_AGE_CHOICES, JUNIOR_MASTERS_AGE_CHOICES, NOVICE_CHOICES
+from core.models import (
+    AGB_AGE_CHOICES, AGE_CHOICES, JUNIOR_MASTERS_AGE_CHOICES, NOVICE_CHOICES,
+    WA_AGE_CHOICES, Archer, Bowstyle, Club, County, Round,
+)
 from scores.result_modes import get_result_modes
 from tamlynscore.utils import generate_slug
-
 
 SCORING_FULL = 'F'
 SCORING_DOZENS = 'D'
