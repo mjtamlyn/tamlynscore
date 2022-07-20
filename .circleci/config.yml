@@ -7,9 +7,7 @@ references:
 
     container_config: &container_config
         docker:
-            # Currently no tag for 3.6.4 without browsers
-            # Node version is v8.9.2
-            - image: circleci/python:3.6.4-node-browsers
+            - image: cimg/python:3.9
               environment:
                   PIPENV_VENV_IN_PROJECT: "true"
                   PIPENV_IGNORE_VIRTUALENVS: "true"
