@@ -475,15 +475,15 @@ class ByRound(BaseResultMode):
                 categories = [category]
             else:
                 categories = self.get_categories_for_entry(competition, session_entry.competition_entry)
-            for category in categories:
-                if category not in results:
-                    results[category] = []
-                results[category].append(score)
-        for category in results:
-            results[category] = self.sort_results(results[category])
-            for i, score in enumerate(results[category]):
+            for cat in categories:
+                if cat not in results:
+                    results[cat] = []
+                results[cat].append(score)
+        for cat in results:
+            results[cat] = self.sort_results(results[cat])
+            for i, score in enumerate(results[cat]):
                 if not self.leaderboard and score.score == 0:
-                    results[category][i] = ScoreMock(
+                    results[cat][i] = ScoreMock(
                         target=score.target,
                         score='DNS',
                         hits='',
