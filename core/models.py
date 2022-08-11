@@ -39,10 +39,11 @@ AGE_CHOICES = (
 )
 
 WA_AGE_CHOICES = (
-    ('C', 'Cadet'),
-    ('J', 'Junior'),
-    ('', 'Senior'),  # Map senior to '' as we never really print it
-    ('M', 'Master'),
+    ('C', 'U18'),
+    ('J', 'U21'),
+    ('', 'Adult'),  # Map senior to '' as we never really print it
+    ('M', '50+'),
+    ('N', '65+'),
 )
 
 JUNIOR_MASTERS_AGE_CHOICES = (
