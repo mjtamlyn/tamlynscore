@@ -319,6 +319,7 @@ class TargetList(CompetitionMixin, ListView):
     template_name = 'entries/target_list.html'
     model = TargetAllocation
     admin_required = False
+    editable = False
 
     def get_queryset(self):
         return self.model.objects.filter(
@@ -443,13 +444,16 @@ class TargetList(CompetitionMixin, ListView):
         self.add_unallocated_entries(target_list)
 
         context.update({
-            'target_list': target_list
+            'target_list': target_list,
+            'editable': self.editable,
         })
         return context
 
 
 class TargetListEdit(TargetList):
     template_name = 'entries/target_list_edit.html'
+    admin_required = True
+    editable = True
 
     def post(self, request, slug):
         data = json.loads(request.body.decode('utf-8'))

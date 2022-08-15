@@ -1,4 +1,4 @@
-{% extends 'entries/competition_detail.html' %}
+{% extends 'entries/target_list.html' %}
 
 {% block extrastyles %}
 <link rel="stylesheet" href="{{ STATIC_URL }}lib/select2/css/select2.min.css">
@@ -11,31 +11,7 @@
 <script src="{{ STATIC_URL }}js/target_list.js"></script>
 {% endblock scripts %}
 
-{% block competition_content %}
-<div class="{% block moduleclass %}target-list{% endblock %} module">
-    <h4>{% block title %}Manage Target List{% endblock %}</h4>
-
-    {% block main %}
-    <div class="row">
-        <div class="col6">
-            Sessions:
-            <ul>
-                {% for session, details in target_list.items %}
-                <li>
-                <span>{{ session.start|date:"l, jS F - f a" }}</span>
-                {% if details.entries|length %}
-                <span class="unallocated" title="Unallocated entries">{{ details.entries|length }}</span>
-                {% endif %}
-                <a class="btn btn-small edit" href="#session-{{ session.pk }}">Edit</a>
-                </li>
-                {% endfor %}
-            </ul>
-            <p>
-                <a class="btn" href="{% url 'target_list_pdf' slug=competition.slug %}">View PDF</a>
-            </p>
-        </div>
-    </div>
-
+{% block target_list %}
     <div class="row row--flex">
     {% for session, details in target_list.items %}
     <div class="session col{% if target_list|length == 2 %}3{% else %}2{% endif %}" id="session-{{ session.pk }}" data-archers="{{ details.entries_json }}">
@@ -120,6 +96,5 @@
         {% endif %}
     </div>
     {% endfor %}
-    {% endblock %}
 </div>
 {% endblock %}

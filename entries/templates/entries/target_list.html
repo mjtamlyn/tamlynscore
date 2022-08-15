@@ -7,22 +7,17 @@
     {% block main %}
     <div class="row">
         <div class="col6">
-            Sessions:
-            <ul>
-                {% for session, details in target_list.items %}
-                <li>
-                <span>{{ session.start|date:"l, jS F - f a" }}</span>
-                {% endfor %}
-            </ul>
             <p>
-                <a class="btn" href="{% url 'target_list_pdf' slug=competition.slug %}">View PDF</a>
-                {% if competition_admin %}
+                <a class="btn" href="{% url 'target_list_pdf' slug=competition.slug %}">View PDF (by round)</a>
+                <a class="btn" href="{% url 'target_list_pdf' slug=competition.slug %}?by_session=1">View PDF (by session)</a>
+                {% if competition_admin and not editable %}
                     <a class="btn edit" href="{% url 'target_list_edit' slug=competition.slug %}">Edit</a>
                 {% endif %}
             </p>
         </div>
     </div>
 
+    {% block target_list %}
     <div class="row row--flex">
     {% for session, details in target_list.items %}
     <div class="session col{% if target_list|length == 2 %}3{% else %}2{% endif %}" id="session-{{ session.pk }}" data-archers="{{ details.entries_json }}">
@@ -69,6 +64,7 @@
         {% endfor %}
     </div>
     {% endfor %}
+    {% endblock %}
     {% endblock %}
 </div>
 {% endblock %}
