@@ -633,7 +633,7 @@ class OlympicTreeMixin(object):
                             table_data[blocks[m][1] - 1][i] = qualified_seeds[1].seed.seed
                             table_data[blocks[m][1] - 1][i + 1] = qualified_seeds[1].seed.label()
 
-                if self.total_levels >= 3 and level == 1:
+                if self.total_levels >= 2 and level == 1:
                     if self.total_levels == 3:
                         table_data.append([None for i in range(self.cols)])
                         table_data.append([None for i in range(self.cols)])
@@ -646,6 +646,9 @@ class OlympicTreeMixin(object):
                     bronze = bronze[0]
                     results = bronze.result_set.select_related()
                     results = sorted(results, key=lambda r: Match.objects._effective_seed(r.seed.seed, level))
+                    if self.total_levels == 2:
+                        table_data.append([''] * len(table_data[-1]))
+                        table_data.append([''] * len(table_data[-1]))
                     table_data[-2][-2] = '              ' * 2
                     table_data[-2][-1] = 'Target: ' + str(bronze.target)
                     table_data[-1][-1] = 'Target: ' + str(bronze.target)

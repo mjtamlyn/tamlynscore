@@ -3,6 +3,10 @@
 {% block competition_content %}
 <h2>Head to Head Results</h2>
 
+<p>
+<a class="btn" href="{% url 'olympic_tree_pdf' slug=competition.slug %}">PDF</a>
+</p>
+
 {% for round in rounds %}
     <h3>{{ round.round.shot_round }} - {{ round.round.category }}</h3>
     <table class="tree">
