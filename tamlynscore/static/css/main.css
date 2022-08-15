@@ -5594,6 +5594,26 @@ body {
   cursor: pointer;
 }
 
+/* line 1, ../../sass/_score_sheets.sass */
+.score-sheets-set {
+  margin: 0 0 15px;
+  justify-content: space-around;
+  text-align: center;
+}
+
+/* line 5, ../../sass/_score_sheets.sass */
+.score-sheets-block {
+  padding: 15px;
+}
+/* line 7, ../../sass/_score_sheets.sass */
+.score-sheets-block-100 {
+  width: 100%;
+}
+/* line 9, ../../sass/_score_sheets.sass */
+.score-sheets-block > h4 {
+  margin-top: 0;
+}
+
 /* line 1, ../../sass/_olympic.sass */
 table.field-plan {
   margin: 15px 0;

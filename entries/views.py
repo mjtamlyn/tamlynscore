@@ -4,6 +4,7 @@ import functools
 import itertools
 import json
 import math
+import re
 
 from django.db.models import Prefetch
 from django.http import (
@@ -498,6 +499,17 @@ class ScoreSheets(CompetitionMixin, ListView):
             session__competition=self.competition,
         ).select_related('session', 'shot_round', 'session__competition__tournament').order_by('session__start', 'shot_round_id')
 
+    def get_context_data(self, **kwargs):
+        context = super().get_context_data(**kwargs)
+        by_session = collections.OrderedDict()
+        for sr in self.object_list:
+            if sr.session in by_session:
+                by_session[sr.session].append(sr)
+            else:
+                by_session[sr.session] = [sr]
+        context['by_session'] = by_session
+        return context
+
 
 # PDF views
 
@@ -802,20 +814,34 @@ class SessionScoreSheetsPdf(ScoreSheetsPdf):
         target_list = self.session.target_list()
 
         elements = []
+        current_target = 0
+        current_target_elements = []
+        current_shot_round = None
 
         for target, entry in target_list:
-            if not entry:
+            if not entry and not current_shot_round:
                 continue
-            shot_round = entry.session_entry.session_round.shot_round
+            target_number = re.match(r'\d+', target).group(0)
+            if target_number != current_target:
+                current_target = target_number
+                elements.append(KeepTogether(current_target_elements))
+                current_target_elements = []
+            if entry:
+                shot_round = entry.session_entry.session_round.shot_round
+                if shot_round != current_shot_round:
+                    current_shot_round = shot_round
+            else:
+                shot_round = current_shot_round
             table_data = self.header_table_for_entry(target, entry)
-            header_table = Table(table_data, [0.4 * inch, 2.5 * inch, 4 * inch])
+            header_table = Table(table_data, [0.6 * inch, 2.5 * inch, 4 * inch])
             sheet_elements = [
+                self.spacer,
                 self.Para(shot_round, 'h1'),
                 self.spacer,
                 header_table,
                 self.spacer,
             ] + templates[shot_round]
-            elements.append(KeepTogether(sheet_elements))
+            current_target_elements.append(KeepTogether(sheet_elements))
         elements.append(PageBreak())
 
         return elements

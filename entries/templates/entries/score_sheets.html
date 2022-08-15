@@ -2,15 +2,25 @@
 
 {% block competition_content %}
 <div class="score-sheets module">
-    <h4>Score Sheets</h4>
-    <ul>
-        {% for round in object_list %}
-        {% ifchanged round.session %}
-            <a href="{% url 'session_score_sheets_pdf' slug=competition.slug session_id=round.session.pk %}"><li><em>{{ round.session }} Score Sheets</em></li></a>
-        {% endifchanged %}
-        <a href="{% url 'score_sheets_pdf' slug=competition.slug round_id=round.pk %}"><li>{{ round.shot_round }} Score Sheet - {{ round.session.start }}</li></a>
-        <a href="{% url 'running_slips_pdf' slug=competition.slug round_id=round.pk %}"><li>{{ round.shot_round }} Running Slips - {{ round.session.start }}</li></a>
-        {% endfor %}
-    </ul>
+    <h3>Score Sheets</h3>
+    {% for session, rounds in by_session.items %}
+        <h4>{{ session.start|date:"dS F, g:i a" }}</h4>
+        <div class="flex score-sheets-set">
+            {% for round in rounds %}
+                <div class="score-sheets-block">
+                    <h4>{{ round.shot_round }}</h4>
+                    <a class="btn" href="{% url 'score_sheets_pdf' slug=competition.slug round_id=round.pk %}">Score sheets</a>
+                    <a class="btn" href="{% url 'running_slips_pdf' slug=competition.slug round_id=round.pk %}">Running slips</a>
+                </div>
+            {% endfor %}
+            {% if rounds|length > 1 %}
+            <div class="score-sheets-block score-sheets-block-100">
+                <a class="btn" href="{% url 'session_score_sheets_pdf' slug=competition.slug session_id=session.pk %}">Full session sheets</a>
+                <br>
+                <small><em>Only use this if you have mixed rounds on the same targets</em></small>
+            </div>
+            {% endif %}
+        </div>
+    {% endfor %}
 </div>
 {% endblock %}
