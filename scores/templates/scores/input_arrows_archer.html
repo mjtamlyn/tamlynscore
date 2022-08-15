@@ -2,27 +2,32 @@
 
 {% block competition_content %}
 <div class="module input-arrows">
-    <h4>Scoresheet for {{ entry }} - {{ score.target.boss }}{{ score.target.target }}</h4>
-    <table class="target">
+    <h2>Scoresheet for {{ entry.competition_entry.archer }}<h2>
+    <h3>{{ score.target.boss }}{{ score.target.target }} - {{ round }}</h3>
+    <table class="score-sheet">
 
-        <tr>
-            <td colspan="{% if layout.0.scores|length > 6 %}6{% else %}{{ forms.0.forms|length }}{% endif %}"></td>
-            {% if forms.0.forms|length > 6 %}
-            <th>ET</th>
-            <td colspan="6"></td>
-            <th>ET</th>
-            {% endif %}
-            <th>Doz</th>
-            {% if not round.has_xs %}
-            <th>Hits</th>
-            {% endif %}
-            <th>Golds</th>
-            {% if round.has_xs %}
-            <th>Xs</th>
-            {% endif %}
-            <th>RT<th>
-            <td></td>
-        </tr>
+        <thead>
+            <tr>
+                <td colspan="{% if layout.0.scores|length > 6 %}6{% else %}{{ forms.0.forms|length }}{% endif %}"></td>
+                {% if layout.0.scores|length > 6 %}
+                <th>ET</th>
+                <td colspan="6"></td>
+                <th>ET</th>
+                {% endif %}
+                <th>Doz</th>
+                {% if not round.has_xs %}
+                <th>Hits</th>
+                {% endif %}
+                <th>Golds</th>
+                {% if round.has_xs %}
+                <th>Xs</th>
+                {% endif %}
+                <th>RT</th>
+                {% if competition_admin %}
+                <td></td>
+                {% endif %}
+            </tr>
+        </thead>
         {% for dozen in layout %}
         <tr>
             {% for arrow in dozen.scores %}
@@ -41,12 +46,14 @@
             <th>{{ dozen.xs }}</th>
             {% endif %}
             <th>{{ dozen.rt }}</th>
-            <td><small><a href="{% url 'input_arrows' slug=competition.slug session_id=entry.session_round.session_id dozen=forloop.counter boss=score.target.boss %}">Edit</a></small></td>
+            {% if competition_admin %}
+            <td><a class="btn btn-small" href="{% url 'input_arrows' slug=competition.slug session_id=entry.session_round.session_id dozen=forloop.counter boss=score.target.boss %}">Edit</a></td>
+            {% endif %}
         </tr>
         {% endfor %}
-        <tr>
+        <tr class="footer">
             <td colspan="{{ layout.0.scores|length }}"></td>
-            <th colspan="2">Totals</th>
+            <th class="no-left-border" colspan="2">Totals</th>
             <th>{{ score.score }}</th>
             {% if not round.has_xs %}
             <th>{{ score.hits }}</th>
@@ -54,6 +61,10 @@
             <th>{{ score.golds }}</th>
             {% if round.has_xs %}
             <th>{{ score.xs }}</th>
+            {% endif %}
+            <td></td>
+            {% if competition_admin %}
+            <td></td>
             {% endif %}
         </tr>
     </table>

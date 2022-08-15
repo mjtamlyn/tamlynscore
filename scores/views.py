@@ -179,11 +179,11 @@ class InputArrowsViewMobile(InputArrowsView):
     next_url_name = 'input_scores_mobile'
 
 
-class InputArrowsArcher(TemplateView):
+class InputArrowsArcher(CompetitionMixin, TemplateView):
     template_name = 'scores/input_arrows_archer.html'
+    admin_required = False
 
     def get_context_data(self, **kwargs):
-        competition = get_object_or_404(Competition, slug=self.kwargs['slug'])
         score = Score.objects.get(pk=self.kwargs['score_id'])
         entry = score.target.session_entry
         round = entry.session_round.shot_round
@@ -218,13 +218,14 @@ class InputArrowsArcher(TemplateView):
         for dozen in layout:
             rt += dozen['doz']
             dozen['rt'] = rt
-        return {
-            'competition': competition,
+        context = super().get_context_data(**kwargs)
+        context.update({
             'entry': entry,
             'layout': layout,
             'score': score,
             'round': round,
-        }
+        })
+        return context
 
 
 class InputDozens(CompetitionMixin, TemplateView):
