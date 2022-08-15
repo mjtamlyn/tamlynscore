@@ -353,13 +353,16 @@ class PDFResultsRenderer(object):
     PAGE_HEIGHT = defaultPageSize[1]
     PAGE_WIDTH = defaultPageSize[0]
 
+    def set_styles(self):
+        self.styles = getSampleStyleSheet()
+        self.styles['h1'].alignment = 1
+        self.styles['h2'].alignment = 1
+
     def render_to_pdf(self, context):
         response = HttpResponse(content_type='application/pdf')
         self.page_width, self.page_height = defaultPageSize
         doc = SimpleDocTemplate(response, pagesize=defaultPageSize)
-        self.styles = getSampleStyleSheet()
-        self.styles['h1'].alignment = 1
-        self.styles['h2'].alignment = 1
+        self.set_styles()
         elements = self.get_elements(context['results'])
         if self.competition.sponsors.exists():
             doc.bottomMargin = 1.5 * inch

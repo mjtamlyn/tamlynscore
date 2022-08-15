@@ -12,4 +12,5 @@ urlpatterns = [
     path('<slug:slug>/tree/', views.OlympicTree.as_view(), name='olympic_tree'),
     path('<slug:slug>/tree/pdf/', views.OlympicTreePdf.as_view(), name='olympic_tree_pdf'),
     path('<slug:slug>/field-plan/', views.FieldPlan.as_view(), name='olympic_field_plan'),
+    path('<slug:slug>/combined-pdf/', views.CombinedPdf.as_view(), name='olympic_combined_pdf'),
 ]

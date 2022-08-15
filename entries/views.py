@@ -569,14 +569,19 @@ class HeadedPdfView(PdfView):
     title_position = 70
     do_sponsors = True
 
-    def draw_title(self, canvas, doc):
+    def draw_title(self, canvas, doc, invert_dimensions=False):
         canvas.saveState()
         canvas.setFont('Helvetica-Bold', 18)
         if self.title:
             title = u'{0}: {1}'.format(self.competition, self.title)
         else:
             title = str(self.competition)
-        canvas.drawCentredString(self.PAGE_WIDTH / 2.0, self.PAGE_HEIGHT - self.title_position, title)
+        width = self.PAGE_WIDTH
+        height = self.PAGE_HEIGHT
+        if invert_dimensions:
+            width = self.PAGE_HEIGHT
+            height = self.PAGE_WIDTH
+        canvas.drawCentredString(width / 2.0, height - self.title_position, title)
 
         if self.do_sponsors:
             sponsors = self.competition.sponsors.all()

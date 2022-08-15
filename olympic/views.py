@@ -1,5 +1,7 @@
+import functools
+
 from django.db.models import Max, Prefetch
-from django.http import HttpResponseRedirect
+from django.http import HttpResponse, HttpResponseRedirect
 from django.shortcuts import get_object_or_404, redirect
 from django.urls import reverse
 from django.views.generic import DetailView, FormView, TemplateView
@@ -7,7 +9,8 @@ from django.views.generic import DetailView, FormView, TemplateView
 from reportlab.lib import colors
 from reportlab.lib.units import inch
 from reportlab.platypus import (
-    KeepTogether, PageBreak, Spacer, Table, TableStyle,
+    BaseDocTemplate, Frame, KeepTogether, NextPageTemplate, PageBreak,
+    PageTemplate, Spacer, Table, TableStyle,
 )
 from reportlab.rl_config import defaultPageSize
 
@@ -16,7 +19,7 @@ from olympic.forms import ResultForm, SetupForm
 from olympic.models import Match, OlympicSessionRound, Result, Seeding
 from scores.models import Score
 from scores.result_modes import H2HSeedings
-from scores.views import ResultModeMixin
+from scores.views import ResultModeMixin, Results
 
 
 class OlympicMixin(CompetitionMixin):
@@ -865,3 +868,49 @@ class FieldPlan(FieldPlanMixin, HeadedPdfView):
                 if not target:
                     table_style.append(('BACKGROUND', (i, j), (i, j), colors.lightgrey))
         return table_style
+
+
+class CombinedPdf(CompetitionMixin, HeadedPdfView):
+    title = 'Results'
+
+    def get(self, request, **kwargs):
+        self.set_options(**kwargs)
+
+        response = HttpResponse(content_type='application/pdf')
+        doc = self.get_doc(response)
+        elements = []
+
+        modes = self.competition.result_modes.filter(leaderboard_only=False)
+
+        for mode in modes:
+            seedings_view = Results(competition=self.competition, is_admin=self.is_admin, request=None, kwargs={'mode': mode.mode, 'format': 'pdf'})
+            seedings_view.format = seedings_view.get_format()
+            seedings_view.mode = seedings_view.get_mode()
+            seedings_view.object_list = seedings_view.get_queryset()
+            seedings_view.set_styles()
+            context = seedings_view.get_context_data(object_list=seedings_view.object_list)
+            elements += seedings_view.get_elements(context['results'])
+            elements.append(PageBreak())
+
+        results_view = OlympicResults(competition=self.competition)
+        results_view.doc = doc
+        results_view.update_style()
+        elements += results_view.get_elements()
+
+        elements.append(NextPageTemplate('Landscape'))
+        tree_view = OlympicTreePdf(competition=self.competition)
+        elements += tree_view.get_elements()
+
+        doc.build(elements)
+        return response
+
+    def get_doc(self, response):
+        doc = BaseDocTemplate(response, pagesize=(self.PAGE_WIDTH, self.PAGE_HEIGHT))
+        doc._calc()
+        portrait_frame = Frame(inch, inch, doc.width, doc.height, id='normal')
+        landscape_frame = Frame(inch, inch, doc.height, doc.width, id='landscape')
+        doc.addPageTemplates([
+            PageTemplate(id='Portrait', frames=portrait_frame, onPage=self.draw_title, pagesize=doc.pagesize),
+            PageTemplate(id='Landscape', frames=landscape_frame, onPage=functools.partial(self.draw_title, invert_dimensions=True), pagesize=[doc.pagesize[1], doc.pagesize[0]]),
+        ])
+        return doc
