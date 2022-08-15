@@ -1,7 +1,7 @@
 {% extends 'olympic_index.html' %}
 
 {% block olympic_content %}
-<h4>{{ round }}</h4>
+<h3>{{ round.category.name }} - {{ round.shot_round.short_name }}</h3>
 
 <table>
     <tr>

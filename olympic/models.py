@@ -40,6 +40,9 @@ class OlympicRound(models.Model):
             return 4
         return 5
 
+    def short_name(self):
+        return '{}m ({})'.format(self.distance, self.get_match_type_display())
+
     def __str__(self):
         return '{} Olympic Round at {}m ({})'.format(self.get_team_type_display(), self.distance, self.get_match_type_display())
 

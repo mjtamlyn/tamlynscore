@@ -9,21 +9,32 @@
 {% block competition_content %}
 <div class="module olympic">
     <h2>Head to Heads</h2>
-    <p>
-        <a class="btn" href="{% url 'olympic_index' slug=competition.slug %}">Home</a>
-        <a class="btn" href="{% url 'olympic_setup' slug=competition.slug %}">Setup</a>
-        <a class="btn" href="{% url 'olympic_field_plan' slug=competition.slug %}">Field plan</a>
-        <a class="btn" href="{% url 'olympic_tree' slug=competition.slug %}">Tree</a>
-        <a class="btn" href="{% url 'olympic_results' slug=competition.slug %}">Results</a>
-    </p>
-    {% for round in rounds %}
-    <p>
-        {{ round }}<br>
-        <a class="btn" href="{% url 'olympic_score_sheet' slug=competition.slug round_id=round.pk %}">Score sheets</a>
-        <a class="btn" href="{% url 'olympic_input_index' slug=competition.slug round_id=round.pk %}">Enter scores</a>
-    </p>
-    {% endfor %}
+    <div class="row">
+        <div class="col2">
+            <h3>Setup</h3>
+            <p><a class="btn" href="{% url 'olympic_index' slug=competition.slug %}">Home / Confirm seedings</a></p>
+            <p><a class="btn" href="{% url 'olympic_setup' slug=competition.slug %}">Setup field plan</a></p>
+            <p><a class="btn" href="{% url 'olympic_tree' slug=competition.slug %}">Tree (public)</a></p>
+            <h3>Downloads</h3>
+            <p><a class="btn" href="{% url 'olympic_field_plan' slug=competition.slug %}">Field plan</a></p>
+            <p><a class="btn" href="{% url 'olympic_tree_pdf' slug=competition.slug %}">Tree</a></p>
+            <p><a class="btn" href="{% url 'olympic_results' slug=competition.slug %}">Results</a></p>
+        </div>
+        <div class="col2">
+            <h3>Score sheets</h3>
+            {% for round in rounds %}
+            <p><a class="btn" href="{% url 'olympic_score_sheet' slug=competition.slug round_id=round.pk %}">{{ round.category.name }} - {{ round.shot_round.short_name }}</a></p>
+            {% endfor %}
+        </div>
+        <div class="col2">
+            <h3>Score entry</h3>
+            {% for round in rounds %}
+            <p><a class="btn" href="{% url 'olympic_input_index' slug=competition.slug round_id=round.pk %}">{{ round.category.name }} - {{ round.shot_round.short_name }}</a></p>
+            {% endfor %}
+        </div>
+    </div>
     {% block olympic_content %}
+    <h3>Seedings</h3>
     {% include 'scores/_leaderboard.html' with include_confirmation_form=True %}
     {% endblock %}
 </div>
