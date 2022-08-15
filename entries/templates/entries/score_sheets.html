@@ -2,9 +2,9 @@
 
 {% block competition_content %}
 <div class="score-sheets module">
-    <h3>Score Sheets</h3>
+    <h2>Score Sheets</h2>
     {% for session, rounds in by_session.items %}
-        <h4>{{ session.start|date:"dS F, g:i a" }}</h4>
+        <h3>{{ session.start|date:"dS F, g:i a" }}</h3>
         <div class="flex score-sheets-set">
             {% for round in rounds %}
                 <div class="score-sheets-block">

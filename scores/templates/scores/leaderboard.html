@@ -4,6 +4,7 @@
 {% block title %}{{ title }} - {{ mode }}{% endblock %}
 
 {% block competition_content %}
+<h2>{% if leaderboard %}Leaderboard{% else %}Results{% endif %} - {{ mode }}</h2>
 <p>
     <a href="{% url url_name slug=competition.slug mode=mode.slug format='pdf' %}" class="btn">PDF</a>
     <a href="{% url url_name slug=competition.slug mode=mode.slug format='pdf-summary' %}" class="btn">PDF (top 8 only)</a>

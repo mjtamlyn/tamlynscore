@@ -576,6 +576,7 @@ class Leaderboard(ResultModeMixin, CompetitionMixin, PDFResultsRenderer, CSVResu
         kwargs['mode'] = self.mode
         kwargs['url_name'] = self.url_name
         kwargs['title'] = self.title
+        kwargs['leaderboard'] = self.leaderboard
         return super(Leaderboard, self).get_context_data(**kwargs)
 
     def get_hide_golds(self):
