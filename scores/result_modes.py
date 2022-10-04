@@ -45,10 +45,10 @@ class ResultCategory(object):
 
     def __str__(self):
         parts = filter(None, [
-            self.junior,
             self.novice,
-            self.gender,
             str(self.bowstyle),
+            self.junior,
+            self.gender,
         ])
         return ' '.join(parts)
 
@@ -403,7 +403,6 @@ class BySession(BaseResultMode):
                 continue
             categories = self.get_categories_for_entry(competition, session_entry.competition_entry)
             for category in categories:
-                category = session_entry.competition_entry.category()
                 if category not in results:
                     results[category] = []
                 results[category].append(score)
@@ -699,7 +698,7 @@ class Team(BaseResultMode):
         team_types = []
         if competition.team_size:
             if competition.split_gender_teams:
-                team_types += ['Gents non-compound', 'Ladies non-compound']
+                team_types += ['Non-compound Men', 'Non-compound Women']
             else:
                 team_types.append('Non-compound')
         if competition.recurve_team_size is not None:
@@ -791,13 +790,13 @@ class Team(BaseResultMode):
             if not competition.novices_in_experienced_teams:
                 return is_non_compound and score.target.session_entry.competition_entry.novice == 'E'
             return is_non_compound
-        if type == 'Gents non-compound':
+        if type == 'Non-compound Men':
             if not competition.novices_in_experienced_teams:
                 return (is_non_compound and
                         score.target.session_entry.competition_entry.novice == 'E' and
                         score.target.session_entry.competition_entry.archer.gender == 'G')
             return is_non_compound and score.target.session_entry.competition_entry.archer.gender == 'G'
-        if type == 'Ladies non-compound':
+        if type == 'Non-compound Women':
             if not competition.novices_in_experienced_teams:
                 return (is_non_compound and
                         score.target.session_entry.competition_entry.novice == 'E' and
@@ -970,25 +969,25 @@ class Weekend(BaseResultMode):
             h2h_results = category.get_results()
             results = []
             for round in all_fita_results:
-                if category.category.gender == 'G' and round.round.name == 'WA 1440 (Gents)':
+                if category.category.gender == 'G' and round.round.name == 'WA 1440 (Men)':
                     fita = round
                     break
-                if category.category.gender == 'L' and round.round.name == 'WA 1440 (Ladies)':
+                if category.category.gender == 'L' and round.round.name == 'WA 1440 (Women)':
                     fita = round
                     break
             for division in all_fita_results[fita]:
                 if 'Compound' in str(category.category) and 'Compound' in division:
-                    if category.category.gender == 'G' and 'Gent' in division:
+                    if category.category.gender == 'G' and 'Men' in division:
                         fita_results = all_fita_results[fita][division]
                         break
-                    if category.category.gender == 'L' and 'Lady' in division:
+                    if category.category.gender == 'L' and 'Women' in division:
                         fita_results = all_fita_results[fita][division]
                         break
                 if 'Recurve' in str(category.category) and 'Recurve' in division:
-                    if category.category.gender == 'G' and 'Gent' in division:
+                    if category.category.gender == 'G' and 'Men' in division:
                         fita_results = all_fita_results[fita][division]
                         break
-                    if category.category.gender == 'L' and 'Lady' in division:
+                    if category.category.gender == 'L' and 'Women' in division:
                         fita_results = all_fita_results[fita][division]
                         break
 

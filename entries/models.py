@@ -306,16 +306,6 @@ class CompetitionEntry(models.Model):
         bowstyle = self.bowstyle.name[0]
         return gender + bowstyle
 
-    def category(self):
-        """TODO: Remove this - used only by Score.objects.results."""
-        junior = 'Junior ' if self.competition.has_juniors and self.age == 'J' else ''
-        novice = 'Novice ' if self.competition.has_novices and self.novice == 'N' else ''
-        if self.competition.has_agb_age_groups and self.agb_age:
-            junior = '%s ' % self.get_agb_age_display()
-        if self.competition.has_junior_masters_age_groups and self.junior_masters_age:
-            junior = '%s ' % self.get_junior_masters_age_display()
-        return u'{2}{3}{0} {1}'.format(self.archer.get_gender_display(), self.bowstyle, junior, novice)
-
     def team_name(self, short_form=True):
         if self.club_id:
             name = self.club.short_name if short_form else self.club.name

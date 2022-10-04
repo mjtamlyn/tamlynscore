@@ -38,11 +38,10 @@
                             {% if entry %}
                                 <p>{{ entry.session_entry.competition_entry.team_name }}</p>
                                 <p>
-                                    <span class="pill bowstyle {{ entry.session_entry.competition_entry.bowstyle|slugify }}">{{ entry.session_entry.competition_entry.bowstyle }}</span>
-                                    <span class="pill gender {{ entry.session_entry.competition_entry.archer.get_gender_display|lower }}">{{ entry.session_entry.competition_entry.archer.get_gender_display }}</span>
                                     {% if competition.has_novices and entry.session_entry.competition_entry.novice == "N" %}
                                     <span class="pill novice">{{ entry.session_entry.competition_entry.get_novice_display }}</span>
                                     {% endif %}
+                                    <span class="pill bowstyle {{ entry.session_entry.competition_entry.bowstyle|slugify }}">{{ entry.session_entry.competition_entry.bowstyle }}</span>
                                     {% if competition.has_juniors and entry.session_entry.competition_entry.age == "J" %}
                                     <span class="pill junior">{{ entry.session_entry.competition_entry.get_age_display }}</span>
                                     {% endif %}
@@ -55,6 +54,7 @@
                                     {% if competition.has_junior_masters_age_groups and entry.session_entry.competition_entry.junior_masters_age %}
                                     <span class="pill junior">{{ entry.session_entry.competition_entry.get_junior_masters_age_display }}</span>
                                     {% endif %}
+                                    <span class="pill gender {{ entry.session_entry.competition_entry.archer.get_gender_display|lower }}">{{ entry.session_entry.competition_entry.archer.get_gender_display }}</span>
                                 </p>
                             {% endif %}
                         </div>

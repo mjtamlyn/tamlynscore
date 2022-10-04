@@ -4072,11 +4072,11 @@ ul.link-list li a:hover {
   border-radius: 0.5em;
 }
 /* line 42, ../../sass/components/_archer_block.sass */
-.pill.gent {
+.pill.men {
   background-color: #A62;
 }
 /* line 44, ../../sass/components/_archer_block.sass */
-.pill.lady {
+.pill.women {
   background-color: #F57;
 }
 /* line 47, ../../sass/components/_archer_block.sass */

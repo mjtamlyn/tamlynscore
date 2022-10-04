@@ -62,38 +62,41 @@ class Category(models.Model):
 
     def code(self):
         code = ''
+        if self.novice:
+            code += self.novice
+        code += ''.join([str(b)[0] for b in self.bowstyles.all()])
         if self.wa_ages:
             code += ''.join(self.wa_ages)
         if self.junior_masters_age:
             code += ''.join(self.junior_masters_age)
-        if self.novice:
-            code += self.novice
         if self.gender:
-            code += self.gender
-        return code + u''.join([str(b)[0] for b in self.bowstyles.all()])
+            code += self.get_gender_display()[0]
+        return code
 
     def short_code(self):
         code = ''
+        if self.novice:
+            code = self.novice
+        code += str(self.bowstyles.all()[0])[0]
         if self.wa_ages:
             code += ''.join(self.wa_ages)
-        if self.novice:
-            code += self.novice
         if self.gender:
-            code += self.gender
-        return code + str(self.bowstyles.all()[0])[0]
+            code += self.get_gender_display()[0]
+        return code
 
     @property
     def name(self):
         name = ''
+        if self.novice:
+            name += self.get_novice_display() + ' '
+        name += u', '.join([str(b) for b in self.bowstyles.all()]) + ' '
         if self.wa_ages:
             name += ', '.join([dict(WA_AGE_CHOICES)[age] for age in self.wa_ages]) + ' '
         if self.junior_masters_age:
             name += self.get_junior_masters_age_display() + ' '
-        if self.novice:
-            name += self.get_novice_display() + ' '
         if self.gender:
             name += self.get_gender_display() + ' '
-        return name + u', '.join([str(b) for b in self.bowstyles.all()])
+        return name.strip()
 
     @property
     def short_name(self):

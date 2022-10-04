@@ -22,8 +22,8 @@ SCORING_TYPES = (
 
 
 GENDER_CHOICES = (
-    ('G', 'Gent'),
-    ('L', 'Lady'),
+    ('G', 'Men'),
+    ('L', 'Women'),
 )
 
 
