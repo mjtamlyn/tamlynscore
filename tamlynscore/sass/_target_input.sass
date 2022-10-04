@@ -1,0 +1,107 @@
+#target-input
+  background-color: $bluegrey
+
+  .header-title
+    height: 44px
+    margin: 0
+    font-size: 22px
+    text-align: right
+    width: 100%
+
+  .full-height-page
+    display: flex
+    flex-direction: column
+    height: calc(100vh - 44px)
+
+  .scoring-header
+    display: flex
+    justify-content: space-between
+    padding: 0 10px
+
+    h3
+      color: white
+
+  .archers
+    display: grid
+    grid-gap: 3px
+
+    &__row
+      padding: 3px 10px
+      background-color: $lightblue
+
+      display: grid
+      grid-template-columns: 30px 1fr auto
+      grid-gap: 3px
+      align-items: baseline
+
+    &__target
+      font-size: 15px
+
+    &__name
+      font-weight: bold
+
+    &__score
+      grid-column-end: span 3
+      display: grid
+      grid-template-columns: repeat(5, 1fr)
+      grid-gap: 3px
+      align-items: baseline
+      text-align: center
+
+      &__total,
+      &__running,
+        font-weight: bold
+
+      &__input
+        border: 1px solid transparent
+        transition: background-color 0.5s, padding 0.5s, border 0.5s
+        height: 100%
+
+    &__row--current
+      .archers__score__input
+        background-color: white
+        border: 1px solid $dark
+        border-radius: 4px
+        padding: 6px 0
+        font-weight: bold
+        
+        &--active
+          box-shadow: 0 0 2px $hlorange inset
+          border-color: $hlorange
+          background-color: $bg-dark
+
+  .input
+    display: grid
+    grid-template-columns: repeat(4, 1fr)
+    grid-template-rows: repeat(3, 1fr)
+    background-color: $bluegrey
+    grid-gap: 5px
+    padding: 5px
+    flex-grow: 1
+
+    &__control
+      font-size: 25px
+      font-weight: bold
+      border-radius: 4px
+      display: flex
+      align-items: center
+      justify-content: center
+
+      &--gold
+        background-color: $wagold
+      &--red
+        background-color: $wared
+        color: white
+      &--blue
+        background-color: $wablue
+      &--black
+        background-color: $wablack
+        color: white
+      &--white
+        background-color: $wawhite
+      &--green
+        background-color: $wagreen
+        color: white
+
+      &--miss
+        grid-column-end: span 2

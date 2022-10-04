@@ -5782,3 +5782,137 @@ table.tree td.border-bottom {
 table.tree td.border-right {
   border-right: 1px solid #bbb;
 }
+
+/* line 1, ../../sass/_target_input.sass */
+#target-input {
+  background-color: #353345;
+}
+/* line 4, ../../sass/_target_input.sass */
+#target-input .header-title {
+  height: 44px;
+  margin: 0;
+  font-size: 22px;
+  text-align: right;
+  width: 100%;
+}
+/* line 11, ../../sass/_target_input.sass */
+#target-input .full-height-page {
+  display: flex;
+  flex-direction: column;
+  height: calc(100vh - 44px);
+}
+/* line 16, ../../sass/_target_input.sass */
+#target-input .scoring-header {
+  display: flex;
+  justify-content: space-between;
+  padding: 0 10px;
+}
+/* line 21, ../../sass/_target_input.sass */
+#target-input .scoring-header h3 {
+  color: white;
+}
+/* line 24, ../../sass/_target_input.sass */
+#target-input .archers {
+  display: grid;
+  grid-gap: 3px;
+}
+/* line 28, ../../sass/_target_input.sass */
+#target-input .archers__row {
+  padding: 3px 10px;
+  background-color: #6FB3FF;
+  display: grid;
+  grid-template-columns: 30px 1fr auto;
+  grid-gap: 3px;
+  align-items: baseline;
+}
+/* line 37, ../../sass/_target_input.sass */
+#target-input .archers__target {
+  font-size: 15px;
+}
+/* line 40, ../../sass/_target_input.sass */
+#target-input .archers__name {
+  font-weight: bold;
+}
+/* line 43, ../../sass/_target_input.sass */
+#target-input .archers__score {
+  grid-column-end: span 3;
+  display: grid;
+  grid-template-columns: repeat(5, 1fr);
+  grid-gap: 3px;
+  align-items: baseline;
+  text-align: center;
+}
+/* line 51, ../../sass/_target_input.sass */
+#target-input .archers__score__total, #target-input .archers__score__running {
+  font-weight: bold;
+}
+/* line 55, ../../sass/_target_input.sass */
+#target-input .archers__score__input {
+  border: 1px solid transparent;
+  transition: background-color 0.5s, padding 0.5s, border 0.5s;
+  height: 100%;
+}
+/* line 61, ../../sass/_target_input.sass */
+#target-input .archers__row--current .archers__score__input {
+  background-color: white;
+  border: 1px solid #000F1F;
+  border-radius: 4px;
+  padding: 6px 0;
+  font-weight: bold;
+}
+/* line 68, ../../sass/_target_input.sass */
+#target-input .archers__row--current .archers__score__input--active {
+  box-shadow: 0 0 2px #D58100 inset;
+  border-color: #D58100;
+  background-color: #eeeeee;
+}
+/* line 73, ../../sass/_target_input.sass */
+#target-input .input {
+  display: grid;
+  grid-template-columns: repeat(4, 1fr);
+  grid-template-rows: repeat(3, 1fr);
+  background-color: #353345;
+  grid-gap: 5px;
+  padding: 5px;
+  flex-grow: 1;
+}
+/* line 82, ../../sass/_target_input.sass */
+#target-input .input__control {
+  font-size: 25px;
+  font-weight: bold;
+  border-radius: 4px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+/* line 90, ../../sass/_target_input.sass */
+#target-input .input__control--gold {
+  background-color: #ffff56;
+}
+/* line 92, ../../sass/_target_input.sass */
+#target-input .input__control--red {
+  background-color: #ea3525;
+  color: white;
+}
+/* line 95, ../../sass/_target_input.sass */
+#target-input .input__control--blue {
+  background-color: #75fbfd;
+}
+/* line 97, ../../sass/_target_input.sass */
+#target-input .input__control--black {
+  background-color: #020202;
+  color: white;
+}
+/* line 100, ../../sass/_target_input.sass */
+#target-input .input__control--white {
+  background-color: #ffffff;
+}
+/* line 102, ../../sass/_target_input.sass */
+#target-input .input__control--green {
+  background-color: #486F38;
+  color: white;
+}
+/* line 106, ../../sass/_target_input.sass */
+#target-input .input__control--miss {
+  grid-column-end: span 2;
+}
