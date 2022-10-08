@@ -17,4 +17,5 @@ urlpatterns = [
 
 archer_urlpatterns = [
     path('', views.TargetInput.as_view(), name='target-input'),
+    path('js/', views.TargetInputJs.as_view(), name='target-input-js'),
 ]

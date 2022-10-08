@@ -40,6 +40,14 @@ STATICFILES_STORAGE = 'whitenoise.storage.CompressedStaticFilesStorage'
 MEDIA_ROOT = os.path.join(BASE_DIR, 'media')
 MEDIA_URL = '/'
 
+WEBPACK_LOADER = {
+    'DEFAULT': {
+        'CACHE': not DEBUG,
+        'BUNDLE_DIR_NAME': 'bundles/',
+        'STATS_FILE': os.path.join(BASE_DIR, 'build', 'webpack-stats.json'),
+    },
+}
+
 TEMPLATES = [{
     'BACKEND': 'django.template.backends.django.DjangoTemplates',
     'DIRS': [],
@@ -92,6 +100,7 @@ INSTALLED_APPS = (
     'django.contrib.admin',
     'gunicorn',
     'debug_toolbar',
+    'webpack_loader',
     'floppyforms',
     'custom_user',
     'qr_code',

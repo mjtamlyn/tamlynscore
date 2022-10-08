@@ -676,3 +676,11 @@ class RankingsExport(ResultModeMixin, CompetitionMixin, View):
             for seeding in results:
                 archers[seeding.entry_id] += [seeding.rank]
         return archers
+
+
+class TargetInput(TemplateView):
+    template_name = 'scores/target_input.html'
+
+
+class TargetInputJs(TemplateView):
+    template_name = 'scores/target_input_js.html'

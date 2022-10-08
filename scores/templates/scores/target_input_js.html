@@ -1,0 +1,27 @@
+{% extends 'base.html' %}
+
+{% load render_bundle from webpack_loader %}
+
+{% block scripts %}
+{% render_bundle 'main' 'js' %}
+{% endblock %}
+
+{% block page_id %}target-input{% endblock %}
+
+{% block nav %}
+<nav class="header-nav">
+    <div class="container">
+        <div class="home">
+            <a href="{% url 'index' %}" class="wide">TamlynScore</a>
+            <a href="{% url 'index' %}" class="narrow">TS</a>
+        </div>
+        <h2 class="header-title">Wallingford Indoor Series</h2>
+    </div>
+</nav>
+{% endblock %}
+
+{% block full_content %}
+<div id="app"></div>
+{% endblock %}
+
+{% block footer %}{% endblock %}

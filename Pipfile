@@ -22,6 +22,7 @@ whitenoise = "*"
 isort = "*"
 django-render-block = "*"
 django-qr-code = "*"
+django-webpack-loader = "*"
 
 [dev-packages]
 
