@@ -35,7 +35,7 @@ class UserAdmin(EmailUserAdmin):
 
 class ArcherAdmin(admin.ModelAdmin):
     search_fields = ('name',)
-    list_display = ('name', 'club')
+    list_display = ('name', 'club', 'agb_number')
     list_filter = ('club',)
 
 
