@@ -28,21 +28,27 @@
                     <span class="pill {{ bowstyle|slugify }}">{{ count }} {{ bowstyle }}</span>
                     {% if forloop.last %}<br>{% endif %}
                     {% endfor %}
-                    {% if competition.has_juniors %}
+                    {% if sr.junior_count %}
                     <span class="pill junior">{{ sr.junior_count }} Junior</span><br>
                     {% endif %}
-                    {% if competition.has_agb_age_groups %}
+                    {% if sr.agb_age_groups %}
                         {% for age_group, count in sr.agb_age_groups %}
                         <span class="pill {{ age_group|slugify }}">{{ count }} {{ age_group }}</span>
                         {% if forloop.last %}<br>{% endif %}
                         {% endfor %}
                     {% endif %}
                     {% for gender, count in sr.genders %}
-                    <span class="pill {{ gender|slugify }}">{{ count }} {{ gender }}</span>
-                    {% if forloop.last %}<br>{% endif %}
+                        <span class="pill {{ gender|slugify }}">{{ count }} {{ gender }}</span>
+                        {% if forloop.last %}<br>{% endif %}
                     {% endfor %}
-                    {% if competition.has_novices %}
-                    <span class="pill novice">{{ sr.novice_count }} Novice</span><br>
+                    {% if sr.novice_count %}
+                        <span class="pill novice">{{ sr.novice_count }} Novice</span><br>
+                    {% endif %}
+                    {% if sr.ifaa_division %}
+                        {% for age_group, count in sr.ifaa_division %}
+                        <span class="pill {{ age_group|slugify }}">{{ count }} {{ age_group }}</span>
+                        {% if forloop.last %}<br>{% endif %}
+                        {% endfor %}
                     {% endif %}
                 {% endif %}
             {% endfor %}

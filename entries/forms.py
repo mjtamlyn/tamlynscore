@@ -321,7 +321,7 @@ class EntryCreateForm(forms.Form):
                 label='Division',
                 choices=(('', '---------'),) + IFAA_DIVISIONS,
             )
-            if current.ifaa_division:
+            if getattr(current, 'ifaa_division', None):
                 self.initial['ifaa_division'] = current.ifaa_division
 
     def get_current_obj(self):

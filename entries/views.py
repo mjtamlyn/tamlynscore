@@ -140,8 +140,9 @@ class EntryList(CompetitionMixin, ListView):
         ).order_by('-pk')
 
     def get_stats(self):
+        competition = self.competition
         stats = []
-        sessions = self.competition.session_set.prefetch_related(
+        sessions = competition.session_set.prefetch_related(
             'sessionround_set',
             Prefetch(
                 'sessionround_set__sessionentry_set',
@@ -159,21 +160,25 @@ class EntryList(CompetitionMixin, ListView):
                 bowstyles = collections.Counter(e.competition_entry.bowstyle for e in sr.sessionentry_set.all())
                 genders = collections.Counter(
                     e.competition_entry.archer.get_gender_display() for e in sr.sessionentry_set.all())
-                # TODO: Remove counters not needed by competition options
-                novice_count = len([e for e in sr.sessionentry_set.all() if e.competition_entry.novice == 'N'])
-                junior_count = len([e for e in sr.sessionentry_set.all() if e.competition_entry.age == 'J'])
-                agb_age_groups = collections.Counter(
-                    e.competition_entry.get_agb_age_display() for e in
-                    sr.sessionentry_set.all() if e.competition_entry.agb_age)
                 session_round_stats.append({
                     'session_round': sr,
                     'total_entries': len(sr.sessionentry_set.all()),
                     'bowstyles': bowstyles.most_common(5),
                     'genders': genders.most_common(2),
-                    'agb_age_groups': agb_age_groups.most_common(5),
-                    'novice_count': novice_count,
-                    'junior_count': junior_count,
                 })
+                if competition.has_novices:
+                    session_round_stats[-1]['novice_count'] = len([e for e in sr.sessionentry_set.all() if e.competition_entry.novice == 'N'])
+                if competition.has_juniors:
+                    session_round_stats[-1]['junior_count'] = len([e for e in sr.sessionentry_set.all() if e.competition_entry.age == 'J'])
+                if competition.has_agb_age_groups:
+                    session_round_stats[-1]['agb_age_groups'] = collections.Counter(
+                        e.competition_entry.get_agb_age_display() for e in
+                        sr.sessionentry_set.all() if e.competition_entry.agb_age
+                    ).most_common(5)
+                if competition.ifaa_rules:
+                    session_round_stats[-1]['ifaa_division'] = collections.Counter(
+                        e.competition_entry.get_ifaa_division_display() for e in sr.sessionentry_set.all()
+                    ).most_common(7)
             stats.append({
                 'session': session,
                 'total_entries': SessionEntry.objects.filter(session_round__session=session).count(),

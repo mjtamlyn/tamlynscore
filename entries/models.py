@@ -251,6 +251,15 @@ class SessionRound(models.Model):
                                 allocation += (
                                     None,
                                 )
+                        if competition.ifaa_rules:
+                            if entry.ifaa_division:
+                                allocation += (
+                                    entry.get_ifaa_division_display(),
+                                )
+                            else:
+                                allocation += (
+                                    None,
+                                )
                     if whole_session:
                         allocation += (shot_round.name,)
                     targets.append((target,) + allocation)

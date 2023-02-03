@@ -50,7 +50,10 @@
                     {% if competition.has_juniors %}
                     <th>Age</th>
                     {% endif %}
-                    <th>ArcheryGB Number</th>
+                    {% if competition.ifaa_rules %}
+                    <th>Division</th>
+                    {% endif %}
+                    <th>{% if competition.ifaa_rules %}ID{% else %}ArcheryGB Number{% endif %}</th>
                     <th>Present</th>
                 </thead>
                 {% for boss, archers in details.target_list %}
@@ -98,6 +101,9 @@
                     {% endif %}
                     {% if competition.has_juniors %}
                     <td>{{ entry.get_age_display }}</td>
+                    {% endif %}
+                    {% if competition.ifaa_rules %}
+                    <td>{{ entry.get_ifaa_division_display }}</td>
                     {% endif %}
                     <td>{{ entry.archer.agb_number }}</td>
                     <td>
