@@ -6,8 +6,8 @@ from django.core.cache import cache
 from django.db import transaction
 
 from core.models import (
-    AGB_AGE_CHOICES, IFAA_DIVISIONS, NOVICE_CHOICES, SIMPLE_AGE_CHOICES, Archer, Bowstyle,
-    Club, County, Round,
+    AGB_AGE_CHOICES, IFAA_DIVISIONS, NOVICE_CHOICES, SIMPLE_AGE_CHOICES,
+    Archer, Bowstyle, Club, County, Round,
 )
 from scores.result_modes import ByRound, get_result_modes
 

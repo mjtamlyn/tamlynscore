@@ -4,8 +4,8 @@ from django.db import models
 from django.urls import reverse
 
 from core.models import (
-    AGB_AGE_CHOICES, IFAA_DIVISIONS, NOVICE_CHOICES, SIMPLE_AGE_CHOICES, Archer, Bowstyle,
-    Club, County, Round,
+    AGB_AGE_CHOICES, IFAA_DIVISIONS, NOVICE_CHOICES, SIMPLE_AGE_CHOICES,
+    Archer, Bowstyle, Club, County, Round,
 )
 from scores.result_modes import get_result_modes
 from tamlynscore.utils import generate_slug
