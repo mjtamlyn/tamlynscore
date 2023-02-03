@@ -125,7 +125,7 @@ class BaseResultMode(object):
 
     def get_section_for_round(self, round, competition):
         headers = ['Pl.'] + self.get_main_headers(competition)
-        if competition.has_juniors or competition.has_wa_age_groups or competition.has_junior_masters_age_groups:
+        if competition.has_juniors:
             headers += ['']
         if competition.has_novices:
             headers += ['']
@@ -345,12 +345,8 @@ class BaseResultMode(object):
         }
         if competition.has_juniors and entry.age == 'J':
             kwargs['junior'] = 'Junior'
-        if competition.has_wa_age_groups and entry.wa_age:
-            kwargs['junior'] = entry.get_wa_age_display()
         if competition.has_agb_age_groups and entry.agb_age:
             kwargs['junior'] = entry.get_agb_age_display()
-        if competition.has_junior_masters_age_groups and entry.junior_masters_age:
-            kwargs['junior'] = entry.get_junior_masters_age_display()
         if competition.has_novices and entry.novice == 'N':
             kwargs['novice'] = 'Novice'
         categories = [ResultCategory(**kwargs)]
@@ -928,8 +924,7 @@ class H2HSeedings(ByRound, Team, BaseResultMode):
             if entry.bowstyle in category.bowstyles.all():
                 if ((category.gender is None or category.gender == entry.archer.gender) and
                         (category.novice is None or category.novice == entry.novice) and
-                        (category.junior_masters_age is None or category.junior_masters_age == entry.junior_masters_age) and
-                        (not category.wa_ages or entry.wa_age in category.wa_ages)):
+                        (not category.ages or entry.agb_age in category.age)):
                     categories.append(category)
         return categories
 

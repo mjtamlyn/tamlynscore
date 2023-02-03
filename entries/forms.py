@@ -6,8 +6,8 @@ from django.core.cache import cache
 from django.db import transaction
 
 from core.models import (
-    AGB_AGE_CHOICES, AGE_CHOICES, JUNIOR_MASTERS_AGE_CHOICES, NOVICE_CHOICES,
-    WA_AGE_CHOICES, Archer, Bowstyle, Club, County, Round,
+    AGB_AGE_CHOICES, NOVICE_CHOICES, SIMPLE_AGE_CHOICES, Archer, Bowstyle,
+    Club, County, Round,
 )
 from scores.result_modes import ByRound, get_result_modes
 
@@ -49,9 +49,7 @@ class CompetitionForm(forms.Form):
     has_guests = forms.BooleanField(required=False, label='Allow guest entries')
     has_novices = forms.BooleanField(required=False, label='Use a novice category')
     has_juniors = forms.BooleanField(required=False, label='Use a general junior category')
-    has_wa_age_groups = forms.BooleanField(required=False, label='Use WA style age groups')
     has_agb_age_groups = forms.BooleanField(required=False, label='Use ArcheryGB style age groups')
-    has_junior_masters_age_groups = forms.BooleanField(required=False, label='Use Junior Masters style age groups')
     exclude_later_shoots = forms.BooleanField(required=False, help_text='Only the first session can count for results')
 
     # Fields about team results
@@ -74,9 +72,7 @@ class CompetitionForm(forms.Form):
         'has_guests',
         'has_novices',
         'has_juniors',
-        'has_wa_age_groups',
         'has_agb_age_groups',
-        'has_junior_masters_age_groups',
         'exclude_later_shoots',
         'team_size',
         'allow_incomplete_teams',
@@ -290,17 +286,10 @@ class EntryCreateForm(forms.Form):
         if self.competition.has_juniors:
             self.fields['age'] = forms.ChoiceField(
                 label='Age (%s)' % current.get_age_display(),
-                choices=(('', '---------'),) + AGE_CHOICES,
+                choices=(('', '---------'),) + SIMPLE_AGE_CHOICES,
                 required=False,
             )
             self.fields['update_age'] = forms.BooleanField(required=False)
-        if self.competition.has_wa_age_groups:
-            self.fields['wa_age'] = forms.ChoiceField(
-                label='Age Group (%s)' % current.get_wa_age_display(),
-                choices=(('', '---------'),) + WA_AGE_CHOICES,
-                required=False,
-            )
-            self.fields['update_wa_age'] = forms.BooleanField(required=False)
         if self.competition.has_agb_age_groups:
             self.fields['agb_age'] = forms.ChoiceField(
                 label='Age Group (%s)' % current.get_agb_age_display(),
@@ -308,13 +297,6 @@ class EntryCreateForm(forms.Form):
                 required=False,
             )
             self.fields['update_agb_age'] = forms.BooleanField(required=False)
-        if self.competition.has_junior_masters_age_groups:
-            self.fields['junior_masters_age'] = forms.ChoiceField(
-                label='Age Group (%s)' % current.get_junior_masters_age_display(),
-                choices=(('', '---------'),) + JUNIOR_MASTERS_AGE_CHOICES,
-                required=False,
-            )
-            self.fields['update_junior_masters_age'] = forms.BooleanField(required=False)
         if len(self.session_rounds) > 1:
             self.fields['sessions'] = forms.ModelMultipleChoiceField(
                 queryset=self.session_rounds.order_by('session__start', 'shot_round_id'),
@@ -352,14 +334,8 @@ class EntryCreateForm(forms.Form):
         if self.competition.has_juniors and self.cleaned_data['age'] and self.cleaned_data['update_age']:
             self.archer.age = self.cleaned_data['age']
             changed = True
-        if self.competition.has_wa_age_groups and self.cleaned_data['wa_age'] and self.cleaned_data['update_wa_age']:
-            self.archer.wa_age = self.cleaned_data['wa_age']
-            changed = True
         if self.competition.has_agb_age_groups and self.cleaned_data['agb_age'] and self.cleaned_data['update_agb_age']:
             self.archer.agb_age = self.cleaned_data['agb_age']
-            changed = True
-        if self.competition.has_junior_masters_age_groups and self.cleaned_data['junior_masters_age'] and self.cleaned_data['update_junior_masters_age']:
-            self.archer.junior_masters_age = self.cleaned_data['junior_masters_age']
             changed = True
         if not self.cleaned_data['agb_number'] == self.archer.agb_number:
             self.archer.agb_number = self.cleaned_data['agb_number']
@@ -389,10 +365,6 @@ class EntryCreateForm(forms.Form):
             entry.novice = self.cleaned_data['novice'] or default.novice
         if self.competition.has_juniors:
             entry.age = self.cleaned_data['age'] or default.age
-        if self.competition.has_wa_age_groups:
-            entry.wa_age = self.cleaned_data['wa_age']
-        if self.competition.has_junior_masters_age_groups:
-            entry.junior_masters_age = self.cleaned_data['junior_masters_age']
         if self.competition.has_agb_age_groups:
             entry.agb_age = self.cleaned_data['agb_age']
             if entry.agb_age:
@@ -430,10 +402,6 @@ class EntryUpdateForm(EntryCreateForm):
             self.initial['custom_team_name'] = instance.custom_team_name
         if self.competition.has_agb_age_groups:
             self.initial['agb_age'] = instance.agb_age
-        if self.competition.has_wa_age_groups:
-            self.initial['wa_age'] = instance.wa_age
-        if self.competition.has_junior_masters_age_groups:
-            self.initial['junior_masters_age'] = instance.junior_masters_age
 
     def get_current_obj(self):
         return self.instance

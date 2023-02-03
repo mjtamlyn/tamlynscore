@@ -162,23 +162,15 @@ class EntryList(CompetitionMixin, ListView):
                 # TODO: Remove counters not needed by competition options
                 novice_count = len([e for e in sr.sessionentry_set.all() if e.competition_entry.novice == 'N'])
                 junior_count = len([e for e in sr.sessionentry_set.all() if e.competition_entry.age == 'J'])
-                wa_age_groups = collections.Counter(
-                    e.competition_entry.get_wa_age_display() for e in
-                    sr.sessionentry_set.all() if e.competition_entry.wa_age)
                 agb_age_groups = collections.Counter(
                     e.competition_entry.get_agb_age_display() for e in
                     sr.sessionentry_set.all() if e.competition_entry.agb_age)
-                junior_masters_age_groups = collections.Counter(
-                    e.competition_entry.get_junior_masters_age_display() for e in
-                    sr.sessionentry_set.all() if e.competition_entry.junior_masters_age)
                 session_round_stats.append({
                     'session_round': sr,
                     'total_entries': len(sr.sessionentry_set.all()),
                     'bowstyles': bowstyles.most_common(5),
                     'genders': genders.most_common(2),
-                    'wa_age_groups': wa_age_groups.most_common(4),
                     'agb_age_groups': agb_age_groups.most_common(5),
-                    'junior_masters_age_groups': junior_masters_age_groups.most_common(4),
                     'novice_count': novice_count,
                     'junior_count': junior_count,
                 })
@@ -711,12 +703,8 @@ class ScoreSheetsPdf(CompetitionMixin, HeadedPdfView):
             category_labels = []
             if self.competition.has_novices:
                 category_labels.append(entry.get_novice_display())
-            if self.competition.has_wa_age_groups and entry.wa_age:
-                category_labels.append(entry.get_wa_age_display())
             if self.competition.has_agb_age_groups and entry.agb_age:
                 category_labels.append(entry.get_agb_age_display())
-            if self.competition.has_junior_masters_age_groups and entry.junior_masters_age:
-                category_labels.append(entry.get_junior_masters_age_display())
             if category_labels:
                 header_elements[1][2] = self.Para(' '.join(category_labels), 'h2')
             return header_elements

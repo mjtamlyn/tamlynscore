@@ -31,20 +31,8 @@
                     {% if competition.has_juniors %}
                     <span class="pill junior">{{ sr.junior_count }} Junior</span><br>
                     {% endif %}
-                    {% if competition.has_wa_age_groups %}
-                        {% for age_group, count in sr.wa_age_groups %}
-                        <span class="pill {{ age_group|slugify }}">{{ count }} {{ age_group }}</span>
-                        {% if forloop.last %}<br>{% endif %}
-                        {% endfor %}
-                    {% endif %}
                     {% if competition.has_agb_age_groups %}
                         {% for age_group, count in sr.agb_age_groups %}
-                        <span class="pill {{ age_group|slugify }}">{{ count }} {{ age_group }}</span>
-                        {% if forloop.last %}<br>{% endif %}
-                        {% endfor %}
-                    {% endif %}
-                    {% if competition.has_junior_masters_age_groups %}
-                        {% for age_group, count in sr.junior_masters_age_groups %}
                         <span class="pill {{ age_group|slugify }}">{{ count }} {{ age_group }}</span>
                         {% if forloop.last %}<br>{% endif %}
                         {% endfor %}
@@ -93,14 +81,8 @@
                         {% if competition.has_juniors and entry.age == "J" %}
                         <span class="pill junior">{{ entry.get_age_display }}</span>
                         {% endif %}
-                        {% if competition.has_wa_age_groups and entry.wa_age %}
-                        <span class="pill junior">{{ entry.get_wa_age_display }}</span>
-                        {% endif %}
                         {% if competition.has_agb_age_groups and entry.agb_age %}
                         <span class="pill junior">{{ entry.get_agb_age_display }}</span>
-                        {% endif %}
-                        {% if competition.has_junior_masters_age_groups and entry.junior_masters_age %}
-                        <span class="pill junior">{{ entry.get_junior_masters_age_display }}</span>
                         {% endif %}
                         <span class="pill gender {{ entry.archer.get_gender_display|lower }}">{{ entry.archer.get_gender_display }}</span>
                         {% if entry.archer.agb_number %}
