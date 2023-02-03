@@ -347,6 +347,8 @@ class BaseResultMode(object):
             kwargs['junior'] = 'Junior'
         if competition.has_agb_age_groups and entry.agb_age:
             kwargs['junior'] = entry.get_agb_age_display()
+        if competition.ifaa_rules and entry.ifaa_division:
+            kwargs['junior'] = entry.get_ifaa_division_display()
         if competition.has_novices and entry.novice == 'N':
             kwargs['novice'] = 'Novice'
         categories = [ResultCategory(**kwargs)]
