@@ -10,7 +10,7 @@ from django.views.generic import (
 
 from braces.views import LoginRequiredMixin, SuperuserRequiredMixin
 
-from entries.models import CompetitionEntry
+from entries.models import Competition, CompetitionEntry
 from entries.views import BatchEntryMixin
 from leagues.models import League
 from scores.models import Score
@@ -147,6 +147,12 @@ class ArcherCreate(BatchEntryMixin, LoginRequiredMixin, CreateView):
         if name:
             initial['name'] = name
         return initial
+
+    def get_form_kwargs(self):
+        kwargs = super().get_form_kwargs()
+        if 'competition' in self.request.GET:
+            kwargs['competition'] = Competition.objects.get(slug=self.request.GET['competition'])
+        return kwargs
 
     def form_valid(self, form):
         cache_data = copy.copy(form.cleaned_data)

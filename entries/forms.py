@@ -6,7 +6,7 @@ from django.core.cache import cache
 from django.db import transaction
 
 from core.models import (
-    AGB_AGE_CHOICES, NOVICE_CHOICES, SIMPLE_AGE_CHOICES, Archer, Bowstyle,
+    AGB_AGE_CHOICES, IFAA_DIVISIONS, NOVICE_CHOICES, SIMPLE_AGE_CHOICES, Archer, Bowstyle,
     Club, County, Round,
 )
 from scores.result_modes import ByRound, get_result_modes
@@ -247,7 +247,7 @@ class ArcherSearchForm(forms.Form):
 
 class EntryCreateForm(forms.Form):
     bowstyle = forms.ModelChoiceField(
-        queryset=Bowstyle.objects,
+        queryset=Bowstyle.objects.filter(ifaa_only=False),
         required=False,
     )
     update_bowstyle = forms.BooleanField(required=False)
@@ -309,6 +309,21 @@ class EntryCreateForm(forms.Form):
             self.fields.pop('club')
             self.fields.pop('update_club')
 
+        if self.competition.ifaa_rules:
+            self.fields['agb_number'].label = 'ID number'
+            self.fields['bowstyle'].queryset = Bowstyle.objects.filter(ifaa_only=True)
+            self.fields['bowstyle'].label = 'Bowstyle'
+            if current.bowstyle:
+                self.initial['bowstyle'] = current.bowstyle
+            self.fields.pop('update_bowstyle')
+            self.fields['custom_team_name'].label = 'Country'
+            self.fields['ifaa_division'] = forms.ChoiceField(
+                label='Division',
+                choices=(('', '---------'),) + IFAA_DIVISIONS,
+            )
+            if current.ifaa_division:
+                self.initial['ifaa_division'] = current.ifaa_division
+
     def get_current_obj(self):
         return self.archer
 
@@ -325,7 +340,7 @@ class EntryCreateForm(forms.Form):
         if not self.competition.use_county_teams and self.cleaned_data.get('club') and self.cleaned_data.get('update_club'):
             self.archer.club = self.cleaned_data['club']
             changed = True
-        if self.cleaned_data['bowstyle'] and self.cleaned_data['update_bowstyle']:
+        if self.cleaned_data['bowstyle'] and self.cleaned_data.get('update_bowstyle'):
             self.archer.bowstyle = self.cleaned_data['bowstyle']
             changed = True
         if self.competition.has_novices and self.cleaned_data['novice'] and self.cleaned_data['update_novice']:
@@ -371,6 +386,8 @@ class EntryCreateForm(forms.Form):
                 entry.age = 'J'
         if self.competition.has_guests:
             entry.guest = self.cleaned_data['guest']
+        if self.competition.ifaa_rules:
+            entry.ifaa_division = self.cleaned_data['ifaa_division']
 
     def create_session_entries(self, entry):
         if len(self.session_rounds) == 1:

@@ -9,7 +9,7 @@
 <p>
     {% if competition.use_county_teams %}
         <a class="btn add pull-right" href="{% url 'county_create' %}?next={{ request.path }}">Add county</a>
-    {% else %}
+    {% elif not competition.ifaa_rules %}
         <a class="btn add pull-right" href="{% url 'club_create' %}?next={{ request.path }}">Add club</a>
     {% endif %}
 </p>

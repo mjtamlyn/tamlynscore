@@ -51,6 +51,16 @@ AGB_AGE_CHOICES = (
     ('U10', 'U10'),
 )
 
+IFAA_DIVISIONS = (
+    ('P', 'Professional'),
+    ('C', 'Cub'),
+    ('J', 'Junior'),
+    ('YA', 'Young Adult'),
+    ('A', 'Adult'),
+    ('V', 'Veteran'),
+    ('S', 'Senior'),
+)
+
 
 class User(AbstractEmailUser):
     name = models.CharField(max_length=255, default='')
@@ -129,6 +139,7 @@ class Round(models.Model):
 
 class Bowstyle(models.Model):
     name = models.CharField(max_length=50, unique=True)
+    ifaa_only = models.BooleanField(default=False)
 
     def __str__(self):
         return self.name

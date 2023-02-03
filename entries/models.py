@@ -4,7 +4,7 @@ from django.db import models
 from django.urls import reverse
 
 from core.models import (
-    AGB_AGE_CHOICES, NOVICE_CHOICES, SIMPLE_AGE_CHOICES, Archer, Bowstyle,
+    AGB_AGE_CHOICES, IFAA_DIVISIONS, NOVICE_CHOICES, SIMPLE_AGE_CHOICES, Archer, Bowstyle,
     Club, County, Round,
 )
 from scores.result_modes import get_result_modes
@@ -46,6 +46,7 @@ class ResultsFormatFields(models.Model):
     novices_in_experienced_individual = models.BooleanField(default=False, help_text='Puts the novices in experienced results and their own category')
     novices_in_experienced_teams = models.BooleanField(default=False)
     exclude_later_shoots = models.BooleanField(default=False, help_text='Only the first session can count for results')
+    ifaa_rules = models.BooleanField(default=False)
     use_county_teams = models.BooleanField(default=False)
     strict_b_teams = models.BooleanField(default=False, help_text='e.g. BUTC')
     strict_c_teams = models.BooleanField(default=False, help_text='e.g. BUTC')
@@ -271,6 +272,7 @@ class CompetitionEntry(models.Model):
     age = models.CharField(max_length=1, choices=SIMPLE_AGE_CHOICES, default='S')
     agb_age = models.CharField(max_length=3, choices=AGB_AGE_CHOICES, default='', blank=True)
     novice = models.CharField(max_length=1, choices=NOVICE_CHOICES, default='E')
+    ifaa_division = models.CharField(max_length=2, choices=IFAA_DIVISIONS, default='', blank=True)
 
     guest = models.BooleanField(default=False)
     custom_team_name = models.CharField(max_length=200, default='', blank=True)

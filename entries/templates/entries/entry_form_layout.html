@@ -18,13 +18,30 @@
             <div class="form-group">
                 {% formrow form.agb_number form.guest using 'form-item.html' %}
                 {% formrow form.bowstyle form.update_bowstyle using 'form-item.html' %}
-                {% formrow form.club form.update_club using 'form-item.html' %}
-                {% formrow form.county using 'form-item.html' %}
-                {% formrow form.custom_team_name using 'form-item.html' %}
-                {% formrow form.novice form.update_novice using 'form-item.html' %}
-                {% formrow form.age form.update_age using 'form-item.html' %}
-                {% formrow form.agb_age form.update_agb_age using 'form-item.html' %}
-                {% formrow form.sessions using 'form-item.html' %}
+                {% if form.club %}
+                    {% formrow form.club form.update_club using 'form-item.html' %}
+                {% endif %}
+                {% if form.county %}
+                    {% formrow form.county using 'form-item.html' %}
+                {% endif %}
+                {% if form.custom_team_name %}
+                    {% formrow form.custom_team_name using 'form-item.html' %}
+                {% endif %}
+                {% if form.novice %}
+                    {% formrow form.novice form.update_novice using 'form-item.html' %}
+                {% endif %}
+                {% if form.age %}
+                    {% formrow form.age form.update_age using 'form-item.html' %}
+                {% endif %}
+                {% if form.agb_age %}
+                    {% formrow form.agb_age form.update_agb_age using 'form-item.html' %}
+                {% endif %}
+                {% if form.ifaa_division %}
+                    {% formrow form.ifaa_division using 'form-item.html' %}
+                {% endif %}
+                {% if form.sessions %}
+                    {% formrow form.sessions using 'form-item.html' %}
+                {% endif %}
             </div>
         </div>
         <p><input type="submit" class="btn" {% if button_text %}value="{{ button_text }}"{% endif %}></p>

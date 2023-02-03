@@ -1,12 +1,21 @@
 import floppyforms.__future__ as forms
 
-from .models import Archer
+from .models import Archer, Bowstyle
 
 
 class ArcherForm(forms.ModelForm):
-    def __init__(self, *args, **kwargs):
+    def __init__(self, competition=None, *args, **kwargs):
         super(ArcherForm, self).__init__(*args, **kwargs)
         self.fields['name'].widget.attrs.update({'autofocus': ''})
+        self.fields['bowstyle'].queryset = Bowstyle.objects.filter(ifaa_only=False)
+
+        if competition:
+            if competition.ifaa_rules:
+                self.fields['bowstyle'].queryset = Bowstyle.objects.filter(ifaa_only=True)
+                self.fields.pop('age')
+                self.fields.pop('novice')
+                self.fields.pop('club')
+                self.fields.pop('agb_number')
 
     class Meta:
         model = Archer
