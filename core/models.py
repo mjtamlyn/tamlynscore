@@ -98,6 +98,7 @@ class Round(models.Model):
             'tick this box and the split can be used in exports.'
         ),
     )
+    is_ifaa = models.BooleanField(default=False)
 
     def __str__(self):
         return self.name

@@ -682,6 +682,10 @@ class ScoreSheetsPdf(CompetitionMixin, HeadedPdfView):
             for target, entry in entries:
                 table_data = self.header_table_for_entry(target, entry)
                 header_table = Table(table_data, [0.6 * inch, 2.5 * inch, 3.9 * inch])
+                if self.competition.ifaa_rules:
+                    header_table.setStyle(TableStyle([
+                         ('SPAN', (1, 1), (2, 1)),
+                    ]))
                 elements.append(KeepTogether([self.spacer, header_table, self.spacer] + score_sheet_elements))
             elements.append(PageBreak())
 
@@ -691,6 +695,8 @@ class ScoreSheetsPdf(CompetitionMixin, HeadedPdfView):
         if entry:
             entry = entry.session_entry.competition_entry
             category = u'{0} {1}'.format(entry.archer.get_gender_display(), entry.bowstyle)
+            if self.competition.ifaa_rules:
+                category = entry.get_ifaa_division_display() + ' ' + category
             if self.competition.has_juniors and entry.age == 'J':
                 category = 'Junior ' + category
             header_elements = [
@@ -720,6 +726,8 @@ class ScoreSheetsPdf(CompetitionMixin, HeadedPdfView):
             ]
 
     def get_score_sheet_elements(self, session_round):
+        if session_round.shot_round.is_ifaa:
+            return self.get_ifaa_score_sheet(session_round)
         subrounds = session_round.shot_round.subrounds.order_by('-distance')
         score_sheet_elements = []
 
@@ -755,15 +763,82 @@ class ScoreSheetsPdf(CompetitionMixin, HeadedPdfView):
 
             score_sheet_elements += [totals_table, self.spacer]
 
+        return score_sheet_elements + self.get_signing_footer()
+
+    def get_signing_footer(self):
         signing_table_widths = [0.8 * inch, 2 * inch]
         signing_table = Table(
             [[self.Para('Archer', 'h3'), None, None, self.Para('Scorer', 'h3'), '']],
             signing_table_widths + [0.5 * inch] + signing_table_widths
         )
         signing_table.setStyle(self.signing_table_style)
-        score_sheet_elements += [self.spacer, signing_table]
+        return [self.spacer, signing_table]
 
-        return score_sheet_elements
+    def get_ifaa_score_sheet(self, session_round):
+        row_1 = [
+            'Unit 1',
+            None,
+            None,
+            None,
+            None,
+            'ET',
+            'RT',
+            None,
+            'Unit 2',
+            None,
+            None,
+            None,
+            None,
+            'ET',
+            'RT',
+        ]
+        pen_row = [None] * 3 + ['Total Unit 1'] + [None] * 7 + ['Total Unit 2']
+        end_row = [None] * 11 + ['Unit 1 + Unit 2']
+        table_data = [row_1] + [[None for i in range(15)] for j in range(6)] + [pen_row, end_row]
+
+        box_size = self.box_size * 1.3
+        col_widths = [
+            box_size,
+            box_size,
+            box_size,
+            box_size,
+            box_size,
+            box_size * 1.35,
+            box_size * 1.35,
+            box_size * 1.5,
+            box_size,
+            box_size,
+            box_size,
+            box_size,
+            box_size,
+            box_size * 1.35,
+            box_size * 1.35,
+        ]
+        row_heights = 9 * [box_size / 1.3]
+
+        table = Table(table_data, col_widths, row_heights)
+
+        table.setStyle(TableStyle([
+            # alignment
+            ('ALIGN', (0, 0), (-1, -1), 'CENTER'),
+            ('VALIGN', (0, 0), (-1, -1), 'MIDDLE'),
+
+            # unit 1 grid
+            ('BOX', (0, 1), (6, -3), 2, colors.black),
+            ('INNERGRID', (0, 1), (6, -3), 0.25, colors.black),
+
+            # unit 2 grid
+            ('BOX', (8, 1), (-1, -3), 2, colors.black),
+            ('INNERGRID', (8, 1), (-1, -3), 0.25, colors.black),
+
+            # end totals columns
+            ('BOX', (5, 0), (6, -2), 2, colors.black),
+            ('INNERGRID', (5, 0), (6, -2), 0.25, colors.black),
+            ('BOX', (-2, 0), (-1, -1), 2, colors.black),
+            ('INNERGRID', (-2, 0), (-1, -1), 0.25, colors.black),
+            ('BOX', (-2, -1), (-1, -1), 2, colors.black),
+        ]))
+        return [table, self.spacer] + self.get_signing_footer()
 
     scores_table_style = TableStyle([
         # alignment
