@@ -84,6 +84,9 @@ class Competition(ResultsFormatFields, models.Model):
     class Meta:
         unique_together = ('date', 'tournament')
 
+    def get_absolute_url(self):
+        return reverse('competition_detail', kwargs={'slug': self.slug})
+
     def __str__(self):
         return u'{0} {1}'.format(self.tournament, self.date.year)
 
