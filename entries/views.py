@@ -727,7 +727,7 @@ class ScoreSheetsPdf(CompetitionMixin, HeadedPdfView):
 
     def get_score_sheet_elements(self, session_round):
         if session_round.shot_round.is_ifaa:
-            return self.get_ifaa_score_sheet(session_round)
+            return self.get_ifaa_score_sheet(session_round, flint_round=session_round.shot_round.flint_round)
         subrounds = session_round.shot_round.subrounds.order_by('-distance')
         score_sheet_elements = []
 
@@ -774,7 +774,7 @@ class ScoreSheetsPdf(CompetitionMixin, HeadedPdfView):
         signing_table.setStyle(self.signing_table_style)
         return [self.spacer, signing_table]
 
-    def get_ifaa_score_sheet(self, session_round):
+    def get_ifaa_score_sheet(self, session_round, flint_round=False):
         row_1 = [
             'Unit 1',
             None,
@@ -794,11 +794,21 @@ class ScoreSheetsPdf(CompetitionMixin, HeadedPdfView):
         ]
         pen_row = [None] * 3 + ['Total Unit 1'] + [None] * 7 + ['Total Unit 2']
         end_row = [None] * 11 + ['Unit 1 + Unit 2']
-        table_data = [row_1] + [[None for i in range(15)] for j in range(6)] + [pen_row, end_row]
+        rows = 7 if flint_round else 6
+        table_data = [row_1] + [[None for i in range(15)] for j in range(rows)] + [pen_row, end_row]
+
+        if flint_round:
+            table_data[1][0] = table_data[1][8] = '25Y'
+            table_data[2][0] = table_data[2][8] = '20ft'
+            table_data[3][0] = table_data[3][8] = '30Y'
+            table_data[4][0] = table_data[4][8] = '15Y'
+            table_data[5][0] = table_data[5][8] = '20Y'
+            table_data[6][0] = table_data[6][8] = '10Y'
+            table_data[7][0] = table_data[7][8] = 'W Up'
 
         box_size = self.box_size * 1.3
         col_widths = [
-            box_size,
+            box_size * (1.35 if flint_round else 1),
             box_size,
             box_size,
             box_size,
@@ -806,7 +816,7 @@ class ScoreSheetsPdf(CompetitionMixin, HeadedPdfView):
             box_size * 1.35,
             box_size * 1.35,
             box_size * 1.5,
-            box_size,
+            box_size * (1.35 if flint_round else 1),
             box_size,
             box_size,
             box_size,
@@ -814,11 +824,11 @@ class ScoreSheetsPdf(CompetitionMixin, HeadedPdfView):
             box_size * 1.35,
             box_size * 1.35,
         ]
-        row_heights = 9 * [box_size / 1.3]
+        row_heights = (3 + rows) * [box_size / 1.3]
 
         table = Table(table_data, col_widths, row_heights)
 
-        table.setStyle(TableStyle([
+        styles = [
             # alignment
             ('ALIGN', (0, 0), (-1, -1), 'CENTER'),
             ('VALIGN', (0, 0), (-1, -1), 'MIDDLE'),
@@ -837,7 +847,14 @@ class ScoreSheetsPdf(CompetitionMixin, HeadedPdfView):
             ('BOX', (-2, 0), (-1, -1), 2, colors.black),
             ('INNERGRID', (-2, 0), (-1, -1), 0.25, colors.black),
             ('BOX', (-2, -1), (-1, -1), 2, colors.black),
-        ]))
+        ]
+        if flint_round:
+            styles += [
+                ('BOX', (0, 1), (0, -3), 2, colors.black),
+                ('BOX', (8, 1), (8, -3), 2, colors.black),
+            ]
+
+        table.setStyle(TableStyle(styles))
         return [table, self.spacer] + self.get_signing_footer()
 
     scores_table_style = TableStyle([

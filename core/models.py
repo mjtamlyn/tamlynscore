@@ -99,6 +99,8 @@ class Round(models.Model):
         ),
     )
     is_ifaa = models.BooleanField(default=False)
+    # This is such a weird round we may as well special case it
+    flint_round = models.BooleanField(default=False)
 
     def __str__(self):
         return self.name
