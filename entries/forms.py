@@ -6,8 +6,8 @@ from django.core.cache import cache
 from django.db import transaction
 
 from core.models import (
-    AGB_AGE_CHOICES, AGE_CHOICES, JUNIOR_MASTERS_AGE_CHOICES, NOVICE_CHOICES,
-    WA_AGE_CHOICES, Archer, Bowstyle, Club, County, Round,
+    AGB_AGE_CHOICES, IFAA_DIVISIONS, NOVICE_CHOICES, SIMPLE_AGE_CHOICES,
+    Archer, Bowstyle, Club, County, Round,
 )
 from scores.result_modes import ByRound, get_result_modes
 
@@ -49,9 +49,7 @@ class CompetitionForm(forms.Form):
     has_guests = forms.BooleanField(required=False, label='Allow guest entries')
     has_novices = forms.BooleanField(required=False, label='Use a novice category')
     has_juniors = forms.BooleanField(required=False, label='Use a general junior category')
-    has_wa_age_groups = forms.BooleanField(required=False, label='Use WA style age groups')
     has_agb_age_groups = forms.BooleanField(required=False, label='Use ArcheryGB style age groups')
-    has_junior_masters_age_groups = forms.BooleanField(required=False, label='Use Junior Masters style age groups')
     exclude_later_shoots = forms.BooleanField(required=False, help_text='Only the first session can count for results')
 
     # Fields about team results
@@ -74,9 +72,7 @@ class CompetitionForm(forms.Form):
         'has_guests',
         'has_novices',
         'has_juniors',
-        'has_wa_age_groups',
         'has_agb_age_groups',
-        'has_junior_masters_age_groups',
         'exclude_later_shoots',
         'team_size',
         'allow_incomplete_teams',
@@ -211,7 +207,14 @@ class CompetitionForm(forms.Form):
 
 
 class CSVEntryForm(forms.Form):
-    data = forms.CharField(widget=forms.Textarea, help_text='Enter a CSV of archer data. First column must be the name to search on.')
+    data = forms.CharField(widget=forms.Textarea, help_text=(
+        'Copy here the text of a CSV file of entry data. '
+        'Include a header row using some of the following field names: '
+        'name, agb_number, age_group, gender, bowstyle, club. '
+        'name column is required, others are optional. '
+        'Matching is case insensitive, but otherwise needs to be spelled correctly. '
+        'We suggest using multiple small batches rather than one block of hundreds!'
+    ))
 
     def clean_data(self):
         value = self.cleaned_data['data']
@@ -219,8 +222,10 @@ class CSVEntryForm(forms.Form):
         data.write(value)
         data.seek(0)
         try:
-            reader = csv.reader(data)
+            reader = csv.DictReader(data)
             self.read_data = list(reader)
+            if 'name' not in self.read_data[0]:
+                raise forms.ValidationError('name field is required')
         except csv.Error:
             raise forms.ValidationError('Count not interpret csv file')
         return value
@@ -251,7 +256,7 @@ class ArcherSearchForm(forms.Form):
 
 class EntryCreateForm(forms.Form):
     bowstyle = forms.ModelChoiceField(
-        queryset=Bowstyle.objects,
+        queryset=Bowstyle.objects.filter(ifaa_only=False),
         required=False,
     )
     update_bowstyle = forms.BooleanField(required=False)
@@ -264,7 +269,8 @@ class EntryCreateForm(forms.Form):
         self.session_rounds = SessionRound.objects.filter(session__competition=competition)
         current = self.get_current_obj()
         self.fields['bowstyle'].label = 'Bowstyle (%s)' % current.bowstyle
-        self.initial['agb_number'] = archer.agb_number
+        if archer.agb_number:
+            self.initial['agb_number'] = archer.agb_number
         if self.competition.use_county_teams:
             self.fields['county'] = forms.ModelChoiceField(
                 label='County (%s)' % current.club.county if current.club and current.club.county else 'County',
@@ -290,17 +296,10 @@ class EntryCreateForm(forms.Form):
         if self.competition.has_juniors:
             self.fields['age'] = forms.ChoiceField(
                 label='Age (%s)' % current.get_age_display(),
-                choices=(('', '---------'),) + AGE_CHOICES,
+                choices=(('', '---------'),) + SIMPLE_AGE_CHOICES,
                 required=False,
             )
             self.fields['update_age'] = forms.BooleanField(required=False)
-        if self.competition.has_wa_age_groups:
-            self.fields['wa_age'] = forms.ChoiceField(
-                label='Age Group (%s)' % current.get_wa_age_display(),
-                choices=(('', '---------'),) + WA_AGE_CHOICES,
-                required=False,
-            )
-            self.fields['update_wa_age'] = forms.BooleanField(required=False)
         if self.competition.has_agb_age_groups:
             self.fields['agb_age'] = forms.ChoiceField(
                 label='Age Group (%s)' % current.get_agb_age_display(),
@@ -308,13 +307,6 @@ class EntryCreateForm(forms.Form):
                 required=False,
             )
             self.fields['update_agb_age'] = forms.BooleanField(required=False)
-        if self.competition.has_junior_masters_age_groups:
-            self.fields['junior_masters_age'] = forms.ChoiceField(
-                label='Age Group (%s)' % current.get_junior_masters_age_display(),
-                choices=(('', '---------'),) + JUNIOR_MASTERS_AGE_CHOICES,
-                required=False,
-            )
-            self.fields['update_junior_masters_age'] = forms.BooleanField(required=False)
         if len(self.session_rounds) > 1:
             self.fields['sessions'] = forms.ModelMultipleChoiceField(
                 queryset=self.session_rounds.order_by('session__start', 'shot_round_id'),
@@ -326,6 +318,40 @@ class EntryCreateForm(forms.Form):
             self.fields['custom_team_name'] = forms.CharField(required=True)
             self.fields.pop('club')
             self.fields.pop('update_club')
+            if 'club' in self.initial:
+                self.initial['custom_team_name'] = self.initial['club']
+
+        if self.competition.ifaa_rules:
+            self.fields['agb_number'].label = 'ID number'
+            self.fields['bowstyle'].queryset = Bowstyle.objects.filter(ifaa_only=True)
+            self.fields['bowstyle'].label = 'Bowstyle'
+            if current.bowstyle:
+                self.initial['bowstyle'] = current.bowstyle
+            self.fields.pop('update_bowstyle')
+            self.fields['custom_team_name'].label = 'Country'
+            self.fields['ifaa_division'] = forms.ChoiceField(
+                label='Division',
+                choices=(('', '---------'),) + IFAA_DIVISIONS,
+            )
+            if 'age_group' in self.initial:
+                self.initial['ifaa_division'] = self.initial['age_group']
+            if getattr(current, 'ifaa_division', None):
+                self.initial['ifaa_division'] = current.ifaa_division
+
+        if self.initial:
+            print(self.initial)
+            for name in self.initial:
+                if name not in self.fields:
+                    continue
+                choices = getattr(self.fields[name], 'choices', None)
+                if choices:
+                    for item in choices:
+                        if hasattr(item[1], 'value'):
+                            value = item[1].value.lower()
+                        else:
+                            value = item[1].lower()
+                        if value == str(self.initial[name]).lower():
+                            self.initial[name] = item[0]
 
     def get_current_obj(self):
         return self.archer
@@ -343,7 +369,7 @@ class EntryCreateForm(forms.Form):
         if not self.competition.use_county_teams and self.cleaned_data.get('club') and self.cleaned_data.get('update_club'):
             self.archer.club = self.cleaned_data['club']
             changed = True
-        if self.cleaned_data['bowstyle'] and self.cleaned_data['update_bowstyle']:
+        if self.cleaned_data['bowstyle'] and self.cleaned_data.get('update_bowstyle'):
             self.archer.bowstyle = self.cleaned_data['bowstyle']
             changed = True
         if self.competition.has_novices and self.cleaned_data['novice'] and self.cleaned_data['update_novice']:
@@ -352,14 +378,8 @@ class EntryCreateForm(forms.Form):
         if self.competition.has_juniors and self.cleaned_data['age'] and self.cleaned_data['update_age']:
             self.archer.age = self.cleaned_data['age']
             changed = True
-        if self.competition.has_wa_age_groups and self.cleaned_data['wa_age'] and self.cleaned_data['update_wa_age']:
-            self.archer.wa_age = self.cleaned_data['wa_age']
-            changed = True
         if self.competition.has_agb_age_groups and self.cleaned_data['agb_age'] and self.cleaned_data['update_agb_age']:
             self.archer.agb_age = self.cleaned_data['agb_age']
-            changed = True
-        if self.competition.has_junior_masters_age_groups and self.cleaned_data['junior_masters_age'] and self.cleaned_data['update_junior_masters_age']:
-            self.archer.junior_masters_age = self.cleaned_data['junior_masters_age']
             changed = True
         if not self.cleaned_data['agb_number'] == self.archer.agb_number:
             self.archer.agb_number = self.cleaned_data['agb_number']
@@ -389,16 +409,14 @@ class EntryCreateForm(forms.Form):
             entry.novice = self.cleaned_data['novice'] or default.novice
         if self.competition.has_juniors:
             entry.age = self.cleaned_data['age'] or default.age
-        if self.competition.has_wa_age_groups:
-            entry.wa_age = self.cleaned_data['wa_age']
-        if self.competition.has_junior_masters_age_groups:
-            entry.junior_masters_age = self.cleaned_data['junior_masters_age']
         if self.competition.has_agb_age_groups:
             entry.agb_age = self.cleaned_data['agb_age']
             if entry.agb_age:
                 entry.age = 'J'
         if self.competition.has_guests:
             entry.guest = self.cleaned_data['guest']
+        if self.competition.ifaa_rules:
+            entry.ifaa_division = self.cleaned_data['ifaa_division']
 
     def create_session_entries(self, entry):
         if len(self.session_rounds) == 1:
@@ -430,10 +448,6 @@ class EntryUpdateForm(EntryCreateForm):
             self.initial['custom_team_name'] = instance.custom_team_name
         if self.competition.has_agb_age_groups:
             self.initial['agb_age'] = instance.agb_age
-        if self.competition.has_wa_age_groups:
-            self.initial['wa_age'] = instance.wa_age
-        if self.competition.has_junior_masters_age_groups:
-            self.initial['junior_masters_age'] = instance.junior_masters_age
 
     def get_current_obj(self):
         return self.instance

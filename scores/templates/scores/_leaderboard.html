@@ -39,9 +39,6 @@
                         {% if competition.has_novices %}
                             <td>{% if score.target.session_entry.competition_entry.novice == 'N' %}Novice{% endif %}</td>
                         {% endif %}
-                        {% if competition.has_wa_age_groups %}
-                            <td>{% if score.target.session_entry.competition_entry.wa_age %}{{ score.target.session_entry.competition_entry.get_wa_age_display }}{% endif %}</td>
-                        {% endif %}
                     {% endif %}
                     {% for detail in score.details %}
                         <td>{{ detail }}</td>

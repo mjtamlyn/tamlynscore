@@ -3,8 +3,7 @@ from django.db import models
 from django.utils.functional import cached_property
 
 from core.models import (
-    GENDER_CHOICES, JUNIOR_MASTERS_AGE_CHOICES, NOVICE_CHOICES, WA_AGE_CHOICES,
-    Bowstyle,
+    AGB_AGE_CHOICES, GENDER_CHOICES, NOVICE_CHOICES, Bowstyle,
 )
 from entries.models import CompetitionEntry, Session, SessionRound
 
@@ -49,8 +48,7 @@ class OlympicRound(models.Model):
 
 class Category(models.Model):
     bowstyles = models.ManyToManyField(Bowstyle)
-    wa_ages = ArrayField(models.CharField(max_length=1, choices=WA_AGE_CHOICES), blank=True, null=True)
-    junior_masters_age = models.CharField(max_length=3, choices=JUNIOR_MASTERS_AGE_CHOICES, blank=True, null=True)
+    ages = ArrayField(models.CharField(max_length=4, choices=AGB_AGE_CHOICES), blank=True, null=True)
     gender = models.CharField(max_length=1, choices=GENDER_CHOICES, blank=True, null=True)
     novice = models.CharField(max_length=1, choices=NOVICE_CHOICES, blank=True, null=True)
 
@@ -65,10 +63,8 @@ class Category(models.Model):
         if self.novice:
             code += self.novice
         code += ''.join([str(b)[0] for b in self.bowstyles.all()])
-        if self.wa_ages:
-            code += ''.join(self.wa_ages)
-        if self.junior_masters_age:
-            code += ''.join(self.junior_masters_age)
+        if self.ages:
+            code += ''.join(self.ages)
         if self.gender:
             code += self.get_gender_display()[0]
         return code
@@ -78,8 +74,8 @@ class Category(models.Model):
         if self.novice:
             code = self.novice
         code += str(self.bowstyles.all()[0])[0]
-        if self.wa_ages:
-            code += ''.join(self.wa_ages)
+        if self.ages:
+            code += ''.join(self.ages)
         if self.gender:
             code += self.get_gender_display()[0]
         return code
@@ -90,10 +86,8 @@ class Category(models.Model):
         if self.novice:
             name += self.get_novice_display() + ' '
         name += u', '.join([str(b) for b in self.bowstyles.all()]) + ' '
-        if self.wa_ages:
-            name += ', '.join([dict(WA_AGE_CHOICES)[age] for age in self.wa_ages]) + ' '
-        if self.junior_masters_age:
-            name += self.get_junior_masters_age_display() + ' '
+        if self.ages:
+            name += ', '.join([dict(AGB_AGE_CHOICES)[age] for age in self.ages]) + ' '
         if self.gender:
             name += self.get_gender_display() + ' '
         return name.strip()
@@ -101,10 +95,8 @@ class Category(models.Model):
     @property
     def short_name(self):
         name = ''
-        if self.wa_ages:
-            name += ', '.join([dict(WA_AGE_CHOICES)[age] for age in self.wa_age_choices]) + ' '
-        if self.junior_masters_age:
-            name += self.get_junior_masters_age_display() + ' '
+        if self.ages:
+            name += ', '.join([dict(AGB_AGE_CHOICES)[age] for age in self.ages]) + ' '
         if self.novice:
             name += self.get_novice_display() + ' '
         if self.gender:

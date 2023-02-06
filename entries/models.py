@@ -1,10 +1,11 @@
 import math
 
 from django.db import models
+from django.urls import reverse
 
 from core.models import (
-    AGB_AGE_CHOICES, AGE_CHOICES, JUNIOR_MASTERS_AGE_CHOICES, NOVICE_CHOICES,
-    WA_AGE_CHOICES, Archer, Bowstyle, Club, County, Round,
+    AGB_AGE_CHOICES, IFAA_DIVISIONS, NOVICE_CHOICES, SIMPLE_AGE_CHOICES,
+    Archer, Bowstyle, Club, County, Round,
 )
 from scores.result_modes import get_result_modes
 from tamlynscore.utils import generate_slug
@@ -41,12 +42,11 @@ class ResultsFormatFields(models.Model):
     has_guests = models.BooleanField(default=False)
     has_novices = models.BooleanField(default=False)
     has_juniors = models.BooleanField(default=False)
-    has_wa_age_groups = models.BooleanField(default=False)
     has_agb_age_groups = models.BooleanField(default=False)
-    has_junior_masters_age_groups = models.BooleanField(default=False)
     novices_in_experienced_individual = models.BooleanField(default=False, help_text='Puts the novices in experienced results and their own category')
     novices_in_experienced_teams = models.BooleanField(default=False)
     exclude_later_shoots = models.BooleanField(default=False, help_text='Only the first session can count for results')
+    ifaa_rules = models.BooleanField(default=False)
     use_county_teams = models.BooleanField(default=False)
     strict_b_teams = models.BooleanField(default=False, help_text='e.g. BUTC')
     strict_c_teams = models.BooleanField(default=False, help_text='e.g. BUTC')
@@ -83,6 +83,9 @@ class Competition(ResultsFormatFields, models.Model):
 
     class Meta:
         unique_together = ('date', 'tournament')
+
+    def get_absolute_url(self):
+        return reverse('competition_detail', kwargs={'slug': self.slug})
 
     def __str__(self):
         return u'{0} {1}'.format(self.tournament, self.date.year)
@@ -239,15 +242,6 @@ class SessionRound(models.Model):
                             allocation += (
                                 entry.get_novice_display(),
                             )
-                        if competition.has_wa_age_groups:
-                            if entry.wa_age:
-                                allocation += (
-                                    entry.get_wa_age_display(),
-                                )
-                            else:
-                                allocation += (
-                                    None,
-                                )
                         if competition.has_agb_age_groups:
                             if entry.agb_age:
                                 allocation += (
@@ -257,10 +251,10 @@ class SessionRound(models.Model):
                                 allocation += (
                                     None,
                                 )
-                        if competition.has_junior_masters_age_groups:
-                            if entry.junior_masters_age:
+                        if competition.ifaa_rules:
+                            if entry.ifaa_division:
                                 allocation += (
-                                    entry.get_junior_masters_age_display(),
+                                    entry.get_ifaa_division_display(),
                                 )
                             else:
                                 allocation += (
@@ -284,11 +278,10 @@ class CompetitionEntry(models.Model):
     club = models.ForeignKey(Club, blank=True, null=True, on_delete=models.CASCADE)
     county = models.ForeignKey(County, blank=True, null=True, on_delete=models.CASCADE)
     bowstyle = models.ForeignKey(Bowstyle, on_delete=models.CASCADE)
-    age = models.CharField(max_length=1, choices=AGE_CHOICES, default='S')
-    wa_age = models.CharField(max_length=1, choices=WA_AGE_CHOICES, default='', blank=True)
+    age = models.CharField(max_length=1, choices=SIMPLE_AGE_CHOICES, default='S')
     agb_age = models.CharField(max_length=3, choices=AGB_AGE_CHOICES, default='', blank=True)
-    junior_masters_age = models.CharField(max_length=3, choices=JUNIOR_MASTERS_AGE_CHOICES, default='', blank=True)
     novice = models.CharField(max_length=1, choices=NOVICE_CHOICES, default='E')
+    ifaa_division = models.CharField(max_length=2, choices=IFAA_DIVISIONS, default='', blank=True)
 
     guest = models.BooleanField(default=False)
     custom_team_name = models.CharField(max_length=200, default='', blank=True)

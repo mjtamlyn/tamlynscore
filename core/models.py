@@ -33,35 +33,32 @@ NOVICE_CHOICES = (
 )
 
 
-AGE_CHOICES = (
+SIMPLE_AGE_CHOICES = (
     ('J', 'Junior'),
     ('S', 'Senior'),
 )
 
-WA_AGE_CHOICES = (
-    ('C', 'U18'),
-    ('J', 'U21'),
-    ('', 'Adult'),  # Map senior to '' as we never really print it
-    ('M', '50+'),
-    ('N', '65+'),
-)
-
-JUNIOR_MASTERS_AGE_CHOICES = (
-    ('', 'None'),
+AGB_AGE_CHOICES = (
+    ('', 'Senior'),
+    ('50+', '50+'),
+    ('65+', '65+'),
     ('U21', 'U21'),
     ('U18', 'U18'),
-    ('U14', 'U14'),
-    ('U12', 'U12'),
-)
-
-AGB_AGE_CHOICES = (
-    ('50+', '50+'),
-    ('', 'Senior'),
-    ('U18', 'U18'),
     ('U16', 'U16'),
+    ('U15', 'U15'),
     ('U14', 'U14'),
     ('U12', 'U12'),
     ('U10', 'U10'),
+)
+
+IFAA_DIVISIONS = (
+    ('P', 'Professional'),
+    ('C', 'Cub'),
+    ('J', 'Junior'),
+    ('YA', 'Young Adult'),
+    ('A', 'Adult'),
+    ('V', 'Veteran'),
+    ('S', 'Senior'),
 )
 
 
@@ -101,6 +98,9 @@ class Round(models.Model):
             'tick this box and the split can be used in exports.'
         ),
     )
+    is_ifaa = models.BooleanField(default=False)
+    # This is such a weird round we may as well special case it
+    flint_round = models.BooleanField(default=False)
 
     def __str__(self):
         return self.name
@@ -142,6 +142,7 @@ class Round(models.Model):
 
 class Bowstyle(models.Model):
     name = models.CharField(max_length=50, unique=True)
+    ifaa_only = models.BooleanField(default=False)
 
     def __str__(self):
         return self.name
@@ -212,10 +213,8 @@ class Archer(models.Model):
     gender = models.CharField(max_length=1, choices=GENDER_CHOICES)
     club = models.ForeignKey(Club, blank=True, null=True, on_delete=models.CASCADE)
     bowstyle = models.ForeignKey(Bowstyle, on_delete=models.CASCADE)
-    age = models.CharField(max_length=1, choices=AGE_CHOICES, default='S')
-    wa_age = models.CharField(max_length=1, choices=WA_AGE_CHOICES, default='', blank=True)
+    age = models.CharField(max_length=1, choices=SIMPLE_AGE_CHOICES, default='S')
     agb_age = models.CharField(max_length=3, choices=AGB_AGE_CHOICES, default='', blank=True)
-    junior_masters_age = models.CharField(max_length=3, choices=JUNIOR_MASTERS_AGE_CHOICES, default='', blank=True)
     novice = models.CharField(max_length=1, choices=NOVICE_CHOICES, default='E')
     agb_number = models.BigIntegerField(blank=True, null=True)
     archived = models.BooleanField(default=False)
@@ -228,7 +227,6 @@ class Archer(models.Model):
             'id': self.pk,
             'name': self.name,
             'age': self.age,
-            'wa_age': self.wa_age,
             'agb_age': self.agb_age,
             'gender': self.gender,
             'club': self.club.pk,

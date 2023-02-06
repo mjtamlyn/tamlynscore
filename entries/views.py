@@ -140,8 +140,9 @@ class EntryList(CompetitionMixin, ListView):
         ).order_by('-pk')
 
     def get_stats(self):
+        competition = self.competition
         stats = []
-        sessions = self.competition.session_set.prefetch_related(
+        sessions = competition.session_set.prefetch_related(
             'sessionround_set',
             Prefetch(
                 'sessionround_set__sessionentry_set',
@@ -159,29 +160,25 @@ class EntryList(CompetitionMixin, ListView):
                 bowstyles = collections.Counter(e.competition_entry.bowstyle for e in sr.sessionentry_set.all())
                 genders = collections.Counter(
                     e.competition_entry.archer.get_gender_display() for e in sr.sessionentry_set.all())
-                # TODO: Remove counters not needed by competition options
-                novice_count = len([e for e in sr.sessionentry_set.all() if e.competition_entry.novice == 'N'])
-                junior_count = len([e for e in sr.sessionentry_set.all() if e.competition_entry.age == 'J'])
-                wa_age_groups = collections.Counter(
-                    e.competition_entry.get_wa_age_display() for e in
-                    sr.sessionentry_set.all() if e.competition_entry.wa_age)
-                agb_age_groups = collections.Counter(
-                    e.competition_entry.get_agb_age_display() for e in
-                    sr.sessionentry_set.all() if e.competition_entry.agb_age)
-                junior_masters_age_groups = collections.Counter(
-                    e.competition_entry.get_junior_masters_age_display() for e in
-                    sr.sessionentry_set.all() if e.competition_entry.junior_masters_age)
                 session_round_stats.append({
                     'session_round': sr,
                     'total_entries': len(sr.sessionentry_set.all()),
                     'bowstyles': bowstyles.most_common(5),
                     'genders': genders.most_common(2),
-                    'wa_age_groups': wa_age_groups.most_common(4),
-                    'agb_age_groups': agb_age_groups.most_common(5),
-                    'junior_masters_age_groups': junior_masters_age_groups.most_common(4),
-                    'novice_count': novice_count,
-                    'junior_count': junior_count,
                 })
+                if competition.has_novices:
+                    session_round_stats[-1]['novice_count'] = len([e for e in sr.sessionentry_set.all() if e.competition_entry.novice == 'N'])
+                if competition.has_juniors:
+                    session_round_stats[-1]['junior_count'] = len([e for e in sr.sessionentry_set.all() if e.competition_entry.age == 'J'])
+                if competition.has_agb_age_groups:
+                    session_round_stats[-1]['agb_age_groups'] = collections.Counter(
+                        e.competition_entry.get_agb_age_display() for e in
+                        sr.sessionentry_set.all() if e.competition_entry.agb_age
+                    ).most_common(5)
+                if competition.ifaa_rules:
+                    session_round_stats[-1]['ifaa_division'] = collections.Counter(
+                        e.competition_entry.get_ifaa_division_display() for e in sr.sessionentry_set.all()
+                    ).most_common(7)
             stats.append({
                 'session': session,
                 'total_entries': SessionEntry.objects.filter(session_round__session=session).count(),
@@ -203,7 +200,7 @@ class BatchEntryMixin(object):
         context = super(BatchEntryMixin, self).get_context_data(**kwargs)
         context['batch'] = self.is_in_batch()
         if context['batch']:
-            context['current_row'] = ', '.join(self.get_batch()[0])
+            context['current_row'] = ', '.join('%s: %s' % item for item in self.get_batch()[0].items())
             context['batch_length'] = len(self.get_batch())
         return context
 
@@ -214,7 +211,7 @@ class BatchEntryMixin(object):
         return self.request.session[self.BATCH_KEY]
 
     def url_for_next_in_batch(self):
-        next_name = self.get_batch()[0][0]
+        next_name = self.get_batch()[0]['name']
         url = reverse('archer_search', kwargs={'slug': self.competition.slug})
         return url + '?query=' + next_name
 
@@ -255,11 +252,18 @@ class EntryAdd(BatchEntryMixin, CompetitionMixin, DetailView):
     pk_url_kwarg = 'archer_id'
     template_name = 'entries/entry_add.html'
 
+    def get_initial(self):
+        initial = {}
+        if self.is_in_batch():
+            initial.update(self.get_batch()[0])
+        return initial
+
     def get(self, request, *args, **kwargs):
         self.object = self.get_object()
         form = EntryCreateForm(
             archer=self.object,
             competition=self.competition,
+            initial=self.get_initial(),
         )
         context = self.get_context_data(
             form=form,
@@ -685,6 +689,10 @@ class ScoreSheetsPdf(CompetitionMixin, HeadedPdfView):
             for target, entry in entries:
                 table_data = self.header_table_for_entry(target, entry)
                 header_table = Table(table_data, [0.6 * inch, 2.5 * inch, 3.9 * inch])
+                if self.competition.ifaa_rules:
+                    header_table.setStyle(TableStyle([
+                         ('SPAN', (1, 1), (2, 1)),
+                    ]))
                 elements.append(KeepTogether([self.spacer, header_table, self.spacer] + score_sheet_elements))
             elements.append(PageBreak())
 
@@ -694,6 +702,8 @@ class ScoreSheetsPdf(CompetitionMixin, HeadedPdfView):
         if entry:
             entry = entry.session_entry.competition_entry
             category = u'{0} {1}'.format(entry.archer.get_gender_display(), entry.bowstyle)
+            if self.competition.ifaa_rules:
+                category = entry.get_ifaa_division_display() + ' ' + category
             if self.competition.has_juniors and entry.age == 'J':
                 category = 'Junior ' + category
             header_elements = [
@@ -711,12 +721,8 @@ class ScoreSheetsPdf(CompetitionMixin, HeadedPdfView):
             category_labels = []
             if self.competition.has_novices:
                 category_labels.append(entry.get_novice_display())
-            if self.competition.has_wa_age_groups and entry.wa_age:
-                category_labels.append(entry.get_wa_age_display())
             if self.competition.has_agb_age_groups and entry.agb_age:
                 category_labels.append(entry.get_agb_age_display())
-            if self.competition.has_junior_masters_age_groups and entry.junior_masters_age:
-                category_labels.append(entry.get_junior_masters_age_display())
             if category_labels:
                 header_elements[1][2] = self.Para(' '.join(category_labels), 'h2')
             return header_elements
@@ -727,6 +733,8 @@ class ScoreSheetsPdf(CompetitionMixin, HeadedPdfView):
             ]
 
     def get_score_sheet_elements(self, session_round):
+        if session_round.shot_round.is_ifaa:
+            return self.get_ifaa_score_sheet(session_round, flint_round=session_round.shot_round.flint_round)
         subrounds = session_round.shot_round.subrounds.order_by('-distance')
         score_sheet_elements = []
 
@@ -762,15 +770,99 @@ class ScoreSheetsPdf(CompetitionMixin, HeadedPdfView):
 
             score_sheet_elements += [totals_table, self.spacer]
 
+        return score_sheet_elements + self.get_signing_footer()
+
+    def get_signing_footer(self):
         signing_table_widths = [0.8 * inch, 2 * inch]
         signing_table = Table(
             [[self.Para('Archer', 'h3'), None, None, self.Para('Scorer', 'h3'), '']],
             signing_table_widths + [0.5 * inch] + signing_table_widths
         )
         signing_table.setStyle(self.signing_table_style)
-        score_sheet_elements += [self.spacer, signing_table]
+        return [self.spacer, signing_table]
 
-        return score_sheet_elements
+    def get_ifaa_score_sheet(self, session_round, flint_round=False):
+        row_1 = [
+            'Unit 1',
+            None,
+            None,
+            None,
+            None,
+            'ET',
+            'RT',
+            None,
+            'Unit 2',
+            None,
+            None,
+            None,
+            None,
+            'ET',
+            'RT',
+        ]
+        pen_row = [None] * 3 + ['Total Unit 1'] + [None] * 7 + ['Total Unit 2']
+        end_row = [None] * 11 + ['Unit 1 + Unit 2']
+        rows = 7 if flint_round else 6
+        table_data = [row_1] + [[None for i in range(15)] for j in range(rows)] + [pen_row, end_row]
+
+        if flint_round:
+            table_data[1][0] = table_data[1][8] = '25Y'
+            table_data[2][0] = table_data[2][8] = '20ft'
+            table_data[3][0] = table_data[3][8] = '30Y'
+            table_data[4][0] = table_data[4][8] = '15Y'
+            table_data[5][0] = table_data[5][8] = '20Y'
+            table_data[6][0] = table_data[6][8] = '10Y'
+            table_data[7][0] = table_data[7][8] = 'W Up'
+
+        box_size = self.box_size * 1.3
+        col_widths = [
+            box_size * (1.35 if flint_round else 1),
+            box_size,
+            box_size,
+            box_size,
+            box_size,
+            box_size * 1.35,
+            box_size * 1.35,
+            box_size * 1.5,
+            box_size * (1.35 if flint_round else 1),
+            box_size,
+            box_size,
+            box_size,
+            box_size,
+            box_size * 1.35,
+            box_size * 1.35,
+        ]
+        row_heights = (3 + rows) * [box_size / 1.3]
+
+        table = Table(table_data, col_widths, row_heights)
+
+        styles = [
+            # alignment
+            ('ALIGN', (0, 0), (-1, -1), 'CENTER'),
+            ('VALIGN', (0, 0), (-1, -1), 'MIDDLE'),
+
+            # unit 1 grid
+            ('BOX', (0, 1), (6, -3), 2, colors.black),
+            ('INNERGRID', (0, 1), (6, -3), 0.25, colors.black),
+
+            # unit 2 grid
+            ('BOX', (8, 1), (-1, -3), 2, colors.black),
+            ('INNERGRID', (8, 1), (-1, -3), 0.25, colors.black),
+
+            # end totals columns
+            ('BOX', (5, 0), (6, -2), 2, colors.black),
+            ('INNERGRID', (5, 0), (6, -2), 0.25, colors.black),
+            ('BOX', (-2, 0), (-1, -1), 2, colors.black),
+            ('INNERGRID', (-2, 0), (-1, -1), 0.25, colors.black),
+            ('BOX', (-2, -1), (-1, -1), 2, colors.black),
+        ]
+        if flint_round:
+            styles += [
+                ('BOX', (0, 1), (0, -3), 2, colors.black),
+                ('BOX', (8, 1), (8, -3), 2, colors.black),
+            ]
+
+        table.setStyle(TableStyle(styles))
+        return [table, self.spacer] + self.get_signing_footer()
 
     scores_table_style = TableStyle([
         # alignment

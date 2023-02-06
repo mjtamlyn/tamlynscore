@@ -432,11 +432,6 @@ class PDFResultsRenderer(object):
                     row.append('Novice')
                 else:
                     row.append(None)
-            if self.competition.has_wa_age_groups:
-                if score.target.session_entry.competition_entry.wa_age:
-                    row.append(score.target.session_entry.competition_entry.get_wa_age_display())
-                else:
-                    row.append(None)
         row += self.mode.score_details(score, section)
         return rows
 
@@ -463,11 +458,6 @@ class CSVResultsRenderer(object):
                         if self.competition.has_novices:
                             if score.target.session_entry.competition_entry.novice == 'N':
                                 row.append('Novice')
-                            else:
-                                row.append('')
-                        if self.competition.has_wa_age_groups:
-                            if score.target.session_entry.competition_entry.wa_age:
-                                row.append(score.target.session_entry.competition_entry.get_wa_age_display())
                             else:
                                 row.append('')
                         row += self.mode.score_details(score, section)
@@ -691,12 +681,8 @@ class RankingsExport(ResultModeMixin, CompetitionMixin, View):
             division += 'M'
         else:
             division += 'W'
-        if self.competition.has_wa_age_groups:
-            division = entry.wa_age + division
         if self.competition.has_agb_age_groups:
             division = entry.agb_age + division
-        if self.competition.has_junior_masters_age_groups:
-            division = entry.junior_masters_age + division
         return division
 
     def archer_details(self, entries, scores):
