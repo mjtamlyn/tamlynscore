@@ -207,7 +207,14 @@ class CompetitionForm(forms.Form):
 
 
 class CSVEntryForm(forms.Form):
-    data = forms.CharField(widget=forms.Textarea, help_text='Enter a CSV of archer data. First column must be the name to search on.')
+    data = forms.CharField(widget=forms.Textarea, help_text=(
+        'Copy here the text of a CSV file of entry data. '
+        'Include a header row using some of the following field names: '
+        'name, agb_number, age_group, gender, bowstyle, club. '
+        'name column is required, others are optional. '
+        'Matching is case insensitive, but otherwise needs to be spelled correctly. '
+        'We suggest using multiple small batches rather than one block of hundreds!'
+    ))
 
     def clean_data(self):
         value = self.cleaned_data['data']
@@ -215,8 +222,10 @@ class CSVEntryForm(forms.Form):
         data.write(value)
         data.seek(0)
         try:
-            reader = csv.reader(data)
+            reader = csv.DictReader(data)
             self.read_data = list(reader)
+            if 'name' not in self.read_data[0]:
+                raise forms.ValidationError('name field is required')
         except csv.Error:
             raise forms.ValidationError('Count not interpret csv file')
         return value
@@ -260,7 +269,8 @@ class EntryCreateForm(forms.Form):
         self.session_rounds = SessionRound.objects.filter(session__competition=competition)
         current = self.get_current_obj()
         self.fields['bowstyle'].label = 'Bowstyle (%s)' % current.bowstyle
-        self.initial['agb_number'] = archer.agb_number
+        if archer.agb_number:
+            self.initial['agb_number'] = archer.agb_number
         if self.competition.use_county_teams:
             self.fields['county'] = forms.ModelChoiceField(
                 label='County (%s)' % current.club.county if current.club and current.club.county else 'County',
@@ -308,6 +318,8 @@ class EntryCreateForm(forms.Form):
             self.fields['custom_team_name'] = forms.CharField(required=True)
             self.fields.pop('club')
             self.fields.pop('update_club')
+            if 'club' in self.initial:
+                self.initial['custom_team_name'] = self.initial['club']
 
         if self.competition.ifaa_rules:
             self.fields['agb_number'].label = 'ID number'
@@ -321,8 +333,25 @@ class EntryCreateForm(forms.Form):
                 label='Division',
                 choices=(('', '---------'),) + IFAA_DIVISIONS,
             )
+            if 'age_group' in self.initial:
+                self.initial['ifaa_division'] = self.initial['age_group']
             if getattr(current, 'ifaa_division', None):
                 self.initial['ifaa_division'] = current.ifaa_division
+
+        if self.initial:
+            print(self.initial)
+            for name in self.initial:
+                if name not in self.fields:
+                    continue
+                choices = getattr(self.fields[name], 'choices', None)
+                if choices:
+                    for item in choices:
+                        if hasattr(item[1], 'value'):
+                            value = item[1].value.lower()
+                        else:
+                            value = item[1].lower()
+                        if value == str(self.initial[name]).lower():
+                            self.initial[name] = item[0]
 
     def get_current_obj(self):
         return self.archer

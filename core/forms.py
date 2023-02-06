@@ -17,6 +17,20 @@ class ArcherForm(forms.ModelForm):
                 self.fields.pop('club')
                 self.fields.pop('agb_number')
 
+        if self.initial:
+            for name in self.initial:
+                if name not in self.fields:
+                    continue
+                choices = getattr(self.fields[name], 'choices', None)
+                if choices:
+                    for item in choices:
+                        if hasattr(item[1], 'value'):
+                            value = item[1].value.lower()
+                        else:
+                            value = item[1].lower()
+                        if value == str(self.initial[name]).lower():
+                            self.initial[name] = item[0]
+
     class Meta:
         model = Archer
         fields = ['name', 'gender', 'club', 'bowstyle', 'age', 'novice', 'agb_number']

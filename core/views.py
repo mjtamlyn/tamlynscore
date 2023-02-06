@@ -146,6 +146,8 @@ class ArcherCreate(BatchEntryMixin, LoginRequiredMixin, CreateView):
         name = self.request.GET.get('name')
         if name:
             initial['name'] = name
+        if self.is_in_batch():
+            initial.update(self.get_batch()[0])
         return initial
 
     def get_form_kwargs(self):

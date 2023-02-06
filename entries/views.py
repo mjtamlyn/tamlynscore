@@ -200,7 +200,7 @@ class BatchEntryMixin(object):
         context = super(BatchEntryMixin, self).get_context_data(**kwargs)
         context['batch'] = self.is_in_batch()
         if context['batch']:
-            context['current_row'] = ', '.join(self.get_batch()[0])
+            context['current_row'] = ', '.join('%s: %s' % item for item in self.get_batch()[0].items())
             context['batch_length'] = len(self.get_batch())
         return context
 
@@ -211,7 +211,7 @@ class BatchEntryMixin(object):
         return self.request.session[self.BATCH_KEY]
 
     def url_for_next_in_batch(self):
-        next_name = self.get_batch()[0][0]
+        next_name = self.get_batch()[0]['name']
         url = reverse('archer_search', kwargs={'slug': self.competition.slug})
         return url + '?query=' + next_name
 
@@ -252,11 +252,18 @@ class EntryAdd(BatchEntryMixin, CompetitionMixin, DetailView):
     pk_url_kwarg = 'archer_id'
     template_name = 'entries/entry_add.html'
 
+    def get_initial(self):
+        initial = {}
+        if self.is_in_batch():
+            initial.update(self.get_batch()[0])
+        return initial
+
     def get(self, request, *args, **kwargs):
         self.object = self.get_object()
         form = EntryCreateForm(
             archer=self.object,
             competition=self.competition,
+            initial=self.get_initial(),
         )
         context = self.get_context_data(
             form=form,
