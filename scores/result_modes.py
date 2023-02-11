@@ -145,6 +145,8 @@ class BaseResultMode(object):
             headers += ['10s', 'Xs']
         elif round.scoring_type == 'I':
             headers += ['10s']
+        elif round.scoring_type == 'S':
+            pass
         else:
             headers += ['Hits', 'Golds']
         return ResultSection(
@@ -156,6 +158,8 @@ class BaseResultMode(object):
     def get_main_headers(self, competition):
         if competition.use_county_teams:
             return ['Archer', 'County']
+        if competition.ifaa_rules:
+            return ['Archer', 'Country']
         return ['Archer', 'Club']
 
     def label_for_round(self, round):
@@ -240,6 +244,8 @@ class BaseResultMode(object):
                 scores += [
                     score.golds,
                 ]
+        elif section.round.scoring_type == 'S':
+            scores += [score.score]
         else:
             scores += [
                 score.score,
@@ -379,6 +385,8 @@ class BySession(BaseResultMode):
             headers += ['10s', 'Xs']
         elif round.scoring_type == 'I':
             headers += ['10s']
+        elif round.scoring_type == 'S':
+            pass
         else:
             headers += ['Hits', 'Golds']
         return OrderedDict((
