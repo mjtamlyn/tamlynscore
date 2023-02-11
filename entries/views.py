@@ -159,7 +159,7 @@ class EntryList(CompetitionMixin, ListView):
             for sr in session_rounds:
                 bowstyles = collections.Counter(e.competition_entry.bowstyle for e in sr.sessionentry_set.all())
                 genders = collections.Counter(
-                    e.competition_entry.archer.get_gender_display() for e in sr.sessionentry_set.all())
+                    e.competition_entry.get_gender_display() for e in sr.sessionentry_set.all())
                 session_round_stats.append({
                     'session_round': sr,
                     'total_entries': len(sr.sessionentry_set.all()),
@@ -419,7 +419,7 @@ class TargetList(CompetitionMixin, ListView):
         data = {
             'id': entry.pk,
             'name': entry.competition_entry.archer.name,
-            'gender': entry.competition_entry.archer.get_gender_display(),
+            'gender': entry.competition_entry.get_gender_display(),
             'bowstyle': entry.competition_entry.bowstyle.name,
             'club': entry.competition_entry.team_name(),
             'text': u'%s %s %s %s' % (
@@ -701,7 +701,7 @@ class ScoreSheetsPdf(CompetitionMixin, HeadedPdfView):
     def header_table_for_entry(self, target, entry):
         if entry:
             entry = entry.session_entry.competition_entry
-            category = u'{0} {1}'.format(entry.archer.get_gender_display(), entry.bowstyle)
+            category = u'{0} {1}'.format(entry.get_gender_display(), entry.bowstyle)
             if self.competition.ifaa_rules:
                 category = entry.get_ifaa_division_display() + ' ' + category
             if self.competition.has_juniors and entry.age == 'J':

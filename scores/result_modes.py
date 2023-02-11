@@ -145,6 +145,8 @@ class BaseResultMode(object):
             headers += ['10s', 'Xs']
         elif round.scoring_type == 'I':
             headers += ['10s']
+        elif round.scoring_type == 'S':
+            pass
         else:
             headers += ['Hits', 'Golds']
         return ResultSection(
@@ -156,6 +158,8 @@ class BaseResultMode(object):
     def get_main_headers(self, competition):
         if competition.use_county_teams:
             return ['Archer', 'County']
+        if competition.ifaa_rules:
+            return ['Archer', 'Country']
         return ['Archer', 'Club']
 
     def label_for_round(self, round):
@@ -176,8 +180,10 @@ class BaseResultMode(object):
             shot_round = score.target.session_entry.session_round.shot_round
             subrounds = self.get_subrounds(score)
             if len(subrounds) > 1 and not score.target.session_entry.session_round.session.scoring_system == SCORING_TOTALS:
-                if score.disqualified or score.target.session_entry.session_round.session.scoring_system == SCORING_TOTALS or not hasattr(score, 'source'):
+                if score.disqualified or score.target.session_entry.session_round.session.scoring_system == SCORING_TOTALS:
                     scores += [''] * len(subrounds)
+                elif not hasattr(score, 'source'):
+                    scores += subrounds
                 else:
                     score = score.source
                     subround_scores = []
@@ -240,6 +246,8 @@ class BaseResultMode(object):
                 scores += [
                     score.golds,
                 ]
+        elif section.round.scoring_type == 'S':
+            scores += [score.score]
         else:
             scores += [
                 score.score,
@@ -340,7 +348,7 @@ class BaseResultMode(object):
 
     def get_categories_for_entry(self, competition, entry):
         kwargs = {
-            'gender': entry.archer.get_gender_display(),
+            'gender': entry.get_gender_display(),
             'bowstyle': entry.bowstyle,
         }
         if competition.has_juniors and entry.age == 'J':
@@ -379,6 +387,8 @@ class BySession(BaseResultMode):
             headers += ['10s', 'Xs']
         elif round.scoring_type == 'I':
             headers += ['10s']
+        elif round.scoring_type == 'S':
+            pass
         else:
             headers += ['Hits', 'Golds']
         return OrderedDict((
@@ -613,6 +623,70 @@ class DoubleRound(BaseResultMode):
 
     def label_for_round(self, round):
         return 'Double %s' % str(round)
+
+
+class CombinedRounds(BaseResultMode):
+    slug = 'combined-rounds'
+    name = 'Combined rounds'
+
+    def get_results(self, competition, scores, leaderboard=False, request=None):
+        """Get the results for each category, by combined all scores.
+
+        Strategy:
+        - find the first round shot for result formatting
+        - go through scores, adding to each category specific sets
+        - need to add a quacking score object which is the combination of all the scores
+        """
+        from entries.models import SessionRound
+
+        self.leaderboard = leaderboard
+        self.include_distance_breakdown = True
+
+        shot_round = SessionRound.objects.filter(session__competition=competition).order_by('session__start').exclude(
+            olympicsessionround__exclude_ranking_rounds=True,
+        ).first().shot_round
+        section = ResultSection('Combined scores', shot_round, [])
+        return {
+            section: self.get_round_results(competition, scores)
+        }
+
+    def get_round_results(self, competition, scores):
+        results = OrderedDict()
+        for score in scores:
+            session_entry = score.target.session_entry
+            categories = self.get_categories_for_entry(competition, session_entry.competition_entry)
+            for category in categories:
+                if category not in results:
+                    results[category] = {}
+                if session_entry.competition_entry not in results[category]:
+                    results[category][session_entry.competition_entry] = []
+                results[category][session_entry.competition_entry].append(score)
+        for category, scores in results.items():
+            if not scores:
+                results.pop(category)
+                continue
+            for entry in scores:
+                scores[entry] = sorted(scores[entry], key=lambda s: s.target.session_entry.session_round.session.start)
+            new_scores = [ScoreMock(
+                disqualified=any(s.disqualified for s in sub_scores),
+                retired=any(s.disqualified for s in sub_scores),
+                target=sub_scores[0].target,
+                score=sum(s.score for s in sub_scores),
+                subrounds=[s.score for s in sub_scores],
+                hits=sum(s.hits for s in sub_scores),
+                golds=sum(s.golds for s in sub_scores),
+                xs=sum(s.xs for s in sub_scores),
+            ) for entry, sub_scores in scores.items()]
+            if not self.leaderboard:
+                new_scores = filter(lambda s: s.score > 0, new_scores)
+            results[category] = self.sort_results(new_scores)
+        return results
+
+    def get_subrounds(self, score):
+        return score.subrounds
+
+    def label_for_round(self, round):
+        return 'Combined scores'
 
 
 class Team(BaseResultMode):

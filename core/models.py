@@ -18,6 +18,7 @@ SCORING_TYPES = (
     ('X', 'WA Outdoor - Ten Zone, with Xs, no hits'),
     ('I', 'WA Indoor - Ten Zone, no Xs, no hits'),
     ('W', 'Worcester'),
+    ('S', 'Score only (e.g. IFAA Indoor)'),
 )
 
 

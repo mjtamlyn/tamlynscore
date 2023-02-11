@@ -51,7 +51,7 @@
                                     {% if competition.ifaa_rules and entry.session_entry.competition_entry.ifaa_division %}
                                     <span class="pill junior">{{ entry.session_entry.competition_entry.get_ifaa_division_display }}</span>
                                     {% endif %}
-                                    <span class="pill gender {{ entry.session_entry.competition_entry.archer.get_gender_display|lower }}">{{ entry.session_entry.competition_entry.archer.get_gender_display }}</span>
+                                    <span class="pill gender {{ entry.session_entry.competition_entry.archer.get_gender_display|lower }}">{{ entry.session_entry.competition_entry.get_gender_display }}</span>
                                 </p>
                             {% endif %}
                         </div>

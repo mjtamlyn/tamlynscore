@@ -231,7 +231,7 @@ class SessionRound(models.Model):
                         allocation += (None, None, None)
                     else:
                         allocation += (
-                            entry.archer.get_gender_display(),
+                            entry.get_gender_display(),
                             entry.bowstyle,
                         )
                         if competition.has_juniors:
@@ -311,6 +311,12 @@ class CompetitionEntry(models.Model):
         if self.b_team or self.c_team:
             return '%s (%s)' % (name, 'B' if self.b_team else 'C')
         return name
+
+    def get_gender_display(self):
+        if self.competition.ifaa_rules:
+            names = {'G': 'Male', 'L': 'Female'}
+            return names[self.archer.gender]
+        return self.archer.get_gender_display()
 
 
 class SessionEntry(models.Model):
