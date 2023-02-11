@@ -346,7 +346,7 @@ class BaseResultMode(object):
 
     def get_categories_for_entry(self, competition, entry):
         kwargs = {
-            'gender': entry.archer.get_gender_display(),
+            'gender': entry.get_gender_display(),
             'bowstyle': entry.bowstyle,
         }
         if competition.has_juniors and entry.age == 'J':

@@ -90,7 +90,7 @@
                         {% if competition.has_agb_age_groups and entry.agb_age %}
                         <span class="pill junior">{{ entry.get_agb_age_display }}</span>
                         {% endif %}
-                        <span class="pill gender {{ entry.archer.get_gender_display|lower }}">{{ entry.archer.get_gender_display }}</span>
+                        <span class="pill gender {{ entry.archer.get_gender_display|lower }}">{{ entry.get_gender_display }}</span>
                         {% if entry.archer.agb_number %}
                             {{ entry.archer.agb_number }}
                         {% else %}
