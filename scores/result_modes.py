@@ -677,6 +677,7 @@ class CombinedRounds(BaseResultMode):
                 hits=sum(s.hits for s in sub_scores),
                 golds=sum(s.golds for s in sub_scores),
                 xs=sum(s.xs for s in sub_scores),
+                tiebreak=0,
             ) for entry, sub_scores in scores.items()]
             if not self.leaderboard:
                 new_scores = filter(lambda s: s.score > 0, new_scores)
@@ -842,6 +843,7 @@ class Team(BaseResultMode):
                 hits=sum(s.hits for s in club_scores),
                 golds=sum(s.golds for s in club_scores),
                 xs=sum(s.xs for s in club_scores),
+                tiebreak=0,
                 club=club,
                 team=club_scores,
             )
@@ -902,6 +904,7 @@ class Team(BaseResultMode):
                 hits=sum(s.hits for s in scores),
                 golds=sum(s.golds for s in scores),
                 xs=sum(s.xs for s in scores),
+                tiebreak=sum(s.tiebreak for s in scores),
                 target=scores[0].target,
                 components=scores,
             ))
@@ -946,6 +949,7 @@ class H2HSeedings(ByRound, Team, BaseResultMode):
                         hits=score.hits,
                         golds=score.golds,
                         xs=score.xs,
+                        tiebreak=score.tiebreak,
                         disqualified=score.disqualified,
                         retired=score.retired,
                         source=score,
@@ -1105,6 +1109,7 @@ class Weekend(BaseResultMode):
                     hits=seed.rank,
                     golds=fita_result.placing,
                     xs=ranking_result.placing + seed.rank + fita_result.placing,
+                    tiebreak=0,
                     disqualified=False,
                     retired=False,
                     placing=seed.rank,
