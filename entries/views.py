@@ -591,7 +591,7 @@ class HeadedPdfView(PdfView):
             sponsors = self.competition.sponsors.all()
 
             positions = (
-                (50, -50),
+                (50, 20),
             )
             for i, sponsor in enumerate(sponsors):
                 canvas.drawImage(
@@ -831,7 +831,7 @@ class ScoreSheetsPdf(CompetitionMixin, HeadedPdfView):
             box_size * 1.35,
             box_size * 1.35,
         ]
-        row_heights = (3 + rows) * [box_size / 1.3]
+        row_heights = (3 + rows) * [box_size / 1.4]
 
         table = Table(table_data, col_widths, row_heights)
 

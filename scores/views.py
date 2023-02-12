@@ -375,7 +375,7 @@ class PDFResultsRenderer(object):
         canvas.drawCentredString(self.page_width / 2.0, self.page_height - 70, u'{0}: {1}'.format(self.competition, self.title))
         sponsors = self.competition.sponsors.all()
         if sponsors:
-            canvas.drawImage(sponsors[0].logo.path, 50, -50, width=self.PAGE_WIDTH - 100, preserveAspectRatio=True, anchor='nw')
+            canvas.drawImage(sponsors[0].logo.path, 50, 20, width=self.PAGE_WIDTH - 100, preserveAspectRatio=True, anchor='nw')
         canvas.restoreState()
 
     def get_elements(self, results):
