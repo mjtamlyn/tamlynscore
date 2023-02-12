@@ -92,7 +92,7 @@ class BaseResultMode(object):
         raise ImproperlyConfigured('Subclasses must implement get_results')
 
     def sort_results(self, scores):
-        scores = sorted(scores, key=lambda s: (s.score, s.hits, s.golds, s.xs), reverse=True)
+        scores = sorted(scores, key=lambda s: (s.score, s.hits, s.golds, s.xs, s.tiebreak), reverse=True)
         placing = 0
         current_score = None
         placing_counter = 1
@@ -105,6 +105,7 @@ class BaseResultMode(object):
                     hits=score.hits,
                     golds=score.golds,
                     xs=score.xs,
+                    tiebreak=score.tiebreak,
                     disqualified=score.disqualified,
                     retired=score.retired,
                     source=score,
@@ -112,7 +113,7 @@ class BaseResultMode(object):
             if score.disqualified or score.guest:
                 score.placing = None
             else:
-                score_repr = (score.score, score.hits, score.golds, score.xs)
+                score_repr = (score.score, score.hits, score.golds, score.xs, score.tiebreak)
                 if score_repr == current_score:
                     placing_counter += 1
                 else:

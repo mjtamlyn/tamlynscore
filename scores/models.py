@@ -40,6 +40,8 @@ class Score(models.Model):
     golds = models.PositiveIntegerField(default=0)
     xs = models.PositiveIntegerField(default=0)
 
+    tiebreak = models.PositiveIntegerField(default=0)
+
     alteration = models.IntegerField(default=0)
 
     retired = models.BooleanField(default=False)
