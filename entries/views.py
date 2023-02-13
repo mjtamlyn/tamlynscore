@@ -99,6 +99,27 @@ class CompetitionDetail(CompetitionMixin, DetailView):
     def get_object(self):
         return self.competition
 
+    def get_context_data(self, **kwargs):
+        today = timezone.now().date()
+
+        context = super().get_context_data(**kwargs)
+        context['legs'] = self.object.leg_set.select_related('season__league')
+        context['related_events'] = self.object.tournament.competition_set.order_by('-date').exclude(pk=self.object.pk)
+
+        context['is_future'] = (self.competition.date > today)
+        if context['is_future']:
+            rounds = set()
+            for session in self.competition.session_set.all():
+                rounds |= {sr.shot_round for sr in session.sessionround_set.all()}
+            context['rounds'] = sorted(rounds)
+
+            context['entry_count'] = self.competition.competitionentry_set.count()
+
+            context['target_list_set'] = TargetAllocation.objects.filter(
+                session_entry__competition_entry__competition=self.competition,
+            ).exists()
+        return context
+
 
 class CompetitionUpdate(CompetitionMixin, FormView):
     form_class = CompetitionForm

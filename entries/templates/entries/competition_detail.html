@@ -4,7 +4,7 @@
 <header class="banner competition-banner">
     <a href="{% url 'competition_detail' slug=competition.slug %}" class="main">
         <h1>{{ competition.tournament }}</h1>
-        <p>{{ competition.date }}{% if competition.end_date > competition.date %} to {{ competition.end_date }}{% endif %}</p>
+        <p>{{ competition.date|date:"jS F Y" }}{% if competition.end_date > competition.date %} to {{ competition.end_date }}{% endif %}</p>
     </a>
 
     <span class="byline">Malcolm Rees</span>
@@ -62,24 +62,85 @@
 {% block content %}
 {% block competition_content %}
 <div class="row">
+    {% if is_future %}
     <div class="col6">
-        <h3>About this competition</h3>
-        <dl>
-            <dt>Tournament date(s)</dt>
-            <dd>{{ competition.date }}{% if not competition.end_date == competition.date %} to {{ competition.end_date }}{% endif %}</dd>
-            <dt>Hosted by</dt>
-            <dd>{{ competition.tournament.host_club.name }}</dd>
-            <dt>Options</dt>
-            <dd>
-                <ul>
-                    <li>{% if competition.has_novices %}Has a novice category{% else %}Does not have a novice category{% endif %}</li>
-                    {% if competition.has_novices %}
-                    <li>{% if competition.novices_in_experienced_teams %}Novices can be in experienced teams{% else %}Novices cannot be in experienced teams{% endif %}</li>
-                    {% endif %}
-                </ul>
-            </dd>
-        </dl>
+        <h2>Tournament information</h2>
     </div>
+
+    <div class="col3">
+        <h3>Entry stats</h3>
+        <ul class="bullets">
+            {% for round in rounds %}
+            <li>{{ round }}</li>
+            {% endfor %}
+        </ul>
+        <p>Total entries</p>
+        <p>{{ entry_count }}</p>
+
+        <p><b>TODO!</b> Copy the entry stats section from Manage Entries here?</p>
+    </div>
+
+    <div class="col3">
+        <h3>Target List</h3>
+        {% if target_list_set %}
+        <p><a class="btn" href="{% url 'target_list' slug=competition.slug %}">View online</a></p>
+        <p><b>TODO!</b> Add link to download, make this look less shit</p>
+        {% else %}
+        <p>Target list coming soon.</p>
+        {% endif %}
+    </div>
+
+    {% else %}
+    <p><b>TODO!</b> Pull the top results here - minimal team results (when teams exist), top 3 when ByRound exists, if neither exist then link to results</p>
+    {% endif %}
+</div>
+
+<div class="row">
+    {% if legs %}
+    <div class="col3">
+        {% if legs %}
+            {% for leg in legs %}
+
+            <h2>{{ leg.season.league }}</h2>
+            <p>This event is part of {{ leg }}.</p>
+            <p><a class="btn" href="{{ leg.season.get_absolute_url }}">View season</a></p>
+
+            {% if leg.competitions.count > 1 %}
+            <p>The other events in this leg are:</p>
+            <p>
+            <ul class="link-list">
+                {% for event in leg.competitions.all %}
+                    {% if event.id != competition.id %}
+                    <li><a href="{% url 'competition_detail' slug=event.slug %}">{{ event.tournament }}</a></li>
+                    {% endif %}
+                {% endfor %}
+            </ul>
+            {% endif %}
+
+            {% if leg.result_modes.all %}
+            <p>Combined results can be viewed at:</p>
+            <ul class="link-list">
+                {% for mode in leg.result_modes.all %}
+                <li><a href="{{ mode.get_absolute_url }}">{{ mode }}</a></li>
+                {% endfor %}
+            </ul>
+            {% endif %}
+
+            {% endfor %}
+        {% endif %}
+    </div>
+    {% endif %}
+
+    {% if related_events %}
+    <div class="col3">
+        <h2>Other editions</h2>
+        <ul class="link-list">
+            {% for event in related_events %}
+            <li><a href="{% url 'competition_detail' slug=event.slug %}">{{ event.date|date:"jS F Y" }}</a></li>
+            {% endfor %}
+        </ul>
+    </div>
+    {% endif %}
 </div>
 {% endblock %}
 {% endblock %}

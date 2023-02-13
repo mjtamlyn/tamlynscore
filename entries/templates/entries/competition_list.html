@@ -2,8 +2,10 @@
 
 {% block content %}
 <header>
-    <a class="pull-right btn add" href="{% url 'competition_create' %}">New competition</a>
-    <h1>Competitions</h1>
+    {% if user.is_superuser %}
+    <a class="pull-right btn add" href="{% url 'competition_create' %}">New tournament</a>
+    {% endif %}
+    <h1>Tournaments</h1>
 </header>
 
 {% if current %}

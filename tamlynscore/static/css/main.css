@@ -3636,6 +3636,16 @@ ul {
 }
 
 /* line 35, ../../sass/_typography.sass */
+ul.bullets {
+  list-style-type: disc;
+  padding-inline-start: 30px;
+}
+/* line 38, ../../sass/_typography.sass */
+ul.bullets li {
+  display: list-item;
+}
+
+/* line 41, ../../sass/_typography.sass */
 li {
   display: block;
 }
