@@ -9,15 +9,52 @@
     <p>TamlynScore is an online platform for running archery competitions.<br>If you'd like to use TamlynScore for your event, please <a href="mailto:hello@tamlynscore.co.uk?subject=TamlynScore" class="link">contact us</a>.</p>
 </div>
 
+<h2>Tournaments</h2>
+<div class="row">
+    {% if current_competitions %}
+    <div class="col3">
+        <h3>In progress and coming soon</h3>
+        <ul class="link-list">
+            {% for competition in current_competitions %}
+            <li>
+            <a href="{% url 'competition_detail' slug=competition.slug %}">
+                {{ competition }}
+                <small>{{ competition.date|date:"jS F" }}</small>
+            </a>
+            </li>
+            {% endfor %}
+        </ul>
+    </div>
+    {% endif %}
+    {% if recent_competitions %}
+    <div class="col3">
+        <h3>Recently Finished</h3>
+        <ul class="link-list">
+            {% for competition in recent_competitions %}
+            <li>
+            <a href="{% url 'competition_detail' slug=competition.slug %}">
+                {{ competition }}
+                <small>{{ competition.date|date:"jS F" }}</small>
+            </a>
+            </li>
+            {% endfor %}
+        </ul>
+    </div>
+    {% endif %}
+</div>
+
+{% if seasons %}
 <h2>Leagues</h2>
 <div class="leagues">
-{% for league in leagues %}
-<a href="{% firstof league.get_current_season.get_absolute_url league.get_absolute_url %}">
+{% for season in seasons %}
+<a href="{% firstof season.league.get_current_season.get_absolute_url league.get_absolute_url %}">
     <div class="leagues__block">
-        <img class="leagues__img" src="{% static 'leagues/logos/'|add:league.slug|add:'.png' %}">
-        <h3>{{ league }}</h3>
+        <img class="leagues__img" src="{% static 'leagues/logos/'|add:season.league.slug|add:'.png' %}">
+        <h3>{{ season.league }}</h3>
     </div>
 </a>
 {% endfor %}
 </div>
+{% endif %}
+
 {% endblock %}

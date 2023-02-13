@@ -1,9 +1,11 @@
 import copy
+import datetime
 
 from django.core.cache import cache
 from django.db.models import Prefetch
 from django.shortcuts import get_object_or_404
 from django.urls import reverse
+from django.utils import timezone
 from django.views.generic import (
     CreateView, DetailView, ListView, TemplateView, UpdateView,
 )
@@ -12,7 +14,7 @@ from braces.views import LoginRequiredMixin, SuperuserRequiredMixin
 
 from entries.models import Competition, CompetitionEntry
 from entries.views import BatchEntryMixin
-from leagues.models import League
+from leagues.models import Season
 from scores.models import Score
 
 from .forms import ArcherForm, ClubArcherForm
@@ -41,7 +43,19 @@ class Index(TemplateView):
 
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
-        context['leagues'] = League.objects.order_by('?')
+        today = timezone.now().date()
+
+        context['seasons'] = Season.objects.filter(start_date__lte=today, end_date__gt=today)
+
+        competitions = Competition.objects.select_related('tournament').order_by('date')
+        context['current_competitions'] = competitions.filter(
+            date__lte=today + datetime.timedelta(days=7),
+            end_date__gte=today,
+        )
+        context['recent_competitions'] = competitions.filter(
+            date__gte=today - datetime.timedelta(days=7),
+            end_date__lt=today,
+        )
         return context
 
 
