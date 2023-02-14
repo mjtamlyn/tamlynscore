@@ -107,6 +107,7 @@ class BaseResultMode(object):
                     xs=score.xs,
                     tiebreak=score.tiebreak,
                     disqualified=score.disqualified,
+                    is_actual_zero=score.is_actual_zero,
                     retired=score.retired,
                     source=score,
                 )
@@ -418,7 +419,7 @@ class BySession(BaseResultMode):
         for category in results:
             results[category] = self.sort_results(results[category])
             for i, score in enumerate(results[category]):
-                if not self.leaderboard and score.score == 0:
+                if not self.leaderboard and score.score == 0 and not getattr(score, 'is_actual_zero', False):
                     results[category][i] = ScoreMock(
                         target=score.target,
                         score='DNS',
@@ -490,7 +491,7 @@ class ByRound(BaseResultMode):
         for cat in results:
             results[cat] = self.sort_results(results[cat])
             for i, score in enumerate(results[cat]):
-                if not self.leaderboard and score.score == 0:
+                if not self.leaderboard and score.score == 0 and not getattr(score, 'is_actual_zero', False):
                     results[cat][i] = ScoreMock(
                         target=score.target,
                         score='DNS',

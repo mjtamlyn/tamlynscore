@@ -495,6 +495,7 @@ class ResultModeMixin(object):
             'target__session_entry__competition_entry__archer__gender',
             'disqualified',
             '-score',
+            '-is_actual_zero',
             '-golds',
             '-xs'
         )

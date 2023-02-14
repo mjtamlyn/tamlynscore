@@ -45,6 +45,10 @@ class Score(models.Model):
     alteration = models.IntegerField(default=0)
 
     retired = models.BooleanField(default=False)
+    is_actual_zero = models.BooleanField(default=False, help_text=(
+        'Set true if the archer really completed the round without scoring a '
+        'single point. Also useful if the "alteration" returns the score to 0.'
+    ))
     disqualified = models.BooleanField(default=False)
 
     objects = ScoreManager()
