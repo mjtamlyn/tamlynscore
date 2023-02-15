@@ -647,7 +647,8 @@ class CombinedRounds(BaseResultMode):
         shot_round = SessionRound.objects.filter(session__competition=competition).order_by('session__start').exclude(
             olympicsessionround__exclude_ranking_rounds=True,
         ).first().shot_round
-        section = ResultSection('Combined scores', shot_round, [])
+        headers = ['Pl.'] + self.get_main_headers(competition)
+        section = ResultSection('Combined scores', shot_round, headers)
         return {
             section: self.get_round_results(competition, scores)
         }

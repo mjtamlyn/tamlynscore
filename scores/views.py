@@ -396,6 +396,8 @@ class PDFResultsRenderer(object):
                 category_table_style = copy.copy(table_style)
                 elements.append(Paragraph(str(category), self.styles['h2']))
                 table_data = [section.headers]
+                if not scores:
+                    continue
                 for i, score in enumerate(scores):
                     table_data += self.rows_from_score(scores, score, section, i, category_table_style)
                 table = Table(table_data)
@@ -453,7 +455,7 @@ class CSVResultsRenderer(object):
                     else:
                         row += [
                             score.target.session_entry.competition_entry.archer.name,
-                            score.target.session_entry.competition_entry.club.name + (' (Guest)' if score.guest else ''),
+                            score.target.session_entry.competition_entry.team_name() + (' (Guest)' if score.guest else ''),
                         ]
                         if self.competition.has_novices:
                             if score.target.session_entry.competition_entry.novice == 'N':
