@@ -198,9 +198,9 @@ class InputArrowsArcher(CompetitionMixin, TemplateView):
             'et2': 0,
             'rt': 0,
         } for i in range(int(round.arrows / per_end))]
-        arrows = score.arrow_set.all()
+        arrows = score.arrow_set.order_by('arrow_of_round')
         for arrow in arrows:
-            dozen = int((arrow.arrow_of_round - 13) / per_end)
+            dozen = int((arrow.arrow_of_round - per_end - 1) / per_end)
             point = arrow.arrow_of_round % per_end - 1
             layout[dozen]['scores'][point] = str(arrow)
             layout[dozen]['doz'] += arrow.arrow_value
@@ -224,6 +224,7 @@ class InputArrowsArcher(CompetitionMixin, TemplateView):
             'layout': layout,
             'score': score,
             'round': round,
+            'per_end': per_end,
         })
         return context
 

@@ -8,17 +8,19 @@
 
         <thead>
             <tr>
-                <td colspan="{% if layout.0.scores|length > 6 %}6{% else %}{{ forms.0.forms|length }}{% endif %}"></td>
+                <td colspan="{% if layout.0.scores|length > 6 %}6{% else %}{{ per_end }}{% endif %}"></td>
                 {% if layout.0.scores|length > 6 %}
                 <th>ET</th>
                 <td colspan="6"></td>
                 <th>ET</th>
                 {% endif %}
                 <th>Doz</th>
-                {% if not round.has_xs %}
+                {% if round.has_hits %}
                 <th>Hits</th>
                 {% endif %}
+                {% if round.has_golds %}
                 <th>Golds</th>
+                {% endif %}
                 {% if round.has_xs %}
                 <th>Xs</th>
                 {% endif %}
@@ -36,12 +38,16 @@
                 <th>{{ dozen.et1 }}</th>
                 {% endif %}
             {% endfor %}
+            {% if layout.0.scores|length > 6 %}
             <th>{{ dozen.et2 }}</th>
+            {% endif %}
             <th>{{ dozen.doz }}</th>
-            {% if not round.has_xs %}
+            {% if round.has_hits %}
             <th>{{ dozen.hits }}</th>
             {% endif %}
+            {% if round.has_golds %}
             <th>{{ dozen.golds }}</th>
+            {% endif %}
             {% if round.has_xs %}
             <th>{{ dozen.xs }}</th>
             {% endif %}
@@ -52,13 +58,19 @@
         </tr>
         {% endfor %}
         <tr class="footer">
-            <td colspan="{{ layout.0.scores|length }}"></td>
-            <th class="no-left-border" colspan="2">Totals</th>
+            {% if layout.0.scores|length > 6 %}
+                <td colspan="{{ layout.0.scores|length|add:"-1" }}"></td>
+            {% else %}
+                <td colspan="{{ layout.0.scores|length|add:"-3" }}"></td>
+            {% endif %}
+            <th class="no-left-border" colspan="3">Totals</th>
             <th>{{ score.score }}</th>
-            {% if not round.has_xs %}
+            {% if round.has_hits %}
             <th>{{ score.hits }}</th>
             {% endif %}
+            {% if round.has_golds %}
             <th>{{ score.golds }}</th>
+            {% endif %}
             {% if round.has_xs %}
             <th>{{ score.xs }}</th>
             {% endif %}

@@ -123,6 +123,18 @@ class Round(models.Model):
         return self.scoring_type == 'X'
 
     @property
+    def has_golds(self):
+        return not self.is_ifaa
+
+    @property
+    def has_hits(self):
+        if self.scoring_type in ['X', 'I']:
+            return False
+        if self.is_ifaa:
+            return False
+        return True
+
+    @property
     def score_sheet_headings(self):
         if self.scoring_type == 'X':
             return ['10+X', 'X']
