@@ -679,7 +679,7 @@ class CombinedRounds(BaseResultMode):
                 hits=sum(s.hits for s in sub_scores),
                 golds=sum(s.golds for s in sub_scores),
                 xs=sum(s.xs for s in sub_scores),
-                tiebreak=0,
+                tiebreak=sum(s.tiebreak for s in sub_scores),
             ) for entry, sub_scores in scores.items()]
             if not self.leaderboard:
                 new_scores = filter(lambda s: s.score > 0, new_scores)
