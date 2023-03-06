@@ -411,7 +411,7 @@ class EntryCreateForm(forms.Form):
             entry.age = self.cleaned_data['age'] or default.age
         if self.competition.has_agb_age_groups:
             entry.agb_age = self.cleaned_data['agb_age']
-            if entry.agb_age:
+            if entry.agb_age not in ['', '50+', '65+']:
                 entry.age = 'J'
         if self.competition.has_guests:
             entry.guest = self.cleaned_data['guest']
