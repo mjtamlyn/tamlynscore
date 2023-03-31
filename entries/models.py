@@ -43,6 +43,7 @@ class ResultsFormatFields(models.Model):
     has_novices = models.BooleanField(default=False)
     has_juniors = models.BooleanField(default=False)
     has_agb_age_groups = models.BooleanField(default=False)
+    split_categories_on_agb_age = models.BooleanField(default=True)
     novices_in_experienced_individual = models.BooleanField(default=False, help_text='Puts the novices in experienced results and their own category')
     novices_in_experienced_teams = models.BooleanField(default=False)
     exclude_later_shoots = models.BooleanField(default=False, help_text='Only the first session can count for results')

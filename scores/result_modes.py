@@ -127,8 +127,8 @@ class BaseResultMode(object):
 
     def get_section_for_round(self, round, competition):
         headers = ['Pl.'] + self.get_main_headers(competition)
-        if competition.has_juniors:
-            headers += ['']
+        if competition.has_juniors or not competition.split_categories_on_agb_age:
+            headers += ['Age']
         if competition.has_novices:
             headers += ['']
         if self.include_distance_breakdown and hasattr(round, 'subrounds'):
@@ -355,7 +355,7 @@ class BaseResultMode(object):
         }
         if competition.has_juniors and entry.age == 'J':
             kwargs['junior'] = 'Junior'
-        if competition.has_agb_age_groups and entry.agb_age:
+        if competition.has_agb_age_groups and competition.split_categories_on_agb_age and entry.agb_age:
             kwargs['junior'] = entry.get_agb_age_display()
         if competition.ifaa_rules and entry.ifaa_division:
             kwargs['junior'] = entry.get_ifaa_division_display()

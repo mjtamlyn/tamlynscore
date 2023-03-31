@@ -435,6 +435,11 @@ class PDFResultsRenderer(object):
                     row.append('Novice')
                 else:
                     row.append(None)
+            if self.competition.has_agb_age_groups and not self.competition.split_categories_on_agb_age:
+                if score.target.session_entry.competition_entry.agb_age:
+                    row.append(score.target.session_entry.competition_entry.get_agb_age_display())
+                else:
+                    row.append('')
         row += self.mode.score_details(score, section)
         return rows
 
@@ -461,6 +466,11 @@ class CSVResultsRenderer(object):
                         if self.competition.has_novices:
                             if score.target.session_entry.competition_entry.novice == 'N':
                                 row.append('Novice')
+                            else:
+                                row.append('')
+                        if self.competition.has_agb_age_groups and not self.competition.split_categories_on_agb_age:
+                            if score.target.session_entry.competition_entry.agb_age:
+                                row.append(score.target.session_entry.competition_entry.get_agb_age_display())
                             else:
                                 row.append('')
                         row += self.mode.score_details(score, section)

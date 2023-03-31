@@ -39,6 +39,9 @@
                         {% if competition.has_novices %}
                             <td>{% if score.target.session_entry.competition_entry.novice == 'N' %}Novice{% endif %}</td>
                         {% endif %}
+                        {% if not competition.split_categories_on_agb_age %}
+                            <td>{% if score.target.session_entry.competition_entry.agb_age %}{{ score.target.session_entry.competition_entry.get_agb_age_display }}{% endif %}</td>
+                        {% endif %}
                     {% endif %}
                     {% for detail in score.details %}
                         <td>{{ detail }}</td>
