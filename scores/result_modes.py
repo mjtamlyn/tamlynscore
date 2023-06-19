@@ -125,9 +125,9 @@ class BaseResultMode(object):
             results.append(score)
         return results
 
-    def get_section_for_round(self, round, competition):
+    def get_section_for_round(self, round, competition, is_team=False):
         headers = ['Pl.'] + self.get_main_headers(competition)
-        if competition.has_juniors or not competition.split_categories_on_agb_age:
+        if competition.has_juniors or not competition.split_categories_on_agb_age and not is_team:
             headers += ['Age']
         if competition.has_novices:
             headers += ['']
@@ -718,7 +718,7 @@ class Team(BaseResultMode):
             type_results = self.get_team_scores(competition, clubs, type)
             if type_results:
                 results[type] = type_results
-        return {self.get_section_for_round(round, competition): results}
+        return {self.get_section_for_round(round, competition, is_team=True): results}
 
     def split_by_club(self, scores, competition, leaderboard, valid_rounds=None):
         from entries.models import Competition, SessionRound
