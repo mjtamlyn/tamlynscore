@@ -129,7 +129,7 @@ class BaseResultMode(object):
         headers = ['Pl.'] + self.get_main_headers(competition)
         if competition.has_juniors or not competition.split_categories_on_agb_age and not is_team:
             headers += ['Age']
-        if competition.has_novices:
+        if competition.has_novices and not is_team:
             headers += ['']
         if self.include_distance_breakdown and hasattr(round, 'subrounds'):
             subrounds = round.subrounds.all()
