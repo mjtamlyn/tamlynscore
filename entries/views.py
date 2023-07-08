@@ -123,7 +123,10 @@ class CompetitionDetail(CompetitionMixin, ResultModeMixin, DetailView):
                 session_entry__competition_entry__competition=self.competition,
             ).exists()
         else:
-            by_round = self.get_mode('by-round')
+            try:
+                by_round = self.get_mode('by-round')
+            except Http404:
+                by_round = None
             if by_round:
                 context['by_round'] = by_round.get_results(self.competition, self.get_scores(), leaderboard=True, request=self.request)
                 for section in context['by_round']:
@@ -183,6 +186,7 @@ class EntryList(CompetitionMixin, ListView):
                     'competition_entry',
                     'competition_entry__bowstyle',
                     'competition_entry__archer',
+                    'competition_entry__competition',
                 ),
             ),
         ).order_by('start')
