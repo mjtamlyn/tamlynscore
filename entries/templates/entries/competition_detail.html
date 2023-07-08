@@ -3,7 +3,7 @@
 {% block precontent %}
 <header class="banner competition-banner">
     <a href="{% url 'competition_detail' slug=competition.slug %}" class="main">
-        <h1>{{ competition.tournament }}</h1>
+        <h1>{{ competition.short_name }}</h1>
         <p>{{ competition.date|date:"jS F Y" }}{% if competition.end_date > competition.date %} to {{ competition.end_date }}{% endif %}</p>
     </a>
 
@@ -61,6 +61,7 @@
 
 {% block content %}
 {% block competition_content %}
+<h1>{{ competition.full_name }}</h1>
 <div class="row">
     {% if is_future %}
     <div class="col6">
@@ -153,7 +154,12 @@
         <h2>Other editions</h2>
         <ul class="link-list">
             {% for event in related_events %}
-            <li><a href="{% url 'competition_detail' slug=event.slug %}">{{ event.date|date:"jS F Y" }}</a></li>
+            <li>
+                <a href="{% url 'competition_detail' slug=event.slug %}">
+                    {{ event }}
+                    <small>{{ event.date|date:"jS F Y" }}</small>
+                </a>
+            </li>
             {% endfor %}
         </ul>
     </div>
