@@ -59,12 +59,15 @@ class InputScores(TargetList):
             if cache.get('bosses_cache_%d' % session.pk):
                 allocations = allocations.exclude(session_entry__session_round__session=session)
 
-        arrows = Arrow.objects.filter(score__target__in=allocations).values('arrow_of_round', 'score__target_id', 'score__target__session_entry__session_round__session__arrows_entered_per_end')
-        dozens = Dozen.objects.filter(score__target__in=allocations).values('score__target_id', 'dozen', 'score__target__session_entry__session_round__session__arrows_entered_per_end')
+        entered_per_end = None
+        if allocations:
+            entered_per_end = allocations[0].session_entry.session_round.session.arrows_entered_per_end
+
+        arrows = Arrow.objects.filter(score__target__in=allocations).values('arrow_of_round', 'score__target_id')
+        dozens = Dozen.objects.filter(score__target__in=allocations).values('score__target_id', 'dozen')
         target_lookup = {}
         for arrow in arrows:
             target = arrow['score__target_id']
-            entered_per_end = arrow['score__target__session_entry__session_round__session__arrows_entered_per_end']
             if target not in target_lookup:
                 target_lookup[target] = {}
             dozen = math.floor((arrow['arrow_of_round'] - 1) / entered_per_end)
@@ -75,7 +78,6 @@ class InputScores(TargetList):
 
         for dozen in dozens:
             target = dozen['score__target_id']
-            entered_per_end = dozen['score__target__session_entry__session_round__session__arrows_entered_per_end']
             if target not in target_lookup:
                 target_lookup[target] = {}
             if dozen['dozen'] not in target_lookup[target]:
