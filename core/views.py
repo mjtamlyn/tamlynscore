@@ -53,9 +53,13 @@ class Index(TemplateView):
             end_date__gte=today,
         )
         context['recent_competitions'] = competitions.filter(
-            date__gte=today - datetime.timedelta(days=7),
+            date__gte=today - datetime.timedelta(days=14),
             end_date__lt=today,
         )
+        if len(context['recent_competitions']) < 5:
+            context['recent_competitions'] = competitions.order_by('-date').filter(
+                end_date__lt=today,
+            )[:5]
         return context
 
 

@@ -19,3 +19,22 @@ ul.link-list
       &:hover
         background: $bg
         cursor: pointer
+
+.year-accordion
+  &__header
+    cursor: pointer
+    &::after
+      @include fa-icon()
+      content: $fa-var-chevron-right
+      margin-left: 5px
+      color: $borders
+      font-size: 14px
+
+  .link-list
+    display: none
+
+  &--active
+    .year-accordion__header::after
+      transform: rotate(90deg)
+    .link-list
+      display: block
