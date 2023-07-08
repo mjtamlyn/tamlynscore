@@ -1,5 +1,4 @@
 import itertools
-import json
 from collections import OrderedDict
 
 from django.core.exceptions import ImproperlyConfigured
@@ -261,93 +260,6 @@ class BaseResultMode(object):
                     score.golds,
                 ]
         return scores
-
-    def serialize(self, results=None):
-        if results is None:
-            results = self.get_results()
-        json_results = []
-        for section, categories in results.items():
-            json_section = {
-                'section': {
-                    'label': section.label,
-                    'round': section.round.pk,
-                    'headers': section.headers,
-                },
-                'categories': [],
-            }
-            for category, scores in categories.items():
-                json_category = {
-                    'category': str(category),
-                    'scores': [],
-                }
-                for score in scores:
-                    if score.is_team:
-                        json_score = {
-                            'summary': [
-                                score.placing,
-                                score.club,
-                            ] + self.score_details(score, section),
-                            'team': [[
-                                member.target.pk,
-                            ] + self.score_details(member, section) for member in score.team],
-                        }
-                    else:
-                        json_score = [
-                            score.placing,
-                            score.target.pk,
-                        ] + self.score_details(score, section)
-                    json_category['scores'].append(json_score)
-                json_section['categories'].append(json_category)
-            json_results.append(json_section)
-        return json.dumps(json_results)
-
-    def deserialize(self, json_results):
-        from entries.models import TargetAllocation
-
-        json_results = json.loads(json_results)
-        results = OrderedDict()
-        for json_section in json_results:
-            kwargs = json_section['section']
-            section = ResultSection(**kwargs)
-            results[section] = OrderedDict()
-            for json_category in json_section['categories']:
-                category = json_category['category']
-                scores = []
-                individual_target_pks = [score[1] for score in json_category['scores'] if isinstance(score, list)]
-                team_target_pks = sum([
-                    [score[0] for score in place['team']
-                ] for place in json_category['scores'] if isinstance(place, dict)], [])
-                targets = TargetAllocation.objects.filter(
-                    pk__in=individual_target_pks + team_target_pks,
-                ).select_related(
-                    'session_entry__competition_entry__archer',
-                    'session_entry__competition_entry__club',
-                    'session_entry__competition_entry__county',
-                )
-                target_lookup = {target.pk: target for target in targets}
-                for score in json_category['scores']:
-                    if isinstance(score, dict):
-                        summary = score['summary']
-                        scores.append(ScoreMock(
-                            placing=summary[0],
-                            club=summary[1],
-                            details=summary[2:],
-                            team=[ScoreMock(
-                                target=target_lookup.get(member[0], None),
-                                details=member[1:],
-                            ) for member in score['team']],
-                        ))
-                    else:
-                        placing = score[0]
-                        target = score[1]
-                        details = score[2:]
-                        scores.append(ScoreMock(
-                            placing=placing,
-                            target=target_lookup.get(target, None),
-                            details=details,
-                        ))
-                results[section][category] = scores
-        return results
 
     def get_categories_for_entry(self, competition, entry):
         kwargs = {

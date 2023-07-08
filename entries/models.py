@@ -131,7 +131,6 @@ class ResultsMode(models.Model):
     competition = models.ForeignKey(Competition, related_name='result_modes', on_delete=models.CASCADE)
     mode = models.CharField(max_length=31, choices=tuple(get_result_modes()))
     leaderboard_only = models.BooleanField(default=False)
-    json = models.TextField(blank=True, default='')
 
     class Meta:
         unique_together = ('competition', 'mode')
