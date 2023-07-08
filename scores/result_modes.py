@@ -460,7 +460,10 @@ class ByRound(BaseResultMode):
         if isinstance(competition, Competition):
             session_rounds = SessionRound.objects.filter(
                 session__competition=competition,
-            ).exclude(olympicsessionround__exclude_ranking_rounds=True).order_by('session__start').select_related('shot_round')
+            ).exclude(olympicsessionround__exclude_ranking_rounds=True).order_by(
+                'session__start',
+                '-shot_round__longest_distance',
+            ).select_related('shot_round')
         else:
             # We have a league leg
             session_rounds = SessionRound.objects.filter(

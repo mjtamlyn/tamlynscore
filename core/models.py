@@ -91,6 +91,7 @@ class Subround(models.Model):
 class Round(models.Model):
     name = models.CharField(max_length=100, unique=True)
     subrounds = models.ManyToManyField(Subround)
+    longest_distance = models.IntegerField(default=0)  # Used for ordering results
     scoring_type = models.CharField(max_length=1, choices=SCORING_TYPES)
     can_split = models.BooleanField(
         default=False, help_text=(
