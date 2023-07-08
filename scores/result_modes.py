@@ -100,6 +100,7 @@ class BaseResultMode(object):
         for score in scores:
             if not isinstance(score, ScoreMock):
                 score = ScoreMock(
+                    pk=score.pk,
                     target=score.target,
                     score=score.score,
                     hits=score.hits,
@@ -949,6 +950,7 @@ class H2HSeedings(ByRound, Team, BaseResultMode):
                     if not score:
                         continue
                     score = ScoreMock(
+                        pk=score.pk,
                         target=score.target,
                         score=score.score,
                         hits=score.hits,

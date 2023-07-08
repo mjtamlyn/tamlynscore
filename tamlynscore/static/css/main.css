@@ -3425,6 +3425,16 @@ table.table tbody tr {
 table.table tbody tr.no-border {
   border-bottom: none;
 }
+/* line 40, ../../sass/_tables.sass */
+table.table .score-sheet-link:after {
+  display: inline-block;
+  font: normal normal normal 14px/1 FontAwesome;
+  font-size: inherit;
+  text-rendering: auto;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+  content: "";
+}
 
 /* line 1, ../../sass/_forms.sass */
 input,

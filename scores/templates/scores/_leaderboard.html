@@ -46,6 +46,9 @@
                     {% for detail in score.details %}
                         <td>{{ detail }}</td>
                     {% endfor %}
+                    {% if score.score and score.pk %}
+                        <td><a href="{% url 'input_arrows_archer' slug=competition.slug score_id=score.pk %}" class="score-sheet-link"></a></td>
+                    {% endif %}
                 </tr>
                 {% if score.team %}
                     {% for member in score.team %}
