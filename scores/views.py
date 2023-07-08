@@ -28,6 +28,7 @@ from entries.views import CompetitionMixin, TargetList
 from olympic.models import OlympicSessionRound
 
 from .forms import get_arrow_formset, get_dozen_formset
+from .mixins import ResultModeMixin
 from .models import Arrow, Dozen, Score
 from .result_modes import ByRound, get_mode
 
@@ -486,35 +487,6 @@ class JSONResultsRenderer(object):
         return HttpResponse(results, content_type='application/json')
 
 
-class ResultModeMixin(object):
-    def get_scores(self):
-        scores = Score.objects.filter(
-            target__session_entry__competition_entry__competition=self.competition
-        ).select_related(
-            'target',
-            'target__session_entry',
-            'target__session_entry__session_round',
-            'target__session_entry__session_round__shot_round',
-            'target__session_entry__competition_entry',
-            'target__session_entry__competition_entry__competition',
-            'target__session_entry__competition_entry__archer',
-            'target__session_entry__competition_entry__bowstyle',
-            'target__session_entry__competition_entry__club',
-        ).order_by(
-            '-target__session_entry__competition_entry__age',
-            '-target__session_entry__competition_entry__agb_age',
-            'target__session_entry__competition_entry__novice',
-            'target__session_entry__competition_entry__bowstyle',
-            'target__session_entry__competition_entry__archer__gender',
-            'disqualified',
-            '-score',
-            '-is_actual_zero',
-            '-golds',
-            '-xs'
-        )
-        return scores
-
-
 class Leaderboard(ResultModeMixin, CompetitionMixin, PDFResultsRenderer, CSVResultsRenderer, JSONResultsRenderer, ListView):
     """General leaderboard/results generation.
 
@@ -529,7 +501,6 @@ class Leaderboard(ResultModeMixin, CompetitionMixin, PDFResultsRenderer, CSVResu
     leaderboard = True
     title = 'Leaderboard'
     url_name = 'leaderboard'
-    include_distance_breakdown = False
 
     def get(self, request, *args, **kwargs):
         self.format = self.get_format()
@@ -547,29 +518,6 @@ class Leaderboard(ResultModeMixin, CompetitionMixin, PDFResultsRenderer, CSVResu
         obj.save()
         return HttpResponseRedirect(request.get_full_path())
 
-    def get_mode(self, load=False):
-        mode = get_mode(self.kwargs['mode'], include_distance_breakdown=self.include_distance_breakdown, hide_golds=self.get_hide_golds())
-        if not mode:
-            raise Http404('No such mode')
-        if load:
-            exists, obj = self.mode_exists(mode, load=True)
-        else:
-            exists = self.mode_exists(mode)
-        if not exists:
-            raise Http404('No such mode for this competition')
-        return (mode, obj) if load else mode
-
-    def mode_exists(self, mode, load=False):
-        if load:
-            try:
-                obj = self.competition.result_modes.filter(mode=mode.slug).get()
-            except ResultsMode.DoesNotExist:
-                return False, None
-            else:
-                return True, obj
-        else:
-            return self.competition.result_modes.filter(mode=mode.slug).exists()
-
     def get_format(self):
         format = self.kwargs['format']
         if format not in ['html', 'pdf', 'pdf-summary', 'big-screen', 'csv', 'json']:
@@ -586,11 +534,6 @@ class Leaderboard(ResultModeMixin, CompetitionMixin, PDFResultsRenderer, CSVResu
         kwargs['title'] = self.title
         kwargs['leaderboard'] = self.leaderboard
         return super(Leaderboard, self).get_context_data(**kwargs)
-
-    def get_hide_golds(self):
-        if self.format == 'big-screen':
-            return True
-        return False
 
     def render_to_response(self, context, **response_kwargs):
         results = context['results']

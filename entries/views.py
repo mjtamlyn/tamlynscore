@@ -28,6 +28,7 @@ from reportlab.platypus import (
 from reportlab.rl_config import defaultPageSize
 
 from core.models import Archer
+from scores.mixins import ResultModeMixin
 
 from .forms import (
     ArcherSearchForm, CompetitionForm, CSVEntryForm, EntryCreateForm,
@@ -92,12 +93,44 @@ class CompetitionMixin(MessageMixin):
         return context
 
 
-class CompetitionDetail(CompetitionMixin, DetailView):
+class CompetitionDetail(CompetitionMixin, ResultModeMixin, DetailView):
     admin_required = False
     object_name = 'competition'
 
     def get_object(self):
         return self.competition
+
+    def get_result_mode(self, mode):
+        pass
+
+    def get_context_data(self, **kwargs):
+        today = timezone.now().date()
+
+        context = super().get_context_data(**kwargs)
+        context['legs'] = self.object.leg_set.select_related('season__league')
+        context['related_events'] = self.object.tournament.competition_set.order_by('-date').exclude(pk=self.object.pk)
+
+        context['is_future'] = (self.competition.date > today)
+        if context['is_future']:
+            rounds = set()
+            for session in self.competition.session_set.all():
+                rounds |= {sr.shot_round for sr in session.sessionround_set.all()}
+            context['rounds'] = sorted(rounds)
+
+            context['entry_count'] = self.competition.competitionentry_set.count()
+
+            context['target_list_set'] = TargetAllocation.objects.filter(
+                session_entry__competition_entry__competition=self.competition,
+            ).exists()
+        else:
+            by_round = self.get_mode('by-round')
+            if by_round:
+                context['by_round'] = by_round.get_results(self.competition, self.get_scores(), leaderboard=True, request=self.request)
+                for section in context['by_round']:
+                    for category in context['by_round'][section]:
+                        for score in context['by_round'][section][category]:
+                            score.details = by_round.score_details(score, section)
+        return context
 
 
 class CompetitionUpdate(CompetitionMixin, FormView):

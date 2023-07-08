@@ -3,8 +3,8 @@
         <meta name="viewport" content="width=device-width, initial-scale=1">
         {% block head %}
             {% block meta %}
-            <title>{% block title %}{% if title %}{{ title }} | {% endif %}Archery Tournaments{% endblock %}</title>
-            <meta property="og:title" content="{% if title %}{{ title }}{% else %}Archery Tournaments{% endif %}" />
+            <title>{% block title %}{% if title %}{{ title }} | {% endif %}Archery Competitions{% endblock %}</title>
+            <meta property="og:title" content="{% if title %}{{ title }}{% else %}Archery Competitions{% endif %}" />
             <meta property="og:site_name" content="TamlynScore" />
             {% if meta_description %}
                 <meta property="og:description" content="{{ meta_description }}" />
@@ -29,7 +29,7 @@
                     </div>
                     <div class="nav-links">
                         {% block nav_links %}
-                        <a href="{% url 'tournaments_list' %}" class="nav-link">Tournaments</a>
+                        <a href="{% url 'tournaments_list' %}" class="nav-link">Competitions</a>
                         <a href="{% url 'club_list' %}" class="nav-link">Clubs</a>
                         {% endblock nav_links %}
                     </div>

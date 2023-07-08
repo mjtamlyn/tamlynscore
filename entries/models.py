@@ -70,12 +70,14 @@ class ResultsFormatFields(models.Model):
 
 class Competition(ResultsFormatFields, models.Model):
     tournament = models.ForeignKey(Tournament, on_delete=models.CASCADE)
+    name_override = models.CharField(max_length=200, blank=True, default='', help_text='Override the recurring tournament name')
+    short_name_override = models.CharField(max_length=20, blank=True, default='')
     admins = models.ManyToManyField('core.User', blank=True)
 
     date = models.DateField()
     end_date = models.DateField(blank=True, null=True)
 
-    slug = models.SlugField(editable=False, unique=True)
+    slug = models.SlugField(unique=True)
 
     created = models.DateTimeField(auto_now_add=True)
     modified = models.DateTimeField(auto_now=True)
@@ -89,7 +91,15 @@ class Competition(ResultsFormatFields, models.Model):
         return reverse('competition_detail', kwargs={'slug': self.slug})
 
     def __str__(self):
-        return u'{0} {1}'.format(self.tournament, self.date.year)
+        return u'{0} {1}'.format(self.short_name, self.date.year)
+
+    @property
+    def full_name(self):
+        return self.name_override or self.tournament.full_name
+
+    @property
+    def short_name(self):
+        return self.short_name_override or self.tournament.short_name
 
     def clean(self, *args, **kwargs):
         if self.end_date is None:
