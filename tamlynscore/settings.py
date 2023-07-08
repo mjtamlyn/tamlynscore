@@ -119,6 +119,10 @@ DEBUG_TOOLBAR_CONFIG = {
     'JQUERY_URL': STATIC_URL + 'lib/jquery/jquery-2.1.3.min.js',
 }
 
+INTERNAL_IPS = [
+    '127.0.0.1',
+]
+
 if os.environ.get('RAVEN_DSN'):
     RAVEN_CONFIG = {
         'dsn': os.environ['RAVEN_DSN'],
