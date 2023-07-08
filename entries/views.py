@@ -28,6 +28,7 @@ from reportlab.platypus import (
 from reportlab.rl_config import defaultPageSize
 
 from core.models import Archer
+from scores.mixins import ResultModeMixin
 
 from .forms import (
     ArcherSearchForm, CompetitionForm, CSVEntryForm, EntryCreateForm,
@@ -92,12 +93,15 @@ class CompetitionMixin(MessageMixin):
         return context
 
 
-class CompetitionDetail(CompetitionMixin, DetailView):
+class CompetitionDetail(CompetitionMixin, ResultModeMixin, DetailView):
     admin_required = False
     object_name = 'competition'
 
     def get_object(self):
         return self.competition
+
+    def get_result_mode(self, mode):
+        pass
 
     def get_context_data(self, **kwargs):
         today = timezone.now().date()
@@ -118,6 +122,14 @@ class CompetitionDetail(CompetitionMixin, DetailView):
             context['target_list_set'] = TargetAllocation.objects.filter(
                 session_entry__competition_entry__competition=self.competition,
             ).exists()
+        else:
+            by_round = self.get_mode('by-round')
+            if by_round:
+                context['by_round'] = by_round.get_results(self.competition, self.get_scores(), leaderboard=True, request=self.request)
+                for section in context['by_round']:
+                    for category in context['by_round'][section]:
+                        for score in context['by_round'][section][category]:
+                            score.details = by_round.score_details(score, section)
         return context
 
 

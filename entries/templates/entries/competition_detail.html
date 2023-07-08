@@ -91,11 +91,28 @@
     </div>
 
     {% else %}
-    <p><b>TODO!</b> Pull the top results here - minimal team results (when teams exist), top 3 when ByRound exists, if neither exist then link to results</p>
+        {% if by_round %}
+            <div class="col3">
+                <h2>Results by round</h2>
+                <table class="table">
+                {% for round, categories in by_round.items %}
+                    {% for category, scores in categories.items %}
+                        <tr><th colspan="100%">{{ round }} - {{ category }}</th></tr>
+                        {% for score in scores|slice:":3" %}
+                        <tr>
+                            <td>{% if score.placing %}{{ score.placing }}{% endif %}</td>
+                            <td>{{ score.target.session_entry.competition_entry.archer }}</td>
+                            <td>{{ score.details.0 }}</td>
+                        </tr>
+                        {% endfor %}
+                    {% endfor %}
+                {% endfor %}
+                </table>
+                <p><a class="btn" href="{% url 'results' slug=competition.slug mode='by-round' format='html' %}">Full results by round</a></p>
+            </div>
+        {% endif %}
     {% endif %}
-</div>
 
-<div class="row">
     {% if legs %}
     <div class="col3">
         {% if legs %}

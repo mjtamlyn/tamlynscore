@@ -185,7 +185,7 @@ class BaseResultMode(object):
                 if score.disqualified or score.target.session_entry.session_round.session.scoring_system == SCORING_TOTALS:
                     scores += [''] * len(subrounds)
                 elif not hasattr(score, 'source'):
-                    scores += subrounds
+                    scores += [''] * len(subrounds)
                 else:
                     score = score.source
                     subround_scores = []
