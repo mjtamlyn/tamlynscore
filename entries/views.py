@@ -115,7 +115,7 @@ class CompetitionDetail(CompetitionMixin, ResultModeMixin, DetailView):
             rounds = set()
             for session in self.competition.session_set.all():
                 rounds |= {sr.shot_round for sr in session.sessionround_set.all()}
-            context['rounds'] = sorted(rounds)
+            context['rounds'] = sorted(rounds, key=lambda r: -r.longest_distance)
 
             context['entry_count'] = self.competition.competitionentry_set.count()
 
