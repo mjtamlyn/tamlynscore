@@ -304,11 +304,6 @@ class CompetitionEntry(models.Model):
     class Meta:
         verbose_name_plural = 'competition entries'
 
-    def code(self):
-        gender = self.archer.gender
-        bowstyle = self.bowstyle.name[0]
-        return gender + bowstyle
-
     def team_name(self, short_form=True):
         if self.club_id:
             name = self.club.short_name if short_form else self.club.name

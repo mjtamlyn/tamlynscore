@@ -184,8 +184,9 @@ class EntryList(CompetitionMixin, ListView):
                 'sessionround_set__sessionentry_set',
                 queryset=SessionEntry.objects.select_related(
                     'competition_entry',
-                    'competition_entry__bowstyle',
                     'competition_entry__archer',
+                ).prefetch_related(
+                    'competition_entry__bowstyle',
                     'competition_entry__competition',
                 ),
             ),
@@ -738,7 +739,7 @@ class ScoreSheetsPdf(CompetitionMixin, HeadedPdfView):
     def header_table_for_entry(self, target, entry):
         if entry:
             entry = entry.session_entry.competition_entry
-            category = u'{0} {1}'.format(entry.get_gender_display(), entry.bowstyle)
+            category = u'{1} {0}'.format(entry.get_gender_display(), entry.bowstyle)
             if self.competition.ifaa_rules:
                 category = entry.get_ifaa_division_display() + ' ' + category
             if self.competition.has_juniors and entry.age == 'J':
