@@ -115,8 +115,38 @@ class CompetitionDetail(CompetitionMixin, ResultModeMixin, DetailView):
             rounds = set()
             for session in self.competition.session_set.all():
                 rounds |= {sr.shot_round for sr in session.sessionround_set.all()}
-            context['rounds'] = sorted(rounds, key=lambda r: -r.longest_distance)
+            context['rounds'] = {r.pk: {
+                'round': r,
+                'entry_count': 0,
+                'entries': [],
+            } for r in rounds}
 
+            entries = SessionEntry.objects.filter(
+                competition_entry__competition=self.competition
+            ).select_related(
+                'session_round',
+                'competition_entry',
+                'competition_entry__bowstyle',
+                'competition_entry__archer',
+            )
+            for entry in entries:
+                context['rounds'][entry.session_round.shot_round_id]['entry_count'] += 1
+                context['rounds'][entry.session_round.shot_round_id]['entries'].append(entry)
+
+            for info in context['rounds'].values():
+                if self.competition.has_agb_age_groups:
+                    counter = collections.Counter('%s %s %s' % (
+                        e.competition_entry.bowstyle,
+                        e.competition_entry.get_agb_age_display(),
+                        e.competition_entry.get_gender_display(),
+                    ) for e in info['entries'])
+                else:
+                    counter = collections.Counter('%s %s' % (
+                        e.competition_entry.bowstyle,
+                        e.competition_entry.get_gender_display(),
+                    ) for e in info['entries'])
+                info['data'] = counter.most_common(10)
+            context['rounds'] = sorted(context['rounds'].values(), key=lambda r: -r['round'].longest_distance)
             context['entry_count'] = self.competition.competitionentry_set.count()
 
             context['target_list_set'] = TargetAllocation.objects.filter(

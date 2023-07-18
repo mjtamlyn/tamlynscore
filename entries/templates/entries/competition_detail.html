@@ -69,23 +69,31 @@
     </div>
 
     <div class="col3">
-        <h3>Entry stats</h3>
-        <ul class="bullets">
-            {% for round in rounds %}
-            <li>{{ round }}</li>
-            {% endfor %}
-        </ul>
-        <p>Total entries</p>
-        <p>{{ entry_count }}</p>
-
-        <!--p><b>TODO!</b> Copy the entry stats section from Manage Entries here?</p-->
+        <h3>Entries</h3>
+        <table>
+        {% for info in rounds %}
+        <tr>
+            <th>{{ info.round }}</th>
+            <td>
+                {% for category, count in info.data %}
+                    <span class="pill {{ category|truncatewords:1|slugify }}">{{ count }} {{ category }}</span>
+                    {% if not forloop.last %}<br />{% endif %}
+                {% endfor %}
+            </td>
+        {% endfor %}
+        <tr>
+            <th>Total archers entered</th>
+            <td><span class="pill">{{ entry_count }} entries</span></td>
+        </table>
     </div>
 
     <div class="col3">
         <h3>Target List</h3>
         {% if target_list_set %}
-        <p><a class="btn" href="{% url 'target_list' slug=competition.slug %}">View online</a></p>
-        <!--p><b>TODO!</b> Add link to download, make this look less shit</p-->
+        <p>
+        <a class="btn" href="{% url 'target_list' slug=competition.slug %}">View online</a>
+        <a class="btn" href="{% url 'target_list_pdf' slug=competition.slug %}">View PDF</a>
+        </p>
         {% else %}
         <p>Target list coming soon.</p>
         {% endif %}
