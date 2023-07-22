@@ -71,13 +71,19 @@ class CompetitionCreate(SuperuserRequiredMixin, FormView):
 class CompetitionMixin(MessageMixin):
     admin_required = True
 
-    def dispatch(self, request, *args, **kwargs):
+    def setup(self, request, *args, **kwargs):
+        super().setup(request, *args, **kwargs)
         self.competition = get_object_or_404(Competition, slug=kwargs['slug'])
         self.is_admin = self.competition.is_admin(self.request.user)
-        if self.admin_required and not self.is_admin:
+
+    def check_permission(self):
+        return self.is_admin or not self.admin_required
+
+    def dispatch(self, request, *args, **kwargs):
+        if not self.check_permission():
             self.messages.error('You must be logged in as a competition admin to do that.')
             return HttpResponseRedirect(reverse('competition_detail', kwargs={'slug': self.kwargs['slug']}))
-        return super(CompetitionMixin, self).dispatch(request, *args, **kwargs)
+        return super().dispatch(request, *args, **kwargs)
 
     def get_meta_description(self):
         return '{} on {}, hosted on TamlynScore.'.format(self.competition, self.competition.date.strftime('%d %B %Y'))

@@ -1,0 +1,15 @@
+{% extends 'entries/competition_detail.html' %}
+
+{% block competition_content %}
+<div class="row">
+    <div class="col6">
+        <h2>{{ competition }} - Judge pages</h2>
+        {% if not user_is_judge %}
+        <p>You are currently logged in as a competition admin. Be careful with any changes on these pages!</p>
+        <p>
+        <a href="{% url 'judge_authenticate' id=judge_user.uuid %}">Judge login</a>
+        </p>
+        {% endif %}
+    </div>
+</div>
+{% endblock %}
