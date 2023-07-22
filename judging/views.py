@@ -1,17 +1,17 @@
 from django.contrib.auth import login
+from django.http import Http404
 from django.urls import reverse
 from django.views.generic import RedirectView, TemplateView
 
 from braces.views import MessageMixin
 
-from entries.views import CompetitionMixin
+from entries.models import SessionEntry
+from entries.views import CompetitionMixin, Registration
 
 from .models import Judge
 
 
-class JudgeIndex(CompetitionMixin, TemplateView):
-    template_name = 'judging/index.html'
-
+class JudgeMixin(CompetitionMixin):
     def setup(self, request, *args, **kwargs):
         super().setup(request, *args, **kwargs)
         try:
@@ -30,6 +30,21 @@ class JudgeIndex(CompetitionMixin, TemplateView):
             judge_user=self.judge_user,
             **kwargs
         )
+
+
+class JudgeIndex(JudgeMixin, TemplateView):
+    template_name = 'judging/index.html'
+
+
+class JudgeInspection(JudgeMixin, Registration):
+    template_name = 'judging/inspection.html'
+
+    def post(self, request, slug):
+        inspected = request.POST['kit_inspected'] == 'true'
+        updated = SessionEntry.objects.filter(pk=request.POST['pk']).update(kit_inspected=inspected)
+        if not updated:
+            raise Http404
+        return self.get(request, slug)
 
 
 class JudgeAuthenticate(MessageMixin, RedirectView):

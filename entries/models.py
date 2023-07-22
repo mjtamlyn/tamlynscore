@@ -329,6 +329,7 @@ class SessionEntry(models.Model):
     session_round = models.ForeignKey(SessionRound, on_delete=models.CASCADE)
 
     present = models.BooleanField(default=False)
+    kit_inspected = models.BooleanField(default=False)
     index = models.PositiveIntegerField(default=1)
 
     def __str__(self):

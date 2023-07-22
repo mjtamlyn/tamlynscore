@@ -9,7 +9,11 @@
         <p>
         <a href="{% url 'judge_authenticate' id=judge_user.uuid %}">Judge login</a>
         </p>
+        {% else %}
+        <a class="btn" href="{% url 'judge_inspection' slug=competition.slug %}">Equipment inspection</a>
         {% endif %}
     </div>
 </div>
+{% block judge_content %}
+{% endblock %}
 {% endblock %}
