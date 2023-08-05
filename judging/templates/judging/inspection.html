@@ -4,7 +4,7 @@
 
 {% block judge_content %}
 {% for session, details in target_list.items %}
-<div class="registration-board">
+<div class="registration-board pjax-target">
     <h3>{{ session.start|date:"l, jS F - f a" }}</h3>
     <table class="table">
         <thead>
@@ -46,16 +46,14 @@
                 {% if archer %}
                 {% if archer.session_entry.kit_inspected %}
                 ✅
-                <form method="POST" class="inline">
-                    {% csrf_token %}
+                <form method="POST" class="inline pjax-form">
                     <input name="kit_inspected" value="false" type="hidden" />
                     <input name="pk" value="{{ archer.session_entry.pk }}" type="hidden" />
                     <input type="submit" class="btn btn-small btn-subtle" value="Undo" />
                 </form>
                 {% else %}
                 ❌
-                <form method="POST" class="inline">
-                    {% csrf_token %}
+                <form method="POST" class="inline pjax-form">
                     <input name="kit_inspected" value="true" type="hidden" />
                     <input name="pk" value="{{ archer.session_entry.pk }}" type="hidden" />
                     <input type="submit" class="btn btn-small" value="Done!" />
@@ -70,4 +68,32 @@
     </table>
 </div>
 {% endfor %}
+{% endblock %}
+
+{% block scripts %}
+<script>
+    function init() {
+        document.querySelectorAll('.pjax-form').forEach(function(el) {
+            el.addEventListener('submit', function(ev) {
+                ev.preventDefault();
+                const form = ev.target;
+                const formData = new FormData(form);
+                formData.append('pjax', true);
+                const request = new XMLHttpRequest();
+
+                request.addEventListener('load', function(loadEvent) {
+                    const response = loadEvent.target.response;
+                    const newEl = new DOMParser().parseFromString(response, 'text/html').body.firstChild;
+                    const target = document.querySelector('.pjax-target');
+                    target.parentNode.replaceChild(newEl, target);
+                    init();
+                });
+
+                request.open(form.method, form.action);
+                request.send(formData);
+            });
+        });
+    }
+    init();
+</script>
 {% endblock %}
