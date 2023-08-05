@@ -21,6 +21,7 @@ raven = "*"
 whitenoise = "*"
 isort = "*"
 django-render-block = "*"
+django-qr-code = "*"
 
 [dev-packages]
 
