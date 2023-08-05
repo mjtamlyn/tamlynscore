@@ -29,6 +29,9 @@ class JudgeMixin(CompetitionMixin):
         return super().get_context_data(
             user_is_judge=self.user_is_judge,
             judge_user=self.judge_user,
+            judge_login_url=self.request.build_absolute_uri(
+                reverse('judge_authenticate', kwargs={'id': self.judge_user.uuid})
+            ),
             **kwargs
         )
 

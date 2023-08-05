@@ -1,5 +1,7 @@
 {% extends 'entries/competition_detail.html' %}
 
+{% load qr_code %}
+
 {% block competition_content %}
 <div class="row">
     <div class="col6">
@@ -9,12 +11,14 @@
         <p>
         <a href="{% url 'judge_authenticate' id=judge_user.uuid %}">Judge login</a>
         </p>
-        {% else %}
+        {% qr_from_text judge_login_url size="S" %}
+        {% endif %}
+        <p>
         <a class="btn" href="{% url 'judge_inspection' slug=competition.slug %}">Equipment inspection</a>
         {% if competition.has_olympic %}
         <a class="btn" href="{% url 'judge_matches' slug=competition.slug %}">Matchplay layout</a>
         {% endif %}
-        {% endif %}
+        </p>
     </div>
 </div>
 {% block judge_content %}

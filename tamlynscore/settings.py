@@ -94,6 +94,7 @@ INSTALLED_APPS = (
     'debug_toolbar',
     'floppyforms',
     'custom_user',
+    'qr_code',
     'raven.contrib.django.raven_compat',
 )
 
