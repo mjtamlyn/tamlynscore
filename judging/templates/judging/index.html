@@ -11,6 +11,9 @@
         </p>
         {% else %}
         <a class="btn" href="{% url 'judge_inspection' slug=competition.slug %}">Equipment inspection</a>
+        {% if competition.has_olympic %}
+        <a class="btn" href="{% url 'judge_matches' slug=competition.slug %}">Matchplay layout</a>
+        {% endif %}
         {% endif %}
     </div>
 </div>

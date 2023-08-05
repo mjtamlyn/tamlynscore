@@ -7,6 +7,7 @@ from braces.views import MessageMixin
 
 from entries.models import SessionEntry
 from entries.views import CompetitionMixin, Registration
+from olympic.views import FieldPlanMixin
 
 from .models import Judge
 
@@ -45,6 +46,49 @@ class JudgeInspection(JudgeMixin, Registration):
         if not updated:
             raise Http404
         return self.get(request, slug)
+
+
+class JudgeMatches(FieldPlanMixin, JudgeMixin, TemplateView):
+    template_name = 'judging/matches.html'
+
+    def get_context_data(self, **kwargs):
+        context = super().get_context_data(**kwargs)
+        matches = self.get_matches().prefetch_related('session_round__category__bowstyles')
+        if len(matches) == 0:
+            return context
+
+        max_timing = (max(matches, key=lambda m: m.timing)).timing
+        last_match = max(matches, key=lambda m: (m.target_2 or m.target))
+        max_target = last_match.target_2 or last_match.target
+        if matches[0].session_round.shot_round.team_type:
+            max_target += 1
+        levels = ['Final', 'Semis', 'Quarters', '1/8', '1/16', '1/32', '1/64', '1/128']
+        passes = 'ABCDEFGHIJK'
+
+        layout = [{
+            'name': 'Pass %s' % letter,
+            'targets': [{
+                'number': i,
+                'match': None,
+                'category': None,
+                'round': None,
+            } for i in range(1, max_target + 1)],
+        } for letter in passes[:max_timing]]
+        for m in matches:
+            layout[m.timing - 1]['targets'][m.target - 1]['match'] = m
+            layout[m.timing - 1]['targets'][m.target - 1]['category'] = m.session_round.category.name
+            layout[m.timing - 1]['targets'][m.target - 1]['distance'] = '%sm' % m.session_round.shot_round.distance
+            layout[m.timing - 1]['targets'][m.target - 1]['round'] = levels[m.level - 1]
+            if m.level == 1 and m.match == 2:
+                layout[m.timing - 1]['targets'][m.target - 1]['round'] = 'Bronze'
+            if m.target_2:
+                layout[m.timing - 1]['targets'][m.target_2 - 1].update(
+                    layout[m.timing - 1]['targets'][m.target - 1]
+                )
+                layout[m.timing - 1]['targets'][m.target_2 - 1]['number'] = m.target_2
+        context['layout'] = layout
+
+        return context
 
 
 class JudgeAuthenticate(MessageMixin, RedirectView):
