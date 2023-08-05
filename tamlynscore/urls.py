@@ -9,6 +9,7 @@ urlpatterns = [
     path('leagues/', include('leagues.urls')),
     path('tournaments/', include('entries.urls')),
     path('tournaments/', include('scores.urls')),
+    path('tournaments/', include('judging.urls')),
     path('tournaments/olympic/', include('olympic.urls')),
     path('accounts/', include('accounts.urls')),
     path('admin/', admin.site.urls),

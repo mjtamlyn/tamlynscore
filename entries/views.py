@@ -18,6 +18,7 @@ from django.views.generic import (
 )
 
 from braces.views import MessageMixin, SuperuserRequiredMixin
+from render_block import render_block_to_string
 from reportlab.lib import colors
 from reportlab.lib.styles import getSampleStyleSheet
 from reportlab.lib.units import inch
@@ -71,13 +72,19 @@ class CompetitionCreate(SuperuserRequiredMixin, FormView):
 class CompetitionMixin(MessageMixin):
     admin_required = True
 
-    def dispatch(self, request, *args, **kwargs):
+    def setup(self, request, *args, **kwargs):
+        super().setup(request, *args, **kwargs)
         self.competition = get_object_or_404(Competition, slug=kwargs['slug'])
         self.is_admin = self.competition.is_admin(self.request.user)
-        if self.admin_required and not self.is_admin:
+
+    def check_permission(self):
+        return self.is_admin or not self.admin_required
+
+    def dispatch(self, request, *args, **kwargs):
+        if not self.check_permission():
             self.messages.error('You must be logged in as a competition admin to do that.')
             return HttpResponseRedirect(reverse('competition_detail', kwargs={'slug': self.kwargs['slug']}))
-        return super(CompetitionMixin, self).dispatch(request, *args, **kwargs)
+        return super().dispatch(request, *args, **kwargs)
 
     def get_meta_description(self):
         return '{} on {}, hosted on TamlynScore.'.format(self.competition, self.competition.date.strftime('%d %B %Y'))
@@ -558,6 +565,16 @@ class Registration(TargetList):
                     unregistered += 1
             target_list[session]['unregistered'] = unregistered
         return target_list
+
+    def render_to_response(self, context, **response_kwargs):
+        if self.request.POST.get('pjax'):
+            response = render_block_to_string(
+                self.get_template_names(),
+                'judge_content',
+                context,
+            )
+            return HttpResponse(response)
+        return super().render_to_response(context, **response_kwargs)
 
     def post(self, request, slug):
         present = request.POST['present'] == 'true'

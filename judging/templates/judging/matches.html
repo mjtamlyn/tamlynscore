@@ -1,0 +1,20 @@
+{% extends 'judging/index.html' %}
+
+{% block bodyclass %}registration{% endblock %}
+
+{% block judge_content %}
+{% for pass in layout %}
+<h3>{{ pass.name }}</h3>
+<table class="table">
+    {% for target in pass.targets %}
+    <tr>
+        <th>{{ target.number }}</th>
+        <td>{{ target.distance }}</td>
+        <td>{{ target.category }}</td>
+        <td>{{ target.round }}</td>
+    </tr>
+    {% endfor %}
+</table>
+
+{% endfor %}
+{% endblock %}

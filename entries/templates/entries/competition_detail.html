@@ -20,6 +20,11 @@
             {% if competition_admin %}
                 <li><a href="{% url 'score_sheets' slug=competition.slug %}">Score sheets</a></li>
                 <li><a href="{% url 'registration' slug=competition.slug %}">Registration</a></li>
+            {% endif %}
+            {% if competition_admin or user_is_judge %}
+                <li><a href="{% url 'judge_index' slug=competition.slug %}">Judges</a></li>
+            {% endif %}
+            {% if competition_admin %}
                 <li><a href="{% url 'input_scores' slug=competition.slug %}">Input scores</a></li>
             {% endif %}
             <li><p class="drop"><a onclick="void(0)">Leaderboards</a></p>

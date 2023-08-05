@@ -1,0 +1,99 @@
+{% extends 'judging/index.html' %}
+
+{% block bodyclass %}registration{% endblock %}
+
+{% block judge_content %}
+{% for session, details in target_list.items %}
+<div class="registration-board pjax-target">
+    <h3>{{ session.start|date:"l, jS F - f a" }}</h3>
+    <table class="table">
+        <thead>
+            <th>T.</th>
+            <th>Archer</th>
+            <th>Here</th>
+            <th>Kit</th>
+        </thead>
+        {% for boss, archers in details.target_list %}
+        {% for target, archer in archers %}
+        {% with archer.session_entry.competition_entry as entry %}
+        <tr class="archer {% if archer.session_entry.kit_inspected or not archer %}kit-inspected{% endif %}">
+            <td>{{ boss }}{{ target }}</td>
+            <td>
+                {% if archer %}
+                <div class="archer-name">
+                <strong>{{ entry.archer }}</strong> <small>{{ entry.archer.agb_number }}</small>
+                </div>
+                <div class="archer-category">
+                {% if competition.has_novices and entry.novice == "N" %}
+                <span class="pill novice">{{ entry.get_novice_display }}</span>
+                {% endif %}
+                <span class="pill {{ entry.bowstyle|slugify }}">{{ entry.bowstyle }}</span>
+                {% if competition.has_agb_age_groups %}
+                <span class="pill">{{ entry.get_agb_age_display }}</span>
+                {% endif %}
+                <span class="pill {{ entry.archer.get_gender_display|slugify }}">
+                    {{ entry.get_gender_display }}
+                </span>
+                </div>
+                {% endif %}
+            </td>
+            <td>
+                {% if archer %}
+                {% if archer.session_entry.present %}✅{% else %}❌{% endif %}
+                {% endif %}
+            </td>
+            <td class="oneline">
+                {% if archer %}
+                {% if archer.session_entry.kit_inspected %}
+                ✅
+                <form method="POST" class="inline pjax-form">
+                    <input name="kit_inspected" value="false" type="hidden" />
+                    <input name="pk" value="{{ archer.session_entry.pk }}" type="hidden" />
+                    <input type="submit" class="btn btn-small btn-subtle" value="Undo" />
+                </form>
+                {% else %}
+                ❌
+                <form method="POST" class="inline pjax-form">
+                    <input name="kit_inspected" value="true" type="hidden" />
+                    <input name="pk" value="{{ archer.session_entry.pk }}" type="hidden" />
+                    <input type="submit" class="btn btn-small" value="Done!" />
+                </form>
+                {% endif %}
+                {% endif %}
+            </td>
+        </tr>
+        {% endwith %}
+        {% endfor %}
+        {% endfor %}
+    </table>
+</div>
+{% endfor %}
+{% endblock %}
+
+{% block scripts %}
+<script>
+    function init() {
+        document.querySelectorAll('.pjax-form').forEach(function(el) {
+            el.addEventListener('submit', function(ev) {
+                ev.preventDefault();
+                const form = ev.target;
+                const formData = new FormData(form);
+                formData.append('pjax', true);
+                const request = new XMLHttpRequest();
+
+                request.addEventListener('load', function(loadEvent) {
+                    const response = loadEvent.target.response;
+                    const newEl = new DOMParser().parseFromString(response, 'text/html').body.firstChild;
+                    const target = document.querySelector('.pjax-target');
+                    target.parentNode.replaceChild(newEl, target);
+                    init();
+                });
+
+                request.open(form.method, form.action);
+                request.send(formData);
+            });
+        });
+    }
+    init();
+</script>
+{% endblock %}

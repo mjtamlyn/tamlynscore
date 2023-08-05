@@ -74,10 +74,9 @@ class OlympicIndex(OlympicMixin, ResultModeMixin, TemplateView):
 
 
 class FieldPlanMixin(CompetitionMixin):
-    def dispatch(self, request, *args, **kwargs):
-        # Use the slug because CompetitionMixin hasn't loaded the competition yet
-        self.session_rounds = OlympicSessionRound.objects.filter(session__competition__slug=self.kwargs['slug'])
-        return super(FieldPlanMixin, self).dispatch(request, *args, **kwargs)
+    def setup(self, request, *args, **kwargs):
+        super().setup(request, *args, **kwargs)
+        self.session_rounds = OlympicSessionRound.objects.filter(session__competition=self.competition)
 
     def get_matches(self):
         return Match.objects.filter(session_round__session__competition=self.competition).select_related('session_round', 'session_round__category')
