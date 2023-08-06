@@ -35,11 +35,20 @@ table.table
 
     tr
       border-bottom: 1px solid $borders
-    tr.boss-end
-      border-bottom: 2px solid $dark
 
       &.no-border
         border-bottom: none
+
+    tr.boss-start
+      border-top: 2px solid $dark
+    tr.boss-end
+      border-bottom: 2px solid $dark
+    tr.empty
+      background-color: $bg
+
+    .bye
+      opacity: 0.6
+      font-style: italic
 
   .score-sheet-link:after
     @include fa-icon()

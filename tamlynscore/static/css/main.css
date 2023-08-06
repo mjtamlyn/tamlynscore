@@ -3425,15 +3425,28 @@ table.table tbody {
 table.table tbody tr {
   border-bottom: 1px solid #CCCCCC;
 }
-/* line 38, ../../sass/_tables.sass */
+/* line 39, ../../sass/_tables.sass */
+table.table tbody tr.no-border {
+  border-bottom: none;
+}
+/* line 42, ../../sass/_tables.sass */
+table.table tbody tr.boss-start {
+  border-top: 2px solid #000F1F;
+}
+/* line 44, ../../sass/_tables.sass */
 table.table tbody tr.boss-end {
   border-bottom: 2px solid #000F1F;
 }
-/* line 41, ../../sass/_tables.sass */
-table.table tbody tr.boss-end.no-border {
-  border-bottom: none;
+/* line 46, ../../sass/_tables.sass */
+table.table tbody tr.empty {
+  background-color: #f7f7f7;
 }
-/* line 44, ../../sass/_tables.sass */
+/* line 49, ../../sass/_tables.sass */
+table.table tbody .bye {
+  opacity: 0.6;
+  font-style: italic;
+}
+/* line 53, ../../sass/_tables.sass */
 table.table .score-sheet-link:after {
   display: inline-block;
   font: normal normal normal 14px/1 FontAwesome;

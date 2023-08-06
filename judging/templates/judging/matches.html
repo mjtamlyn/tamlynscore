@@ -7,11 +7,20 @@
 <h3>{{ pass.name }}</h3>
 <table class="table">
     {% for target in pass.targets %}
-    <tr>
+    <tr class="{% ifchanged target.category %}boss-start{% endifchanged %} {% if target.has_second_target %}no-border{% endif %} {% if not target.distance %}empty{% endif %}">
         <th>{{ target.number }}</th>
-        <td>{{ target.distance }}</td>
-        <td>{{ target.category }}</td>
-        <td>{{ target.round }}</td>
+        <td>{{ target.distance|default:"" }}</td>
+        <td>{{ target.category|default:"" }}</td>
+        <td>{{ target.round|default:"" }}</td>
+        <td {% if target.is_bye %}class="bye"{% endif %}>
+            {% if target.seed_1 or target.seed_2 %}
+                {% if target.seed_1 %}<strong>{{ target.seed_1 }}</strong>{% endif %} {{ target.archer_1 }}
+                {% if not target.has_second_target and not target.is_second_target %}
+                    v
+                    {% if target.seed_2 %}<strong>{{ target.seed_2 }}</strong>{% endif %} {{ target.archer_2 }}
+                {% endif %}
+            {% endif %}
+        </td>
     </tr>
     {% endfor %}
 </table>
