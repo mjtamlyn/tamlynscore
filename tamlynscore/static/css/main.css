@@ -3415,7 +3415,7 @@ table.table td.oneline, table.table th.oneline {
 }
 /* line 30, ../../sass/_tables.sass */
 table.table thead tr {
-  border-bottom: 2px solid #CCCCCC;
+  border-bottom: 2px solid #000F1F;
 }
 /* line 33, ../../sass/_tables.sass */
 table.table tbody {
@@ -3425,11 +3425,15 @@ table.table tbody {
 table.table tbody tr {
   border-bottom: 1px solid #CCCCCC;
 }
-/* line 39, ../../sass/_tables.sass */
-table.table tbody tr.no-border {
+/* line 38, ../../sass/_tables.sass */
+table.table tbody tr.boss-end {
+  border-bottom: 2px solid #000F1F;
+}
+/* line 41, ../../sass/_tables.sass */
+table.table tbody tr.boss-end.no-border {
   border-bottom: none;
 }
-/* line 42, ../../sass/_tables.sass */
+/* line 44, ../../sass/_tables.sass */
 table.table .score-sheet-link:after {
   display: inline-block;
   font: normal normal normal 14px/1 FontAwesome;

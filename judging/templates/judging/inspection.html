@@ -16,7 +16,7 @@
         {% for boss, archers in details.target_list %}
         {% for target, archer in archers %}
         {% with archer.session_entry.competition_entry as entry %}
-        <tr class="archer {% if archer.session_entry.kit_inspected or not archer %}kit-inspected{% endif %}">
+        <tr class="archer {% if archer.session_entry.kit_inspected or not archer %}kit-inspected{% endif %} {% if forloop.last %}boss-end{% endif %}">
             <td>{{ boss }}{{ target }}</td>
             <td>
                 {% if archer %}
