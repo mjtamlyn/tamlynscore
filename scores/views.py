@@ -639,7 +639,7 @@ class RankingsExport(ResultModeMixin, CompetitionMixin, View):
             division += 'M'
         else:
             division += 'W'
-        if self.competition.has_agb_age_groups:
+        if self.competition.has_agb_age_groups and self.competition.split_categories_on_agb_age:
             division = entry.agb_age + division
         return division
 
