@@ -142,16 +142,31 @@ class CompetitionDetail(CompetitionMixin, ResultModeMixin, DetailView):
 
             for info in context['rounds'].values():
                 if self.competition.has_agb_age_groups:
-                    counter = collections.Counter('%s %s %s' % (
-                        e.competition_entry.bowstyle,
-                        e.competition_entry.get_agb_age_display(),
-                        e.competition_entry.get_gender_display(),
-                    ) for e in info['entries'])
+                    if self.competition.has_novices:
+                        counter = collections.Counter('%s %s %s%s' % (
+                            e.competition_entry.bowstyle,
+                            e.competition_entry.get_agb_age_display(),
+                            e.competition_entry.get_gender_display(),
+                            (' %s' % e.competition_entry.get_novice_display()) if e.competition_entry.novice == 'N' else '',
+                        ) for e in info['entries'])
+                    else:
+                        counter = collections.Counter('%s %s %s' % (
+                            e.competition_entry.bowstyle,
+                            e.competition_entry.get_agb_age_display(),
+                            e.competition_entry.get_gender_display(),
+                        ) for e in info['entries'])
                 else:
-                    counter = collections.Counter('%s %s' % (
-                        e.competition_entry.bowstyle,
-                        e.competition_entry.get_gender_display(),
-                    ) for e in info['entries'])
+                    if self.competition.has_novices:
+                        counter = collections.Counter('%s %s%s' % (
+                            e.competition_entry.bowstyle,
+                            e.competition_entry.get_gender_display(),
+                            (' %s' % e.competition_entry.get_novice_display()) if e.competition_entry.novice == 'N' else '',
+                        ) for e in info['entries'])
+                    else:
+                        counter = collections.Counter('%s %s' % (
+                            e.competition_entry.bowstyle,
+                            e.competition_entry.get_gender_display(),
+                        ) for e in info['entries'])
                 info['data'] = counter.most_common(10)
             context['rounds'] = sorted(context['rounds'].values(), key=lambda r: -r['round'].longest_distance)
             context['entry_count'] = self.competition.competitionentry_set.count()
