@@ -15,7 +15,7 @@ const ArcherRowSummary = ({ score }) => {
                     { score.getGoldCount() } <small className="archers__summary__legend">10s</small>
                 </div>
                 <div className="archers__summary__arrows-shot">
-                    { score.getArrowsShot() } / 60 <small className="archers__summary__legend">arrows shot</small>
+                    { score.getArrowsShot() } / 30 <small className="archers__summary__legend">arrows shot</small>
                 </div>
             </div>
         </div>

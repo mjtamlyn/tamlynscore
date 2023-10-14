@@ -14,7 +14,7 @@ const scoreA = new Score({
         bowstyle: 'Compound',
         gender: 'Women',
     },
-    arrows: [10, 9, 9, 10, 10, 9, 10, 9, 8],
+    arrows: [9, 9, 9, 9, 9, 9, 9, 9, 9, 9, 9, 9, 9, 9, 9, 9, 9, 9, 10, 9, 9, 10, 10, 9, 10, 9, 8],
 });
 const scoreB = new Score({
     target: '1B',
@@ -23,7 +23,7 @@ const scoreB = new Score({
         bowstyle: 'Recurve',
         gender: 'Men',
     },
-    arrows: [10, 9, 9, 10, 10, 9, 10],
+    arrows: [9, 9, 9, 9, 9, 9, 9, 9, 9, 9, 9, 9, 9, 9, 9, 9, 9, 9, 10, 9, 9, 10, 10, 9, 10],
 });
 const scoreC = new Score({
     target: '1C',
@@ -32,7 +32,7 @@ const scoreC = new Score({
         bowstyle: 'Compound',
         gender: 'Women',
     },
-    arrows: [10, 10, 9, 10, 10, 9],
+    arrows: [9, 9, 9, 9, 9, 9, 9, 9, 9, 9, 9, 9, 9, 9, 9, 9, 9, 9, 10, 10, 9, 10, 10, 9],
 });
 const scoreD = new Score({
     target: '1D',
@@ -41,24 +41,32 @@ const scoreD = new Score({
         bowstyle: 'Compound',
         gender: 'Men',
     },
-    arrows: [10, 9, 9, 10, 10, 9],
+    arrows: [9, 9, 9, 9, 9, 9, 9, 9, 9, 9, 9, 9, 9, 9, 9, 9, 9, 9, 10, 9, 9, 10, 10, 9],
 });
 const scores = [scoreA, scoreB, scoreC, scoreD];
 
 const Target = () => {
-    const [endNumber, setEndNumber] = useState(3);
+    const [endNumber, setEndNumber] = useState(9);
+    const maxEnds = 10;
     const [page, setPage] = useState('overview');
 
     let startNextEnd = null;
+    let complete = null;
     if (scoreA.isEndComplete(endNumber) &&
             scoreB.isEndComplete(endNumber) &&
             scoreC.isEndComplete(endNumber) &&
             scoreD.isEndComplete(endNumber)
     ) {
-        startNextEnd = () => {
-            setPage('input');
-            setEndNumber(endNumber + 1);
-        };
+        if (endNumber + 1 <= maxEnds) {
+            startNextEnd = () => {
+                setPage('input');
+                setEndNumber(endNumber + 1);
+            };
+        } else {
+            complete = () => {
+                window.location = '/'
+            };
+        }
     }
 
     const continueEnd = () => {
@@ -69,7 +77,7 @@ const Target = () => {
         return (
             <div className="full-height-page">
                 <EventHeader round="WA 18" pageTitle="Overview" />
-                <ScoresOverview scores={ scores } endNumber={ endNumber } continueEnd={ continueEnd } startNextEnd={ startNextEnd } />
+                <ScoresOverview scores={ scores } endNumber={ endNumber } continueEnd={ continueEnd } startNextEnd={ startNextEnd } complete={ complete } />
             </div>
         );
     } else if (page === 'input') {

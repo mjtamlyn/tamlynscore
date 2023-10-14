@@ -3,7 +3,7 @@ import React from 'react';
 import ArcherRowSummary from './ArcherRowSummary';
 
 
-const ScoresOverview = ({ scores, endNumber, continueEnd, startNextEnd }) => {
+const ScoresOverview = ({ scores, endNumber, continueEnd, startNextEnd, complete }) => {
     const [scoreA, scoreB, scoreC, scoreD] = scores;
     return (
         <>
@@ -19,6 +19,9 @@ const ScoresOverview = ({ scores, endNumber, continueEnd, startNextEnd }) => {
                 </div> }
                 { startNextEnd && <div className="actions__button" onClick={ startNextEnd }>
                     Start end { endNumber + 1 }
+                </div> }
+                { complete && <div className="actions__button" onClick={ complete }>
+                    Confirm final scores
                 </div> }
             </div>
         </>
