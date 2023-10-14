@@ -8,6 +8,34 @@ const sum = (array) => array.reduce((a, b) => {
     return a + b;
 }, 0);
 
+const compareArrows = (a, b) => {
+    if (a === 'M') {
+        a = 0;
+    }
+    if (b === 'M') {
+        b = 0;
+    }
+    if (a < b) {
+        return 1;
+    } else if (a > b) {
+        return -1;
+    }
+    return 0;
+};
+
+const isDescending = (end) => {
+    const sorted = end.toSorted(compareArrows);
+    if (end.length !== sorted.length) {
+        return false;
+    }
+    for (let i=0; i<end.length; i++) {
+        if (end[i] !== sorted[i]) {
+            return false;
+        }
+    }
+    return true
+}
+
 class Score {
     constructor({ target, name, categories, arrows, endLength = 3 }) {
         this.target = target;
@@ -50,6 +78,10 @@ class Score {
             arrowNumber = this.arrows.length;
         }
         this.arrows[arrowNumber] = number;
+        const end = this.getEnd(endNumber);
+        if (!isDescending(end)) {
+            this.arrows.splice((endNumber - 1) * this.endLength, this.endLength, ...end.toSorted(compareArrows));
+        };
     }
 }
 
