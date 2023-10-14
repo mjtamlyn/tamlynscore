@@ -1,6 +1,4 @@
 #target-input
-  background-color: $bluegrey
-
   .header-title
     height: 44px
     margin: 0
@@ -11,7 +9,12 @@
   .full-height-page
     display: flex
     flex-direction: column
-    height: calc(100vh - 44px)
+    height: calc(100% - 44px)
+    width: 100vw
+    position: fixed
+    top: 44px
+    left: 0
+    background-color: $bluegrey
 
   .scoring-header
     display: flex
@@ -57,6 +60,17 @@
         transition: background-color 0.5s, padding 0.5s, border 0.5s
         height: 100%
 
+    &__summary
+      grid-column-end: span 3
+      display: grid
+      grid-template-columns: repeat(3, 1fr)
+      grid-gap: 3px
+      align-items: baseline
+      font-weight: bold
+
+      &__legend
+        font-weight: normal
+
     &__row--current
       .archers__score__input
         background-color: white
@@ -70,7 +84,7 @@
           border-color: $hlorange
           background-color: $bg-dark
 
-  .input
+  .score-input
     display: grid
     grid-template-columns: repeat(4, 1fr)
     grid-template-rows: repeat(3, 1fr)
@@ -105,3 +119,15 @@
 
       &--miss
         grid-column-end: span 2
+
+  .actions
+    padding: 5px
+
+    &__button
+      width: 100%
+      text-align: center
+      padding: 8px 5px
+      margin: 5px 0
+      background-color: $wared
+      color: white
+      border-radius: 4px

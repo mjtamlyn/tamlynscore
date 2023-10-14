@@ -1,4 +1,12 @@
-const sum = (array) => array.reduce((a, b) => a + b, 0);
+const sum = (array) => array.reduce((a, b) => {
+    if (a === 'M') {
+        a = 0;
+    }
+    if (b === 'M') {
+        b = 0;
+    }
+    return a + b;
+}, 0);
 
 class Score {
     constructor({ target, name, categories, arrows, endLength = 3 }) {
@@ -13,16 +21,35 @@ class Score {
         return this.arrows.slice((endNumber - 1) * this.endLength, endNumber * this.endLength);
     }
 
+    isEndComplete(endNumber) {
+        return this.getEnd(endNumber).length == this.endLength;
+    }
+
     getEndScore(endNumber) {
         return sum(this.getEnd(endNumber));
     }
 
+    getArrowsShot() {
+        return this.arrows.length;
+    }
+
     getRunningTotal(endNumber) {
+        if (!endNumber) {
+            endNumber = 100
+        }
         return sum(this.arrows.slice(0, endNumber * this.endLength));
     }
 
+    getGoldCount() {
+        return sum(this.arrows.map(a => ((a === 10) ? 1 : 0)));
+    }
+
     setScore(endNumber, cursorPosition, number) {
-        this.arrows[(endNumber - 1) * this.endLength + cursorPosition] = number;
+        let arrowNumber = (endNumber - 1) * this.endLength + cursorPosition;
+        if (this.arrows.length < arrowNumber) {
+            arrowNumber = this.arrows.length;
+        }
+        this.arrows[arrowNumber] = number;
     }
 }
 
