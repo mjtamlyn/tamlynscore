@@ -36,8 +36,8 @@ from .forms import (
     EntryUpdateForm,
 )
 from .models import (
-    SCORING_DOZENS, SCORING_FULL, Competition, CompetitionEntry, Session,
-    SessionEntry, SessionRound, TargetAllocation,
+    SCORING_DOZENS, SCORING_FULL, Competition, CompetitionEntry, EntryUser,
+    Session, SessionEntry, SessionRound, TargetAllocation,
 )
 
 
@@ -578,6 +578,13 @@ class Registration(TargetList):
             for target in target_list[session]['targets']:
                 if not target.session_entry.present:
                     unregistered += 1
+                try:
+                    entry_user = target.session_entry.competition_entry.entryuser
+                except EntryUser.DoesNotExist:
+                    entry_user = EntryUser.objects.create(competition_entry=target.session_entry.competition_entry)
+                target.login_url = self.request.build_absolute_uri(reverse('entry-authenticate', kwargs={
+                    'id': entry_user.uuid,
+                }))
             target_list[session]['unregistered'] = unregistered
         return target_list
 

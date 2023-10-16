@@ -113,6 +113,7 @@ LOGIN_REDIRECT_URL = '/'
 AUTH_USER_MODEL = 'core.User'
 AUTHENTICATION_BACKENDS = [
     'judging.auth_backends.JudgeAuthBackend',
+    'entries.auth_backends.EntryUserAuthBackend',
     'django.contrib.auth.backends.ModelBackend',
 ]
 

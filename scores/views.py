@@ -4,13 +4,15 @@ import functools
 import math
 from itertools import groupby
 
+from django.contrib.auth import login
 from django.core.cache import cache
 from django.db.models import Count, Max
 from django.http import Http404, HttpResponse, HttpResponseRedirect
 from django.shortcuts import get_object_or_404, render
 from django.urls import reverse
-from django.views.generic import ListView, TemplateView, View
+from django.views.generic import ListView, RedirectView, TemplateView, View
 
+from braces.views import MessageMixin
 from reportlab.lib import colors
 from reportlab.lib.styles import getSampleStyleSheet
 from reportlab.lib.units import inch
@@ -21,7 +23,7 @@ from reportlab.rl_config import defaultPageSize
 
 from core.models import County
 from entries.models import (
-    Competition, CompetitionEntry, ResultsMode, SessionRound,
+    Competition, CompetitionEntry, EntryUser, ResultsMode, SessionRound,
 )
 from entries.views import CompetitionMixin, TargetList
 from olympic.models import OlympicSessionRound
@@ -676,6 +678,24 @@ class RankingsExport(ResultModeMixin, CompetitionMixin, View):
             for seeding in results:
                 archers[seeding.entry_id] += [seeding.rank]
         return archers
+
+
+class EntryAuthenticate(MessageMixin, RedirectView):
+    permanent = False
+
+    def dispatch(self, request, *args, **kwargs):
+        try:
+            self.archer = EntryUser.objects.get(uuid=kwargs['id'])
+        except EntryUser.DoesNotExist:
+            raise Http404
+        if self.archer.competition_entry.competition.is_admin(request.user):
+            self.messages.error('You are logged in already as a competition admin - you must log out before you can log in as a archer.')
+        else:
+            login(request, self.archer, backend='entries.auth_backends.EntryUserAuthBackend')
+        return super().dispatch(request, *args, **kwargs)
+
+    def get_redirect_url(self, *args, **kwargs):
+        return reverse('target-input-js')
 
 
 class TargetInput(TemplateView):

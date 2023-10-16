@@ -1,4 +1,5 @@
 import math
+import uuid
 
 from django.db import models
 from django.urls import reverse
@@ -322,6 +323,18 @@ class CompetitionEntry(models.Model):
             names = {'G': 'Male', 'L': 'Female'}
             return names[self.archer.gender]
         return self.archer.get_gender_display()
+
+
+class EntryUser(models.Model):
+    uuid = models.UUIDField(default=uuid.uuid4)
+    competition_entry = models.OneToOneField(CompetitionEntry, on_delete=models.CASCADE)
+    last_login = models.DateField(null=True, blank=True)
+
+    is_anonymous = False
+    is_superuser = False
+
+    def __str__(self):
+        return 'Archer login - %s' % self.competition_entry
 
 
 class SessionEntry(models.Model):

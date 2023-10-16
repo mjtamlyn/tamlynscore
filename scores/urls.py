@@ -17,5 +17,6 @@ urlpatterns = [
 
 archer_urlpatterns = [
     path('', views.TargetInput.as_view(), name='target-input'),
+    path('auth/<uuid:id>/', views.EntryAuthenticate.as_view(), name='entry-authenticate'),
     path('js/', views.TargetInputJs.as_view(), name='target-input-js'),
 ]
