@@ -1,5 +1,7 @@
 {% extends 'base.html' %}
 
+{% block meta_viewport %}width=device-width, user-scalable=no{% endblock %}
+
 {% load render_bundle from webpack_loader %}
 
 {% block scripts %}
@@ -8,18 +10,7 @@
 
 {% block page_id %}target-input{% endblock %}
 
-{% block nav %}
-<nav class="header-nav">
-    <div class="container">
-        <div class="home">
-            <a href="{% url 'index' %}" class="wide">TamlynScore</a>
-            <a href="{% url 'index' %}" class="narrow">TS</a>
-        </div>
-        <h2 class="header-title">{{ request.user.competition_entry.competition }}</h2>
-        <h2 class="header-title">{{ request.user.competition_entry.archer }}</h2>
-    </div>
-</nav>
-{% endblock %}
+{% block nav %}{% endblock %}
 
 {% block full_content %}
 <div id="app"></div>

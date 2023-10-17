@@ -1,11 +1,11 @@
 import React from 'react';
 import { createRoot } from 'react-dom/client';
 
-import Target from './input/Target';
+import InputController from './input/InputController';
 
 let app = document.getElementById('app');
 
 if (app) {
     const root = createRoot(app);
-    root.render(<Target />);
+    root.render(<InputController />);
 }

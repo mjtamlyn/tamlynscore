@@ -6,7 +6,6 @@ import ScoreInput from './ScoreInput';
 
 const TargetInput = ({ scores, endNumber, toSummary }) => {
     const endLength = 3;
-    const [scoreA, scoreB, scoreC, scoreD] = scores;
 
     let initialActive = null;
     let initialCursor = 0;
@@ -15,6 +14,7 @@ const TargetInput = ({ scores, endNumber, toSummary }) => {
         if (!score.isEndComplete(endNumber) && !initialActive) {
             initialActive = score;
             initialCursor = score.getEnd(endNumber).length;
+        } else {
         }
     });
 
@@ -46,13 +46,12 @@ const TargetInput = ({ scores, endNumber, toSummary }) => {
         }
     }
 
+    const scoresRendered = scores.map(score => <ArcherRow score={ score } endNumber={ endNumber } active={ activeScore && (score.target === activeScore.target) } cursorPosition={ cursorPosition } setPosition = { setPosition } key={ score.target } /> );
+
     return (
         <>
             <div className="archers">
-                <ArcherRow score={ scoreA } endNumber={ endNumber } active={ activeScore === scoreA } cursorPosition={ cursorPosition } setPosition={ setPosition } />
-                <ArcherRow score={ scoreB } endNumber={ endNumber } active={ activeScore === scoreB } cursorPosition={ cursorPosition } setPosition={ setPosition } />
-                <ArcherRow score={ scoreC } endNumber={ endNumber } active={ activeScore === scoreC } cursorPosition={ cursorPosition } setPosition={ setPosition } />
-                <ArcherRow score={ scoreD } endNumber={ endNumber } active={ activeScore === scoreD } cursorPosition={ cursorPosition } setPosition={ setPosition } />
+                { scoresRendered }
             </div>
             { (cursorPosition !== null ) && <ScoreInput setArrow={ setArrow } /> }
             <div className="actions">

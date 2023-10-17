@@ -7,56 +7,15 @@ import ScoresOverview from './ScoresOverview';
 import TargetInput from './TargetInput';
 
 
-const scoreA = new Score({
-    target: '1A',
-    name: 'Nicola Wood',
-    categories: {
-        bowstyle: 'Compound',
-        gender: 'Women',
-    },
-    arrows: [9, 9, 9, 9, 9, 9, 9, 9, 9, 9, 9, 9, 9, 9, 9, 9, 9, 9, 10, 9, 9, 10, 10, 9, 10, 9, 8],
-});
-const scoreB = new Score({
-    target: '1B',
-    name: 'Antony Wood',
-    categories: {
-        bowstyle: 'Recurve',
-        gender: 'Men',
-    },
-    arrows: [9, 9, 9, 9, 9, 9, 9, 9, 9, 9, 9, 9, 9, 9, 9, 9, 9, 9, 10, 9, 9, 10, 10, 9, 10],
-});
-const scoreC = new Score({
-    target: '1C',
-    name: 'Hannah Brown',
-    categories: {
-        bowstyle: 'Compound',
-        gender: 'Women',
-    },
-    arrows: [9, 9, 9, 9, 9, 9, 9, 9, 9, 9, 9, 9, 9, 9, 9, 9, 9, 9, 10, 10, 9, 10, 10, 9],
-});
-const scoreD = new Score({
-    target: '1D',
-    name: 'Steve Mitchell',
-    categories: {
-        bowstyle: 'Compound',
-        gender: 'Men',
-    },
-    arrows: [9, 9, 9, 9, 9, 9, 9, 9, 9, 9, 9, 9, 9, 9, 9, 9, 9, 9, 10, 9, 9, 10, 10, 9],
-});
-const scores = [scoreA, scoreB, scoreC, scoreD];
-
-const Target = () => {
-    const [endNumber, setEndNumber] = useState(9);
-    const maxEnds = 10;
+const Target = ({ session, scores }) => {
+    const modelScores = scores.map(score => new Score(score));
+    const [endNumber, setEndNumber] = useState(Math.min(...modelScores.map(score => score.currentEnd())));
+    const maxEnds = 20;
     const [page, setPage] = useState('overview');
 
     let startNextEnd = null;
     let complete = null;
-    if (scoreA.isEndComplete(endNumber) &&
-            scoreB.isEndComplete(endNumber) &&
-            scoreC.isEndComplete(endNumber) &&
-            scoreD.isEndComplete(endNumber)
-    ) {
+    if (!modelScores.some(score => !score.isEndComplete(endNumber))) {
         if (endNumber + 1 <= maxEnds) {
             startNextEnd = () => {
                 setPage('input');
@@ -76,15 +35,15 @@ const Target = () => {
     if (page === 'overview') {
         return (
             <div className="full-height-page">
-                <EventHeader round="WA 18" pageTitle="Overview" />
-                <ScoresOverview scores={ scores } endNumber={ endNumber } continueEnd={ continueEnd } startNextEnd={ startNextEnd } complete={ complete } />
+                <EventHeader round={ session.round } pageTitle="Overview" />
+                <ScoresOverview scores={ modelScores } endNumber={ endNumber } continueEnd={ continueEnd } startNextEnd={ startNextEnd } complete={ complete } />
             </div>
         );
     } else if (page === 'input') {
         return (
             <div className="full-height-page">
-                <EventHeader round="WA 18" pageTitle={ 'End ' + endNumber } />
-                <TargetInput scores={ scores } endNumber={ endNumber } toSummary={ () => setPage('overview') } />
+                <EventHeader round={ session.round } pageTitle={ 'End ' + endNumber } />
+                <TargetInput scores={ modelScores } endNumber={ endNumber } toSummary={ () => setPage('overview') } />
             </div>
         );
     }

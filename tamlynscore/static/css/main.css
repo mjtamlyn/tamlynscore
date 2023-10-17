@@ -5803,21 +5803,67 @@ table.tree td.border-right {
   background-color: #353345;
 }
 /* line 19, ../../sass/_target_input.sass */
+#target-input .full-height-page__loading {
+  height: 100%;
+  width: 100%;
+  color: white;
+  font-weight: bold;
+  text-align: center;
+  line-height: 50vh;
+  font-size: larger;
+}
+/* line 28, ../../sass/_target_input.sass */
+#target-input .session-selector {
+  margin: 30px;
+  text-align: center;
+  padding: 15px 10px;
+  background-color: #6FB3FF;
+  border-radius: 4px;
+  line-height: 1.4;
+}
+/* line 36, ../../sass/_target_input.sass */
+#target-input .session-selector__event {
+  font-weight: bold;
+  margin: 0 0 5px;
+}
+/* line 40, ../../sass/_target_input.sass */
+#target-input .session-selector__session {
+  margin: 15px 0 0;
+  padding: 5px 0 0;
+  border: 1px solid black;
+  border-radius: 5px;
+  background-color: white;
+}
+/* line 47, ../../sass/_target_input.sass */
+#target-input .session-selector__session__time {
+  font-weight: bold;
+}
+/* line 50, ../../sass/_target_input.sass */
+#target-input .session-selector__session__action {
+  display: block;
+  padding: 5px;
+  margin: 5px 0 0;
+  background-color: #ea3525;
+  width: 100%;
+  color: white;
+  font-weight: bold;
+}
+/* line 59, ../../sass/_target_input.sass */
 #target-input .scoring-header {
   display: flex;
   justify-content: space-between;
   padding: 0 10px;
 }
-/* line 24, ../../sass/_target_input.sass */
+/* line 64, ../../sass/_target_input.sass */
 #target-input .scoring-header h3 {
   color: white;
 }
-/* line 27, ../../sass/_target_input.sass */
+/* line 67, ../../sass/_target_input.sass */
 #target-input .archers {
   display: grid;
   grid-gap: 3px;
 }
-/* line 31, ../../sass/_target_input.sass */
+/* line 71, ../../sass/_target_input.sass */
 #target-input .archers__row {
   padding: 3px 10px;
   background-color: #6FB3FF;
@@ -5826,15 +5872,15 @@ table.tree td.border-right {
   grid-gap: 3px;
   align-items: baseline;
 }
-/* line 40, ../../sass/_target_input.sass */
+/* line 80, ../../sass/_target_input.sass */
 #target-input .archers__target {
   font-size: 15px;
 }
-/* line 43, ../../sass/_target_input.sass */
+/* line 83, ../../sass/_target_input.sass */
 #target-input .archers__name {
   font-weight: bold;
 }
-/* line 46, ../../sass/_target_input.sass */
+/* line 86, ../../sass/_target_input.sass */
 #target-input .archers__score {
   grid-column-end: span 3;
   display: grid;
@@ -5843,17 +5889,17 @@ table.tree td.border-right {
   align-items: baseline;
   text-align: center;
 }
-/* line 54, ../../sass/_target_input.sass */
+/* line 94, ../../sass/_target_input.sass */
 #target-input .archers__score__total, #target-input .archers__score__running {
   font-weight: bold;
 }
-/* line 58, ../../sass/_target_input.sass */
+/* line 98, ../../sass/_target_input.sass */
 #target-input .archers__score__input {
   border: 1px solid transparent;
   transition: background-color 0.5s, padding 0.5s, border 0.5s;
   height: 100%;
 }
-/* line 63, ../../sass/_target_input.sass */
+/* line 103, ../../sass/_target_input.sass */
 #target-input .archers__summary {
   grid-column-end: span 3;
   display: grid;
@@ -5862,11 +5908,11 @@ table.tree td.border-right {
   align-items: baseline;
   font-weight: bold;
 }
-/* line 71, ../../sass/_target_input.sass */
+/* line 111, ../../sass/_target_input.sass */
 #target-input .archers__summary__legend {
   font-weight: normal;
 }
-/* line 75, ../../sass/_target_input.sass */
+/* line 115, ../../sass/_target_input.sass */
 #target-input .archers__row--current .archers__score__input {
   background-color: white;
   border: 1px solid #000F1F;
@@ -5874,13 +5920,13 @@ table.tree td.border-right {
   padding: 6px 0;
   font-weight: bold;
 }
-/* line 82, ../../sass/_target_input.sass */
+/* line 122, ../../sass/_target_input.sass */
 #target-input .archers__row--current .archers__score__input--active {
   box-shadow: 0 0 2px #D58100 inset;
   border-color: #D58100;
   background-color: #eeeeee;
 }
-/* line 87, ../../sass/_target_input.sass */
+/* line 127, ../../sass/_target_input.sass */
 #target-input .score-input {
   display: grid;
   grid-template-columns: repeat(4, 1fr);
@@ -5890,7 +5936,7 @@ table.tree td.border-right {
   padding: 5px;
   flex-grow: 1;
 }
-/* line 96, ../../sass/_target_input.sass */
+/* line 136, ../../sass/_target_input.sass */
 #target-input .score-input__control {
   font-size: 25px;
   font-weight: bold;
@@ -5899,42 +5945,42 @@ table.tree td.border-right {
   align-items: center;
   justify-content: center;
 }
-/* line 104, ../../sass/_target_input.sass */
+/* line 144, ../../sass/_target_input.sass */
 #target-input .score-input__control--gold {
   background-color: #ffff56;
 }
-/* line 106, ../../sass/_target_input.sass */
+/* line 146, ../../sass/_target_input.sass */
 #target-input .score-input__control--red {
   background-color: #ea3525;
   color: white;
 }
-/* line 109, ../../sass/_target_input.sass */
+/* line 149, ../../sass/_target_input.sass */
 #target-input .score-input__control--blue {
   background-color: #75fbfd;
 }
-/* line 111, ../../sass/_target_input.sass */
+/* line 151, ../../sass/_target_input.sass */
 #target-input .score-input__control--black {
   background-color: #020202;
   color: white;
 }
-/* line 114, ../../sass/_target_input.sass */
+/* line 154, ../../sass/_target_input.sass */
 #target-input .score-input__control--white {
   background-color: #ffffff;
 }
-/* line 116, ../../sass/_target_input.sass */
+/* line 156, ../../sass/_target_input.sass */
 #target-input .score-input__control--green {
   background-color: #486F38;
   color: white;
 }
-/* line 120, ../../sass/_target_input.sass */
+/* line 160, ../../sass/_target_input.sass */
 #target-input .score-input__control--miss {
   grid-column-end: span 2;
 }
-/* line 123, ../../sass/_target_input.sass */
+/* line 163, ../../sass/_target_input.sass */
 #target-input .actions {
   padding: 5px;
 }
-/* line 126, ../../sass/_target_input.sass */
+/* line 166, ../../sass/_target_input.sass */
 #target-input .actions__button {
   width: 100%;
   text-align: center;
@@ -5942,5 +5988,6 @@ table.tree td.border-right {
   margin: 5px 0;
   background-color: #ea3525;
   color: white;
+  font-weight: bold;
   border-radius: 4px;
 }

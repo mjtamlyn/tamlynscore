@@ -37,12 +37,19 @@ const isDescending = (end) => {
 }
 
 class Score {
-    constructor({ target, name, categories, arrows, endLength = 3 }) {
+    constructor({ target, name, categories, arrows = [], endLength = 3 }) {
         this.target = target;
         this.name = name;
         this.categories = categories;
         this.arrows = arrows;
         this.endLength = endLength;
+    }
+
+    currentEnd() {
+        if (!this.arrows.length) {
+            return 1;
+        }
+        return Math.floor((this.arrows.length - 1) / this.endLength) + 1;
     }
 
     getEnd(endNumber) {

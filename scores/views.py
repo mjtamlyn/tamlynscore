@@ -723,7 +723,10 @@ class TargetAPIRoot(EntryUserRequired, View):
         sessions = entry.sessionentry_set.filter(targetallocation__isnull=False).order_by('session_round__session__start')
         return JsonResponse({
             'user': entry.archer.name,
-            'event': entry.competition.short_name,
+            'competition': {
+                'name': entry.competition.full_name,
+                'short': entry.competition.short_name,
+            },
             'sessions': [{
                 'round': se.session_round.shot_round.name,
                 'start': {
@@ -755,7 +758,10 @@ class TargetAPISession(EntryUserRequired, View):
         ).order_by('target')
         return JsonResponse({
             'user': entry.archer.name,
-            'event': entry.competition.short_name,
+            'competition': {
+                'name': entry.competition.full_name,
+                'short': entry.competition.short_name,
+            },
             'session': {
                 'round': session_entry.session_round.shot_round.name,
                 'start': {
@@ -766,7 +772,7 @@ class TargetAPISession(EntryUserRequired, View):
                     reverse('target-api-session', kwargs={'session': session_entry.session_round.session_id})
                 ),
             },
-            'targets': [{
+            'scores': [{
                 'target': target.label,
                 'name': target.session_entry.competition_entry.archer.name,
                 'categories': {

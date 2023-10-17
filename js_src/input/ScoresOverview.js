@@ -4,14 +4,11 @@ import ArcherRowSummary from './ArcherRowSummary';
 
 
 const ScoresOverview = ({ scores, endNumber, continueEnd, startNextEnd, complete }) => {
-    const [scoreA, scoreB, scoreC, scoreD] = scores;
+    const scoresRendered = scores.map(score => <ArcherRowSummary score={ score } key={ score.target } />);
     return (
         <>
             <div className="archers">
-                <ArcherRowSummary score={ scoreA } />
-                <ArcherRowSummary score={ scoreB } />
-                <ArcherRowSummary score={ scoreC } />
-                <ArcherRowSummary score={ scoreD } />
+                { scoresRendered }
             </div>
             <div className="actions">
                 { continueEnd && <div className="actions__button" onClick={ continueEnd }>
