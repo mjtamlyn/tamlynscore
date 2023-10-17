@@ -7,7 +7,10 @@ from itertools import groupby
 from django.contrib.auth import login
 from django.core.cache import cache
 from django.db.models import Count, Max
-from django.http import Http404, HttpResponse, HttpResponseRedirect
+from django.http import (
+    Http404, HttpResponse, HttpResponseNotAllowed, HttpResponseRedirect,
+    JsonResponse,
+)
 from django.shortcuts import get_object_or_404, render
 from django.urls import reverse
 from django.views.generic import ListView, RedirectView, TemplateView, View
@@ -23,7 +26,8 @@ from reportlab.rl_config import defaultPageSize
 
 from core.models import County
 from entries.models import (
-    Competition, CompetitionEntry, EntryUser, ResultsMode, SessionRound,
+    Competition, CompetitionEntry, EntryUser, ResultsMode, SessionEntry,
+    SessionRound, TargetAllocation,
 )
 from entries.views import CompetitionMixin, TargetList
 from olympic.models import OlympicSessionRound
@@ -704,3 +708,71 @@ class TargetInput(TemplateView):
 
 class TargetInputJs(TemplateView):
     template_name = 'scores/target_input_js.html'
+
+
+class EntryUserRequired():
+    def dispatch(self, request, *args, **kwargs):
+        if not request.session['_auth_user_backend'] == 'entries.auth_backends.EntryUserAuthBackend':
+            return HttpResponseNotAllowed('You need to log in as an entry')
+        return super().dispatch(request, *args, **kwargs)
+
+
+class TargetAPIRoot(EntryUserRequired, View):
+    def get(self, request, *args, **kwargs):
+        entry = request.user.competition_entry
+        sessions = entry.sessionentry_set.filter(targetallocation__isnull=False).order_by('session_round__session__start')
+        return JsonResponse({
+            'user': entry.archer.name,
+            'event': entry.competition.short_name,
+            'sessions': [{
+                'round': se.session_round.shot_round.name,
+                'start': {
+                    'iso': se.session_round.session.start,
+                    'pretty': se.session_round.session.start.strftime('%d %B %-I:%M%p'),
+                },
+                'target': se.targetallocation.label,
+                'api': request.build_absolute_uri(
+                    reverse('target-api-session', kwargs={'session': se.session_round.session_id})
+                ),
+            } for se in sessions],
+        })
+
+
+class TargetAPISession(EntryUserRequired, View):
+    def get(self, request, *args, **kwargs):
+        entry = request.user.competition_entry
+        try:
+            session_entry = entry.sessionentry_set.filter(
+                targetallocation__isnull=False,
+            ).get(session_round__session_id=kwargs['session'])
+        except SessionEntry.DoesNotExist:
+            raise Http404
+        session_round = session_entry.session_round
+        boss = session_entry.targetallocation.boss
+        targets = TargetAllocation.objects.filter(
+            boss=boss,
+            session_entry__session_round=session_round,
+        ).order_by('target')
+        return JsonResponse({
+            'user': entry.archer.name,
+            'event': entry.competition.short_name,
+            'session': {
+                'round': session_entry.session_round.shot_round.name,
+                'start': {
+                    'iso': session_entry.session_round.session.start,
+                    'pretty': session_entry.session_round.session.start.strftime('%d %B %-I:%M%p'),
+                },
+                'api': request.build_absolute_uri(
+                    reverse('target-api-session', kwargs={'session': session_entry.session_round.session_id})
+                ),
+            },
+            'targets': [{
+                'target': target.label,
+                'name': target.session_entry.competition_entry.archer.name,
+                'categories': {
+                    'bowstyle': target.session_entry.competition_entry.bowstyle.name,
+                    'gender': target.session_entry.competition_entry.archer.get_gender_display(),
+                },
+                'arrows': [a.json_value for a in target.score.arrow_set.order_by('arrow_of_round')],
+            } for target in targets],
+        })

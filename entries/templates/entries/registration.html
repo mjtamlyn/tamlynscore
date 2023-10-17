@@ -116,7 +116,9 @@
                     </td>
                     <td>
                         {% if archer %}
-                        {% qr_from_text archer.login_url size="S" %}
+                        <a href="{{ archer.login_url }}">
+                            {% qr_from_text archer.login_url size="S" %}
+                        </a>
                         {% endif %}
                     </td>
                 </tr>

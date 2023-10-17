@@ -106,10 +106,17 @@ class Arrow(models.Model):
 
     def __str__(self):
         if self.is_x:
-            return u'X'
+            return 'X'
         if self.arrow_value == 0:
-            return u'M'
+            return 'M'
         return str(self.arrow_value)
+
+    @property
+    def json_value(self):
+        try:
+            return int(str(self))
+        except ValueError:
+            return str(self)
 
 
 class Dozen(models.Model):

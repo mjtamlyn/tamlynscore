@@ -357,5 +357,9 @@ class TargetAllocation(models.Model):
     boss = models.PositiveIntegerField()
     target = models.CharField(max_length=1)
 
+    @property
+    def label(self):
+        return '%s%s' % (self.boss, self.target)
+
     def __str__(self):
-        return u'{0}{1} - {2}'.format(self.boss, self.target, self.session_entry)
+        return '%s%s - %s' % (self.boss, self.target, self.session_entry)
