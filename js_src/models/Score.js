@@ -63,7 +63,7 @@ class Score {
 
     getRunningTotal(endNumber) {
         if (!endNumber) {
-            endNumber = 100
+            return sum(this.arrows);
         }
         return sum(this.arrows.slice(0, endNumber * this.endLength));
     }
