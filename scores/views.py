@@ -788,18 +788,46 @@ class TargetAPISession(CsrfExemptMixin, EntryUserRequired, View):
             } for target in targets],
         })
 
+    def _parse_value(self, arrow, sent):
+        if sent == 'M':
+            arrow.arrow_value = 0
+            arrow.is_x = False
+        elif sent == 'X':
+            arrow.arrow_value = 10
+            arrow.is_x = True
+        else:
+            arrow.arrow_value = sent
+            arrow.is_x = False
+
     def post(self, request, *args, **kwargs):
         data = json.loads(request.body)
-        print(data)
+        lookup = {}
+        for score in data['scores']:
+            for i, arrow in enumerate(score['arrows'], 1):
+                lookup['%s:%s' % (score['target'], i)] = arrow
 
         entry = request.user.competition_entry
         session_entry = self.get_session_entry(entry)
         targets = self.get_targets(session_entry)
+        target_lookup = {target.label: target for target in targets}
         for target in targets:
             saved_arrows = target.score.arrow_set.order_by('arrow_of_round')
-            print([{
-                'shot': a.arrow_of_round,
-                'value': a.json_value,
-            } for a in saved_arrows])
+            for a in saved_arrows:
+                lookup_key = '%s:%s' % (target.label, a.arrow_of_round)
+                sent = lookup.get(lookup_key, None)
+                if sent:
+                    lookup.pop(lookup_key)
+                    self._parse_value(a, sent)
+                    a.save()
+
+        for key, sent in lookup.items():
+            target_label, arrow_of_round = key.split(':')
+            arrow = Arrow(score=target_lookup[target_label].score, arrow_of_round=arrow_of_round)
+            self._parse_value(arrow, sent)
+            arrow.save()
+
+        for target in targets:
+            target.score.update_score()
+            target.score.save(force_update=True)
 
         return JsonResponse({'status': 'ok'})

@@ -339,7 +339,6 @@ class EntryCreateForm(forms.Form):
                 self.initial['ifaa_division'] = current.ifaa_division
 
         if self.initial:
-            print(self.initial)
             for name in self.initial:
                 if name not in self.fields:
                     continue
