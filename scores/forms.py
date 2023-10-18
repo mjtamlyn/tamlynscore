@@ -42,9 +42,9 @@ def get_arrow_formset(scores, session_round, boss, dozen, arrows_per_end, data=N
         for arrow in range(1, arrows_per_end + 1):
             prefix = score.target.target + str(arrow)
             try:
-                instance = Arrow.objects.get(score=score, arrow_of_round=int(dozen) * arrows_per_end + arrow)
+                instance = Arrow.objects.get(score=score, arrow_of_round=(int(dozen) - 1) * arrows_per_end + arrow)
             except Arrow.DoesNotExist:
-                instance = Arrow(score=score, arrow_of_round=int(dozen) * arrows_per_end + arrow)
+                instance = Arrow(score=score, arrow_of_round=(int(dozen) - 1) * arrows_per_end + arrow)
             target['forms'].append(ArrowForm(data, instance=instance, prefix=prefix))
         target['retiring_form'] = RetiringForm(data, instance=score, prefix='retiring%s' % score.pk)
         forms_list.append(target)

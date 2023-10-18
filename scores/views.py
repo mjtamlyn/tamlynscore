@@ -77,7 +77,7 @@ class InputScores(TargetList):
             if target not in target_lookup:
                 target_lookup[target] = {}
             dozen = math.floor((arrow['arrow_of_round'] - 1) / entered_per_end)
-            dozen = int(dozen)
+            dozen = int(dozen) + 1
             if dozen not in target_lookup[target]:
                 target_lookup[target][dozen] = []
             target_lookup[target][dozen].append(arrow)
@@ -209,7 +209,7 @@ class InputArrowsArcher(CompetitionMixin, TemplateView):
         } for i in range(int(round.arrows / per_end))]
         arrows = score.arrow_set.order_by('arrow_of_round')
         for arrow in arrows:
-            dozen = int((arrow.arrow_of_round - per_end - 1) / per_end)
+            dozen = int((arrow.arrow_of_round - 1) / per_end)
             point = arrow.arrow_of_round % per_end - 1
             layout[dozen]['scores'][point] = str(arrow)
             layout[dozen]['doz'] += arrow.arrow_value
