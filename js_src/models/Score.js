@@ -37,12 +37,20 @@ const isDescending = (end) => {
 }
 
 class Score {
-    constructor({ target, name, categories, arrows = [], endLength = 3 }) {
+    constructor({ store, target, name, categories, arrows = [], endLength = 3 }) {
+        this.store = store;
         this.target = target;
         this.name = name;
         this.categories = categories;
         this.arrows = arrows;
         this.endLength = endLength;
+    }
+
+    serialize() {
+        return {
+            target: this.target,
+            arrows: this.arrows,
+        };
     }
 
     currentEnd() {

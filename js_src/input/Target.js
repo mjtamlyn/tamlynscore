@@ -1,21 +1,18 @@
 import React, { useState } from 'react';
 
-import Score from '../models/Score';
-
 import EventHeader from './EventHeader';
 import ScoresOverview from './ScoresOverview';
 import TargetInput from './TargetInput';
 
 
-const Target = ({ session, scores }) => {
-    const modelScores = scores.map(score => new Score(score));
-    const [endNumber, setEndNumber] = useState(Math.min(...modelScores.map(score => score.currentEnd())));
+const Target = ({ session, scores, store }) => {
+    const [endNumber, setEndNumber] = useState(Math.min(...scores.map(score => score.currentEnd())));
     const maxEnds = 20;
     const [page, setPage] = useState('overview');
 
     let startNextEnd = null;
     let complete = null;
-    if (!modelScores.some(score => !score.isEndComplete(endNumber))) {
+    if (!scores.some(score => !score.isEndComplete(endNumber))) {
         if (endNumber + 1 <= maxEnds) {
             startNextEnd = () => {
                 setPage('input');
@@ -36,14 +33,18 @@ const Target = ({ session, scores }) => {
         return (
             <div className="full-height-page">
                 <EventHeader round={ session.round } pageTitle="Overview" />
-                <ScoresOverview scores={ modelScores } endNumber={ endNumber } continueEnd={ continueEnd } startNextEnd={ startNextEnd } complete={ complete } />
+                <ScoresOverview scores={ scores } endNumber={ endNumber } continueEnd={ continueEnd } startNextEnd={ startNextEnd } complete={ complete } />
             </div>
         );
     } else if (page === 'input') {
+        const toSummary = () => {
+            setPage('overview');
+            store.save();
+        };
         return (
             <div className="full-height-page">
                 <EventHeader round={ session.round } pageTitle={ 'End ' + endNumber } />
-                <TargetInput scores={ modelScores } endNumber={ endNumber } toSummary={ () => setPage('overview') } />
+                <TargetInput scores={ scores } endNumber={ endNumber } toSummary={ toSummary } />
             </div>
         );
     }

@@ -1,5 +1,7 @@
 import React, { useState } from 'react';
 
+import Store from '../models/Store';
+
 import SessionList from './SessionList';
 import Target from './Target';
 import View from './View';
@@ -17,7 +19,20 @@ const InputController = () => {
         );
     } else {
         return (
-            <View api={ page.api } render={ data => <Target session={ data.session } user={ data.user } competition={ data.competition } scores={ data.scores } setPage={ setPage } key={ page.name } /> } />
+            <View api={ page.api } render={ data => {
+                const store = new Store({ api: page.api, scores: data.scores });
+                return (
+                    <Target
+                        session={ data.session }
+                        user={ data.user }
+                        competition={ data.competition }
+                        scores={ store.scores }
+                        store={ store }
+                        setPage={ setPage }
+                        key={ page.name }
+                    />
+                );
+            } } />
         );
     }
 };

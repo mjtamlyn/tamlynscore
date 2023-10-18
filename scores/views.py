@@ -1,6 +1,7 @@
 import copy
 import csv
 import functools
+import json
 import math
 from itertools import groupby
 
@@ -15,7 +16,7 @@ from django.shortcuts import get_object_or_404, render
 from django.urls import reverse
 from django.views.generic import ListView, RedirectView, TemplateView, View
 
-from braces.views import MessageMixin
+from braces.views import CsrfExemptMixin, MessageMixin
 from reportlab.lib import colors
 from reportlab.lib.styles import getSampleStyleSheet
 from reportlab.lib.units import inch
@@ -741,21 +742,25 @@ class TargetAPIRoot(EntryUserRequired, View):
         })
 
 
-class TargetAPISession(EntryUserRequired, View):
-    def get(self, request, *args, **kwargs):
-        entry = request.user.competition_entry
+class TargetAPISession(CsrfExemptMixin, EntryUserRequired, View):
+    def get_session_entry(self, entry):
         try:
-            session_entry = entry.sessionentry_set.filter(
+            return entry.sessionentry_set.filter(
                 targetallocation__isnull=False,
-            ).get(session_round__session_id=kwargs['session'])
+            ).get(session_round__session_id=self.kwargs['session'])
         except SessionEntry.DoesNotExist:
             raise Http404
-        session_round = session_entry.session_round
-        boss = session_entry.targetallocation.boss
-        targets = TargetAllocation.objects.filter(
-            boss=boss,
-            session_entry__session_round=session_round,
+
+    def get_targets(self, session_entry):
+        return TargetAllocation.objects.filter(
+            boss=session_entry.targetallocation.boss,
+            session_entry__session_round=session_entry.session_round,
         ).order_by('target')
+
+    def get(self, request, *args, **kwargs):
+        entry = request.user.competition_entry
+        session_entry = self.get_session_entry(entry)
+        targets = self.get_targets(session_entry)
         return JsonResponse({
             'user': entry.archer.name,
             'competition': {
@@ -782,3 +787,19 @@ class TargetAPISession(EntryUserRequired, View):
                 'arrows': [a.json_value for a in target.score.arrow_set.order_by('arrow_of_round')],
             } for target in targets],
         })
+
+    def post(self, request, *args, **kwargs):
+        data = json.loads(request.body)
+        print(data)
+
+        entry = request.user.competition_entry
+        session_entry = self.get_session_entry(entry)
+        targets = self.get_targets(session_entry)
+        for target in targets:
+            saved_arrows = target.score.arrow_set.order_by('arrow_of_round')
+            print([{
+                'shot': a.arrow_of_round,
+                'value': a.json_value,
+            } for a in saved_arrows])
+
+        return JsonResponse({'status': 'ok'})
