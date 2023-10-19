@@ -629,6 +629,7 @@ class ScoreSheets(CompetitionMixin, ListView):
 # PDF views
 
 class PdfView(View):
+    filename = None
 
     styles = getSampleStyleSheet()
     PAGE_HEIGHT = defaultPageSize[1]
@@ -657,8 +658,12 @@ class PdfView(View):
     def setMargins(self, doc):
         pass
 
+    def get_filename(self):
+        return self.filename or 'Download'
+
     def response(self, elements):
         response = HttpResponse(content_type='application/pdf')
+        response['Content-Disposition'] = 'filename="%s %s.pdf"' % (self.competition, self.get_filename())
         doc = self.get_doc(response)
         self.setMargins(doc)
         doc.build(elements)
@@ -712,8 +717,16 @@ class HeadedPdfView(PdfView):
 
         canvas.restoreState()
 
+    def get_filename(self):
+        if self.filename:
+            return self.filename
+        if self.title:
+            return self.title
+        return super().get_filename()
+
     def response(self, elements):
         response = HttpResponse(content_type='application/pdf')
+        response['Content-Disposition'] = 'filename="%s %s.pdf"' % (self.competition, self.get_filename())
         doc = self.get_doc(response)
         self.setMargins(doc)
         doc.build(elements, onFirstPage=self.draw_title, onLaterPages=self.draw_title)
@@ -771,11 +784,13 @@ class TargetListLunch(TargetListPdf):
 
 
 class ScoreSheetsPdf(CompetitionMixin, HeadedPdfView):
-
     box_size = 0.32 * inch
     wide_box = box_size * 1.35
     total_cols = 1 + 12 + 2 + 4
     col_widths = 7 * [box_size] + [wide_box] + 6 * [box_size] + 6 * [wide_box]
+
+    def get_filename(self):
+        return 'Score Sheets - %s' % self.session_round.shot_round
 
     def setMargins(self, doc):
         doc.topMargin = 0.9 * inch
@@ -1010,6 +1025,9 @@ class ScoreSheetsPdf(CompetitionMixin, HeadedPdfView):
 
 
 class SessionScoreSheetsPdf(ScoreSheetsPdf):
+    def get_filename(self):
+        return 'Score Sheets'
+
     def update_style(self):
         self.title = None
         self.spacer = Spacer(self.PAGE_WIDTH, self.box_size * 0.5)
@@ -1056,6 +1074,10 @@ class SessionScoreSheetsPdf(ScoreSheetsPdf):
 
 
 class RunningSlipsPdf(ScoreSheetsPdf):
+
+    def get_filename(self):
+        return 'Running Slips - %s' % self.session_round.shot_round
+
     def draw_title(self, canvas, doc):
         pass
 

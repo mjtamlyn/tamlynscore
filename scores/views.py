@@ -307,6 +307,7 @@ class PDFResultsRenderer(object):
 
     def render_to_pdf(self, context):
         response = HttpResponse(content_type='application/pdf')
+        response['Content-Disposition'] = 'filename="%s %s - %s.pdf"' % (self.competition, self.title, self.mode.name)
         self.page_width, self.page_height = defaultPageSize
         doc = SimpleDocTemplate(response, pagesize=defaultPageSize)
         self.set_styles()
@@ -546,6 +547,7 @@ class RankingsExport(ResultModeMixin, CompetitionMixin, View):
         h2h_rounds = OlympicSessionRound.objects.filter(session__competition=self.competition)
         self.annotate_h2h_data(h2h_rounds, archer_details)
         response = HttpResponse(content_type='text/csv')
+        response['Content-Disposition'] = 'attachment; filename="%s-rankings-export.pdf"' % self.competition.slug
         writer = csv.writer(response)
         writer.writerow(headings)
         writer.writerows(archer_details.values())

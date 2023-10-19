@@ -464,6 +464,7 @@ class OlympicScoreSheet(ScoreSheetsPdf):
 class OlympicResults(CompetitionMixin, HeadedPdfView):
     admin_required = False
     title = 'Results'
+    filename = 'H2H results'
 
     match_headers = ['1/64', '1/32', '1/16', '1/8', 'QF', 'SF', 'F']
 
@@ -761,6 +762,7 @@ class OlympicTree(OlympicTreeMixin, CompetitionMixin, TemplateView):
 
 class OlympicTreePdf(OlympicTreeMixin, OlympicResults):
     admin_required = False
+    filename = 'H2H bracket'
 
     PAGE_HEIGHT = defaultPageSize[0]
     PAGE_WIDTH = defaultPageSize[1]
@@ -876,6 +878,7 @@ class CombinedPdf(CompetitionMixin, HeadedPdfView):
         self.set_options(**kwargs)
 
         response = HttpResponse(content_type='application/pdf')
+        response['Content-Disposition'] = 'filename="%s Full Results Book.pdf"' % self.competition
         doc = self.get_doc(response)
         elements = []
 
