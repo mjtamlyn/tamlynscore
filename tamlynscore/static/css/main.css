@@ -3292,59 +3292,66 @@ footer p {
 
 /* line 26, ../../sass/_layout.sass */
 .row {
-  overflow: hidden;
-  *zoom: 1;
   margin-left: -10px;
   margin-right: -10px;
   margin-bottom: 10px;
 }
+/* line 28, ../../sass/_layout.sass */
+.row:before, .row:after {
+  display: table;
+  content: " ";
+}
 /* line 31, ../../sass/_layout.sass */
+.row:after {
+  clear: both;
+}
+/* line 37, ../../sass/_layout.sass */
 .row--flex {
   display: flex;
   flex-wrap: wrap;
 }
-/* line 34, ../../sass/_layout.sass */
+/* line 40, ../../sass/_layout.sass */
 .row--flex > .col1, .row--flex .col2, .row--flex .col3, .row--flex .col4, .row--flex .col5, .row--flex .col6 {
   float: none;
 }
 
-/* line 37, ../../sass/_layout.sass */
+/* line 43, ../../sass/_layout.sass */
 .col1, .col2, .col3, .col4, .col5, .col6 {
   float: left;
   padding: 0 10px;
 }
 
-/* line 41, ../../sass/_layout.sass */
+/* line 47, ../../sass/_layout.sass */
 .col6 {
   width: 100%;
 }
 
-/* line 44, ../../sass/_layout.sass */
+/* line 50, ../../sass/_layout.sass */
 .col5 {
   width: 83.33333%;
 }
 
-/* line 47, ../../sass/_layout.sass */
+/* line 53, ../../sass/_layout.sass */
 .col4 {
   width: 66.66667%;
 }
 
-/* line 50, ../../sass/_layout.sass */
+/* line 56, ../../sass/_layout.sass */
 .col3 {
   width: 50%;
 }
 
-/* line 53, ../../sass/_layout.sass */
+/* line 59, ../../sass/_layout.sass */
 .col2 {
   width: 33.33333%;
 }
 
-/* line 56, ../../sass/_layout.sass */
+/* line 62, ../../sass/_layout.sass */
 .col1 {
   width: 16.66667%;
 }
 
-/* line 59, ../../sass/_layout.sass */
+/* line 65, ../../sass/_layout.sass */
 .flex {
   display: -webkit-flex;
   display: flex;
@@ -3352,24 +3359,24 @@ footer p {
   flex-wrap: wrap;
 }
 
-/* line 65, ../../sass/_layout.sass */
+/* line 71, ../../sass/_layout.sass */
 .pull-right {
   float: right;
 }
 
 @media (max-width: 1200px) {
-  /* line 69, ../../sass/_layout.sass */
+  /* line 75, ../../sass/_layout.sass */
   .container {
     width: 920px;
   }
 }
 @media (max-width: 950px) {
-  /* line 73, ../../sass/_layout.sass */
+  /* line 79, ../../sass/_layout.sass */
   .container {
     width: 100%;
   }
 
-  /* line 76, ../../sass/_layout.sass */
+  /* line 82, ../../sass/_layout.sass */
   .col1, .col2, .col3, .col4, .col5 {
     width: 100%;
   }
@@ -3461,8 +3468,6 @@ table.table .score-sheet-link:after {
 input,
 select {
   padding: 4px 7px;
-  -moz-border-radius: 3px;
-  -webkit-border-radius: 3px;
   border-radius: 3px;
   outline-color: #6FB3FF;
   border: 1px solid #6FB3FF;
@@ -3684,8 +3689,6 @@ li {
 /* line 1, ../../sass/_buttons.sass */
 .btn {
   font-family: "Helvetica Neue", "Trebuchet MS", Helvetica, sans-serif;
-  -moz-border-radius: 5px;
-  -webkit-border-radius: 5px;
   border-radius: 5px;
   background-color: #004ca2;
   color: white;
@@ -4103,8 +4106,6 @@ ul.link-list li a:hover {
   margin-bottom: 15px;
   border: 1px solid #6FB3FF;
   overflow: hidden;
-  -moz-border-radius: 5px;
-  -webkit-border-radius: 5px;
   border-radius: 5px;
 }
 /* line 8, ../../sass/components/_archer_block.sass */
@@ -4150,8 +4151,6 @@ ul.link-list li a:hover {
   color: #fff;
   padding: 0.2em 0.8em 0.3em;
   white-space: nowrap;
-  -moz-border-radius: 0.5em;
-  -webkit-border-radius: 0.5em;
   border-radius: 0.5em;
 }
 /* line 42, ../../sass/components/_archer_block.sass */
@@ -4240,24 +4239,28 @@ ul.link-list li a:hover {
   border-top: 2px solid black;
 }
 
-/* line 17, ../../sass/main.sass */
+/* line 15, ../../sass/main.sass */
 body {
   color: #000F1F;
-  background-image: linear-gradient(#f7f7f7 50px, rgba(0, 0, 0, 0) 150px);
+  background-image: linear-gradient(#f7f7f7 50px, transparent 150px);
 }
 
-/* line 21, ../../sass/main.sass */
-.clear {
-  overflow: hidden;
-  *zoom: 1;
+/* line 20, ../../sass/main.sass */
+.clear:before, .clear:after {
+  display: table;
+  content: " ";
+}
+/* line 23, ../../sass/main.sass */
+.clear:after {
+  clear: both;
 }
 
-/* line 24, ../../sass/main.sass */
+/* line 27, ../../sass/main.sass */
 .hidden {
   display: none;
 }
 
-/* line 27, ../../sass/main.sass */
+/* line 30, ../../sass/main.sass */
 .text-right {
   text-align: right;
 }
@@ -4629,8 +4632,6 @@ body {
   height: 30px;
   margin: 5px;
   padding: 5px;
-  -moz-border-radius: 5px;
-  -webkit-border-radius: 5px;
   border-radius: 5px;
   text-align: center;
   width: 30px;
@@ -5698,8 +5699,6 @@ body {
 /* line 15, ../../sass/_target_list.sass */
 .target-list .boss .archer-block {
   margin-bottom: 0;
-  -moz-border-radius: 0;
-  -webkit-border-radius: 0;
   border-radius: 0;
   border-bottom: 0;
 }

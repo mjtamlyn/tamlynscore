@@ -24,7 +24,13 @@ footer
   padding: 0 $margin-width
 
 .row
-  @include clearfix
+  // Compass clearfix
+  &:before, &:after
+    display: table
+    content: ' '
+  &:after
+    clear: both
+
   margin-left: -$margin-width
   margin-right: -$margin-width
   margin-bottom: 10px
