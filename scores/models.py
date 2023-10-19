@@ -86,7 +86,7 @@ class Score(models.Model):
 
     def running_total(self, dozen):
         if self.target.session_entry.session_round.session.scoring_system == SCORING_FULL:
-            return self.arrow_set.filter(arrow_of_round__lte=int(dozen) * self.arrows_entered_per_end).aggregate(models.Sum('arrow_value'))['arrow_value__sum']
+            return self.arrow_set.filter(arrow_of_round__lte=(int(dozen) - 1) * self.arrows_entered_per_end).aggregate(models.Sum('arrow_value'))['arrow_value__sum']
         elif self.target.session_entry.session_round.session.scoring_system == SCORING_DOZENS:
             return self.dozen_set.filter(dozen__lt=dozen).aggregate(total=models.Sum('total'))['total'] or 0
 
@@ -106,10 +106,17 @@ class Arrow(models.Model):
 
     def __str__(self):
         if self.is_x:
-            return u'X'
+            return 'X'
         if self.arrow_value == 0:
-            return u'M'
+            return 'M'
         return str(self.arrow_value)
+
+    @property
+    def json_value(self):
+        try:
+            return int(str(self))
+        except ValueError:
+            return str(self)
 
 
 class Dozen(models.Model):

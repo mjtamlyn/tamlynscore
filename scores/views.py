@@ -1,16 +1,22 @@
 import copy
 import csv
 import functools
+import json
 import math
 from itertools import groupby
 
+from django.contrib.auth import login
 from django.core.cache import cache
 from django.db.models import Count, Max
-from django.http import Http404, HttpResponse, HttpResponseRedirect
+from django.http import (
+    Http404, HttpResponse, HttpResponseNotAllowed, HttpResponseRedirect,
+    JsonResponse,
+)
 from django.shortcuts import get_object_or_404, render
 from django.urls import reverse
-from django.views.generic import ListView, TemplateView, View
+from django.views.generic import ListView, RedirectView, TemplateView, View
 
+from braces.views import CsrfExemptMixin, MessageMixin
 from reportlab.lib import colors
 from reportlab.lib.styles import getSampleStyleSheet
 from reportlab.lib.units import inch
@@ -21,7 +27,8 @@ from reportlab.rl_config import defaultPageSize
 
 from core.models import County
 from entries.models import (
-    Competition, CompetitionEntry, ResultsMode, SessionRound,
+    Competition, CompetitionEntry, EntryUser, ResultsMode, SessionEntry,
+    SessionRound, TargetAllocation,
 )
 from entries.views import CompetitionMixin, TargetList
 from olympic.models import OlympicSessionRound
@@ -70,7 +77,7 @@ class InputScores(TargetList):
             if target not in target_lookup:
                 target_lookup[target] = {}
             dozen = math.floor((arrow['arrow_of_round'] - 1) / entered_per_end)
-            dozen = int(dozen)
+            dozen = int(dozen) + 1
             if dozen not in target_lookup[target]:
                 target_lookup[target][dozen] = []
             target_lookup[target][dozen].append(arrow)
@@ -202,7 +209,7 @@ class InputArrowsArcher(CompetitionMixin, TemplateView):
         } for i in range(int(round.arrows / per_end))]
         arrows = score.arrow_set.order_by('arrow_of_round')
         for arrow in arrows:
-            dozen = int((arrow.arrow_of_round - per_end - 1) / per_end)
+            dozen = int((arrow.arrow_of_round - 1) / per_end)
             point = arrow.arrow_of_round % per_end - 1
             layout[dozen]['scores'][point] = str(arrow)
             layout[dozen]['doz'] += arrow.arrow_value
@@ -676,3 +683,150 @@ class RankingsExport(ResultModeMixin, CompetitionMixin, View):
             for seeding in results:
                 archers[seeding.entry_id] += [seeding.rank]
         return archers
+
+
+class EntryAuthenticate(MessageMixin, RedirectView):
+    permanent = False
+
+    def dispatch(self, request, *args, **kwargs):
+        try:
+            self.archer = EntryUser.objects.get(uuid=kwargs['id'])
+        except EntryUser.DoesNotExist:
+            raise Http404
+        if self.archer.competition_entry.competition.is_admin(request.user):
+            self.messages.error('You are logged in already as a competition admin - you must log out before you can log in as a archer.')
+        else:
+            login(request, self.archer, backend='entries.auth_backends.EntryUserAuthBackend')
+        return super().dispatch(request, *args, **kwargs)
+
+    def get_redirect_url(self, *args, **kwargs):
+        return reverse('target-input-js')
+
+
+class TargetInput(TemplateView):
+    template_name = 'scores/target_input.html'
+
+
+class EntryUserRequired():
+    def dispatch(self, request, *args, **kwargs):
+        if not request.session['_auth_user_backend'] == 'entries.auth_backends.EntryUserAuthBackend':
+            return HttpResponseNotAllowed('You need to log in as an entry')
+        return super().dispatch(request, *args, **kwargs)
+
+
+class TargetAPIRoot(EntryUserRequired, View):
+    def get(self, request, *args, **kwargs):
+        entry = request.user.competition_entry
+        sessions = entry.sessionentry_set.filter(targetallocation__isnull=False).order_by('session_round__session__start')
+        return JsonResponse({
+            'user': entry.archer.name,
+            'competition': {
+                'name': entry.competition.full_name,
+                'short': entry.competition.short_name,
+                'url': entry.competition.get_absolute_url(),
+            },
+            'sessions': [{
+                'round': se.session_round.shot_round.name,
+                'start': {
+                    'iso': se.session_round.session.start,
+                    'pretty': se.session_round.session.start.strftime('%d %B %-I:%M%p'),
+                },
+                'target': se.targetallocation.label,
+                'api': request.build_absolute_uri(
+                    reverse('target-api-session', kwargs={'session': se.session_round.session_id})
+                ),
+            } for se in sessions],
+        })
+
+
+class TargetAPISession(CsrfExemptMixin, EntryUserRequired, View):
+    def get_session_entry(self, entry):
+        try:
+            return entry.sessionentry_set.filter(
+                targetallocation__isnull=False,
+            ).get(session_round__session_id=self.kwargs['session'])
+        except SessionEntry.DoesNotExist:
+            raise Http404
+
+    def get_targets(self, session_entry):
+        return TargetAllocation.objects.filter(
+            boss=session_entry.targetallocation.boss,
+            session_entry__session_round=session_entry.session_round,
+            session_entry__present=True,
+        ).order_by('target')
+
+    def get(self, request, *args, **kwargs):
+        entry = request.user.competition_entry
+        session_entry = self.get_session_entry(entry)
+        targets = self.get_targets(session_entry)
+        return JsonResponse({
+            'user': entry.archer.name,
+            'competition': {
+                'name': entry.competition.full_name,
+                'short': entry.competition.short_name,
+                'url': entry.competition.get_absolute_url(),
+            },
+            'session': {
+                'round': session_entry.session_round.shot_round.name,
+                'start': {
+                    'iso': session_entry.session_round.session.start,
+                    'pretty': session_entry.session_round.session.start.strftime('%d %B %-I:%M%p'),
+                },
+                'api': request.build_absolute_uri(
+                    reverse('target-api-session', kwargs={'session': session_entry.session_round.session_id})
+                ),
+            },
+            'scores': [{
+                'target': target.label,
+                'name': target.session_entry.competition_entry.archer.name,
+                'categories': {
+                    'bowstyle': target.session_entry.competition_entry.bowstyle.name,
+                    'gender': target.session_entry.competition_entry.archer.get_gender_display(),
+                },
+                'arrows': [a.json_value for a in target.score.arrow_set.order_by('arrow_of_round')],
+            } for target in targets],
+        })
+
+    def _parse_value(self, arrow, sent):
+        if sent == 'M':
+            arrow.arrow_value = 0
+            arrow.is_x = False
+        elif sent == 'X':
+            arrow.arrow_value = 10
+            arrow.is_x = True
+        else:
+            arrow.arrow_value = sent
+            arrow.is_x = False
+
+    def post(self, request, *args, **kwargs):
+        data = json.loads(request.body)
+        lookup = {}
+        for score in data['scores']:
+            for i, arrow in enumerate(score['arrows'], 1):
+                lookup['%s:%s' % (score['target'], i)] = arrow
+
+        entry = request.user.competition_entry
+        session_entry = self.get_session_entry(entry)
+        targets = self.get_targets(session_entry)
+        target_lookup = {target.label: target for target in targets}
+        for target in targets:
+            saved_arrows = target.score.arrow_set.order_by('arrow_of_round')
+            for a in saved_arrows:
+                lookup_key = '%s:%s' % (target.label, a.arrow_of_round)
+                sent = lookup.get(lookup_key, None)
+                if sent:
+                    lookup.pop(lookup_key)
+                    self._parse_value(a, sent)
+                    a.save()
+
+        for key, sent in lookup.items():
+            target_label, arrow_of_round = key.split(':')
+            arrow = Arrow(score=target_lookup[target_label].score, arrow_of_round=arrow_of_round)
+            self._parse_value(arrow, sent)
+            arrow.save()
+
+        for target in targets:
+            target.score.update_score()
+            target.score.save(force_update=True)
+
+        return JsonResponse({'status': 'ok'})

@@ -1,6 +1,6 @@
-<html>
+<html {% block htmlattrs %}{% endblock %}>
     <head>
-        <meta name="viewport" content="width=device-width, initial-scale=1">
+        <meta name="viewport" content="{% block meta_viewport %}width=device-width, initial-scale=1{% endblock %}">
         {% block head %}
             {% block meta %}
             <title>{% block title %}{% if title %}{{ title }} | {% endif %}Archery Competitions{% endblock %}</title>
@@ -37,6 +37,8 @@
                         {% if user.is_authenticated %}
                         <span class="name">{{ user }}</span>
                         <a href="{% url 'logout' %}" class="logout">Log Out</a>
+                        {% elif user.is_archer %}
+                        <a href="{% url 'target-input' %}" class="nav-link nav-link--priority">Enter scores</a>
                         {% else %}
                         <a href="{% url 'login' %}">Log In</a>
                         {% endif %}
@@ -44,6 +46,7 @@
                 </div>
             </nav>
             {% endblock nav %}
+            {% block full_content %}
             {% block precontent %}{% endblock %}
             <div class="container">
                 {% block messages %}
@@ -58,6 +61,7 @@
                 {% block content %}
                 {% endblock %}
             </div>
+            {% endblock %}
             {% block footer %}
             <footer>
                 <div class="container">

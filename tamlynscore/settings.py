@@ -40,6 +40,14 @@ STATICFILES_STORAGE = 'whitenoise.storage.CompressedStaticFilesStorage'
 MEDIA_ROOT = os.path.join(BASE_DIR, 'media')
 MEDIA_URL = '/'
 
+WEBPACK_LOADER = {
+    'DEFAULT': {
+        'CACHE': not DEBUG,
+        'BUNDLE_DIR_NAME': 'bundles/',
+        'STATS_FILE': os.path.join(BASE_DIR, 'build', 'webpack-stats.json'),
+    },
+}
+
 TEMPLATES = [{
     'BACKEND': 'django.template.backends.django.DjangoTemplates',
     'DIRS': [],
@@ -92,6 +100,7 @@ INSTALLED_APPS = (
     'django.contrib.admin',
     'gunicorn',
     'debug_toolbar',
+    'webpack_loader',
     'floppyforms',
     'custom_user',
     'qr_code',
@@ -104,6 +113,7 @@ LOGIN_REDIRECT_URL = '/'
 AUTH_USER_MODEL = 'core.User'
 AUTHENTICATION_BACKENDS = [
     'judging.auth_backends.JudgeAuthBackend',
+    'entries.auth_backends.EntryUserAuthBackend',
     'django.contrib.auth.backends.ModelBackend',
 ]
 

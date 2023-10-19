@@ -1,0 +1,19 @@
+{% extends 'base.html' %}
+
+{% block meta_viewport %}width=device-width, user-scalable=no{% endblock %}
+
+{% load render_bundle from webpack_loader %}
+
+{% block scripts %}
+{% render_bundle 'main' 'js' %}
+{% endblock %}
+
+{% block page_id %}target-input{% endblock %}
+
+{% block nav %}{% endblock %}
+
+{% block full_content %}
+<div id="app"></div>
+{% endblock %}
+
+{% block footer %}{% endblock %}

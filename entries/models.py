@@ -1,4 +1,5 @@
 import math
+import uuid
 
 from django.db import models
 from django.urls import reverse
@@ -324,6 +325,19 @@ class CompetitionEntry(models.Model):
         return self.archer.get_gender_display()
 
 
+class EntryUser(models.Model):
+    uuid = models.UUIDField(default=uuid.uuid4)
+    competition_entry = models.OneToOneField(CompetitionEntry, on_delete=models.CASCADE)
+    last_login = models.DateField(null=True, blank=True)
+
+    is_anonymous = False
+    is_superuser = False
+    is_archer = True
+
+    def __str__(self):
+        return 'Archer login - %s' % self.competition_entry
+
+
 class SessionEntry(models.Model):
     competition_entry = models.ForeignKey(CompetitionEntry, on_delete=models.CASCADE)
     session_round = models.ForeignKey(SessionRound, on_delete=models.CASCADE)
@@ -344,5 +358,9 @@ class TargetAllocation(models.Model):
     boss = models.PositiveIntegerField()
     target = models.CharField(max_length=1)
 
+    @property
+    def label(self):
+        return '%s%s' % (self.boss, self.target)
+
     def __str__(self):
-        return u'{0}{1} - {2}'.format(self.boss, self.target, self.session_entry)
+        return '%s%s - %s' % (self.boss, self.target, self.session_entry)

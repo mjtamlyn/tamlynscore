@@ -1,5 +1,7 @@
 {% extends 'entries/target_list.html' %}
 
+{% load qr_code %}
+
 {% block scripts %}
 <script src="{{ STATIC_URL }}lib/jquery/jquery-2.1.3.min.js"></script>
 <script src="{{ STATIC_URL }}js/ajax-csrf.js"></script>
@@ -110,6 +112,13 @@
                         {% if archer %}
                         <a href="#present" class="present btn" data-pk="{{ archer.session_entry.pk }}">Register</a>
                         <a href="#not-present" class="not-present btn" data-pk="{{ archer.session_entry.pk }}">Unregister</a>
+                        {% endif %}
+                    </td>
+                    <td>
+                        {% if archer %}
+                        <a href="{{ archer.login_url }}">
+                            {% qr_from_text archer.login_url size="S" %}
+                        </a>
                         {% endif %}
                     </td>
                 </tr>

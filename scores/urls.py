@@ -14,3 +14,10 @@ urlpatterns = [
     path('<slug:slug>/results/<slug:mode>/<slug:format>/', views.Results.as_view(), name='results'),
     path('<slug:slug>/rankings-export.csv', views.RankingsExport.as_view(), name='rankings_export'),
 ]
+
+archer_urlpatterns = [
+    path('', views.TargetInput.as_view(), name='target-input'),
+    path('auth/<uuid:id>/', views.EntryAuthenticate.as_view(), name='entry-authenticate'),
+    path('api/', views.TargetAPIRoot.as_view(), name='target-api-root'),
+    path('api/<int:session>/', views.TargetAPISession.as_view(), name='target-api-session'),
+]

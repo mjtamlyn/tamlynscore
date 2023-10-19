@@ -3,8 +3,13 @@
 .*.swp
 .*.swo
 .sass-cache
+yarn-error.log
 fabfile.py
 collected_static/
+bundles/
+node_modules/
 *.json
 *.dump
 env/
+*.key
+*.pem

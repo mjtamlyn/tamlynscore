@@ -191,8 +191,7 @@ class BaseResultMode(object):
                     subround_scores = []
 
                     if score.target.session_entry.session_round.session.scoring_system == SCORING_FULL:
-                        # Arrow of round has been stored off by a dozen
-                        counter = 13
+                        counter = 1
                         for subround in subrounds:
                             subround_scores.append(score.arrow_set.filter(arrow_of_round__in=range(counter, counter + subround.arrows)).aggregate(models.Sum('arrow_value'))['arrow_value__sum'] or 0)
                             counter += subround.arrows
