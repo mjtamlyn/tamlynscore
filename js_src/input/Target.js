@@ -11,6 +11,21 @@ const Target = ({ session, scores, store, setPageRoot }) => {
     const maxEnds = 20;
     const [subpage, setSubpage] = useState('overview');
 
+    if (!scores.length) {
+        return (
+            <>
+                <EventHeader round={ session.round } pageTitle="Overview" setPageRoot={ setPageRoot } />
+                <div className="full-height-page__card">
+                    No archers to enter - have you registered yet?
+                    <div className="actions">
+                        <a className="actions__button" onClick={ setPageRoot }>Back to session list</a>
+                    </div>
+                </div>
+                <StoreStatus store={ store } />
+            </>
+        );
+    }
+
     let startNextEnd = null;
     let complete = null;
     if (!scores.some(score => !score.isEndComplete(endNumber))) {

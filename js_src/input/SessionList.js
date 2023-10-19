@@ -4,8 +4,8 @@ const SessionList = ({ sessions, user, competition, setPage }) => {
     const sessionsRendered = sessions.map(session => {
         const goToPage = () => {
             setPage({
-                'name': 'target',
-                'api': session.api,
+                name: 'target',
+                api: session.api,
             });
         };
         return (
@@ -17,7 +17,7 @@ const SessionList = ({ sessions, user, competition, setPage }) => {
         );
     });
     return (
-        <div className="session-selector">
+        <div className="full-height-page__card session-selector">
             <div className="session-selector__event">{ competition.name } - Scoring</div>
             <div className="session-selector__archer">{ user }</div>
             { sessionsRendered }
