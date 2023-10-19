@@ -639,7 +639,7 @@ class EntryAuthenticate(MessageMixin, RedirectView):
         return super().dispatch(request, *args, **kwargs)
 
     def get_redirect_url(self, *args, **kwargs):
-        return reverse('target-input-js')
+        return reverse('target-input')
 
 
 class TargetInput(TemplateView):
