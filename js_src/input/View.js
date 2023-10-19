@@ -37,7 +37,7 @@ const View = ({ api, render }) => {
                         <a href="/" className="wide">TamlynScore</a>
                         <a href="/" className="narrow">TS</a>
                     </div>
-                    <h2 className="header-title">{ data.competition.short }</h2>
+                    <h2 className="header-title"><a href={ data.competition.url }>{ data.competition.short }</a></h2>
                 </div>
             </nav>
             { render(data) }

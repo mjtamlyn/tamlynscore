@@ -332,6 +332,7 @@ class EntryUser(models.Model):
 
     is_anonymous = False
     is_superuser = False
+    is_archer = True
 
     def __str__(self):
         return 'Archer login - %s' % self.competition_entry

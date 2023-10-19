@@ -7,7 +7,7 @@ import TargetInput from './TargetInput';
 
 
 const Target = ({ session, scores, store, setPageRoot }) => {
-    const [endNumber, setEndNumber] = useState(Math.min(...scores.map(score => score.currentEnd())));
+    const [endNumber, setEndNumber] = useState(Math.max(...scores.map(score => score.currentEnd())));
     const maxEnds = 20;
     const [subpage, setSubpage] = useState('overview');
 

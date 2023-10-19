@@ -723,6 +723,7 @@ class TargetAPIRoot(EntryUserRequired, View):
             'competition': {
                 'name': entry.competition.full_name,
                 'short': entry.competition.short_name,
+                'url': entry.competition.get_absolute_url(),
             },
             'sessions': [{
                 'round': se.session_round.shot_round.name,
@@ -751,6 +752,7 @@ class TargetAPISession(CsrfExemptMixin, EntryUserRequired, View):
         return TargetAllocation.objects.filter(
             boss=session_entry.targetallocation.boss,
             session_entry__session_round=session_entry.session_round,
+            session_entry__present=True,
         ).order_by('target')
 
     def get(self, request, *args, **kwargs):
@@ -762,6 +764,7 @@ class TargetAPISession(CsrfExemptMixin, EntryUserRequired, View):
             'competition': {
                 'name': entry.competition.full_name,
                 'short': entry.competition.short_name,
+                'url': entry.competition.get_absolute_url(),
             },
             'session': {
                 'round': session_entry.session_round.shot_round.name,
