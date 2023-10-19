@@ -1,6 +1,7 @@
 import React, { useState } from 'react';
 
 import EventHeader from './EventHeader';
+import ScoreSheet from './ScoreSheet';
 import ScoresOverview from './ScoresOverview';
 import StoreStatus from './StoreStatus';
 import TargetInput from './TargetInput';
@@ -43,11 +44,15 @@ const Target = ({ session, scores, store, setPageRoot }) => {
         setSubpage('input');
     };
 
+    const showScoreSheet = (score) => {
+        setSubpage({ name: 'scoresheet', score });
+    };
+
     if (subpage === 'overview') {
         return (
             <>
                 <EventHeader round={ session.round } pageTitle="Overview" setPageRoot={ setPageRoot } />
-                <ScoresOverview scores={ scores } endNumber={ endNumber } continueEnd={ continueEnd } startNextEnd={ startNextEnd } complete={ complete } />
+                <ScoresOverview scores={ scores } endNumber={ endNumber } continueEnd={ continueEnd } startNextEnd={ startNextEnd } complete={ complete } showScoreSheet={ showScoreSheet } />
                 <StoreStatus store={ store } />
             </>
         );
@@ -60,6 +65,17 @@ const Target = ({ session, scores, store, setPageRoot }) => {
             <>
                 <EventHeader round={ session.round } pageTitle={ 'End ' + endNumber } setPageRoot={ setPageRoot } />
                 <TargetInput scores={ scores } endNumber={ endNumber } toSummary={ toSummary } />
+                <StoreStatus store={ store } />
+            </>
+        );
+    } else if (subpage.name === 'scoresheet') {
+        const toSummary = () => {
+            setSubpage('overview');
+        };
+        return (
+            <>
+                <EventHeader round={ session.round } pageTitle="Score sheet" setPageRoot={ setPageRoot } />
+                <ScoreSheet score={ subpage.score } toSummary={ toSummary } />
                 <StoreStatus store={ store } />
             </>
         );

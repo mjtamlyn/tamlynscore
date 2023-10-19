@@ -6,6 +6,20 @@
     text-align: right
     width: 100%
 
+  .actions
+    padding: 5px
+
+    &__button
+      display: block
+      width: 100%
+      text-align: center
+      padding: 8px 5px
+      margin: 5px 0
+      background-color: $wared
+      color: white
+      font-weight: bold
+      border-radius: 4px
+
   .full-height-page
     display: flex
     flex-direction: column
@@ -33,6 +47,7 @@
       background-color: $lightblue
       border-radius: 4px
       line-height: 1.4
+      overflow-y: scroll
 
   .session-selector
     &__event
@@ -79,6 +94,10 @@
       grid-gap: 3px
       align-items: baseline
 
+      &__actions
+        grid-column-end: span 3
+        padding: 0
+
     &__target
       font-size: 15px
 
@@ -104,9 +123,8 @@
 
     &__summary
       grid-column-end: span 3
-      display: grid
-      grid-template-columns: repeat(3, 1fr)
-      grid-gap: 3px
+      display: flex
+      justify-content: space-between
       align-items: baseline
       font-weight: bold
 
@@ -162,22 +180,8 @@
       &--miss
         grid-column-end: span 2
 
-  .actions
-    padding: 5px
-
-    &__button
-      display: block
-      width: 100%
-      text-align: center
-      padding: 8px 5px
-      margin: 5px 0
-      background-color: $wared
-      color: white
-      font-weight: bold
-      border-radius: 4px
-
   .sync-status
-    position: absolute
+    position: fixed
     bottom: 0
     height: 20px
     width: 100%

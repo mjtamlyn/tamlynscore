@@ -3,8 +3,8 @@ import React from 'react';
 import ArcherRowSummary from './ArcherRowSummary';
 
 
-const ScoresOverview = ({ scores, endNumber, continueEnd, startNextEnd, complete }) => {
-    const scoresRendered = scores.map(score => <ArcherRowSummary score={ score } key={ score.target } />);
+const ScoresOverview = ({ scores, endNumber, continueEnd, startNextEnd, complete, showScoreSheet }) => {
+    const scoresRendered = scores.map(score => <ArcherRowSummary score={ score } key={ score.target } showScoreSheet={ showScoreSheet } />);
     return (
         <>
             <div className="archers">

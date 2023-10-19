@@ -3,7 +3,7 @@ import React from 'react';
 import ArcherRowDetails from './ArcherRowDetails';
 
 
-const ArcherRowSummary = ({ score }) => {
+const ArcherRowSummary = ({ score, showScoreSheet }) => {
     return (
         <div className="archers__row archers__row--summary">
             <ArcherRowDetails score={ score } />
@@ -17,6 +17,9 @@ const ArcherRowSummary = ({ score }) => {
                 <div className="archers__summary__arrows-shot">
                     { score.getArrowsShot() } / 60 <small className="archers__summary__legend">arrows shot</small>
                 </div>
+            </div>
+            <div className="archers__row__actions actions">
+                <a className="actions__button" onClick={ () => showScoreSheet(score) }>Score sheet</a>
             </div>
         </div>
     );
