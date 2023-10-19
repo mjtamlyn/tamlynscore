@@ -97,6 +97,7 @@ class Score {
         if (!isDescending(end)) {
             this.arrows.splice((endNumber - 1) * this.endLength, this.endLength, ...end.toSorted(compareArrows));
         };
+        this.store.setDirty();
     }
 }
 

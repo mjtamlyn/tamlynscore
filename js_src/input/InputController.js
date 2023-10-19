@@ -10,7 +10,7 @@ import View from './View';
 const InputController = () => {
     const [page, setPage] = useState({
         'name': 'root',
-        'api': '/scoring/js/api/',
+        'api': '/scoring/api/',
     });
 
     if (page.name === 'root') {
@@ -28,7 +28,7 @@ const InputController = () => {
                         competition={ data.competition }
                         scores={ store.scores }
                         store={ store }
-                        setPage={ setPage }
+                        setPageRoot={ () => setPage({name: 'root', api: '/scoring/api/' }) }
                         key={ page.name }
                     />
                 );

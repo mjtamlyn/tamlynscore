@@ -707,10 +707,6 @@ class TargetInput(TemplateView):
     template_name = 'scores/target_input.html'
 
 
-class TargetInputJs(TemplateView):
-    template_name = 'scores/target_input_js.html'
-
-
 class EntryUserRequired():
     def dispatch(self, request, *args, **kwargs):
         if not request.session['_auth_user_backend'] == 'entries.auth_backends.EntryUserAuthBackend':

@@ -1,116 +1,19 @@
 {% extends 'base.html' %}
 
-{% block page_id %}target-input{% endblock %}
+{% block meta_viewport %}width=device-width, user-scalable=no{% endblock %}
 
-{% block nav %}
-<nav class="header-nav">
-    <div class="container">
-        <div class="home">
-            <a href="{% url 'index' %}" class="wide">TamlynScore</a>
-            <a href="{% url 'index' %}" class="narrow">TS</a>
-        </div>
-        <h2 class="header-title">Wallingford Indoor Series</h2>
-    </div>
-</nav>
+{% load render_bundle from webpack_loader %}
+
+{% block scripts %}
+{% render_bundle 'main' 'js' %}
 {% endblock %}
 
+{% block page_id %}target-input{% endblock %}
+
+{% block nav %}{% endblock %}
+
 {% block full_content %}
-<div class="full-height-page">
-    <div class="scoring-header">
-        <h3>WA 18m</h3>
-        <h3>End 3</h3>
-    </div>
-
-    <div class="archers">
-        <div class="archers__row">
-            <div class="archers__target">1A</div>
-            <div class="archers__name">Nicola Wood</div>
-            <div class="archers__categories">
-                <span class="pill bowstyle compound">Compound</span>
-                <span class="pill gender lady">Women</span>
-            </div>
-            <div class="archers__score">
-                <div class="archers__score__input">10</div>
-                <div class="archers__score__input">9</div>
-                <div class="archers__score__input">9</div>
-                <div class="archers__score__total">
-                    28
-                </div>
-                <div class="archers__score__running">
-                    83
-                </div>
-            </div>
-        </div>
-
-        <div class="archers__row archers__row--current">
-            <div class="archers__target">1B</div>
-            <div class="archers__name">Hannah Brown</div>
-            <div class="archers__categories">
-                <span class="pill bowstyle compound">Compound</span>
-                <span class="pill gender lady">Women</span>
-            </div>
-            <div class="archers__score">
-                <div class="archers__score__input">10</div>
-                <div class="archers__score__input archers__score__input--active"></div>
-                <div class="archers__score__input"></div>
-                <div class="archers__score__total">10</div>
-                <div class="archers__score__running">
-                    67
-                </div>
-            </div>
-        </div>
-
-        <div class="archers__row">
-            <div class="archers__target">1C</div>
-            <div class="archers__name">Rachael Graham</div>
-            <div class="archers__categories">
-                <span class="pill bowstyle compound">Compound</span>
-                <span class="pill gender lady">Women</span>
-            </div>
-            <div class="archers__score">
-                <div class="archers__score__input">&nbsp;</div>
-                <div class="archers__score__input"></div>
-                <div class="archers__score__input"></div>
-                <div class="archers__score__total"></div>
-                <div class="archers__score__running">
-                    56
-                </div>
-            </div>
-        </div>
-
-        <div class="archers__row">
-            <div class="archers__target">1D</div>
-            <div class="archers__name">Isabella Brugier</div>
-            <div class="archers__categories">
-                <span class="pill bowstyle compound">Compound</span>
-                <span class="pill gender lady">Women</span>
-            </div>
-            <div class="archers__score">
-                <div class="archers__score__input">&nbsp;</div>
-                <div class="archers__score__input"></div>
-                <div class="archers__score__input"></div>
-                <div class="archers__score__total"></div>
-                <div class="archers__score__running">
-                    54
-                </div>
-            </div>
-        </div>
-    </div>
-
-    <div class="input">
-        <div class="input__control input__control--gold">10</div>
-        <div class="input__control input__control--gold">9</div>
-        <div class="input__control input__control--red">8</div>
-        <div class="input__control input__control--red">7</div>
-        <div class="input__control input__control--blue">6</div>
-        <div class="input__control input__control--blue">5</div>
-        <div class="input__control input__control--black">4</div>
-        <div class="input__control input__control--black">3</div>
-        <div class="input__control input__control--white">2</div>
-        <div class="input__control input__control--white">1</div>
-        <div class="input__control input__control--green input__control--miss">M</div>
-    </div>
-</div>
+<div id="app"></div>
 {% endblock %}
 
 {% block footer %}{% endblock %}

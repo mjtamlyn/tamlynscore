@@ -8,7 +8,7 @@ const TargetInput = ({ scores, endNumber, toSummary }) => {
     const endLength = 3;
 
     let initialActive = null;
-    let initialCursor = 0;
+    let initialCursor = null;
 
     scores.forEach((score) => {
         if (!score.isEndComplete(endNumber) && !initialActive) {

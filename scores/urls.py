@@ -18,7 +18,6 @@ urlpatterns = [
 archer_urlpatterns = [
     path('', views.TargetInput.as_view(), name='target-input'),
     path('auth/<uuid:id>/', views.EntryAuthenticate.as_view(), name='entry-authenticate'),
-    path('js/', views.TargetInputJs.as_view(), name='target-input-js'),
-    path('js/api/', views.TargetAPIRoot.as_view(), name='target-api-root'),
-    path('js/api/<int:session>/', views.TargetAPISession.as_view(), name='target-api-session'),
+    path('api/', views.TargetAPIRoot.as_view(), name='target-api-root'),
+    path('api/<int:session>/', views.TargetAPISession.as_view(), name='target-api-session'),
 ]

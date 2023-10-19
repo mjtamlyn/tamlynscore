@@ -2,50 +2,51 @@ import React, { useState } from 'react';
 
 import EventHeader from './EventHeader';
 import ScoresOverview from './ScoresOverview';
+import StoreStatus from './StoreStatus';
 import TargetInput from './TargetInput';
 
 
-const Target = ({ session, scores, store }) => {
+const Target = ({ session, scores, store, setPageRoot }) => {
     const [endNumber, setEndNumber] = useState(Math.min(...scores.map(score => score.currentEnd())));
     const maxEnds = 20;
-    const [page, setPage] = useState('overview');
+    const [subpage, setSubpage] = useState('overview');
 
     let startNextEnd = null;
     let complete = null;
     if (!scores.some(score => !score.isEndComplete(endNumber))) {
         if (endNumber + 1 <= maxEnds) {
             startNextEnd = () => {
-                setPage('input');
+                setSubpage('input');
                 setEndNumber(endNumber + 1);
             };
         } else {
-            complete = () => {
-                window.location = '/'
-            };
+            complete = setPageRoot;
         }
     }
 
     const continueEnd = () => {
-        setPage('input');
+        setSubpage('input');
     };
 
-    if (page === 'overview') {
+    if (subpage === 'overview') {
         return (
-            <div className="full-height-page">
-                <EventHeader round={ session.round } pageTitle="Overview" />
+            <>
+                <EventHeader round={ session.round } pageTitle="Overview" setPageRoot={ setPageRoot } />
                 <ScoresOverview scores={ scores } endNumber={ endNumber } continueEnd={ continueEnd } startNextEnd={ startNextEnd } complete={ complete } />
-            </div>
+                <StoreStatus store={ store } />
+            </>
         );
-    } else if (page === 'input') {
+    } else if (subpage === 'input') {
         const toSummary = () => {
-            setPage('overview');
+            setSubpage('overview');
             store.save();
         };
         return (
-            <div className="full-height-page">
-                <EventHeader round={ session.round } pageTitle={ 'End ' + endNumber } />
+            <>
+                <EventHeader round={ session.round } pageTitle={ 'End ' + endNumber } setPageRoot={ setPageRoot } />
                 <TargetInput scores={ scores } endNumber={ endNumber } toSummary={ toSummary } />
-            </div>
+                <StoreStatus store={ store } />
+            </>
         );
     }
 };

@@ -9,12 +9,13 @@
   .full-height-page
     display: flex
     flex-direction: column
-    height: calc(100% - 44px)
+    height: 100%
     width: 100vw
     position: fixed
-    top: 44px
+    top: 0
     left: 0
     background-color: $bluegrey
+    padding-bottom: 20px
 
     &__loading
       height: 100%
@@ -172,3 +173,15 @@
       color: white
       font-weight: bold
       border-radius: 4px
+
+  .sync-status
+    position: absolute
+    bottom: 0
+    height: 20px
+    width: 100%
+    background-color: black
+    color: white
+    font-weight: bold
+    font-size: 10px
+    line-height: 20px
+    padding: 0 5px

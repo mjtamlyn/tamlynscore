@@ -16,7 +16,7 @@ const View = ({ api, render }) => {
 
     if (!loaded) {
         return (
-            <>
+            <div className="full-height-page">
                 <nav className="header-nav">
                     <div className="container">
                         <div className="home">
@@ -25,14 +25,12 @@ const View = ({ api, render }) => {
                         </div>
                     </div>
                 </nav>
-                <div className="full-height-page">
-                    <div className="full-height-page__loading">Loading...</div>
-                </div>
-            </>
+                <div className="full-height-page__loading">Loading...</div>
+            </div>
         );
     }
     return (
-        <>
+        <div className="full-height-page">
             <nav className="header-nav">
                 <div className="container">
                     <div className="home">
@@ -42,8 +40,8 @@ const View = ({ api, render }) => {
                     <h2 className="header-title">{ data.competition.short }</h2>
                 </div>
             </nav>
-            <div className="full-height-page">{ render(data) }</div>
-        </>
+            { render(data) }
+        </div>
     );
 };
 
