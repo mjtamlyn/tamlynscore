@@ -10,8 +10,8 @@ const config = {
     entry: './js_src/index.js',
     mode: devMode ? 'development' : 'production',
     output: {
-        path: __dirname,
-        filename: 'build/bundles/bundle.js',
+        filename: devMode ? 'js/[name].js' : 'js/[name]-[contenthash].js',
+        path: path.resolve(__dirname, 'build/bundles'),
         publicPath: devMode ? `${devModeServer}/bundles/` : undefined,
     },
     module: {
