@@ -12,7 +12,7 @@ from django.http import (
     Http404, HttpResponse, HttpResponseNotAllowed, HttpResponseRedirect,
     JsonResponse,
 )
-from django.shortcuts import get_object_or_404, render
+from django.shortcuts import render
 from django.urls import reverse
 from django.views.generic import ListView, RedirectView, TemplateView, View
 
@@ -25,10 +25,9 @@ from reportlab.platypus import (
 )
 from reportlab.rl_config import defaultPageSize
 
-from core.models import County
 from entries.models import (
-    Competition, CompetitionEntry, EntryUser, ResultsMode, Session,
-    SessionEntry, SessionRound, TargetAllocation,
+    CompetitionEntry, EntryUser, ResultsMode, Session, SessionEntry,
+    SessionRound, TargetAllocation,
 )
 from entries.views import CompetitionMixin, TargetList
 from olympic.models import OlympicSessionRound
@@ -123,10 +122,6 @@ class InputScores(TargetList):
         return context
 
 
-class InputScoresMobile(InputScores):
-    template_name = 'scores/input_scores_mobile.html'
-
-
 class InputArrowsView(CompetitionMixin, TemplateView):
     template_name = 'input_arrows.html'
     next_url_name = 'input_scores'
@@ -183,11 +178,6 @@ class InputArrowsView(CompetitionMixin, TemplateView):
             return HttpResponseRedirect(success_url)
         next_exists = self.get_next_exists(session_id, boss)
         return render(request, self.template, locals())
-
-
-class InputArrowsViewMobile(InputArrowsView):
-    template = 'input_arrows_mobile.html'
-    next_url_name = 'input_scores_mobile'
 
 
 class InputArrowsArcher(CompetitionMixin, TemplateView):
@@ -303,61 +293,6 @@ class InputDozens(CompetitionMixin, TemplateView):
                 success_url = reverse(self.next_url_name, kwargs={'slug': slug}) + '?fd={0}&ft={1}&fs={2}'.format(dozen, boss, session_id)
             return HttpResponseRedirect(success_url)
         next_exists = self.get_next_exists(session_id, boss)
-        return render(request, self.template, locals())
-
-
-class InputDozensTeam(View):
-    template = 'scores/input_dozens_team.html'
-    next_url_name = 'input_scores_team'
-
-    def get(self, request, slug, team_id, dozen):
-        competition = get_object_or_404(Competition, slug=slug)
-        team = get_object_or_404(County, pk=team_id)
-        scores = Score.objects.filter(
-            target__session_entry__competition_entry__county=team,
-            target__session_entry__present=True,
-            retired=False,
-        ).order_by('target__boss', 'target__target').select_related()
-        num_dozens = 12
-        try:
-            forms = get_dozen_formset(scores, num_dozens, dozen=dozen)
-        except IndexError:
-            pass
-        return render(request, self.template, locals())
-
-    def post(self, request, slug, team_id, dozen):
-        competition = get_object_or_404(Competition, slug=slug)
-        team = get_object_or_404(County, pk=team_id)
-        scores = Score.objects.filter(
-            target__session_entry__competition_entry__county=team,
-            target__session_entry__present=True,
-            retired=False,
-        ).order_by('target__boss', 'target__target').select_related()
-        num_dozens = 12
-        try:
-            forms = get_dozen_formset(scores, num_dozens, dozen, data=request.POST)
-        except IndexError:
-            forms = []
-        dozens = []
-        failed = False
-        for score in forms:
-            if score['form'].is_valid():
-                dozens.append(score['form'].save(commit=False))
-                if score['score_form']:
-                    if score['score_form'].is_valid():
-                        score['score_form'].save(commit=False)
-                    else:
-                        failed = True
-            else:
-                failed = True
-        if not failed:
-            for dbdozen in dozens:
-                dbdozen.save()
-            for score in scores:
-                score.update_score()
-                score.save(force_update=True)
-            success_url = reverse(self.next_url_name, kwargs={'slug': slug})
-            return HttpResponseRedirect(success_url)
         return render(request, self.template, locals())
 
 
