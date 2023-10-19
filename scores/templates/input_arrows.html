@@ -7,7 +7,7 @@
 
 {% block competition_content %}
 <div class="module input-arrows">
-    <h4>Enter arrow values for boss {{ boss }}, dozen {{ dozen }}</h4>
+    <h4>Enter arrow values for boss {{ boss }}, {% if session.arrows_entered_per_end == 12 %}dozen{% else %}end{% endif %} {{ dozen }}</h4>
     <form action="" method="post" autocomplete="off">
         <table class="target table">
             <thead>

@@ -27,8 +27,8 @@ from reportlab.rl_config import defaultPageSize
 
 from core.models import County
 from entries.models import (
-    Competition, CompetitionEntry, EntryUser, ResultsMode, SessionEntry,
-    SessionRound, TargetAllocation,
+    Competition, CompetitionEntry, EntryUser, ResultsMode, Session,
+    SessionEntry, SessionRound, TargetAllocation,
 )
 from entries.views import CompetitionMixin, TargetList
 from olympic.models import OlympicSessionRound
@@ -137,6 +137,7 @@ class InputArrowsView(CompetitionMixin, TemplateView):
     def get_context_data(self, **kwargs):
         context = super(InputArrowsView, self).get_context_data(**kwargs)
         session_id = self.kwargs['session_id']
+        session = Session.objects.get(pk=session_id)
         boss = self.kwargs['boss']
         dozen = self.kwargs['dozen']
         scores = Score.objects.filter(target__session_entry__session_round__session=session_id, target__boss=boss, target__session_entry__present=True).order_by('target__target').select_related()
@@ -147,6 +148,7 @@ class InputArrowsView(CompetitionMixin, TemplateView):
             forms = None
             round = None
         context.update({
+            'session': session,
             'scores': scores,
             'forms': forms,
             'round': round,
