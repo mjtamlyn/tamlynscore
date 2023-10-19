@@ -11,7 +11,7 @@ const config = {
     mode: devMode ? 'development' : 'production',
     output: {
         path: __dirname,
-        filename: 'bundles/bundle.js',
+        filename: 'build/bundles/bundle.js',
         publicPath: devMode ? `${devModeServer}/bundles/` : undefined,
     },
     module: {
