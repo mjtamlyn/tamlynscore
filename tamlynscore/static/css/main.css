@@ -3607,20 +3607,6 @@ div.form-group div.form-flex-wrapper div.form-flex-subgroup > div.form-item:last
   }
 }
 @font-face {
-  font-family: "Museo";
-  src: url("../fonts/Museo500-Regular-webfont.eot");
-  src: url("../fonts/Museo500-Regular-webfont.eot?#iefix") format("embedded-opentype"), url("../fonts/Museo500-Regular-webfont.woff") format("woff"), url("../fonts/Museo500-Regular-webfont.ttf") format("truetype"), url("../fonts/Museo500-Regular-webfont.svg#MuseoSlab500-Regular") format("svg");
-  font-weight: normal;
-  font-style: normal;
-}
-@font-face {
-  font-family: "MuseoSans";
-  src: url("../fonts/MuseoSans_500-webfont.eot");
-  src: url("../fonts/MuseoSans_500-webfont.eot?#iefix") format("embedded-opentype"), url("../fonts/MuseoSans_500-webfont.woff") format("woff"), url("../fonts/MuseoSans_500-webfont.ttf") format("truetype"), url("../fonts/MuseoSans_500-webfont.svg#MuseoSans_Slab500") format("svg");
-  font-weight: normal;
-  font-style: normal;
-}
-@font-face {
   font-family: "MuseoSlab";
   src: url("../fonts/Museo_Slab_500-webfont.eot");
   src: url("../fonts/Museo_Slab_500-webfont.eot?#iefix") format("embedded-opentype"), url("../fonts/Museo_Slab_500-webfont.woff") format("woff"), url("../fonts/Museo_Slab_500-webfont.ttf") format("truetype"), url("../fonts/Museo_Slab_500-webfont.svg#MuseoSlab500") format("svg");
@@ -3634,55 +3620,61 @@ div.form-group div.form-flex-wrapper div.form-flex-subgroup > div.form-item:last
   font-weight: normal;
   font-style: italic;
 }
-/* line 9, ../../sass/_typography.sass */
+@font-face {
+  font-family: "MuseoSlab";
+  src: url("../fonts/Museo_Slab_700-webfont.eot");
+  src: url("../fonts/Museo_Slab_700-webfont.eot?#iefix") format("embedded-opentype"), url("../fonts/Museo_Slab_700-webfont.woff") format("woff"), url("../fonts/Museo_Slab_700-webfont.ttf") format("truetype"), url("../fonts/Museo_Slab_700-webfont.svg#MuseoSlab700") format("svg");
+  font-weight: bold;
+  font-style: normal;
+}
+/* line 6, ../../sass/_typography.sass */
 body {
   font-family: "Helvetica Neue", "Trebuchet MS", Helvetica, sans-serif;
   margin: 0;
 }
 
-/* line 13, ../../sass/_typography.sass */
+/* line 10, ../../sass/_typography.sass */
 h1, h2, h3, h4, h5, h6 {
   font-family: "MuseoSlab", serif;
-  font-weight: normal;
   color: #111D2A;
   margin: 8px 0 10px;
   text-align: center;
 }
 
-/* line 20, ../../sass/_typography.sass */
+/* line 16, ../../sass/_typography.sass */
 a {
   color: #000F1F;
   text-decoration: none;
 }
-/* line 24, ../../sass/_typography.sass */
+/* line 20, ../../sass/_typography.sass */
 a.link {
   color: #004ca2;
 }
 
-/* line 27, ../../sass/_typography.sass */
+/* line 23, ../../sass/_typography.sass */
 p {
   margin: 5px 0;
   padding: 0;
 }
 
-/* line 31, ../../sass/_typography.sass */
+/* line 27, ../../sass/_typography.sass */
 ul {
   list-style-type: none;
   margin: 0;
   padding: 0;
 }
 
-/* line 36, ../../sass/_typography.sass */
+/* line 32, ../../sass/_typography.sass */
 ul.bullets {
   list-style-type: disc;
   padding-inline-start: 30px;
 }
-/* line 39, ../../sass/_typography.sass */
+/* line 35, ../../sass/_typography.sass */
 ul.bullets li {
   display: list-item;
 }
 
-/* line 42, ../../sass/_typography.sass */
+/* line 38, ../../sass/_typography.sass */
 li {
   display: block;
 }
