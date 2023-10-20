@@ -10,7 +10,7 @@ const config = {
     entry: './js_src/index.js',
     mode: devMode ? 'development' : 'production',
     output: {
-        filename: devMode ? 'js/[name].js' : 'js/[name]-[contenthash].js',
+        filename: devMode ? '[name].js' : '[name]-[contenthash].js',
         path: path.resolve(__dirname, 'build/bundles'),
         publicPath: devMode ? `${devModeServer}/bundles/` : undefined,
     },
@@ -24,7 +24,10 @@ const config = {
         ]
     },
     plugins: [
-        new BundleTracker({ filename: 'build/webpack-stats.json' }),
+        new BundleTracker({
+            path: path.resolve(__dirname, 'build'),
+            filename: 'webpack-stats.json'
+        }),
     ],
     devServer: {
         headers: {
