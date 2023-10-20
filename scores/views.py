@@ -12,7 +12,7 @@ from django.http import (
     Http404, HttpResponse, HttpResponseNotAllowed, HttpResponseRedirect,
     JsonResponse,
 )
-from django.shortcuts import render
+from django.shortcuts import redirect, render
 from django.urls import reverse
 from django.views.generic import ListView, RedirectView, TemplateView, View
 
@@ -634,6 +634,7 @@ class EntryAuthenticate(MessageMixin, RedirectView):
             raise Http404
         if self.archer.competition_entry.competition.is_admin(request.user):
             self.messages.error('You are logged in already as a competition admin - you must log out before you can log in as a archer.')
+            return redirect(self.archer.competition_entry.competition.get_absolute_url())
         else:
             login(request, self.archer, backend='entries.auth_backends.EntryUserAuthBackend')
         return super().dispatch(request, *args, **kwargs)
