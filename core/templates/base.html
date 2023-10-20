@@ -39,6 +39,7 @@
                         <a href="{% url 'logout' %}" class="logout">Log Out</a>
                         {% elif user.is_archer %}
                         <a href="{% url 'target-input' %}" class="nav-link nav-link--priority">Enter scores</a>
+                        <a href="{% url 'logout' %}" class="nav-link">Log Out</a>
                         {% else %}
                         <a href="{% url 'login' %}">Log In</a>
                         {% endif %}

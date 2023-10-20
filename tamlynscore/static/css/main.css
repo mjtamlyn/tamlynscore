@@ -3810,41 +3810,45 @@ nav.header-nav .nav-link--priority {
   color: white;
   font-weight: bold;
 }
-/* line 25, ../../sass/components/_header_nav.sass */
+/* line 24, ../../sass/components/_header_nav.sass */
+nav.header-nav .nav-link--priority:hover {
+  background-color: #ea3525;
+}
+/* line 27, ../../sass/components/_header_nav.sass */
 nav.header-nav .container {
   display: flex;
 }
-/* line 28, ../../sass/components/_header_nav.sass */
+/* line 30, ../../sass/components/_header_nav.sass */
 nav.header-nav .home {
   font-family: "MuseoSlab", serif;
   font-size: 22px;
   margin-right: 10px;
 }
-/* line 32, ../../sass/components/_header_nav.sass */
+/* line 34, ../../sass/components/_header_nav.sass */
 nav.header-nav .home .narrow {
   display: none;
 }
-/* line 34, ../../sass/components/_header_nav.sass */
+/* line 36, ../../sass/components/_header_nav.sass */
 nav.header-nav .home .wide {
   display: block;
 }
 @media (max-width: 500px) {
-  /* line 38, ../../sass/components/_header_nav.sass */
+  /* line 40, ../../sass/components/_header_nav.sass */
   nav.header-nav .home .narrow {
     display: block;
   }
-  /* line 40, ../../sass/components/_header_nav.sass */
+  /* line 42, ../../sass/components/_header_nav.sass */
   nav.header-nav .home .wide {
     display: none;
   }
 }
-/* line 43, ../../sass/components/_header_nav.sass */
+/* line 45, ../../sass/components/_header_nav.sass */
 nav.header-nav .nav-links {
   flex-grow: 1;
   display: flex;
   margin-right: 10px;
 }
-/* line 48, ../../sass/components/_header_nav.sass */
+/* line 50, ../../sass/components/_header_nav.sass */
 nav.header-nav .user {
   font-size: 14px;
   flex-shrink: 1;
@@ -3852,7 +3856,7 @@ nav.header-nav .user {
   white-space: nowrap;
   display: flex;
 }
-/* line 55, ../../sass/components/_header_nav.sass */
+/* line 57, ../../sass/components/_header_nav.sass */
 nav.header-nav .user span.name {
   display: block;
   margin-right: 10px;
@@ -3861,11 +3865,11 @@ nav.header-nav .user span.name {
   min-width: 0;
 }
 @media (max-width: 500px) {
-  /* line 63, ../../sass/components/_header_nav.sass */
+  /* line 65, ../../sass/components/_header_nav.sass */
   nav.header-nav .user span.name .narrow {
     display: block;
   }
-  /* line 65, ../../sass/components/_header_nav.sass */
+  /* line 67, ../../sass/components/_header_nav.sass */
   nav.header-nav .user span.name .wide {
     display: none;
   }

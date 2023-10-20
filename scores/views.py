@@ -643,13 +643,9 @@ class EntryAuthenticate(MessageMixin, RedirectView):
         return reverse('target-input')
 
 
-class TargetInput(TemplateView):
-    template_name = 'scores/target_input.html'
-
-
 class EntryUserRequired():
     def dispatch(self, request, *args, **kwargs):
-        if not request.session['_auth_user_backend'] == 'entries.auth_backends.EntryUserAuthBackend':
+        if '_auth_user_backend' not in request.session or not request.session['_auth_user_backend'] == 'entries.auth_backends.EntryUserAuthBackend':
             return HttpResponseNotAllowed('You need to log in as an entry')
         return super().dispatch(request, *args, **kwargs)
 
@@ -770,3 +766,13 @@ class TargetAPISession(CsrfExemptMixin, EntryUserRequired, View):
             target.score.save(force_update=True)
 
         return JsonResponse({'status': 'ok'})
+
+
+class TargetInput(MessageMixin, TemplateView):
+    template_name = 'scores/target_input.html'
+
+    def dispatch(self, request, *args, **kwargs):
+        if '_auth_user_backend' not in request.session or not request.session['_auth_user_backend'] == 'entries.auth_backends.EntryUserAuthBackend':
+            self.messages.error('You are not currently logged in')
+            return redirect('/')
+        return super().dispatch(request, *args, **kwargs)
