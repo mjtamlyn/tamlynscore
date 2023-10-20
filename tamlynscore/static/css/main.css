@@ -3643,45 +3643,46 @@ body {
 /* line 13, ../../sass/_typography.sass */
 h1, h2, h3, h4, h5, h6 {
   font-family: "MuseoSlab", serif;
+  font-weight: normal;
   color: #111D2A;
   margin: 8px 0 10px;
   text-align: center;
 }
 
-/* line 19, ../../sass/_typography.sass */
+/* line 20, ../../sass/_typography.sass */
 a {
   color: #000F1F;
   text-decoration: none;
 }
-/* line 23, ../../sass/_typography.sass */
+/* line 24, ../../sass/_typography.sass */
 a.link {
   color: #004ca2;
 }
 
-/* line 26, ../../sass/_typography.sass */
+/* line 27, ../../sass/_typography.sass */
 p {
   margin: 5px 0;
   padding: 0;
 }
 
-/* line 30, ../../sass/_typography.sass */
+/* line 31, ../../sass/_typography.sass */
 ul {
   list-style-type: none;
   margin: 0;
   padding: 0;
 }
 
-/* line 35, ../../sass/_typography.sass */
+/* line 36, ../../sass/_typography.sass */
 ul.bullets {
   list-style-type: disc;
   padding-inline-start: 30px;
 }
-/* line 38, ../../sass/_typography.sass */
+/* line 39, ../../sass/_typography.sass */
 ul.bullets li {
   display: list-item;
 }
 
-/* line 41, ../../sass/_typography.sass */
+/* line 42, ../../sass/_typography.sass */
 li {
   display: block;
 }
