@@ -328,7 +328,7 @@ class CompetitionEntry(models.Model):
 class EntryUser(models.Model):
     uuid = models.UUIDField(default=uuid.uuid4)
     competition_entry = models.OneToOneField(CompetitionEntry, on_delete=models.CASCADE)
-    last_login = models.DateField(null=True, blank=True)
+    last_login = models.DateTimeField(null=True, blank=True)
 
     is_anonymous = False
     is_superuser = False
