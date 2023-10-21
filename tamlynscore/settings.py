@@ -123,6 +123,20 @@ CACHES = {
     }
 }
 
+servers = os.environ.get('MEMCACHIER_SERVERS')
+username = os.environ.get('MEMCACHIER_USERNAME')
+password = os.environ.get('MEMCACHIER_PASSWORD')
+
+if servers and username and password:
+    CACHES['default'].update({
+        'BACKEND': 'django_bmemcached.memcached.BMemcached',
+        'LOCATION': servers,
+        'OPTIONS': {
+            'username': username,
+            'password': password,
+        }
+    })
+
 if not DEBUG and not os.environ.get('LOCAL'):
     SESSION_COOKIE_SECURE = True
     X_FRAME_OPTIONS = 'DENY'

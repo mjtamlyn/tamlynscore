@@ -23,6 +23,7 @@ isort = "*"
 django-render-block = "*"
 django-qr-code = "*"
 django-webpack-loader = "*"
+django-bmemcached = "*"
 
 [dev-packages]
 
