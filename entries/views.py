@@ -6,6 +6,7 @@ import json
 import math
 import re
 
+from django.core.cache import cache
 from django.db.models import Prefetch
 from django.http import (
     Http404, HttpResponse, HttpResponseBadRequest, HttpResponseRedirect,
@@ -603,6 +604,8 @@ class Registration(TargetList):
         updated = SessionEntry.objects.filter(pk=request.POST['pk']).update(present=present)
         if not updated:
             raise Http404
+        session_entry = SessionEntry.objects.get(pk=request.POST['pk'])
+        cache.delete('bosses_cache_%d' % session_entry.session_round.session_id)
         return HttpResponse('ok')
 
 
