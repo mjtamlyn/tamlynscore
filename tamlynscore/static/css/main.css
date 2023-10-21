@@ -4237,28 +4237,41 @@ ul.link-list li a:hover {
   border-top: 2px solid black;
 }
 
-/* line 15, ../../sass/main.sass */
+/* line 2, ../../sass/components/messages.sass */
+.messages__message {
+  padding: 5px 8px;
+  border-radius: 4px;
+  font-weight: bold;
+  background-color: #6FB3FF;
+  margin-bottom: 5px;
+}
+/* line 9, ../../sass/components/messages.sass */
+.messages__message--error {
+  background-color: #D58100;
+}
+
+/* line 16, ../../sass/main.sass */
 body {
   color: #000F1F;
   background-image: linear-gradient(#f7f7f7 50px, transparent 150px);
 }
 
-/* line 20, ../../sass/main.sass */
+/* line 21, ../../sass/main.sass */
 .clear:before, .clear:after {
   display: table;
   content: " ";
 }
-/* line 23, ../../sass/main.sass */
+/* line 24, ../../sass/main.sass */
 .clear:after {
   clear: both;
 }
 
-/* line 27, ../../sass/main.sass */
+/* line 28, ../../sass/main.sass */
 .hidden {
   display: none;
 }
 
-/* line 30, ../../sass/main.sass */
+/* line 31, ../../sass/main.sass */
 .text-right {
   text-align: right;
 }
