@@ -4,7 +4,7 @@
 
 {% block judge_content %}
 {% for session, details in target_list.items %}
-<div class="registration-board pjax-target">
+<div class="registration-board pjax-target" id="session-{{ session.id }}">
     <h3>{{ session.start|date:"l, jS F - f a" }}</h3>
     <table class="table">
         <thead>
@@ -83,8 +83,8 @@
 
                 request.addEventListener('load', function(loadEvent) {
                     const response = loadEvent.target.response;
-                    const newEl = new DOMParser().parseFromString(response, 'text/html').body.firstChild;
-                    const target = document.querySelector('.pjax-target');
+                    const target = el.closest('.pjax-target');
+                    const newEl = new DOMParser().parseFromString(response, 'text/html').body.querySelector(`#${target.id}`);
                     target.parentNode.replaceChild(newEl, target);
                     init();
                 });
