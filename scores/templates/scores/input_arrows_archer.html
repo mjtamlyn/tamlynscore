@@ -14,7 +14,13 @@
                 <td colspan="6"></td>
                 <th>ET</th>
                 {% endif %}
-                <th>Doz</th>
+                <th>
+                    {% if layout.scores|length == 12 %}
+                    Doz
+                    {% else %}
+                    Score
+                    {% endif %}
+                </th>
                 {% if round.has_hits %}
                 <th>Hits</th>
                 {% endif %}
@@ -60,6 +66,7 @@
         <tr class="footer">
             {% if layout.0.scores|length > 6 %}
                 <td colspan="{{ layout.0.scores|length|add:"-1" }}"></td>
+            {% elif layout.scores|length < 3 %}
             {% else %}
                 <td colspan="{{ layout.0.scores|length|add:"-3" }}"></td>
             {% endif %}
