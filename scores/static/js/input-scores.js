@@ -40,8 +40,10 @@ window.addEvent('domready', function () {
         }
     });
 
-    $$('.boss-link')[0].focus();
-    if ($$('[data-focus]')) {
+    if ($$('.boss-link').length) {
+        $$('.boss-link')[0].focus();
+    }
+    if ($$('[data-focus]').length && $$('.boss-link').length) {
         var focus = $$('[data-focus]')[0].dataset['focus']
         $$('[rel=' + focus + ']')[0].fireEvent('keydown', {key: 'right', stop: function () {}});
     }

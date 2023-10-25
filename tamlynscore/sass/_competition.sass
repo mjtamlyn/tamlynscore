@@ -297,6 +297,30 @@ $border: 1px solid $darkbluegrey
         border-color: $lightblue
         box-shadow: 0 0 5px $lightblue
 
+  .input-tracker
+    display: grid
+    // Template will come from direct style setting as number of cols and rows varies
+    text-align: center
+    background-color: $dark
+    padding: 1px
+    grid-gap: 1px
+
+    &__header,
+    &__item
+      padding: 3px 5px
+
+    &__header
+      background-color: white
+      font-weight: bold
+
+    &__item
+      background-color: $lightblue
+      &--done
+        background-color: $bluegrey
+
+    &__link
+      color: white
+
 .input-arrows
   table
     margin: 0 auto

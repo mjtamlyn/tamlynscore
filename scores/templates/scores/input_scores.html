@@ -17,6 +17,24 @@
     <div class="col6">
         <h4>{{ session.start|date:"l, jS F - f a" }}</h4>
 
+        {% if session.device_scoring %}
+        <div class="input-tracker" style="grid-template-columns: repeat({{ details.dozens|length|add:"1" }}, 1fr)">
+            <div class="input-tracker__header">Target</div>
+            {% for dozen in details.dozens %}
+                <div class="input-tracker__header">E{{ dozen }}</div>
+            {% endfor %}
+            {% for boss, complete_lookup in details.bosses %}
+                <div class="input-tracker__header">{{ boss }}</div>
+                {% for dozen in details.dozens %}
+                    <div class="input-tracker__item input-tracker__item--{{ complete_lookup|dozcomplete:dozen|yesno:"done|pending" }}">
+                        <a class="input-tracker__link" href="{% url session.input_view_name slug=competition.slug session_id=session.pk dozen=dozen boss=boss %}">
+                            {{ dozen }}
+                        </a>
+                    </div>
+                {% endfor %}
+            {% endfor %}
+        </div>
+        {% else %}
         <div class="input-board" id="session-{{ session.pk }}">
             {% for dozen in details.dozens %}
             <h5>{% if session.arrows_entered_per_end == 12 %}Dozen{% else %}End{% endif %} {{ dozen }}</h5>
@@ -30,6 +48,7 @@
             </div>
             {% endfor %}
         </div>
+        {% endif %}
     </div>
 </div>
 {% endfor %}
