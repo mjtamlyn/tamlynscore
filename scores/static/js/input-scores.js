@@ -1,30 +1,4 @@
 window.addEvent('domready', function () {
-    $$('.session-select a').addEvent('click', function (e) {
-        if (e) { e.stop(); }
-        // do this row
-        $$('.session-select .link').removeClass('selected');
-        this.getElement('.link').addClass('selected');
-        // do the round select row
-        $$('.round-select').removeClass('selected');
-        var newRoundSelect = $$(this.get('href'));
-        newRoundSelect.addClass('selected');
-        newRoundSelect.getElement('.selected').getParent('a').fireEvent('click');
-    });
-
-    $$('.round-select a').addEvent('click', function (e) {
-        if (e) { e.stop(); }
-        // do this row
-        this.getParent('.round-select').getElements('.link').removeClass('selected');
-        this.getElement('.link').addClass('selected');
-        // do the generator
-        target = this.get('href');
-        var board = $$(target);
-        document.location.hash = target.replace('#', '#!');
-        $$('.input-board').removeClass('selected');
-        board.addClass('selected');
-        board.getElement('.boss-link')[0].focus();
-    });
-
     $$('.boss-link').addEvent('keydown', function (e) {
         if (e.key == 'left') {
             e.stop();
@@ -67,10 +41,6 @@ window.addEvent('domready', function () {
     });
 
     $$('.boss-link')[0].focus();
-    if (document.location.hash) {
-        $$('a[href=' + document.location.hash.replace('#!', '#') + ']').fireEvent('click');
-        $$('a[href=' + document.location.hash.replace('#!', '#').replace(/-round-\d/, '') + ']').fireEvent('click');
-    }
     if ($$('[data-focus]')) {
         var focus = $$('[data-focus]')[0].dataset['focus']
         $$('[rel=' + focus + ']')[0].fireEvent('keydown', {key: 'right', stop: function () {}});
