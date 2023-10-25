@@ -83,8 +83,12 @@ class Score {
         return sum(this.arrows.slice(0, endNumber * this.endLength));
     }
 
-    getGoldCount() {
-        return sum(this.arrows.map(a => ((a === 10) ? 1 : 0)));
+    getGoldCount(endNumber) {
+        let arrows = this.arrows;
+        if (endNumber) {
+            arrows = this.getEnd(endNumber);
+        }
+        return sum(arrows.map(a => ((a === 10) ? 1 : 0)));
     }
 
     setScore(endNumber, cursorPosition, number) {

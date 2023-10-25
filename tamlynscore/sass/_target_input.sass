@@ -112,9 +112,20 @@
       align-items: baseline
       text-align: center
 
+      &__heading
+        border-bottom: 1px solid $dark
+        font-weight: italic
+        font-size: smaller
+
+        &--span
+          grid-column-end: span 3
+
       &__total,
-      &__running,
+      &__grand-total
         font-weight: bold
+
+      &__grand-total
+        border-top: 1px solid $dark
 
       &__input
         border: 1px solid transparent

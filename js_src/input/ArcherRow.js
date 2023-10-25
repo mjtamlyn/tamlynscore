@@ -28,7 +28,7 @@ const ArcherRow = ({ score, endNumber, active, cursorPosition = null, setPositio
                 <div onClick={ setPosition(score, 1) } className={ inputCls2 }>{ currentArrows[1] }</div>
                 <div onClick={ setPosition(score, 2) } className={ inputCls3 }>{ currentArrows[2] }</div>
                 <div className="archers__score__total">{ score.getEndScore(endNumber) }</div>
-                <div className="archers__score__running">{ score.getRunningTotal(endNumber) }</div>
+                <div className="archers__score__total">{ score.getRunningTotal(endNumber) }</div>
             </div>
         </div>
     )
