@@ -52,7 +52,9 @@ class Store {
         }
 
         this.loading = true;
+        this.dirty = false;
         this.hooks.loading.forEach(hook => hook(true));
+        this.hooks.dirty.forEach(hook => hook(false));
         const data = JSON.stringify({
             scores: this.scores.map(score => score.serialize()),
         });
@@ -64,15 +66,16 @@ class Store {
             this.retryCount = 0;
             this.loading = false;
             this.hooks.loading.forEach(hook => hook(false));
-            if (response.status === 200) {
-                this.dirty = false;
-                this.hooks.dirty.forEach(hook => hook(false));
-            } else {
+            if (response.status !== 200) {
+                this.dirty = true;
+                this.hooks.dirty.forEach(hook => hook(true));
                 throw('Something else went wrong?');
             }
         }).catch(() => {
             this.loading = false;
+            this.dirty = true;
             this.hooks.loading.forEach(hook => hook(false));
+            this.hooks.dirty.forEach(hook => hook(true));
             this.retryCount++;
             this.retry = setTimeout(() => this.save(), 1000 * this.retryCount);
         });
