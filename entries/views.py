@@ -421,6 +421,7 @@ class TargetList(CompetitionMixin, ListView):
             session_entry__competition_entry__competition=self.competition,
         ).select_related(
             'session_entry__competition_entry__competition__tournament',
+            'session_entry__competition_entry__entryuser',
             'session_entry__session_round__session',
             'session_entry__session_round__shot_round',
             'session_entry__competition_entry__bowstyle',
@@ -579,13 +580,14 @@ class Registration(TargetList):
             for target in target_list[session]['targets']:
                 if not target.session_entry.present:
                     unregistered += 1
-                try:
-                    entry_user = target.session_entry.competition_entry.entryuser
-                except EntryUser.DoesNotExist:
-                    entry_user = EntryUser.objects.create(competition_entry=target.session_entry.competition_entry)
-                target.login_url = self.request.build_absolute_uri(reverse('entry-authenticate', kwargs={
-                    'id': entry_user.uuid,
-                }))
+                if session.device_scoring:
+                    try:
+                        entry_user = target.session_entry.competition_entry.entryuser
+                    except EntryUser.DoesNotExist:
+                        entry_user = EntryUser.objects.create(competition_entry=target.session_entry.competition_entry)
+                    target.login_url = self.request.build_absolute_uri(reverse('entry-authenticate', kwargs={
+                        'id': entry_user.uuid,
+                    }))
             target_list[session]['unregistered'] = unregistered
         return target_list
 

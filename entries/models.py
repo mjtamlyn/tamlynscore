@@ -14,10 +14,12 @@ from tamlynscore.utils import generate_slug
 SCORING_FULL = 'F'
 SCORING_DOZENS = 'D'
 SCORING_TOTALS = 'T'
+SCORING_ARCHER = 'T'
 SCORING_SYSTEMS = (
     (SCORING_FULL, 'Full running slips'),
     (SCORING_DOZENS, 'Dozen running slips'),
     (SCORING_TOTALS, 'Totals only'),
+    (SCORING_ARCHER, 'On archer mobile devices'),
 )
 
 
@@ -158,6 +160,10 @@ class Session(models.Model):
     def details(self):
         details = ['A', 'B', 'C', 'D', 'E', 'F']
         return details[:self.archers_per_target]
+
+    @property
+    def device_scoring(self):
+        return self.scoring_system == SCORING_ARCHER
 
     @property
     def input_view_name(self):

@@ -114,6 +114,7 @@
                         <a href="#not-present" class="not-present btn" data-pk="{{ archer.session_entry.pk }}">Unregister</a>
                         {% endif %}
                     </td>
+                    {% if session.device_scoring %}
                     <td>
                         {% if archer %}
                         <a href="{{ archer.login_url }}">
@@ -121,6 +122,7 @@
                         </a>
                         {% endif %}
                     </td>
+                    {% endif %}
                 </tr>
                 {% endwith %}
                 {% endfor %}
