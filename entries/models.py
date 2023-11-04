@@ -169,6 +169,7 @@ class Session(models.Model):
     def input_view_name(self):
         return {
             SCORING_FULL: 'input_arrows',
+            SCORING_ARCHER: 'input_arrows',
             SCORING_DOZENS: 'input_dozens',
             SCORING_TOTALS: 'input_arrows',  # FIXME
         }[self.scoring_system]
