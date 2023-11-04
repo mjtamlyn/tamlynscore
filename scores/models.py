@@ -3,7 +3,7 @@ from itertools import groupby
 from django.db import models
 from django.utils.functional import cached_property
 
-from entries.models import SCORING_DOZENS, SCORING_FULL, TargetAllocation
+from entries.models import SCORING_ARCHER, SCORING_DOZENS, SCORING_FULL, TargetAllocation
 
 
 class ScoreManager(models.Manager):
@@ -59,7 +59,7 @@ class Score(models.Model):
         return u'Score for {0}'.format(self.target)
 
     def update_score(self):
-        if self.target.session_entry.session_round.session.scoring_system == SCORING_FULL:
+        if self.target.session_entry.session_round.session.scoring_system in [SCORING_FULL, SCORING_ARCHER]:
             scoring_type = self.target.session_entry.session_round.shot_round.scoring_type
             arrows = self.arrow_set.all()
             self.score = self.alteration

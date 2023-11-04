@@ -14,7 +14,7 @@ from tamlynscore.utils import generate_slug
 SCORING_FULL = 'F'
 SCORING_DOZENS = 'D'
 SCORING_TOTALS = 'T'
-SCORING_ARCHER = 'T'
+SCORING_ARCHER = 'A'
 SCORING_SYSTEMS = (
     (SCORING_FULL, 'Full running slips'),
     (SCORING_DOZENS, 'Dozen running slips'),
