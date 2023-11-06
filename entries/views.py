@@ -11,6 +11,7 @@ from django.db import IntegrityError
 from django.db.models import Prefetch
 from django.http import (
     Http404, HttpResponse, HttpResponseBadRequest, HttpResponseRedirect,
+    JsonResponse,
 )
 from django.shortcuts import get_object_or_404
 from django.urls import reverse
@@ -565,6 +566,29 @@ class TargetListEdit(TargetList):
             TargetAllocation.objects.get(session_entry__id=data['session_entry']).delete()
             return HttpResponse('ok')
         return HttpResponseBadRequest()
+
+
+class TargetListReact(CompetitionMixin, TemplateView):
+    template_name = 'entries/target_list_react.html'
+    admin_required = True
+
+
+class TargetListApi(TargetList, View):
+    def render_to_response(self, context, **kwargs):
+        target_list = context['target_list']
+        data = []
+        for session, _ in target_list.items():
+            data.append({
+                'sessionTime': session.start.strftime('%A, %-d %B - %-I:%M%p'),
+            })
+        return JsonResponse({
+            'targetList': data,
+            'competition': {
+                'name': self.competition.full_name,
+                'short': self.competition.short_name,
+                'url': self.competition.get_absolute_url(),
+            },
+        })
 
 
 class Registration(TargetList):
