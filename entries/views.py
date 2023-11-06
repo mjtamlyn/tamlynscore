@@ -7,6 +7,7 @@ import math
 import re
 
 from django.core.cache import cache
+from django.db import IntegrityError
 from django.db.models import Prefetch
 from django.http import (
     Http404, HttpResponse, HttpResponseBadRequest, HttpResponseRedirect,
@@ -584,7 +585,10 @@ class Registration(TargetList):
                     try:
                         entry_user = target.session_entry.competition_entry.entryuser
                     except EntryUser.DoesNotExist:
-                        entry_user = EntryUser.objects.create(competition_entry=target.session_entry.competition_entry)
+                        try:
+                            entry_user = EntryUser.objects.create(competition_entry=target.session_entry.competition_entry)
+                        except IntegrityError:
+                            pass  # I think this happens with double session entries
                     target.login_url = self.request.build_absolute_uri(reverse('entry-authenticate', kwargs={
                         'id': entry_user.uuid,
                     }))
