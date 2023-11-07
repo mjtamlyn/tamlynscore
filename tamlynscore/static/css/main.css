@@ -3806,13 +3806,13 @@ nav.header-nav .nav-link:hover {
 /* line 19, ../../sass/components/_header_nav.sass */
 nav.header-nav .nav-link--priority {
   padding: 0 10px;
-  background-color: #ea3525;
+  background-color: #f65058;
   color: white;
   font-weight: bold;
 }
 /* line 24, ../../sass/components/_header_nav.sass */
 nav.header-nav .nav-link--priority:hover {
-  background-color: #ea3525;
+  background-color: #f65058;
 }
 /* line 27, ../../sass/components/_header_nav.sass */
 nav.header-nav .container {
@@ -5756,7 +5756,7 @@ table.tree td.border-right {
   text-align: center;
   padding: 8px 5px;
   margin: 5px 0;
-  background-color: #ea3525;
+  background-color: #f65058;
   color: white;
   font-weight: bold;
   border-radius: 4px;
@@ -5815,7 +5815,7 @@ table.tree td.border-right {
   display: block;
   padding: 5px;
   margin: 5px 0 0;
-  background-color: #ea3525;
+  background-color: #f65058;
   width: 100%;
   color: white;
   font-weight: bold;
@@ -5937,11 +5937,11 @@ table.tree td.border-right {
 }
 /* line 175, ../../sass/_target_input.sass */
 #target-input .score-input__control--gold {
-  background-color: #ffff56;
+  background-color: #ffe552;
 }
 /* line 177, ../../sass/_target_input.sass */
 #target-input .score-input__control--red {
-  background-color: #ea3525;
+  background-color: #f65058;
   color: white;
 }
 /* line 180, ../../sass/_target_input.sass */
