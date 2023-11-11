@@ -35,8 +35,7 @@ const TargetListEdit = ({ targetList }) => {
                         &nbsp;
                         <a className="btn" href={ `${competition.url}target-list/pdf/?by_session=1` }>View PDF (by session)</a>
                         &nbsp;
-                        <a className="btn edit" href={ `${competition.url}target-list/edit/` }>Edit</a>
-
+                        { competition.isAdmin && <a className="btn edit" href={ `${competition.url}target-list/edit/` }>Edit</a> }
                     </p>
                 </div>
             </div>

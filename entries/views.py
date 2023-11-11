@@ -573,7 +573,7 @@ class TargetListEdit(TargetList):
 
 class TargetListReact(CompetitionMixin, TemplateView):
     template_name = 'entries/target_list_react.html'
-    admin_required = True
+    admin_required = False
 
 
 class TargetListApi(TargetList, View):
@@ -603,6 +603,7 @@ class TargetListApi(TargetList, View):
                 'url': self.competition.get_absolute_url(),
                 'hasNovices': self.competition.has_novices,
                 'hasAges': self.competition.has_agb_age_groups or self.competition.has_juniors,
+                'isAdmin': self.is_admin,
             },
         })
 
