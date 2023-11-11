@@ -1,4 +1,4 @@
-{% extends 'entries/target_list.html' %}
+{% extends 'entries/competition_detail.html' %}
 
 {% load bosses %}
 
@@ -7,10 +7,10 @@
 <script src="{{ STATIC_URL }}js/input-scores.js"></script>
 {% endblock scripts %}
 
-{% block moduleclass %}input-scores{% endblock %}
-{% block title %}Input Scores{% endblock %}
+{% block competition_content %}
+<div class="input-scores module">
+    <h2>Input Scores</h2>
 
-{% block main %}
 {% csrf_token %}
 {% for session, details in target_list.items %}
 <div class="row" data-focus="{{ focus }}">
@@ -52,4 +52,6 @@
     </div>
 </div>
 {% endfor %}
+
+</div>
 {% endblock %}
