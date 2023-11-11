@@ -23,25 +23,23 @@ const TargetListEdit = ({ targetList }) => {
         );
     });
     return (
-        <div className="container">
-            <div className="target-list module">
-                <h2>Target List</h2>
-                <div className="row">
-                    <div className="col6">
-                        <p>
-                            <a className="btn" href="../pdf/">View PDF (by round)</a>
-                            &nbsp;
-                            <a className="btn" href="../pdf/?by_session=1">View PDF (by session)</a>
-                            &nbsp;
+        <div className="target-list module">
+            <h2>Target List</h2>
+            <div className="row">
+                <div className="col6">
+                    <p>
+                        <a className="btn" href="../pdf/">View PDF (by round)</a>
+                        &nbsp;
+                        <a className="btn" href="../pdf/?by_session=1">View PDF (by session)</a>
+                        &nbsp;
 
-                            <a className="btn edit" href="../edit/">Edit</a>
+                        <a className="btn edit" href="../edit/">Edit</a>
 
-                        </p>
-                    </div>
+                    </p>
                 </div>
-                <div className="row row--flex">
-                    { sessions }
-                </div>
+            </div>
+            <div className="row row--flex">
+                { sessions }
             </div>
         </div>
     );
