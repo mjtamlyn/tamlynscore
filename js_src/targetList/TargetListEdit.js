@@ -3,7 +3,7 @@ import React, { useContext, useState } from 'react';
 import { CompetitionContext } from '../context/CompetitionContext';
 import SessionList from './SessionList';
 
-const TargetListEdit = ({ targetList }) => {
+const TargetListEdit = ({ targetList, store }) => {
     const competition = useContext(CompetitionContext);
     const [editMode, setEditMode] = useState(false);
 

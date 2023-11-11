@@ -1,8 +1,8 @@
-import Score from './Score';
-
 class Store {
-    constructor({ api, scores }) {
-        this.scores = scores.map(score => new Score({ store: this, ...score }));
+    constructor({ api, data, dataName = 'data' }) {
+        this.data = data;
+        this.data.forEach(item => item.store = this);
+        this.dataName = dataName
         this.api = api;
         this.dirty = false;
         this.loading = false;
@@ -55,13 +55,12 @@ class Store {
         this.dirty = false;
         this.hooks.loading.forEach(hook => hook(true));
         this.hooks.dirty.forEach(hook => hook(false));
-        const data = JSON.stringify({
-            scores: this.scores.map(score => score.serialize()),
-        });
+        const data = {};
+        data[this.dataName] = this.data.map(item => item.serialize())
         fetch(this.api, {
             method: 'POST',
             credentials: 'same-origin',
-            body: data,
+            body: JSON.stringify(data),
         }).then((response) => {
             this.retryCount = 0;
             this.loading = false;

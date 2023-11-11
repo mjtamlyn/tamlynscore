@@ -1,5 +1,6 @@
 import React from 'react';
 
+import Pill from '../utils/Pill';
 
 const ArcherRowDetails = ({ score }) => {
     return (
