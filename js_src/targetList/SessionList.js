@@ -22,8 +22,8 @@ const ArcherBlock = ({ place, archer }) => {
                         { competition.hasNovices && archer.novice && ' ' }
                         <Pill type="bowstyle" value={ archer.bowstyle } />
                         &nbsp;
-                        { archer.age && <Pill type="age" value={ archer.age } /> }
-                        { archer.age && ' ' }
+                        { competition.hasAges && archer.age && <Pill type="age" value={ archer.age } /> }
+                        { competition.hasAges && archer.age && ' ' }
                         <Pill type="gender" value={ archer.gender } />
                     </p>
                 </div>

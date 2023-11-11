@@ -516,7 +516,6 @@ class TargetList(CompetitionMixin, ListView):
             'gender': entry.competition_entry.get_gender_display(),
             'bowstyle': entry.competition_entry.bowstyle.name,
             'club': entry.competition_entry.team_name(),
-            'age': entry.competition_entry.agb_age,
             'text': '%s %s %s %s %s' % (
                 entry.competition_entry.archer,
                 entry.competition_entry.club,
@@ -529,6 +528,8 @@ class TargetList(CompetitionMixin, ListView):
             data['novice'] = entry.competition_entry.get_novice_display()
         if self.competition.has_juniors and entry.competition_entry.age == 'J':
             data['age'] = entry.competition_entry.get_age_display()
+        if self.competition.has_agb_age_groups and entry.competition_entry.agb_age:
+            data['age'] = entry.competition_entry.get_agb_age_display()
         return data
 
     def get_context_data(self, **kwargs):
@@ -600,6 +601,7 @@ class TargetListApi(TargetList, View):
                 'short': self.competition.short_name,
                 'url': self.competition.get_absolute_url(),
                 'hasNovices': self.competition.has_novices,
+                'hasAges': self.competition.has_agb_age_groups or self.competition.has_juniors,
             },
         })
 
