@@ -19,7 +19,7 @@ const ArcherRowSummary = ({ score, showScoreSheet }) => {
                 </div>
             </div>
             <div className="archers__row__actions actions">
-                <a className="actions__button" onClick={ () => showScoreSheet(score) }>Score sheet</a>
+                <a className="actions__button" onClick={ () => showScoreSheet(score) }>View score sheet</a>
             </div>
         </div>
     );
