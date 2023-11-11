@@ -1,5 +1,7 @@
 import React from 'react';
 
+import Pill from '../utils/Pill';
+
 const ArcherBlock = ({ place, archer }) => {
     if (archer) {
         return (
@@ -13,11 +15,11 @@ const ArcherBlock = ({ place, archer }) => {
                 <div className="bottom">
                     <p>{ archer.club }</p>
                     <p>
-                        <span className={ 'pill bowstyle ' + archer.bowstyle.toLowerCase() }>{ archer.bowstyle }</span>
+                        <Pill type="bowstyle" value={ archer.bowstyle } />
                         &nbsp;
-                        { archer.age && <span className={ 'pill age ' + archer.age }>{ archer.age }</span> }
+                        { archer.age && <Pill type="age" value={ archer.age } /> }
                         { archer.age && ' ' }
-                        <span className={ 'pill gender ' + archer.gender.toLowerCase() }>{ archer.gender }</span>
+                        <Pill type="gender" value={ archer.gender } />
                     </p>
                 </div>
             </div>
