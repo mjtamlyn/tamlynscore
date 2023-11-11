@@ -1,8 +1,11 @@
-import React from 'react';
+import React, { useContext } from 'react';
 
+import { CompetitionContext } from '../context/CompetitionContext';
 import SessionList from './SessionList';
 
 const TargetListEdit = ({ targetList }) => {
+    const competition = useContext(CompetitionContext);
+
     const sessionCount = targetList.length;
     let sessionColClass = {
         1: 'col3',
@@ -28,12 +31,11 @@ const TargetListEdit = ({ targetList }) => {
             <div className="row">
                 <div className="col6">
                     <p>
-                        <a className="btn" href="../pdf/">View PDF (by round)</a>
+                        <a className="btn" href={ `${competition.url}target-list/pdf/` }>View PDF (by round)</a>
                         &nbsp;
-                        <a className="btn" href="../pdf/?by_session=1">View PDF (by session)</a>
+                        <a className="btn" href={ `${competition.url}target-list/pdf/?by_session=1` }>View PDF (by session)</a>
                         &nbsp;
-
-                        <a className="btn edit" href="../edit/">Edit</a>
+                        <a className="btn edit" href={ `${competition.url}target-list/edit/` }>Edit</a>
 
                     </p>
                 </div>
