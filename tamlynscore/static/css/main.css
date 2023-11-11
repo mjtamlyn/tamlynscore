@@ -5774,6 +5774,10 @@ table.tree td.border-right {
   padding-bottom: 20px;
 }
 /* line 34, ../../sass/_target_input.sass */
+#target-input .full-height-page__content {
+  overflow-y: scroll;
+}
+/* line 37, ../../sass/_target_input.sass */
 #target-input .full-height-page__loading {
   height: 100%;
   width: 100%;
@@ -5783,7 +5787,7 @@ table.tree td.border-right {
   line-height: 50vh;
   font-size: larger;
 }
-/* line 43, ../../sass/_target_input.sass */
+/* line 46, ../../sass/_target_input.sass */
 #target-input .full-height-page__card {
   margin: 30px;
   text-align: center;
@@ -5793,12 +5797,12 @@ table.tree td.border-right {
   line-height: 1.4;
   overflow-y: scroll;
 }
-/* line 53, ../../sass/_target_input.sass */
+/* line 56, ../../sass/_target_input.sass */
 #target-input .session-selector__event {
   font-weight: bold;
   margin: 0 0 5px;
 }
-/* line 57, ../../sass/_target_input.sass */
+/* line 60, ../../sass/_target_input.sass */
 #target-input .session-selector__session {
   margin: 15px 0 0;
   padding: 5px 0 0;
@@ -5806,11 +5810,11 @@ table.tree td.border-right {
   border-radius: 5px;
   background-color: white;
 }
-/* line 64, ../../sass/_target_input.sass */
+/* line 67, ../../sass/_target_input.sass */
 #target-input .session-selector__session__time {
   font-weight: bold;
 }
-/* line 67, ../../sass/_target_input.sass */
+/* line 70, ../../sass/_target_input.sass */
 #target-input .session-selector__session__action {
   display: block;
   padding: 5px;
@@ -5820,22 +5824,22 @@ table.tree td.border-right {
   color: white;
   font-weight: bold;
 }
-/* line 76, ../../sass/_target_input.sass */
+/* line 79, ../../sass/_target_input.sass */
 #target-input .scoring-header {
   display: flex;
   justify-content: space-between;
   padding: 0 10px;
 }
-/* line 81, ../../sass/_target_input.sass */
+/* line 84, ../../sass/_target_input.sass */
 #target-input .scoring-header h3 {
   color: white;
 }
-/* line 84, ../../sass/_target_input.sass */
+/* line 87, ../../sass/_target_input.sass */
 #target-input .archers {
   display: grid;
   grid-gap: 3px;
 }
-/* line 88, ../../sass/_target_input.sass */
+/* line 91, ../../sass/_target_input.sass */
 #target-input .archers__row {
   padding: 3px 10px;
   background-color: #6FB3FF;
@@ -5844,20 +5848,20 @@ table.tree td.border-right {
   grid-gap: 3px;
   align-items: baseline;
 }
-/* line 97, ../../sass/_target_input.sass */
+/* line 100, ../../sass/_target_input.sass */
 #target-input .archers__row__actions {
   grid-column-end: span 3;
   padding: 0;
 }
-/* line 101, ../../sass/_target_input.sass */
+/* line 104, ../../sass/_target_input.sass */
 #target-input .archers__target {
   font-size: 15px;
 }
-/* line 104, ../../sass/_target_input.sass */
+/* line 107, ../../sass/_target_input.sass */
 #target-input .archers__name {
   font-weight: bold;
 }
-/* line 107, ../../sass/_target_input.sass */
+/* line 110, ../../sass/_target_input.sass */
 #target-input .archers__score {
   grid-column-end: span 3;
   display: grid;
@@ -5866,31 +5870,31 @@ table.tree td.border-right {
   align-items: baseline;
   text-align: center;
 }
-/* line 115, ../../sass/_target_input.sass */
+/* line 118, ../../sass/_target_input.sass */
 #target-input .archers__score__heading {
   border-bottom: 1px solid #000F1F;
   font-weight: italic;
   font-size: smaller;
 }
-/* line 120, ../../sass/_target_input.sass */
+/* line 123, ../../sass/_target_input.sass */
 #target-input .archers__score__heading--span {
   grid-column-end: span 3;
 }
-/* line 123, ../../sass/_target_input.sass */
+/* line 126, ../../sass/_target_input.sass */
 #target-input .archers__score__total, #target-input .archers__score__grand-total {
   font-weight: bold;
 }
-/* line 127, ../../sass/_target_input.sass */
+/* line 130, ../../sass/_target_input.sass */
 #target-input .archers__score__grand-total {
   border-top: 1px solid #000F1F;
 }
-/* line 130, ../../sass/_target_input.sass */
+/* line 133, ../../sass/_target_input.sass */
 #target-input .archers__score__input {
   border: 1px solid transparent;
   transition: background-color 0.5s, padding 0.5s, border 0.5s;
   height: 100%;
 }
-/* line 135, ../../sass/_target_input.sass */
+/* line 138, ../../sass/_target_input.sass */
 #target-input .archers__summary {
   grid-column-end: span 3;
   display: flex;
@@ -5898,11 +5902,11 @@ table.tree td.border-right {
   align-items: baseline;
   font-weight: bold;
 }
-/* line 142, ../../sass/_target_input.sass */
+/* line 145, ../../sass/_target_input.sass */
 #target-input .archers__summary__legend {
   font-weight: normal;
 }
-/* line 146, ../../sass/_target_input.sass */
+/* line 149, ../../sass/_target_input.sass */
 #target-input .archers__row--current .archers__score__input {
   background-color: white;
   border: 1px solid #000F1F;
@@ -5910,13 +5914,13 @@ table.tree td.border-right {
   padding: 6px 0;
   font-weight: bold;
 }
-/* line 153, ../../sass/_target_input.sass */
+/* line 156, ../../sass/_target_input.sass */
 #target-input .archers__row--current .archers__score__input--active {
   box-shadow: 0 0 2px #D58100 inset;
   border-color: #D58100;
   background-color: #eeeeee;
 }
-/* line 158, ../../sass/_target_input.sass */
+/* line 161, ../../sass/_target_input.sass */
 #target-input .score-input {
   display: grid;
   grid-template-columns: repeat(4, 1fr);
@@ -5926,7 +5930,7 @@ table.tree td.border-right {
   padding: 5px;
   flex-grow: 1;
 }
-/* line 167, ../../sass/_target_input.sass */
+/* line 170, ../../sass/_target_input.sass */
 #target-input .score-input__control {
   font-size: 25px;
   font-weight: bold;
@@ -5935,38 +5939,38 @@ table.tree td.border-right {
   align-items: center;
   justify-content: center;
 }
-/* line 175, ../../sass/_target_input.sass */
+/* line 178, ../../sass/_target_input.sass */
 #target-input .score-input__control--gold {
   background-color: #ffe552;
 }
-/* line 177, ../../sass/_target_input.sass */
+/* line 180, ../../sass/_target_input.sass */
 #target-input .score-input__control--red {
   background-color: #f65058;
   color: white;
 }
-/* line 180, ../../sass/_target_input.sass */
+/* line 183, ../../sass/_target_input.sass */
 #target-input .score-input__control--blue {
   background-color: #00b4e4;
 }
-/* line 182, ../../sass/_target_input.sass */
+/* line 185, ../../sass/_target_input.sass */
 #target-input .score-input__control--black {
   background-color: #020202;
   color: white;
 }
-/* line 185, ../../sass/_target_input.sass */
+/* line 188, ../../sass/_target_input.sass */
 #target-input .score-input__control--white {
   background-color: #ffffff;
 }
-/* line 187, ../../sass/_target_input.sass */
+/* line 190, ../../sass/_target_input.sass */
 #target-input .score-input__control--green {
   background-color: #486F38;
   color: white;
 }
-/* line 191, ../../sass/_target_input.sass */
+/* line 194, ../../sass/_target_input.sass */
 #target-input .score-input__control--miss {
   grid-column-end: span 2;
 }
-/* line 194, ../../sass/_target_input.sass */
+/* line 197, ../../sass/_target_input.sass */
 #target-input .sync-status {
   position: fixed;
   bottom: 0;

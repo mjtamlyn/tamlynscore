@@ -40,7 +40,9 @@ const View = ({ api, render }) => {
                     <h2 className="header-title"><a href={ data.competition.url }>{ data.competition.short }</a></h2>
                 </div>
             </nav>
-            { render(data) }
+            <div className="full-height-page__content">
+                { render(data) }
+            </div>
         </div>
     );
 };
