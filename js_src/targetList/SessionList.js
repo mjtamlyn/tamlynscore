@@ -42,19 +42,21 @@ const ArcherBlock = ({ place, archer }) => {
     );
 }
 
-const Boss = ({ number, archers }) => {
+const Boss = ({ number, perBoss, archers }) => {
+    const letters = ['A', 'B' , 'C', 'D', 'E', 'F', 'G'];
+    const lettersUsed = letters.slice(0, perBoss);
+
+    const blocks = lettersUsed.map(letter => <ArcherBlock place={ `${number}${letter}` } archer={ archers[letter] } key={ letter } />);
+
     return (
         <div className="boss">
-            <ArcherBlock place={ `${number}A` } archer={ archers.A } />
-            <ArcherBlock place={ `${number}B` } archer={ archers.B } />
-            <ArcherBlock place={ `${number}C` } archer={ archers.C } />
-            <ArcherBlock place={ `${number}D` } archer={ archers.D } />
+            { blocks }
         </div>
     );
 }
 
-const SessionList = ({ targets }) => {
-    const bosses = targets.map(boss => <Boss number={ boss.number} archers={ boss.archers } key={ boss.number } />);
+const SessionList = ({ targets, perBoss }) => {
+    const bosses = targets.map(boss => <Boss number={ boss.number } perBoss={ perBoss } archers={ boss.archers } key={ boss.number } />);
     return bosses;
 }
 

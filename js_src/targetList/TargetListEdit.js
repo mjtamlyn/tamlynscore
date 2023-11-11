@@ -18,7 +18,7 @@ const TargetListEdit = ({ targetList }) => {
         return (
             <div className={ 'session ' + sessionColClass } key={ session.sessionTime }>
                 <h4>{ session.sessionTime }</h4>
-                <SessionList targets={ session.targetList } />
+                <SessionList perBoss={ session.archersPerBoss } targets={ session.targetList } />
             </div>
         );
     });

@@ -592,6 +592,7 @@ class TargetListApi(TargetList, View):
                 })
             data.append({
                 'sessionTime': session.start.strftime('%A, %-d %B - %-I:%M%p'),
+                'archersPerBoss': session.archers_per_target,
                 'targetList': allocations,
             })
         return JsonResponse({
