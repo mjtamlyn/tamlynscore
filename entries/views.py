@@ -516,11 +516,13 @@ class TargetList(CompetitionMixin, ListView):
             'gender': entry.competition_entry.get_gender_display(),
             'bowstyle': entry.competition_entry.bowstyle.name,
             'club': entry.competition_entry.team_name(),
-            'text': u'%s %s %s %s' % (
+            'age': entry.competition_entry.agb_age,
+            'text': '%s %s %s %s %s' % (
                 entry.competition_entry.archer,
                 entry.competition_entry.club,
                 entry.competition_entry.bowstyle,
                 entry.competition_entry.archer.get_gender_display(),
+                entry.competition_entry.archer.agb_age,
             )
         }
         if self.competition.has_novices and entry.competition_entry.novice == 'N':
@@ -577,9 +579,19 @@ class TargetListApi(TargetList, View):
     def render_to_response(self, context, **kwargs):
         target_list = context['target_list']
         data = []
-        for session, _ in target_list.items():
+        for session, session_context in target_list.items():
+            allocations = []
+            for target, spaces in session_context['target_list']:
+                archers = {}
+                for detail, ta_obj in spaces:
+                    archers[detail] = self.get_json_data(ta_obj.session_entry) if ta_obj else None
+                allocations.append({
+                    'number': target,
+                    'archers': archers,
+                })
             data.append({
                 'sessionTime': session.start.strftime('%A, %-d %B - %-I:%M%p'),
+                'targetList': allocations,
             })
         return JsonResponse({
             'targetList': data,

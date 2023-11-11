@@ -1,10 +1,6 @@
 import React from 'react';
 
-const Session = ({ sessionTime }) => {
-    return (
-        <h4>{ sessionTime }</h4>
-    );
-}
+import SessionList from './SessionList';
 
 const TargetListEdit = ({ targetList }) => {
     const sessionCount = targetList.length;
@@ -21,7 +17,8 @@ const TargetListEdit = ({ targetList }) => {
     const sessions = targetList.map(session => {
         return (
             <div className={ 'session ' + sessionColClass } key={ session.sessionTime }>
-                <Session sessionTime={ session.sessionTime } />
+                <h4>{ session.sessionTime }</h4>
+                <SessionList targets={ session.targetList } />
             </div>
         );
     });
@@ -31,7 +28,15 @@ const TargetListEdit = ({ targetList }) => {
                 <h2>Target List</h2>
                 <div className="row">
                     <div className="col6">
-                        Buttons here
+                        <p>
+                            <a className="btn" href="../pdf/">View PDF (by round)</a>
+                            &nbsp;
+                            <a className="btn" href="../pdf/?by_session=1">View PDF (by session)</a>
+                            &nbsp;
+
+                            <a className="btn edit" href="../edit/">Edit</a>
+
+                        </p>
                     </div>
                 </div>
                 <div className="row row--flex">
