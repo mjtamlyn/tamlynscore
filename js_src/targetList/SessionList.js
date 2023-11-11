@@ -3,17 +3,20 @@ import React, { useContext } from 'react';
 import { CompetitionContext } from '../context/CompetitionContext';
 import Pill from '../utils/Pill';
 
-const ArcherBlock = ({ place, archer }) => {
+const ArcherBlock = ({ place, archer, editMode }) => {
     const competition = useContext(CompetitionContext);
 
     if (archer) {
         return (
             <div className="archer-block">
                 <div className="name">
-                    <p>
-                        <span className="detail">{ place }</span>
-                        <span className="name">{ archer.name }</span>
-                    </p>
+                    <span className="detail">{ place }</span>
+                    <span className="name">
+                        { archer.name }
+                        { editMode && <span className="actions">
+                            <a className="delete action-button"></a>
+                        </span> }
+                    </span>
                 </div>
                 <div className="bottom">
                     <p>{ archer.club }</p>
@@ -33,20 +36,19 @@ const ArcherBlock = ({ place, archer }) => {
     return (
         <div className="archer-block">
             <div className="name">
-                <p>
-                    <span className="detail">{ place }</span>
-                </p>
+                <span className="detail">{ place }</span>
+                { editMode && <span className="name">Select…</span> }
             </div>
             <div className="bottom"></div>
         </div>
     );
 }
 
-const Boss = ({ number, perBoss, archers }) => {
+const Boss = ({ number, perBoss, archers, editMode }) => {
     const letters = ['A', 'B' , 'C', 'D', 'E', 'F', 'G'];
     const lettersUsed = letters.slice(0, perBoss);
 
-    const blocks = lettersUsed.map(letter => <ArcherBlock place={ `${number}${letter}` } archer={ archers[letter] } key={ letter } />);
+    const blocks = lettersUsed.map(letter => <ArcherBlock place={ `${number}${letter}` } archer={ archers[letter] } key={ letter } editMode={ editMode } />);
 
     return (
         <div className="boss">
@@ -55,8 +57,8 @@ const Boss = ({ number, perBoss, archers }) => {
     );
 }
 
-const SessionList = ({ targets, perBoss }) => {
-    const bosses = targets.map(boss => <Boss number={ boss.number } perBoss={ perBoss } archers={ boss.archers } key={ boss.number } />);
+const SessionList = ({ targets, perBoss, editMode }) => {
+    const bosses = targets.map(boss => <Boss number={ boss.number } perBoss={ perBoss } archers={ boss.archers } key={ boss.number } editMode={ editMode } />);
     return bosses;
 }
 

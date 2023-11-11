@@ -1,10 +1,11 @@
-import React, { useContext } from 'react';
+import React, { useContext, useState } from 'react';
 
 import { CompetitionContext } from '../context/CompetitionContext';
 import SessionList from './SessionList';
 
 const TargetListEdit = ({ targetList }) => {
     const competition = useContext(CompetitionContext);
+    const [editMode, setEditMode] = useState(false);
 
     const sessionCount = targetList.length;
     let sessionColClass = {
@@ -21,7 +22,7 @@ const TargetListEdit = ({ targetList }) => {
         return (
             <div className={ 'session ' + sessionColClass } key={ session.sessionTime }>
                 <h4>{ session.sessionTime }</h4>
-                <SessionList perBoss={ session.archersPerBoss } targets={ session.targetList } />
+                <SessionList perBoss={ session.archersPerBoss } targets={ session.targetList } editMode={ editMode } />
             </div>
         );
     });
@@ -35,7 +36,7 @@ const TargetListEdit = ({ targetList }) => {
                         &nbsp;
                         <a className="btn" href={ `${competition.url}target-list/pdf/?by_session=1` }>View PDF (by session)</a>
                         &nbsp;
-                        { competition.isAdmin && <a className="btn edit" href={ `${competition.url}target-list/edit/` }>Edit</a> }
+                        { competition.isAdmin && <a className="btn edit" onClick={ () => setEditMode(!editMode) }>Edit</a> }
                     </p>
                 </div>
             </div>
