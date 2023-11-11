@@ -1,5 +1,8 @@
 import React, { useState, useEffect } from 'react';
 
+import FullPageWrapper from './FullPageWrapper';
+import FullPageLoading from '../utils/FullPageLoading';
+
 
 const View = ({ api, render }) => {
     const [loaded, setLoaded] = useState(false);
@@ -15,35 +18,12 @@ const View = ({ api, render }) => {
     }, [api, loaded]);
 
     if (!loaded) {
-        return (
-            <div className="full-height-page">
-                <nav className="header-nav">
-                    <div className="container">
-                        <div className="home">
-                            <a href="/" className="wide">TamlynScore</a>
-                            <a href="/" className="narrow">TS</a>
-                        </div>
-                    </div>
-                </nav>
-                <div className="full-height-page__loading">Loading...</div>
-            </div>
-        );
+        return <FullPageLoading />
     }
     return (
-        <div className="full-height-page">
-            <nav className="header-nav">
-                <div className="container">
-                    <div className="home">
-                        <a href="/" className="wide">TamlynScore</a>
-                        <a href="/" className="narrow">TS</a>
-                    </div>
-                    <h2 className="header-title"><a href={ data.competition.url }>{ data.competition.short }</a></h2>
-                </div>
-            </nav>
-            <div className="full-height-page__content">
-                { render(data) }
-            </div>
-        </div>
+        <FullPageWrapper>
+            { render(data) }
+        </FullPageWrapper>
     );
 };
 

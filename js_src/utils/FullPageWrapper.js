@@ -13,7 +13,9 @@ const FullPageWrapper = ({ children, competition }) => {
                 </div>
                 { competition && <h2 className="header-title"><a href={ competition.url }>{ competition.short }</a></h2> }
             </nav>
-            { children }
+            <div className="full-height-page__content">
+                { children }
+            </div>
         </div>
     );
 };
