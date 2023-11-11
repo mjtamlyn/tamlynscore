@@ -1,8 +1,11 @@
-import React from 'react';
+import React, { useContext } from 'react';
 
+import { CompetitionContext } from '../context/CompetitionContext';
 import Pill from '../utils/Pill';
 
 const ArcherBlock = ({ place, archer }) => {
+    const competition = useContext(CompetitionContext);
+
     if (archer) {
         return (
             <div className="archer-block">
@@ -15,6 +18,8 @@ const ArcherBlock = ({ place, archer }) => {
                 <div className="bottom">
                     <p>{ archer.club }</p>
                     <p>
+                        { competition.hasNovices && archer.novice && <Pill type="novice" value={ archer.novice } /> }
+                        { competition.hasNovices && archer.novice && ' ' }
                         <Pill type="bowstyle" value={ archer.bowstyle } />
                         &nbsp;
                         { archer.age && <Pill type="age" value={ archer.age } /> }

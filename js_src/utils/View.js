@@ -1,5 +1,7 @@
 import React, { useState, useEffect } from 'react';
 
+import { CompetitionContext } from '../context/CompetitionContext';
+
 
 const View = ({ api, render, Loading }) => {
     const [loaded, setLoaded] = useState(false);
@@ -19,7 +21,11 @@ const View = ({ api, render, Loading }) => {
             <Loading />
         );
     }
-    return render(data);
+    return (
+        <CompetitionContext.Provider value={ data.competition }>
+            { render(data) }
+        </CompetitionContext.Provider>
+    );
 };
 
 export default View;

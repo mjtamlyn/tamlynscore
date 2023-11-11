@@ -599,6 +599,7 @@ class TargetListApi(TargetList, View):
                 'name': self.competition.full_name,
                 'short': self.competition.short_name,
                 'url': self.competition.get_absolute_url(),
+                'hasNovices': self.competition.has_novices,
             },
         })
 
