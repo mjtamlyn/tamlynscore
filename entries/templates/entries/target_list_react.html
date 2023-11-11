@@ -8,6 +8,6 @@
 
 {% block competition_content %}
 <div class="{% block moduleclass %}target-list{% endblock %} module">
-    <div id="app">Loading...</div>
+    <div id="app" data-api-url="{% url "target_list_api" slug=competition.slug %}">Loading...</div>
 </div>
 {% endblock %}

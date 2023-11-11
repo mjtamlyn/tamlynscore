@@ -3,9 +3,9 @@ import React from 'react';
 import View from '../utils/View';
 import TargetListEdit from './TargetListEdit';
 
-const TargetListView = () => {
+const TargetListView = ({ api }) => {
     return (
-        <View api="/tournaments/wallingford-is-2-2023/target-list/api/" render={
+        <View api={ api } render={
             data => <TargetListEdit targetList={ data.targetList } />
         } Loading={
             () => <div>Loading...</div>

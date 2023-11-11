@@ -7,5 +7,5 @@ let app = document.getElementById('app');
 
 if (app) {
     const root = createRoot(app);
-    root.render(<TargetListView />);
+    root.render(<TargetListView api={ app.dataset.apiUrl } />);
 }
