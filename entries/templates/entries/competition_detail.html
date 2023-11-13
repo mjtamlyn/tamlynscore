@@ -142,7 +142,7 @@
             <ul class="link-list">
                 {% for event in leg.competitions.all %}
                     {% if event.id != competition.id %}
-                    <li><a href="{% url 'competition_detail' slug=event.slug %}">{{ event.tournament }}</a></li>
+                    <li><a href="{% url 'competition_detail' slug=event.slug %}">{{ event.short_name }}</a></li>
                     {% endif %}
                 {% endfor %}
             </ul>
