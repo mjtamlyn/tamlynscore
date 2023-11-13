@@ -50,11 +50,10 @@ const ArcherBlock = ({ place, archer, editMode, deleteAllocation }) => {
 
 const SessionList = ({ session, editMode }) => {
     const [bosses, setBosses] = useState(session.bosses);
+    const letters = ['A', 'B' , 'C', 'D', 'E', 'F', 'G'];
+    const lettersUsed = letters.slice(0, session.archersPerBoss);
 
     const displayBosses = bosses.map(boss => {
-        const letters = ['A', 'B' , 'C', 'D', 'E', 'F', 'G'];
-        const lettersUsed = letters.slice(0, session.archersPerBoss);
-
         const blocks = lettersUsed.map(letter => {
             const deleteAllocation = () => {
                 boss.lookup[letter].deleteAllocation();
@@ -71,7 +70,19 @@ const SessionList = ({ session, editMode }) => {
             </div>
         );
     });
-    return displayBosses;
+
+    const addBossHandler = (e) => {
+        e.preventDefault();
+        session.addBoss(lettersUsed);
+        setBosses([...session.bosses]);
+    }
+
+    return (
+        <>
+            { displayBosses }
+            { editMode && <a className="btn add" onClick={ addBossHandler }>Add target</a> }
+        </>
+    );
 }
 
 export default SessionList;

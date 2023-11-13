@@ -59,6 +59,18 @@ class TargetListSession {
             };
         });
     }
+
+    addBoss(lettersUsed) {
+        const lastBossNumber = this.bosses[this.bosses.length - 1].number;
+        const lookup = {};
+        lettersUsed.forEach(letter => {
+            lookup[letter] = null;
+        });
+        this.bosses.push({
+            number: lastBossNumber + 1,
+            lookup: lookup,
+        });
+    }
 }
 
 export default TargetListSession;
