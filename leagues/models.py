@@ -26,7 +26,7 @@ class Season(models.Model):
     name = models.CharField(max_length=255)
     slug = models.SlugField()
     league = models.ForeignKey('League', on_delete=models.CASCADE)
-    non_leg_competitions = models.ManyToManyField('entries.Competition')
+    non_leg_competitions = models.ManyToManyField('entries.Competition', blank=True)
     start_date = models.DateField()
     end_date = models.DateField()
 
