@@ -42,7 +42,7 @@ class Store {
         this.autoSave = setTimeout(() => this.save(), 1000 * 10);
     }
 
-    save() {
+    _sendRequest(data) {
         if (this.retry) {
             clearTimeout(this.retry);
             this.retry = null;
@@ -55,8 +55,6 @@ class Store {
         this.dirty = false;
         this.hooks.loading.forEach(hook => hook(true));
         this.hooks.dirty.forEach(hook => hook(false));
-        const data = {};
-        data[this.dataName] = this.data.map(item => item.serialize())
         fetch(this.api, {
             method: 'POST',
             credentials: 'same-origin',
@@ -78,6 +76,17 @@ class Store {
             this.retryCount++;
             this.retry = setTimeout(() => this.save(), 1000 * this.retryCount);
         });
+    }
+
+    save() {
+        const data = {};
+        data[this.dataName] = this.data.map(item => item.serialize())
+        this._sendRequest(data);
+    }
+
+    delete({ id }) {
+        const data = { id, action: 'DELETE' };
+        this._sendRequest(data);
     }
 }
 

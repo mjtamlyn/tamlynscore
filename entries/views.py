@@ -10,8 +10,8 @@ from django.core.cache import cache
 from django.db import IntegrityError
 from django.db.models import Prefetch
 from django.http import (
-    Http404, HttpResponse, HttpResponseBadRequest, HttpResponseRedirect,
-    JsonResponse,
+    Http404, HttpResponse, HttpResponseBadRequest, HttpResponseNotAllowed,
+    HttpResponseRedirect, JsonResponse,
 )
 from django.shortcuts import get_object_or_404
 from django.urls import reverse
@@ -20,7 +20,7 @@ from django.views.generic import (
     DeleteView, DetailView, FormView, ListView, TemplateView, UpdateView, View,
 )
 
-from braces.views import MessageMixin, SuperuserRequiredMixin
+from braces.views import CsrfExemptMixin, MessageMixin, SuperuserRequiredMixin
 from render_block import render_block_to_string
 from reportlab.lib import colors
 from reportlab.lib.styles import getSampleStyleSheet
@@ -576,7 +576,7 @@ class TargetListReact(CompetitionMixin, TemplateView):
     admin_required = False
 
 
-class TargetListApi(TargetList, View):
+class TargetListApi(CsrfExemptMixin, TargetList, View):
     def render_to_response(self, context, **kwargs):
         target_list = context['target_list']
         data = []
@@ -606,6 +606,15 @@ class TargetListApi(TargetList, View):
                 'isAdmin': self.is_admin,
             },
         })
+
+    def post(self, request, slug):
+        if not self.is_admin:
+            return HttpResponseNotAllowed()
+        data = json.loads(request.body)
+        if data['action'] == 'DELETE':
+            TargetAllocation.objects.get(session_entry__id=data['id']).delete()
+            return HttpResponse('ok')
+        return JsonResponse({'status': 'ok'})
 
 
 class Registration(TargetList):

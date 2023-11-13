@@ -1,12 +1,16 @@
-import React, { useContext } from 'react';
+import React, { useState, useContext } from 'react';
 
 import { CompetitionContext } from '../context/CompetitionContext';
 import Pill from '../utils/Pill';
 
-const ArcherBlock = ({ place, archer, editMode }) => {
+const ArcherBlock = ({ place, archer, editMode, deleteAllocation }) => {
     const competition = useContext(CompetitionContext);
 
     if (archer) {
+        const deleteHandler = (e) => {
+            e.preventDefault();
+            deleteAllocation();
+        };
         return (
             <div className="archer-block">
                 <div className="name">
@@ -14,20 +18,20 @@ const ArcherBlock = ({ place, archer, editMode }) => {
                     <span className="name">
                         { archer.name }
                         { editMode && <span className="actions">
-                            <a className="delete action-button"></a>
+                            <a className="delete action-button" onClick={ deleteHandler }></a>
                         </span> }
                     </span>
                 </div>
                 <div className="bottom">
                     <p>{ archer.club }</p>
                     <p>
-                        { competition.hasNovices && archer.novice && <Pill type="novice" value={ archer.novice } /> }
-                        { competition.hasNovices && archer.novice && ' ' }
-                        <Pill type="bowstyle" value={ archer.bowstyle } />
+                        { competition.hasNovices && archer.categories.novice && <Pill type="novice" value={ archer.categories.novice } /> }
+                        { competition.hasNovices && archer.categories.novice && ' ' }
+                        <Pill type="bowstyle" value={ archer.categories.bowstyle } />
                         &nbsp;
-                        { competition.hasAges && archer.age && <Pill type="age" value={ archer.age } /> }
-                        { competition.hasAges && archer.age && ' ' }
-                        <Pill type="gender" value={ archer.gender } />
+                        { competition.hasAges && archer.categories.age && <Pill type="age" value={ archer.categories.age } /> }
+                        { competition.hasAges && archer.categories.age && ' ' }
+                        <Pill type="gender" value={ archer.categories.gender } />
                     </p>
                 </div>
             </div>
@@ -44,22 +48,30 @@ const ArcherBlock = ({ place, archer, editMode }) => {
     );
 }
 
-const Boss = ({ number, perBoss, archers, editMode }) => {
-    const letters = ['A', 'B' , 'C', 'D', 'E', 'F', 'G'];
-    const lettersUsed = letters.slice(0, perBoss);
+const SessionList = ({ session, editMode }) => {
+    const [bosses, setBosses] = useState(session.bosses);
 
-    const blocks = lettersUsed.map(letter => <ArcherBlock place={ `${number}${letter}` } archer={ archers[letter] } key={ letter } editMode={ editMode } />);
+    const displayBosses = bosses.map(boss => {
+        const letters = ['A', 'B' , 'C', 'D', 'E', 'F', 'G'];
+        const lettersUsed = letters.slice(0, session.archersPerBoss);
 
-    return (
-        <div className="boss">
-            { blocks }
-        </div>
-    );
-}
+        const blocks = lettersUsed.map(letter => {
+            const deleteAllocation = () => {
+                boss.lookup[letter].deleteAllocation();
+                setBosses([...session.bosses]);
+            };
+            return (
+                <ArcherBlock place={ `${boss.number}${letter}` } archer={ boss.lookup[letter] } key={ letter } editMode={ editMode } deleteAllocation={ deleteAllocation } />
+            );
+        });
 
-const SessionList = ({ targets, perBoss, editMode }) => {
-    const bosses = targets.map(boss => <Boss number={ boss.number } perBoss={ perBoss } archers={ boss.archers } key={ boss.number } editMode={ editMode } />);
-    return bosses;
+        return (
+            <div className="boss" key={ boss.number }>
+                { blocks }
+            </div>
+        );
+    });
+    return displayBosses;
 }
 
 export default SessionList;
