@@ -7,9 +7,20 @@
 
 <div class="row row--flex">
     <div class="col4">
-        <h3>Legs</h3>
         {% for leg in legs %}
-            <h4>{{ leg }}</h4>
+            <h3>Leg {{ leg.index }}</h3>
+            <h4>Individual events</h4>
+            <ul class="link-list">
+                {% for competition in leg.competitions.all %}
+                <li>
+                    <a href="{{ competition.get_absolute_url }}">
+                        {{ competition }}
+                        <small>{{ competition.date|date:"jS F" }}</small>
+                    </a>
+                </li>
+                {% endfor %}
+            </ul>
+            <h4>Combined results</h4>
             <ul class="link-list">
                 {% for mode in leg.result_modes.all %}
                 <li><a href="{{ mode.get_absolute_url }}">{{ mode }}</a></li>
@@ -17,9 +28,20 @@
             </ul>
         {% endfor %}
         </ul>
+        <h4>Other events part of this season</h4>
+        <ul class="link-list">
+            {% for competition in non_leg_competitions %}
+            <li>
+                <a href="{{ competition.get_absolute_url }}">
+                    {{ competition }}
+                    <small>{{ competition.date|date:"jS F" }}</small>
+                </a>
+            </li>
+            {% endfor %}
+        </ul>
     </div>
     <div class="col2">
-        <h3>Editions</h3>
+        <h3>Other years</h3>
         <ul class="link-list">
             {% for edition in editions %}
             <li><a href="{{ edition.get_absolute_url }}">{{ edition }}</a></li>

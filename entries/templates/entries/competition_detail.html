@@ -127,7 +127,7 @@
         {% endif %}
     {% endif %}
 
-    {% if legs %}
+    {% if legs or seasons %}
     <div class="col3">
         {% if legs %}
             {% for leg in legs %}
@@ -157,6 +157,14 @@
             </ul>
             {% endif %}
 
+            {% endfor %}
+        {% endif %}
+
+        {% if seasons %}
+            {% for season in seasons %}
+                <h2>{{ season.league }}</h3>
+                <p>This event is part of {{ season }}.</p>
+                <p><a class="btn" href="{{ season.get_absolute_url }}">View season</a></p>
             {% endfor %}
         {% endif %}
     </div>

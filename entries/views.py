@@ -117,6 +117,7 @@ class CompetitionDetail(CompetitionMixin, ResultModeMixin, DetailView):
 
         context = super().get_context_data(**kwargs)
         context['legs'] = self.object.leg_set.select_related('season__league')
+        context['seasons'] = self.object.season_set.select_related('league')
         context['related_events'] = self.object.tournament.competition_set.order_by('-date').exclude(pk=self.object.pk)
 
         context['is_future'] = (self.competition.date > today)

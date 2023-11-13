@@ -47,7 +47,7 @@
                         <td>{{ detail }}</td>
                     {% endfor %}
                     {% if score.score and score.pk %}
-                        <td><a href="{% url 'input_arrows_archer' slug=competition.slug score_id=score.pk %}" class="score-sheet-link"></a></td>
+                        <td><a href="{% url 'input_arrows_archer' slug=score.target.session_entry.competition_entry.competition.slug score_id=score.pk %}" class="score-sheet-link"></a></td>
                     {% endif %}
                 </tr>
                 {% if score.team %}

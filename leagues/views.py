@@ -26,7 +26,8 @@ class SeasonDetail(DetailView):
     def get_context_data(self, **kwargs):
         context = super(SeasonDetail, self).get_context_data(**kwargs)
         context['legs'] = self.object.leg_set.order_by('index')
-        context['editions'] = self.object.league.season_set.order_by('start_date')
+        context['editions'] = self.object.league.season_set.order_by('-start_date').exclude(pk=self.object.pk)
+        context['non_leg_competitions'] = self.object.non_leg_competitions.order_by('date')
         return context
 
 

@@ -6,5 +6,7 @@
     <h1>{{ mode }} results for {{ leg }}</h1>
 </header>
 
+<p><a href="{{ leg.season.get_absolute_url }}">< {{ leg.season }}</a></p>
+
 {% include 'scores/_leaderboard.html' %}
 {% endblock %}
