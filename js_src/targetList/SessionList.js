@@ -1,41 +1,7 @@
-import React, { useState, useContext, useEffect, useRef } from 'react';
+import React, { useState } from 'react';
 
-import useMousetrap from 'react-hook-mousetrap';
-
-import { CompetitionContext } from '../context/CompetitionContext';
-import Pill from '../utils/Pill';
-
-const ArcherSelector = ({ archers, onSelect, close, emptyLabel="Select…" }) => {
-    const ref = useRef(null);
-    const closeHandler = (e) => {
-        if (ref && !ref.current.closest('.archer-block').contains(e.target)) {
-            close();
-        }
-    };
-    useEffect(() => {
-        document.body.addEventListener('click', closeHandler);
-        return () => document.body.removeEventListener('click', closeHandler);
-    });
-    useMousetrap('esc', close);
-
-    const archerList = archers.map(archer => {
-        const clickHandler = (e) =>{
-            e.preventDefault();
-            onSelect(archer);
-            close();
-        }
-        return <li key={ archer.id } onClick={ clickHandler }>{ archer.name }</li>;
-    });
-
-    return (
-        <div className="archer-selector" ref={ ref }>
-            <ul>
-                <li>{ emptyLabel }</li>
-                { archerList }
-            </ul>
-        </div>
-    );
-};
+import ArcherPills from '../utils/ArcherPills';
+import ArcherSelector from './ArcherSelector';
 
 const EmptyArcherBlock = ({ place, editMode, unallocatedEntries, setAllocation }) => {
     const [selectOpen, setSelectOpen] = useState(false);
@@ -50,9 +16,9 @@ const EmptyArcherBlock = ({ place, editMode, unallocatedEntries, setAllocation }
 
     return (
         <div className="archer-block">
-            <div className="name" onClick={ selectHandler }>
+            <div className="name">
                 <span className="detail">{ place }</span>
-                { editMode && <span>Select…</span> }
+                { editMode && <span className="select" onClick={ selectHandler }>Select…</span> }
             </div>
             { selectOpen && <ArcherSelector archers={ unallocatedEntries } close={ close } onSelect={ setAllocation } /> }
             <div className="bottom"></div>
@@ -61,8 +27,6 @@ const EmptyArcherBlock = ({ place, editMode, unallocatedEntries, setAllocation }
 };
 
 const ArcherBlock = ({ place, archer, editMode, deleteAllocation }) => {
-    const competition = useContext(CompetitionContext);
-
     const deleteHandler = (e) => {
         e.preventDefault();
         deleteAllocation();
@@ -80,15 +44,7 @@ const ArcherBlock = ({ place, archer, editMode, deleteAllocation }) => {
             </div>
             <div className="bottom">
                 <p>{ archer.club }</p>
-                <p>
-                    { competition.hasNovices && archer.categories.novice && <Pill type="novice" value={ archer.categories.novice } /> }
-                    { competition.hasNovices && archer.categories.novice && ' ' }
-                    <Pill type="bowstyle" value={ archer.categories.bowstyle } />
-                    &nbsp;
-                    { competition.hasAges && archer.categories.age && <Pill type="age" value={ archer.categories.age } /> }
-                    { competition.hasAges && archer.categories.age && ' ' }
-                    <Pill type="gender" value={ archer.categories.gender } />
-                </p>
+                <p><ArcherPills categories={ archer.categories } /></p>
             </div>
         </div>
     );

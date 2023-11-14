@@ -5,7 +5,7 @@ import SessionList from './SessionList';
 
 const TargetListEdit = ({ targetList, store }) => {
     const competition = useContext(CompetitionContext);
-    const [editMode, setEditMode] = useState(false);
+    const [editMode, setEditMode] = useState(true); // TODO - set back to false
 
     const sessionCount = targetList.length;
     let sessionColClass = {

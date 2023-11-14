@@ -19,6 +19,8 @@
       border-bottom: 0
 
   .archer-block
+    position: relative
+    overflow: unset
 
     .name
       height: 28px
@@ -27,9 +29,41 @@
       min-height: 53px
       overflow: auto
 
-    input
-      margin-top: -4px
-      outline: none
-
   .select
     cursor: pointer
+
+  .archer-selector
+    position: absolute
+    top: 28px
+    left: 10px
+    border: 1px solid $borders
+    border-top: none
+    border-radius: 0 0 8px 8px
+    width: 300px
+    z-index: 1
+
+    &__input
+      width: 100%
+      border: none
+      border-radius: 0
+      border-bottom: 2px solid $borders
+      outline: none
+
+    &__row
+      padding: 5px 8px
+      border-bottom: 1px solid $borders
+      background-color: white
+      cursor: pointer
+
+      &:hover
+        background-color: $oxford
+        color: white
+
+      &[aria-selected]
+        background-color: $lightblue
+        &:hover
+          background-color: $oxford
+          color: white
+
+      &:last-child
+        border-bottom: none

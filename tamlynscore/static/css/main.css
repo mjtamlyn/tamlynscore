@@ -5651,23 +5651,67 @@ body {
   border-radius: 0;
   border-bottom: 0;
 }
-/* line 23, ../../sass/_target_list.sass */
+/* line 21, ../../sass/_target_list.sass */
+.target-list .archer-block {
+  position: relative;
+  overflow: unset;
+}
+/* line 25, ../../sass/_target_list.sass */
 .target-list .archer-block .name {
   height: 28px;
 }
-/* line 26, ../../sass/_target_list.sass */
+/* line 28, ../../sass/_target_list.sass */
 .target-list .archer-block .bottom {
   min-height: 53px;
   overflow: auto;
 }
-/* line 30, ../../sass/_target_list.sass */
-.target-list .archer-block input {
-  margin-top: -4px;
-  outline: none;
-}
-/* line 34, ../../sass/_target_list.sass */
+/* line 32, ../../sass/_target_list.sass */
 .target-list .select {
   cursor: pointer;
+}
+/* line 35, ../../sass/_target_list.sass */
+.target-list .archer-selector {
+  position: absolute;
+  top: 28px;
+  left: 10px;
+  border: 1px solid #CCCCCC;
+  border-top: none;
+  border-radius: 0 0 8px 8px;
+  width: 300px;
+  z-index: 1;
+}
+/* line 45, ../../sass/_target_list.sass */
+.target-list .archer-selector__input {
+  width: 100%;
+  border: none;
+  border-radius: 0;
+  border-bottom: 2px solid #CCCCCC;
+  outline: none;
+}
+/* line 52, ../../sass/_target_list.sass */
+.target-list .archer-selector__row {
+  padding: 5px 8px;
+  border-bottom: 1px solid #CCCCCC;
+  background-color: white;
+  cursor: pointer;
+}
+/* line 58, ../../sass/_target_list.sass */
+.target-list .archer-selector__row:hover {
+  background-color: #002147;
+  color: white;
+}
+/* line 62, ../../sass/_target_list.sass */
+.target-list .archer-selector__row[aria-selected] {
+  background-color: #6FB3FF;
+}
+/* line 64, ../../sass/_target_list.sass */
+.target-list .archer-selector__row[aria-selected]:hover {
+  background-color: #002147;
+  color: white;
+}
+/* line 68, ../../sass/_target_list.sass */
+.target-list .archer-selector__row:last-child {
+  border-bottom: none;
 }
 
 /* line 1, ../../sass/_score_sheets.sass */
