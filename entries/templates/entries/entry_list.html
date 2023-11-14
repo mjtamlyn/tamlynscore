@@ -70,7 +70,7 @@
                         <a class="action-button edit" href="{% url 'entry_update' slug=competition.slug entry_id=entry.pk %}"></a>
                         <a class="action-button delete" href="{% url 'entry_delete' slug=competition.slug entry_id=entry.pk %}"></a>
                     </div>
-                    <p>{{ entry.archer }}</p>
+                    <span>{{ entry.archer }}</span>
                 </div>
                 <div class="bottom">
                     <p>
