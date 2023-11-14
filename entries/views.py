@@ -10,8 +10,8 @@ from django.core.cache import cache
 from django.db import IntegrityError
 from django.db.models import Prefetch, F
 from django.http import (
-    Http404, HttpResponse, HttpResponseBadRequest, HttpResponseNotAllowed,
-    HttpResponseRedirect, JsonResponse,
+    Http404, HttpResponse, HttpResponseNotAllowed, HttpResponseRedirect,
+    JsonResponse,
 )
 from django.shortcuts import get_object_or_404
 from django.urls import reverse
@@ -412,7 +412,7 @@ class EntryDelete(CompetitionMixin, DeleteView):
         return reverse('entry_list', kwargs={'slug': self.competition.slug})
 
 
-class TargetList(CompetitionMixin, ListView):
+class TargetListBase(CompetitionMixin, ListView):
     template_name = 'entries/target_list.html'
     model = TargetAllocation
     admin_required = False
@@ -533,7 +533,7 @@ class TargetList(CompetitionMixin, ListView):
         return data
 
     def get_context_data(self, **kwargs):
-        context = super(TargetList, self).get_context_data(**kwargs)
+        context = super().get_context_data(**kwargs)
         self.allocations = context['object_list']
 
         if self.allocations:
@@ -551,32 +551,12 @@ class TargetList(CompetitionMixin, ListView):
         return context
 
 
-class TargetListEdit(TargetList):
-    template_name = 'entries/target_list_edit.html'
-    admin_required = True
-    editable = True
-
-    def post(self, request, slug):
-        data = json.loads(request.body.decode('utf-8'))
-        if data['method'] == 'create':
-            allocation = TargetAllocation.objects.create(
-                session_entry_id=data['entry'],
-                boss=data['location'][:-1],
-                target=data['location'][-1]
-            )
-            return HttpResponse(allocation.pk)
-        elif data['method'] == 'delete':
-            TargetAllocation.objects.get(session_entry__id=data['session_entry']).delete()
-            return HttpResponse('ok')
-        return HttpResponseBadRequest()
-
-
-class TargetListReact(CompetitionMixin, TemplateView):
+class TargetList(CompetitionMixin, TemplateView):
     template_name = 'entries/target_list_react.html'
     admin_required = False
 
 
-class TargetListApi(CsrfExemptMixin, TargetList, View):
+class TargetListApi(CsrfExemptMixin, TargetListBase, View):
     def render_to_response(self, context, **kwargs):
         target_list = context['target_list']
         data = []
@@ -638,7 +618,7 @@ class TargetListApi(CsrfExemptMixin, TargetList, View):
         return JsonResponse({'status': 'UNKOWN ACTION'})
 
 
-class Registration(TargetList):
+class Registration(TargetListBase):
     template_name = 'entries/registration.html'
     admin_required = True
 

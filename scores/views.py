@@ -29,7 +29,7 @@ from entries.models import (
     CompetitionEntry, EntryUser, ResultsMode, Session, SessionEntry,
     SessionRound, TargetAllocation,
 )
-from entries.views import CompetitionMixin, TargetList
+from entries.views import CompetitionMixin, TargetListBase
 from olympic.models import OlympicSessionRound
 
 from .forms import get_arrow_formset, get_dozen_formset
@@ -38,7 +38,7 @@ from .models import Arrow, Dozen, Score
 from .result_modes import ByRound
 
 
-class InputScores(TargetList):
+class InputScores(TargetListBase):
     template_name = 'scores/input_scores.html'
     admin_required = True
 
