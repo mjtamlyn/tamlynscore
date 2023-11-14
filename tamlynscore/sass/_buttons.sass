@@ -27,6 +27,16 @@
     &:before
       margin-right: 2px
 
+  &.delete
+    background-color: $red
+
+    &:hover
+      background-color: lighten($red, 10%)
+
+  &.depressed
+    background-color: lighten($blue, 10%)
+    box-shadow: 0 0 5px $oxford inset
+
 button.action-button
   font-size: inherit
   background: none
@@ -51,6 +61,10 @@ button.action-button
   &.archive:before
     @include fa-icon()
     content: $fa-var-archive
+
+  &.insert:before
+    @include fa-icon()
+    content: $fa-var-bars
 
   &.reveal:after
     @include fa-icon()

@@ -3715,8 +3715,21 @@ li {
 .btn.btn-small:before {
   margin-right: 2px;
 }
-
 /* line 30, ../../sass/_buttons.sass */
+.btn.delete {
+  background-color: #A21;
+}
+/* line 33, ../../sass/_buttons.sass */
+.btn.delete:hover {
+  background-color: #d82b16;
+}
+/* line 36, ../../sass/_buttons.sass */
+.btn.depressed {
+  background-color: #0064d5;
+  box-shadow: 0 0 5px #002147 inset;
+}
+
+/* line 40, ../../sass/_buttons.sass */
 button.action-button {
   font-size: inherit;
   background: none;
@@ -3725,7 +3738,7 @@ button.action-button {
   margin: 0;
 }
 
-/* line 39, ../../sass/_buttons.sass */
+/* line 49, ../../sass/_buttons.sass */
 .btn.add:before,
 .action-button.add:before {
   display: inline-block;
@@ -3736,7 +3749,7 @@ button.action-button {
   -moz-osx-font-smoothing: grayscale;
   content: "";
 }
-/* line 43, ../../sass/_buttons.sass */
+/* line 53, ../../sass/_buttons.sass */
 .btn.edit:before,
 .action-button.edit:before {
   display: inline-block;
@@ -3747,7 +3760,7 @@ button.action-button {
   -moz-osx-font-smoothing: grayscale;
   content: "";
 }
-/* line 47, ../../sass/_buttons.sass */
+/* line 57, ../../sass/_buttons.sass */
 .btn.delete:before,
 .action-button.delete:before {
   display: inline-block;
@@ -3758,7 +3771,7 @@ button.action-button {
   -moz-osx-font-smoothing: grayscale;
   content: "";
 }
-/* line 51, ../../sass/_buttons.sass */
+/* line 61, ../../sass/_buttons.sass */
 .btn.archive:before,
 .action-button.archive:before {
   display: inline-block;
@@ -3769,7 +3782,18 @@ button.action-button {
   -moz-osx-font-smoothing: grayscale;
   content: "";
 }
-/* line 55, ../../sass/_buttons.sass */
+/* line 65, ../../sass/_buttons.sass */
+.btn.insert:before,
+.action-button.insert:before {
+  display: inline-block;
+  font: normal normal normal 14px/1 FontAwesome;
+  font-size: inherit;
+  text-rendering: auto;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+  content: "";
+}
+/* line 69, ../../sass/_buttons.sass */
 .btn.reveal:after,
 .action-button.reveal:after {
   display: inline-block;
@@ -5652,24 +5676,30 @@ body {
   border-bottom: 0;
 }
 /* line 21, ../../sass/_target_list.sass */
+.target-list__btn {
+  display: block;
+  width: 100%;
+  margin: 10px 0;
+}
+/* line 26, ../../sass/_target_list.sass */
 .target-list .archer-block {
   position: relative;
   overflow: unset;
 }
-/* line 25, ../../sass/_target_list.sass */
+/* line 30, ../../sass/_target_list.sass */
 .target-list .archer-block .name {
   height: 28px;
 }
-/* line 28, ../../sass/_target_list.sass */
+/* line 33, ../../sass/_target_list.sass */
 .target-list .archer-block .bottom {
   min-height: 53px;
   overflow: auto;
 }
-/* line 32, ../../sass/_target_list.sass */
+/* line 37, ../../sass/_target_list.sass */
 .target-list .select {
   cursor: pointer;
 }
-/* line 35, ../../sass/_target_list.sass */
+/* line 40, ../../sass/_target_list.sass */
 .target-list .archer-selector {
   position: absolute;
   top: 28px;
@@ -5682,7 +5712,7 @@ body {
   overflow-y: scroll;
   z-index: 1;
 }
-/* line 47, ../../sass/_target_list.sass */
+/* line 52, ../../sass/_target_list.sass */
 .target-list .archer-selector__input {
   width: 100%;
   border: none;
@@ -5690,28 +5720,28 @@ body {
   border-bottom: 2px solid #CCCCCC;
   outline: none;
 }
-/* line 54, ../../sass/_target_list.sass */
+/* line 59, ../../sass/_target_list.sass */
 .target-list .archer-selector__row {
   padding: 5px 8px;
   border-bottom: 1px solid #CCCCCC;
   background-color: white;
   cursor: pointer;
 }
-/* line 60, ../../sass/_target_list.sass */
+/* line 65, ../../sass/_target_list.sass */
 .target-list .archer-selector__row:hover {
   background-color: #002147;
   color: white;
 }
-/* line 64, ../../sass/_target_list.sass */
+/* line 69, ../../sass/_target_list.sass */
 .target-list .archer-selector__row[aria-selected] {
   background-color: #6FB3FF;
 }
-/* line 66, ../../sass/_target_list.sass */
+/* line 71, ../../sass/_target_list.sass */
 .target-list .archer-selector__row[aria-selected]:hover {
   background-color: #002147;
   color: white;
 }
-/* line 70, ../../sass/_target_list.sass */
+/* line 75, ../../sass/_target_list.sass */
 .target-list .archer-selector__row:last-child {
   border-bottom: none;
 }

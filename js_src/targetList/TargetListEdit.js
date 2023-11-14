@@ -5,7 +5,7 @@ import SessionList from './SessionList';
 
 const TargetListEdit = ({ targetList, store }) => {
     const competition = useContext(CompetitionContext);
-    const [editMode, setEditMode] = useState(true); // TODO - set back to false
+    const [editMode, setEditMode] = useState(false);
 
     const sessionCount = targetList.length;
     let sessionColClass = {
@@ -36,7 +36,7 @@ const TargetListEdit = ({ targetList, store }) => {
                         &nbsp;
                         <a className="btn" href={ `${competition.url}target-list/pdf/?by_session=1` }>View PDF (by session)</a>
                         &nbsp;
-                        { competition.isAdmin && <a className="btn edit" onClick={ () => setEditMode(!editMode) }>Edit</a> }
+                        { competition.isAdmin && <a className={ 'btn edit' + (editMode ? ' depressed' : '') } onClick={ () => setEditMode(!editMode) }>Edit</a> }
                     </p>
                 </div>
             </div>

@@ -12,8 +12,7 @@ class SessionEntry {
     }
 
     deleteAllocation() {
-        this.session.store.setDirty();
-        this.session.store.delete({id: this.id});
+        this.session.store.action('DELETE', {id: this.id});
         delete this.session.bosses.find(boss => boss.number === this.boss).lookup[this.target];
         this.session.unallocatedEntries.push(this);
         this.boss = null;
@@ -27,13 +26,13 @@ class SessionEntry {
         this.allocation = `${boss}${target}`;
         this.session.bosses.find(boss => boss.number === this.boss).lookup[this.target] = this;
         this.session.unallocatedEntries = this.session.unallocatedEntries.filter(entry => entry.id !== this.id);
-        this.session.store.setDirty();
-        this.session.store.set({id: this.id, value: { boss, target }});
+        this.session.store.action('SET', {id: this.id, value: { boss, target }});
     }
 }
 
 class TargetListSession {
-    constructor({ sessionTime, archersPerBoss, targetList, unallocatedEntries }) {
+    constructor({ id, sessionTime, archersPerBoss, targetList, unallocatedEntries }) {
+        this.id = id,
         this.sessionTime = sessionTime;
         this.archersPerBoss = archersPerBoss;
         this.archers = []
@@ -61,7 +60,7 @@ class TargetListSession {
                     session: this,
                 });
                 lookup[target] = instance;
-                this.archers.push(archer);
+                this.archers.push(instance);
             }
 
             return {
@@ -93,7 +92,7 @@ class TargetListSession {
     }
 
     addBoss(lettersUsed) {
-        const lastBossNumber = this.bosses[this.bosses.length - 1].number;
+        const lastBossNumber = this.bosses.length ? this.bosses[this.bosses.length - 1].number : 0;
         const lookup = {};
         lettersUsed.forEach(letter => {
             lookup[letter] = null;
@@ -114,6 +113,47 @@ class TargetListSession {
             number: firstBossNumber - 1,
             lookup: lookup,
         }, ...this.bosses];
+    }
+
+    insertBossAfter(number, lettersUsed) {
+        const index = this.bosses.findIndex(boss => boss.number === number);
+        const lookup = {};
+        lettersUsed.forEach(letter => {
+            lookup[letter] = null;
+        });
+        this.bosses.forEach(boss => {
+            if (boss.number > number) {
+                boss.number++;
+            }
+        });
+        this.archers.forEach(archer => {
+            if (archer.boss && archer.boss > number) {
+                archer.boss++;
+                archer.allocation = `${archer.boss}${archer.target}`;
+            }
+        });
+        this.bosses.splice(index + 1, 0, {
+            number: number + 1,
+            lookup: lookup,
+        });
+        this.store.action('SHIFTUP', {session: this.id, number});
+    }
+
+    removeBoss(number) {
+        const index = this.bosses.findIndex(boss => boss.number === number);
+        this.bosses.splice(index, 1);
+        this.bosses.forEach(boss => {
+            if (boss.number > number) {
+                boss.number--;
+            }
+        });
+        this.archers.forEach(archer => {
+            if (archer.boss && archer.boss > number) {
+                archer.boss--;
+                archer.allocation = `${archer.boss}${archer.target}`;
+            }
+        });
+        this.store.action('SHIFTDOWN', {session: this.id, number});
     }
 }
 

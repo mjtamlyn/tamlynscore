@@ -87,14 +87,9 @@ class Store {
         this._sendRequest(data, this.save);
     }
 
-    set({ id, value }) {
-        const data = { id, value, action: 'SET' };
-        this._sendRequest(data, () => this.set({ id, value }));
-    }
-
-    delete({ id }) {
-        const data = { id, action: 'DELETE' };
-        this._sendRequest(data, () => this.delete({ id }));
+    action(action, data) {
+        this.setDirty();
+        this._sendRequest({ action, ...data }, () => this.action(action, data));
     }
 }
 

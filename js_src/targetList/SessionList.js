@@ -54,10 +54,13 @@ const SessionList = ({ session, editMode }) => {
     const [bosses, setBosses] = useState(session.bosses);
     const letters = ['A', 'B' , 'C', 'D', 'E', 'F', 'G'];
     const lettersUsed = letters.slice(0, session.archersPerBoss);
+    const lastBossNumber = session.bosses.length ? session.bosses[session.bosses.length - 1].number : null;
 
     const displayBosses = bosses.map(boss => {
+        let bossIsEmpty = true;
         const blocks = lettersUsed.map(letter => {
             if (boss.lookup[letter]) {
+                bossIsEmpty = false;
                 const deleteAllocation = () => {
                     boss.lookup[letter].deleteAllocation();
                     setBosses([...session.bosses]);
@@ -75,10 +78,26 @@ const SessionList = ({ session, editMode }) => {
             );
         });
 
+        const insertBossHandler = (e) => {
+            e.preventDefault();
+            session.insertBossAfter(boss.number, lettersUsed);
+            setBosses([...session.bosses]);
+        };
+
+        const deleteBossHandler = (e) => {
+            e.preventDefault();
+            session.removeBoss(boss.number);
+            setBosses([...session.bosses]);
+        };
+
         return (
-            <div className="boss" key={ boss.number }>
-                { blocks }
-            </div>
+            <div key={ boss.number }>
+                { editMode && bossIsEmpty && <a className="target-list__btn btn delete" onClick={ deleteBossHandler }>Remove empty target</a> }
+                <div className="boss">
+                    { blocks }
+                </div>
+                { editMode && boss.number !== lastBossNumber && <a className="target-list__btn btn insert" onClick={ insertBossHandler }>Insert target</a> }
+            </div >
         );
     });
 
@@ -87,10 +106,15 @@ const SessionList = ({ session, editMode }) => {
         session.addBoss(lettersUsed);
         setBosses([...session.bosses]);
     }
-    const canStartAdd = bosses[0].number > 1;
+    const canStartAdd = bosses.length ? bosses[0].number > 1 : null;
     const addStartBossHandler = (e) => {
         e.preventDefault();
         session.addStartBoss(lettersUsed);
+        setBosses([...session.bosses]);
+    }
+    const insertStartBossHandler = (e) => {
+        e.preventDefault();
+        session.insertBossAfter(0, lettersUsed);
         setBosses([...session.bosses]);
     }
 
@@ -109,9 +133,10 @@ const SessionList = ({ session, editMode }) => {
 
     return (
         <>
-            { editMode && canStartAdd && <a className="btn add" onClick={ addStartBossHandler }>Add target</a> }
+            { editMode && canStartAdd && <a className="target-list__btn btn add" onClick={ addStartBossHandler }>Add target</a> }
+            { editMode && !canStartAdd && (bosses.length || null) && <a className="target-list__btn btn insert" onClick={ insertStartBossHandler }>Insert target</a> }
             { displayBosses }
-            { editMode && <a className="btn add" onClick={ addBossHandler }>Add target</a> }
+            { editMode && <a className="target-list__btn btn add" onClick={ addBossHandler }>Add target</a> }
             { unallocated }
         </>
     );

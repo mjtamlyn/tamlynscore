@@ -8,7 +8,7 @@ import re
 
 from django.core.cache import cache
 from django.db import IntegrityError
-from django.db.models import Prefetch
+from django.db.models import Prefetch, F
 from django.http import (
     Http404, HttpResponse, HttpResponseBadRequest, HttpResponseNotAllowed,
     HttpResponseRedirect, JsonResponse,
@@ -591,6 +591,7 @@ class TargetListApi(CsrfExemptMixin, TargetList, View):
                     'archers': archers,
                 })
             data.append({
+                'id': session.pk,
                 'sessionTime': session.start.strftime('%A, %-d %B - %-I:%M%p'),
                 'archersPerBoss': session.archers_per_target,
                 'targetList': allocations,
@@ -622,7 +623,19 @@ class TargetListApi(CsrfExemptMixin, TargetList, View):
                 target=data['value']['target'],
             )
             return JsonResponse({'status': 'ok', 'instance': self.get_json_data(allocation.session_entry)})
-        return JsonResponse({'status': 'ok'})
+        elif data['action'] == 'SHIFTUP':
+            updated = TargetAllocation.objects.filter(
+                session_entry__session_round__session=data['session'],
+                boss__gte=data['number'],
+            ).update(boss=F('boss') + 1)
+            return JsonResponse({'status': 'ok', 'updated': updated})
+        elif data['action'] == 'SHIFTDOWN':
+            updated = TargetAllocation.objects.filter(
+                session_entry__session_round__session=data['session'],
+                boss__gte=data['number'],
+            ).update(boss=F('boss') - 1)
+            return JsonResponse({'status': 'ok', 'updated': updated})
+        return JsonResponse({'status': 'UNKOWN ACTION'})
 
 
 class Registration(TargetList):
