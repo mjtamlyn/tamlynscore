@@ -16,13 +16,21 @@ const ArcherSelector = ({ archers, onSelect, close, emptyLabel="Select…" }) =>
     useEffect(() => {
         document.body.addEventListener('click', closeHandler);
         return () => document.body.removeEventListener('click', closeHandler);
-    });
+    }, []);
     useMousetrap('esc', close);
 
     const [search, setSearch] = useState('');
     const [selected, setSelected] = useState(null);
+    const selectedRef = useRef(null);
 
-    useMousetrap('down', () => {
+    useEffect(() => {
+        if (selectedRef.current && selectedRef.current.scrollIntoViewIfNeeded) {
+            selectedRef.current.scrollIntoViewIfNeeded();
+        }
+    }, [selected]);
+
+    useMousetrap('down', (e) => {
+        e.preventDefault();
         if (selected === null) {
             setSelected(archers[0]);
         } else {
@@ -33,7 +41,8 @@ const ArcherSelector = ({ archers, onSelect, close, emptyLabel="Select…" }) =>
         }
     });
 
-    useMousetrap('up', () => {
+    useMousetrap('up', (e) => {
+        e.preventDefault();
         if (selected !== null) {
             const index = archers.indexOf(selected);
             if (index > 0) {
@@ -44,7 +53,8 @@ const ArcherSelector = ({ archers, onSelect, close, emptyLabel="Select…" }) =>
         }
     });
 
-    useMousetrap('enter', () => {
+    useMousetrap('enter', (e) => {
+        e.preventDefault();
         if (selected) {
             onSelect(selected);
         } else {
@@ -72,7 +82,7 @@ const ArcherSelector = ({ archers, onSelect, close, emptyLabel="Select…" }) =>
             close();
         }
         return (
-            <li className="archer-selector__row" aria-selected={ selected === archer ? true : null } key={ archer.id } onClick={ clickHandler }>
+            <li className="archer-selector__row" aria-selected={ selected === archer ? true : null } ref={ selected === archer ? selectedRef : null } key={ archer.id } onClick={ clickHandler }>
                 { archer.name }
                 <br />
                 { archer.club }
@@ -86,7 +96,7 @@ const ArcherSelector = ({ archers, onSelect, close, emptyLabel="Select…" }) =>
         <div className="archer-selector" ref={ ref }>
             <input className="archer-selector__input mousetrap" value={ search } onChange={ handleSearch } autoFocus placeholder="Search by name, club, categories…" />
             <ul>
-                { search === '' && <li className="archer-selector__row" aria-selected={ selected === null ? true : null } onClick={ close }>{ emptyLabel }</li> }
+                { search === '' && <li className="archer-selector__row" aria-selected={ selected === null ? true : null } ref={ selected === null ? selectedRef : null } onClick={ close }>{ emptyLabel }</li> }
                 { archerList }
             </ul>
         </div>

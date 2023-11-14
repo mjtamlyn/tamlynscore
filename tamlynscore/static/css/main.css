@@ -5678,9 +5678,11 @@ body {
   border-top: none;
   border-radius: 0 0 8px 8px;
   width: 300px;
+  max-height: 350px;
+  overflow-y: scroll;
   z-index: 1;
 }
-/* line 45, ../../sass/_target_list.sass */
+/* line 47, ../../sass/_target_list.sass */
 .target-list .archer-selector__input {
   width: 100%;
   border: none;
@@ -5688,28 +5690,28 @@ body {
   border-bottom: 2px solid #CCCCCC;
   outline: none;
 }
-/* line 52, ../../sass/_target_list.sass */
+/* line 54, ../../sass/_target_list.sass */
 .target-list .archer-selector__row {
   padding: 5px 8px;
   border-bottom: 1px solid #CCCCCC;
   background-color: white;
   cursor: pointer;
 }
-/* line 58, ../../sass/_target_list.sass */
+/* line 60, ../../sass/_target_list.sass */
 .target-list .archer-selector__row:hover {
   background-color: #002147;
   color: white;
 }
-/* line 62, ../../sass/_target_list.sass */
+/* line 64, ../../sass/_target_list.sass */
 .target-list .archer-selector__row[aria-selected] {
   background-color: #6FB3FF;
 }
-/* line 64, ../../sass/_target_list.sass */
+/* line 66, ../../sass/_target_list.sass */
 .target-list .archer-selector__row[aria-selected]:hover {
   background-color: #002147;
   color: white;
 }
-/* line 68, ../../sass/_target_list.sass */
+/* line 70, ../../sass/_target_list.sass */
 .target-list .archer-selector__row:last-child {
   border-bottom: none;
 }
