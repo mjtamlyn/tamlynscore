@@ -10,8 +10,8 @@ const FullPageWrapper = ({ children, competition }) => {
                         <a href="/" className="wide">TamlynScore</a>
                         <a href="/" className="narrow">TS</a>
                     </div>
+                    { competition && <h2 className="header-title"><a href={ competition.url }>{ competition.short }</a></h2> }
                 </div>
-                { competition && <h2 className="header-title"><a href={ competition.url }>{ competition.short }</a></h2> }
             </nav>
             <div className="full-height-page__content">
                 { children }
