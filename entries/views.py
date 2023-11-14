@@ -508,7 +508,7 @@ class TargetListBase(CompetitionMixin, ListView):
                 e.competition_entry.archer.name,
             ))
             data = [self.get_json_data(e) for e in details['entries']]
-            details['entries_json'] = json.dumps(data)
+            details['entries_json'] = data
 
     def get_json_data(self, entry):
         data = {
@@ -576,7 +576,7 @@ class TargetListApi(CsrfExemptMixin, TargetListBase, View):
                 'sessionTime': session.start.strftime('%A, %-d %B - %-I:%M%p'),
                 'archersPerBoss': session.archers_per_target,
                 'targetList': allocations,
-                'unallocatedEntries': json.loads(session_context['entries_json']),
+                'unallocatedEntries': session_context['entries_json'],
             })
         return JsonResponse({
             'targetList': data,
