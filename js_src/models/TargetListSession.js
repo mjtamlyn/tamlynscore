@@ -47,16 +47,11 @@ class TargetListSession {
                     id: archer.id,
                     name: archer.name,
                     club: archer.club,
-                    categories: {
-                        bowstyle: archer.bowstyle,
-                        novice: archer.novice,
-                        age: archer.age,
-                        gender: archer.gender,
-                    },
+                    categories: archer.categories,
                     boss: boss.number,
                     target: target,
                     allocation: `${boss.number}${target}`,
-                    searchtext: archer.text,
+                    searchtext: archer.searchtext,
                     session: this,
                 });
                 lookup[target] = instance;
@@ -74,16 +69,11 @@ class TargetListSession {
                 id: archer.id,
                 name: archer.name,
                 club: archer.club,
-                categories: {
-                    bowstyle: archer.bowstyle,
-                    novice: archer.novice,
-                    age: archer.age,
-                    gender: archer.gender,
-                },
+                categories: archer.categories,
                 boss: null,
                 target: null,
                 allocation: null,
-                searchtext: archer.text,
+                searchtext: archer.searchtext,
                 session: this,
             });
             this.unallocatedEntries.push(instance);

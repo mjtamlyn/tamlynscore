@@ -514,23 +514,23 @@ class TargetListBase(CompetitionMixin, ListView):
         data = {
             'id': entry.pk,
             'name': entry.competition_entry.archer.name,
-            'gender': entry.competition_entry.get_gender_display(),
-            'bowstyle': entry.competition_entry.bowstyle.name,
             'club': entry.competition_entry.team_name(),
-            'text': '%s %s %s %s %s' % (
-                entry.competition_entry.archer,
-                entry.competition_entry.club,
-                entry.competition_entry.bowstyle,
-                entry.competition_entry.archer.get_gender_display(),
-                entry.competition_entry.archer.agb_age,
-            )
+            'categories': {
+                'gender': entry.competition_entry.get_gender_display(),
+                'bowstyle': entry.competition_entry.bowstyle.name,
+            },
         }
         if self.competition.has_novices and entry.competition_entry.novice == 'N':
-            data['novice'] = entry.competition_entry.get_novice_display()
+            data['categories']['novice'] = entry.competition_entry.get_novice_display()
         if self.competition.has_juniors and entry.competition_entry.age == 'J':
-            data['age'] = entry.competition_entry.get_age_display()
+            data['categories']['age'] = entry.competition_entry.get_age_display()
         if self.competition.has_agb_age_groups and entry.competition_entry.agb_age:
-            data['age'] = entry.competition_entry.get_agb_age_display()
+            data['categories']['age'] = entry.competition_entry.get_agb_age_display()
+        data['searchtext'] = '%s %s %s' % (
+            entry.competition_entry.archer,
+            entry.competition_entry.club,
+            ' '.join(data['categories'].values()),
+        )
         return data
 
     def get_context_data(self, **kwargs):
