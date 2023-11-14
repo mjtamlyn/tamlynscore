@@ -1,10 +1,9 @@
 import React, { useState, useEffect } from 'react';
 
-import FullPageWrapper from './FullPageWrapper';
-import FullPageLoading from '../utils/FullPageLoading';
+import { CompetitionContext } from '../context/CompetitionContext';
 
 
-const View = ({ api, render }) => {
+const View = ({ api, render, Loading }) => {
     const [loaded, setLoaded] = useState(false);
     const [data, setData] = useState(null);
 
@@ -18,12 +17,14 @@ const View = ({ api, render }) => {
     }, [api, loaded]);
 
     if (!loaded) {
-        return <FullPageLoading />
+        return (
+            <Loading />
+        );
     }
     return (
-        <FullPageWrapper>
+        <CompetitionContext.Provider value={ data.competition }>
             { render(data) }
-        </FullPageWrapper>
+        </CompetitionContext.Provider>
     );
 };
 

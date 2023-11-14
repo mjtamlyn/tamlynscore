@@ -1,4 +1,4 @@
-{% extends 'entries/target_list.html' %}
+{% extends 'entries/competition_detail.html' %}
 
 {% load qr_code %}
 
@@ -8,10 +8,10 @@
 <script src="{{ STATIC_URL }}js/registration.js"></script>
 {% endblock scripts %}
 
-{% block moduleclass %}registration{% endblock %}
-{% block title %}Registration{% endblock %}
+{% block competition_content %}
+<div class="registration module">
+    <h2>Registration</h2>
 
-{% block main %}
 <div class="row">
     <div class="col6">
         <em>Sessions:</em>
@@ -132,5 +132,7 @@
     </div>
 </div>
 {% endfor %}
+
+</div>
 
 {% endblock %}

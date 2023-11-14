@@ -8,9 +8,10 @@ import re
 
 from django.core.cache import cache
 from django.db import IntegrityError
-from django.db.models import Prefetch
+from django.db.models import F, Prefetch
 from django.http import (
-    Http404, HttpResponse, HttpResponseBadRequest, HttpResponseRedirect,
+    Http404, HttpResponse, HttpResponseNotAllowed, HttpResponseRedirect,
+    JsonResponse,
 )
 from django.shortcuts import get_object_or_404
 from django.urls import reverse
@@ -19,7 +20,7 @@ from django.views.generic import (
     DeleteView, DetailView, FormView, ListView, TemplateView, UpdateView, View,
 )
 
-from braces.views import MessageMixin, SuperuserRequiredMixin
+from braces.views import CsrfExemptMixin, MessageMixin, SuperuserRequiredMixin
 from render_block import render_block_to_string
 from reportlab.lib import colors
 from reportlab.lib.styles import getSampleStyleSheet
@@ -412,7 +413,7 @@ class EntryDelete(CompetitionMixin, DeleteView):
         return reverse('entry_list', kwargs={'slug': self.competition.slug})
 
 
-class TargetList(CompetitionMixin, ListView):
+class TargetListBase(CompetitionMixin, ListView):
     template_name = 'entries/target_list.html'
     model = TargetAllocation
     admin_required = False
@@ -516,21 +517,24 @@ class TargetList(CompetitionMixin, ListView):
             'gender': entry.competition_entry.get_gender_display(),
             'bowstyle': entry.competition_entry.bowstyle.name,
             'club': entry.competition_entry.team_name(),
-            'text': u'%s %s %s %s' % (
+            'text': '%s %s %s %s %s' % (
                 entry.competition_entry.archer,
                 entry.competition_entry.club,
                 entry.competition_entry.bowstyle,
                 entry.competition_entry.archer.get_gender_display(),
+                entry.competition_entry.archer.agb_age,
             )
         }
         if self.competition.has_novices and entry.competition_entry.novice == 'N':
             data['novice'] = entry.competition_entry.get_novice_display()
         if self.competition.has_juniors and entry.competition_entry.age == 'J':
             data['age'] = entry.competition_entry.get_age_display()
+        if self.competition.has_agb_age_groups and entry.competition_entry.agb_age:
+            data['age'] = entry.competition_entry.get_agb_age_display()
         return data
 
     def get_context_data(self, **kwargs):
-        context = super(TargetList, self).get_context_data(**kwargs)
+        context = super().get_context_data(**kwargs)
         self.allocations = context['object_list']
 
         if self.allocations:
@@ -548,27 +552,74 @@ class TargetList(CompetitionMixin, ListView):
         return context
 
 
-class TargetListEdit(TargetList):
-    template_name = 'entries/target_list_edit.html'
-    admin_required = True
-    editable = True
+class TargetList(CompetitionMixin, TemplateView):
+    template_name = 'entries/target_list_react.html'
+    admin_required = False
+
+
+class TargetListApi(CsrfExemptMixin, TargetListBase, View):
+    def render_to_response(self, context, **kwargs):
+        target_list = context['target_list']
+        data = []
+        for session, session_context in target_list.items():
+            allocations = []
+            for target, spaces in session_context['target_list']:
+                archers = {}
+                for detail, ta_obj in spaces:
+                    archers[detail] = self.get_json_data(ta_obj.session_entry) if ta_obj else None
+                allocations.append({
+                    'number': target,
+                    'archers': archers,
+                })
+            data.append({
+                'id': session.pk,
+                'sessionTime': session.start.strftime('%A, %-d %B - %-I:%M%p'),
+                'archersPerBoss': session.archers_per_target,
+                'targetList': allocations,
+                'unallocatedEntries': json.loads(session_context['entries_json']),
+            })
+        return JsonResponse({
+            'targetList': data,
+            'competition': {
+                'name': self.competition.full_name,
+                'short': self.competition.short_name,
+                'url': self.competition.get_absolute_url(),
+                'hasNovices': self.competition.has_novices,
+                'hasAges': self.competition.has_agb_age_groups or self.competition.has_juniors,
+                'isAdmin': self.is_admin,
+            },
+        })
 
     def post(self, request, slug):
-        data = json.loads(request.body.decode('utf-8'))
-        if data['method'] == 'create':
+        if not self.is_admin:
+            return HttpResponseNotAllowed()
+        data = json.loads(request.body)
+        if data['action'] == 'DELETE':
+            TargetAllocation.objects.get(session_entry__id=data['id']).delete()
+            return JsonResponse({'status': 'ok'})
+        elif data['action'] == 'SET':
             allocation = TargetAllocation.objects.create(
-                session_entry_id=data['entry'],
-                boss=data['location'][:-1],
-                target=data['location'][-1]
+                session_entry_id=data['id'],
+                boss=data['value']['boss'],
+                target=data['value']['target'],
             )
-            return HttpResponse(allocation.pk)
-        elif data['method'] == 'delete':
-            TargetAllocation.objects.get(session_entry__id=data['session_entry']).delete()
-            return HttpResponse('ok')
-        return HttpResponseBadRequest()
+            return JsonResponse({'status': 'ok', 'instance': self.get_json_data(allocation.session_entry)})
+        elif data['action'] == 'SHIFTUP':
+            updated = TargetAllocation.objects.filter(
+                session_entry__session_round__session=data['session'],
+                boss__gte=data['number'],
+            ).update(boss=F('boss') + 1)
+            return JsonResponse({'status': 'ok', 'updated': updated})
+        elif data['action'] == 'SHIFTDOWN':
+            updated = TargetAllocation.objects.filter(
+                session_entry__session_round__session=data['session'],
+                boss__gte=data['number'],
+            ).update(boss=F('boss') - 1)
+            return JsonResponse({'status': 'ok', 'updated': updated})
+        return JsonResponse({'status': 'UNKOWN ACTION'})
 
 
-class Registration(TargetList):
+class Registration(TargetListBase):
     template_name = 'entries/registration.html'
     admin_required = True
 

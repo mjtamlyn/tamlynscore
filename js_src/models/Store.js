@@ -1,8 +1,8 @@
-import Score from './Score';
-
 class Store {
-    constructor({ api, scores }) {
-        this.scores = scores.map(score => new Score({ store: this, ...score }));
+    constructor({ api, data, autoSaveEnabled = true, dataName = 'data' }) {
+        this.data = data;
+        this.data.forEach(item => item.store = this);
+        this.dataName = dataName
         this.api = api;
         this.dirty = false;
         this.loading = false;
@@ -11,6 +11,7 @@ class Store {
             loading: [],
         };
         this.autoSave = null;
+        this.autoSaveEnabled = autoSaveEnabled;
         this.retry = null;
         this.retryCount = 0;
     }
@@ -36,13 +37,15 @@ class Store {
     setDirty() {
         this.dirty = true;
         this.hooks.dirty.forEach(hook => hook(true));
-        if (this.autoSave) {
-            clearTimeout(this.autoSave);
+        if (this.autoSaveEnabled) {
+            if (this.autoSave) {
+                clearTimeout(this.autoSave);
+            }
+            this.autoSave = setTimeout(() => this.save(), 1000 * 10);
         }
-        this.autoSave = setTimeout(() => this.save(), 1000 * 10);
     }
 
-    save() {
+    _sendRequest(data, retry) {
         if (this.retry) {
             clearTimeout(this.retry);
             this.retry = null;
@@ -55,13 +58,10 @@ class Store {
         this.dirty = false;
         this.hooks.loading.forEach(hook => hook(true));
         this.hooks.dirty.forEach(hook => hook(false));
-        const data = JSON.stringify({
-            scores: this.scores.map(score => score.serialize()),
-        });
         fetch(this.api, {
             method: 'POST',
             credentials: 'same-origin',
-            body: data,
+            body: JSON.stringify(data),
         }).then((response) => {
             this.retryCount = 0;
             this.loading = false;
@@ -77,8 +77,19 @@ class Store {
             this.hooks.loading.forEach(hook => hook(false));
             this.hooks.dirty.forEach(hook => hook(true));
             this.retryCount++;
-            this.retry = setTimeout(() => this.save(), 1000 * this.retryCount);
+            this.retry = setTimeout(() => retry, 1000 * this.retryCount);
         });
+    }
+
+    save() {
+        const data = {};
+        data[this.dataName] = this.data.map(item => item.serialize())
+        this._sendRequest(data, this.save);
+    }
+
+    action(action, data) {
+        this.setDirty();
+        this._sendRequest({ action, ...data }, () => this.action(action, data));
     }
 }
 

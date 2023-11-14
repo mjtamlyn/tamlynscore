@@ -14,7 +14,7 @@ urlpatterns = [
     path('<slug:slug>/entries/edit/<int:entry_id>/', views.EntryUpdate.as_view(), name='entry_update'),
     path('<slug:slug>/entries/delete/<int:entry_id>/', views.EntryDelete.as_view(), name='entry_delete'),
     path('<slug:slug>/target-list/', views.TargetList.as_view(), name='target_list'),
-    path('<slug:slug>/target-list/edit/', views.TargetListEdit.as_view(), name='target_list_edit'),
+    path('<slug:slug>/target-list/api/', views.TargetListApi.as_view(), name='target_list_api'),
     path('<slug:slug>/target-list/pdf/', views.TargetListPdf.as_view(), name='target_list_pdf'),
     path('<slug:slug>/target-list/lunch/', views.TargetListLunch.as_view()),
     path('<slug:slug>/score-sheets/', views.ScoreSheets.as_view(), name='score_sheets'),

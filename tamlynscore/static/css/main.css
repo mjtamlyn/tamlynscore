@@ -3715,8 +3715,21 @@ li {
 .btn.btn-small:before {
   margin-right: 2px;
 }
-
 /* line 30, ../../sass/_buttons.sass */
+.btn.delete {
+  background-color: #A21;
+}
+/* line 33, ../../sass/_buttons.sass */
+.btn.delete:hover {
+  background-color: #d82b16;
+}
+/* line 36, ../../sass/_buttons.sass */
+.btn.depressed {
+  background-color: #0064d5;
+  box-shadow: 0 0 5px #002147 inset;
+}
+
+/* line 40, ../../sass/_buttons.sass */
 button.action-button {
   font-size: inherit;
   background: none;
@@ -3725,7 +3738,7 @@ button.action-button {
   margin: 0;
 }
 
-/* line 39, ../../sass/_buttons.sass */
+/* line 49, ../../sass/_buttons.sass */
 .btn.add:before,
 .action-button.add:before {
   display: inline-block;
@@ -3736,7 +3749,7 @@ button.action-button {
   -moz-osx-font-smoothing: grayscale;
   content: "";
 }
-/* line 43, ../../sass/_buttons.sass */
+/* line 53, ../../sass/_buttons.sass */
 .btn.edit:before,
 .action-button.edit:before {
   display: inline-block;
@@ -3747,7 +3760,7 @@ button.action-button {
   -moz-osx-font-smoothing: grayscale;
   content: "";
 }
-/* line 47, ../../sass/_buttons.sass */
+/* line 57, ../../sass/_buttons.sass */
 .btn.delete:before,
 .action-button.delete:before {
   display: inline-block;
@@ -3758,7 +3771,7 @@ button.action-button {
   -moz-osx-font-smoothing: grayscale;
   content: "";
 }
-/* line 51, ../../sass/_buttons.sass */
+/* line 61, ../../sass/_buttons.sass */
 .btn.archive:before,
 .action-button.archive:before {
   display: inline-block;
@@ -3769,7 +3782,18 @@ button.action-button {
   -moz-osx-font-smoothing: grayscale;
   content: "";
 }
-/* line 55, ../../sass/_buttons.sass */
+/* line 65, ../../sass/_buttons.sass */
+.btn.insert:before,
+.action-button.insert:before {
+  display: inline-block;
+  font: normal normal normal 14px/1 FontAwesome;
+  font-size: inherit;
+  text-rendering: auto;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+  content: "";
+}
+/* line 69, ../../sass/_buttons.sass */
 .btn.reveal:after,
 .action-button.reveal:after {
   display: inline-block;
@@ -4108,39 +4132,40 @@ ul.link-list li a:hover {
 }
 /* line 8, ../../sass/components/_archer_block.sass */
 .archer-block .name {
+  line-height: 28px;
   font-size: 14px;
   background-color: #6FB3FF;
   padding: 0 10px;
   overflow: auto;
 }
-/* line 14, ../../sass/components/_archer_block.sass */
+/* line 15, ../../sass/components/_archer_block.sass */
 .archer-block .actions {
   float: right;
-  line-height: 25px;
+  line-height: 28px;
   font-size: 16px;
 }
-/* line 19, ../../sass/components/_archer_block.sass */
+/* line 20, ../../sass/components/_archer_block.sass */
 .archer-block .actions .action-button {
   cursor: pointer;
 }
-/* line 21, ../../sass/components/_archer_block.sass */
+/* line 22, ../../sass/components/_archer_block.sass */
 .archer-block .actions .action-button:before {
   padding: 5px 0px 6px 0px;
 }
-/* line 24, ../../sass/components/_archer_block.sass */
+/* line 25, ../../sass/components/_archer_block.sass */
 .archer-block .entries ul {
   display: none;
 }
-/* line 26, ../../sass/components/_archer_block.sass */
+/* line 27, ../../sass/components/_archer_block.sass */
 .archer-block .entries ul.open {
   display: block;
 }
-/* line 29, ../../sass/components/_archer_block.sass */
+/* line 30, ../../sass/components/_archer_block.sass */
 .archer-block .bottom {
   padding: 0 10px;
 }
 
-/* line 32, ../../sass/components/_archer_block.sass */
+/* line 33, ../../sass/components/_archer_block.sass */
 .pill {
   font-size: 11px;
   line-height: 2em;
@@ -4151,30 +4176,30 @@ ul.link-list li a:hover {
   white-space: nowrap;
   border-radius: 0.5em;
 }
-/* line 42, ../../sass/components/_archer_block.sass */
-.pill.men {
+/* line 43, ../../sass/components/_archer_block.sass */
+.pill--men, .pill.men {
   background-color: #A62;
 }
-/* line 44, ../../sass/components/_archer_block.sass */
-.pill.women {
+/* line 46, ../../sass/components/_archer_block.sass */
+.pill--women, .pill.women {
   background-color: #F57;
 }
-/* line 47, ../../sass/components/_archer_block.sass */
-.pill.recurve {
+/* line 50, ../../sass/components/_archer_block.sass */
+.pill--recurve, .pill.recurve {
   background-color: #A21;
 }
-/* line 49, ../../sass/components/_archer_block.sass */
-.pill.compound {
+/* line 53, ../../sass/components/_archer_block.sass */
+.pill--compound, .pill.compound {
   background-color: #6C4;
   color: #000F1F;
 }
-/* line 52, ../../sass/components/_archer_block.sass */
-.pill.barebow {
+/* line 57, ../../sass/components/_archer_block.sass */
+.pill--barebow, .pill.barebow {
   background-color: #6FB3FF;
   color: #000F1F;
 }
-/* line 55, ../../sass/components/_archer_block.sass */
-.pill.longbow {
+/* line 61, ../../sass/components/_archer_block.sass */
+.pill--longbow, .pill.longbow {
   background-color: #000F1F;
 }
 
@@ -5637,35 +5662,88 @@ body {
 /* line 8, ../../sass/_target_list.sass */
 .target-list .detail {
   font-weight: bold;
+  margin-right: 5px;
 }
-/* line 11, ../../sass/_target_list.sass */
+/* line 12, ../../sass/_target_list.sass */
 .target-list .boss {
   margin: 10px 0;
   border-bottom: 1px solid #6FB3FF;
 }
-/* line 15, ../../sass/_target_list.sass */
+/* line 16, ../../sass/_target_list.sass */
 .target-list .boss .archer-block {
   margin-bottom: 0;
   border-radius: 0;
   border-bottom: 0;
 }
-/* line 22, ../../sass/_target_list.sass */
+/* line 21, ../../sass/_target_list.sass */
+.target-list__btn {
+  display: block;
+  width: 100%;
+  margin: 10px 0;
+}
+/* line 26, ../../sass/_target_list.sass */
+.target-list .archer-block {
+  position: relative;
+  overflow: unset;
+}
+/* line 30, ../../sass/_target_list.sass */
 .target-list .archer-block .name {
   height: 28px;
 }
-/* line 25, ../../sass/_target_list.sass */
+/* line 33, ../../sass/_target_list.sass */
 .target-list .archer-block .bottom {
   min-height: 53px;
   overflow: auto;
 }
-/* line 29, ../../sass/_target_list.sass */
-.target-list .archer-block input {
-  margin-top: -4px;
-  outline: none;
-}
-/* line 33, ../../sass/_target_list.sass */
+/* line 37, ../../sass/_target_list.sass */
 .target-list .select {
   cursor: pointer;
+}
+/* line 40, ../../sass/_target_list.sass */
+.target-list .archer-selector {
+  position: absolute;
+  top: 28px;
+  left: 10px;
+  border: 1px solid #CCCCCC;
+  border-top: none;
+  border-radius: 0 0 8px 8px;
+  width: 300px;
+  max-height: 350px;
+  overflow-y: scroll;
+  z-index: 1;
+}
+/* line 52, ../../sass/_target_list.sass */
+.target-list .archer-selector__input {
+  width: 100%;
+  border: none;
+  border-radius: 0;
+  border-bottom: 2px solid #CCCCCC;
+  outline: none;
+}
+/* line 59, ../../sass/_target_list.sass */
+.target-list .archer-selector__row {
+  padding: 5px 8px;
+  border-bottom: 1px solid #CCCCCC;
+  background-color: white;
+  cursor: pointer;
+}
+/* line 65, ../../sass/_target_list.sass */
+.target-list .archer-selector__row:hover {
+  background-color: #002147;
+  color: white;
+}
+/* line 69, ../../sass/_target_list.sass */
+.target-list .archer-selector__row[aria-selected] {
+  background-color: #6FB3FF;
+}
+/* line 71, ../../sass/_target_list.sass */
+.target-list .archer-selector__row[aria-selected]:hover {
+  background-color: #002147;
+  color: white;
+}
+/* line 75, ../../sass/_target_list.sass */
+.target-list .archer-selector__row:last-child {
+  border-bottom: none;
 }
 
 /* line 1, ../../sass/_score_sheets.sass */

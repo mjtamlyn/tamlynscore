@@ -7,7 +7,10 @@ const devMode = process.env.NODE_ENV !== 'production';
 const devModeServer = 'http://localhost:8080';
 
 const config = {
-    entry: './js_src/index.js',
+    entry: {
+        'target_input': './js_src/targetInput.js',
+        'target_list': './js_src/targetList.js'
+    },
     mode: devMode ? 'development' : 'production',
     output: {
         filename: devMode ? '[name].js' : '[name]-[contenthash].js',

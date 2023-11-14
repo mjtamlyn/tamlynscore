@@ -1,0 +1,13 @@
+{% extends 'entries/competition_detail.html' %}
+
+{% load render_bundle from webpack_loader %}
+
+{% block scripts %}
+{% render_bundle 'target_list' 'js' %}
+{% endblock %}
+
+{% block competition_content %}
+<div class="{% block moduleclass %}target-list{% endblock %} module">
+    <div id="app" data-api-url="{% url "target_list_api" slug=competition.slug %}">Loading...</div>
+</div>
+{% endblock %}
