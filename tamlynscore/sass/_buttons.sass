@@ -1,5 +1,6 @@
 .btn
   font-family: $font-sans-serif
+  font-weight: normal
   border-radius: 5px
   background-color: $blue
   color: white
@@ -22,7 +23,7 @@
 
   &.btn-small
     font-size: 12px
-    padding: 2px 4px
+    padding: 3px 6px
     margin: 0 1px
     &:before
       margin-right: 2px
@@ -32,6 +33,12 @@
 
     &:hover
       background-color: lighten($red, 10%)
+
+  &.score-sheet
+    background-color: $wared
+
+    &:hover
+      background-color: $wared
 
   &.depressed
     background-color: lighten($blue, 10%)
@@ -65,6 +72,10 @@ button.action-button
   &.insert:before
     @include fa-icon()
     content: $fa-var-bars
+
+  &.score-sheet:before
+    @include fa-icon()
+    content: $fa-var-table
 
   &.reveal:after
     @include fa-icon()

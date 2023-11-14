@@ -692,15 +692,40 @@ class TargetAPISession(CsrfExemptMixin, EntryUserRequired, View):
         ).order_by('target')
 
     def get(self, request, *args, **kwargs):
-        entry = request.user.competition_entry
-        session_entry = self.get_session_entry(entry)
+        user_entry = request.user.competition_entry
+        competition = user_entry.competition
+        session_entry = self.get_session_entry(user_entry)
         targets = self.get_targets(session_entry)
+
+        scores = []
+        for target in targets:
+            entry = target.session_entry.competition_entry
+            categories = {
+                'bowstyle': entry.bowstyle.name,
+                'gender': entry.archer.get_gender_display(),
+            }
+            if competition.has_novices and entry.novice == 'N':
+                categories['novice'] = entry.get_novice_display()
+            if competition.has_juniors and entry.age == 'J':
+                categories['age'] = entry.get_age_display()
+            if competition.has_agb_age_groups and entry.agb_age:
+                categories['age'] = entry.get_agb_age_display()
+            scores.append({
+                'target': target.label,
+                'name': target.session_entry.competition_entry.archer.name,
+                'categories': categories,
+                'arrows': [a.json_value for a in target.score.arrow_set.order_by('arrow_of_round')],
+            })
+
         return JsonResponse({
-            'user': entry.archer.name,
+            'user': user_entry.archer.name,
             'competition': {
-                'name': entry.competition.full_name,
-                'short': entry.competition.short_name,
-                'url': entry.competition.get_absolute_url(),
+                'name': user_entry.competition.full_name,
+                'short': user_entry.competition.short_name,
+                'url': user_entry.competition.get_absolute_url(),
+                'hasNovices': user_entry.competition.has_novices,
+                'hasAges': user_entry.competition.has_agb_age_groups or user_entry.competition.has_juniors,
+                'isAdmin': False,
             },
             'session': {
                 'round': session_entry.session_round.shot_round.name,
@@ -712,15 +737,7 @@ class TargetAPISession(CsrfExemptMixin, EntryUserRequired, View):
                     reverse('target-api-session', kwargs={'session': session_entry.session_round.session_id})
                 ),
             },
-            'scores': [{
-                'target': target.label,
-                'name': target.session_entry.competition_entry.archer.name,
-                'categories': {
-                    'bowstyle': target.session_entry.competition_entry.bowstyle.name,
-                    'gender': target.session_entry.competition_entry.archer.get_gender_display(),
-                },
-                'arrows': [a.json_value for a in target.score.arrow_set.order_by('arrow_of_round')],
-            } for target in targets],
+            'scores': scores,
         })
 
     def _parse_value(self, arrow, sent):

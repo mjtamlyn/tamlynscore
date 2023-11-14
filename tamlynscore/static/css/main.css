@@ -3682,6 +3682,7 @@ li {
 /* line 1, ../../sass/_buttons.sass */
 .btn {
   font-family: "Helvetica Neue", "Trebuchet MS", Helvetica, sans-serif;
+  font-weight: normal;
   border-radius: 5px;
   background-color: #004ca2;
   color: white;
@@ -3693,43 +3694,51 @@ li {
   -webkit-user-select: none;
   display: inline-block;
 }
-/* line 14, ../../sass/_buttons.sass */
+/* line 15, ../../sass/_buttons.sass */
 .btn:hover {
   background-color: #0064d5;
 }
-/* line 17, ../../sass/_buttons.sass */
+/* line 18, ../../sass/_buttons.sass */
 .btn:before {
   margin-right: 5px;
 }
-/* line 20, ../../sass/_buttons.sass */
+/* line 21, ../../sass/_buttons.sass */
 .btn.btn-subtle {
   background-color: #FBC87A;
 }
-/* line 23, ../../sass/_buttons.sass */
+/* line 24, ../../sass/_buttons.sass */
 .btn.btn-small {
   font-size: 12px;
-  padding: 2px 4px;
+  padding: 3px 6px;
   margin: 0 1px;
 }
-/* line 27, ../../sass/_buttons.sass */
+/* line 28, ../../sass/_buttons.sass */
 .btn.btn-small:before {
   margin-right: 2px;
 }
-/* line 30, ../../sass/_buttons.sass */
+/* line 31, ../../sass/_buttons.sass */
 .btn.delete {
   background-color: #A21;
 }
-/* line 33, ../../sass/_buttons.sass */
+/* line 34, ../../sass/_buttons.sass */
 .btn.delete:hover {
   background-color: #d82b16;
 }
-/* line 36, ../../sass/_buttons.sass */
+/* line 37, ../../sass/_buttons.sass */
+.btn.score-sheet {
+  background-color: #f65058;
+}
+/* line 40, ../../sass/_buttons.sass */
+.btn.score-sheet:hover {
+  background-color: #f65058;
+}
+/* line 43, ../../sass/_buttons.sass */
 .btn.depressed {
   background-color: #0064d5;
   box-shadow: 0 0 5px #002147 inset;
 }
 
-/* line 40, ../../sass/_buttons.sass */
+/* line 47, ../../sass/_buttons.sass */
 button.action-button {
   font-size: inherit;
   background: none;
@@ -3738,7 +3747,7 @@ button.action-button {
   margin: 0;
 }
 
-/* line 49, ../../sass/_buttons.sass */
+/* line 56, ../../sass/_buttons.sass */
 .btn.add:before,
 .action-button.add:before {
   display: inline-block;
@@ -3749,7 +3758,7 @@ button.action-button {
   -moz-osx-font-smoothing: grayscale;
   content: "";
 }
-/* line 53, ../../sass/_buttons.sass */
+/* line 60, ../../sass/_buttons.sass */
 .btn.edit:before,
 .action-button.edit:before {
   display: inline-block;
@@ -3760,7 +3769,7 @@ button.action-button {
   -moz-osx-font-smoothing: grayscale;
   content: "";
 }
-/* line 57, ../../sass/_buttons.sass */
+/* line 64, ../../sass/_buttons.sass */
 .btn.delete:before,
 .action-button.delete:before {
   display: inline-block;
@@ -3771,7 +3780,7 @@ button.action-button {
   -moz-osx-font-smoothing: grayscale;
   content: "";
 }
-/* line 61, ../../sass/_buttons.sass */
+/* line 68, ../../sass/_buttons.sass */
 .btn.archive:before,
 .action-button.archive:before {
   display: inline-block;
@@ -3782,7 +3791,7 @@ button.action-button {
   -moz-osx-font-smoothing: grayscale;
   content: "";
 }
-/* line 65, ../../sass/_buttons.sass */
+/* line 72, ../../sass/_buttons.sass */
 .btn.insert:before,
 .action-button.insert:before {
   display: inline-block;
@@ -3793,7 +3802,18 @@ button.action-button {
   -moz-osx-font-smoothing: grayscale;
   content: "";
 }
-/* line 69, ../../sass/_buttons.sass */
+/* line 76, ../../sass/_buttons.sass */
+.btn.score-sheet:before,
+.action-button.score-sheet:before {
+  display: inline-block;
+  font: normal normal normal 14px/1 FontAwesome;
+  font-size: inherit;
+  text-rendering: auto;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+  content: "";
+}
+/* line 80, ../../sass/_buttons.sass */
 .btn.reveal:after,
 .action-button.reveal:after {
   display: inline-block;

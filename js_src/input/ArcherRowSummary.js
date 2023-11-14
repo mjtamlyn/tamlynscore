@@ -17,9 +17,7 @@ const ArcherRowSummary = ({ score, showScoreSheet }) => {
                 <div className="archers__summary__arrows-shot">
                     { score.getArrowsShot() } / 60 <small className="archers__summary__legend">arrows shot</small>
                 </div>
-            </div>
-            <div className="archers__row__actions actions">
-                <a className="actions__button" onClick={ () => showScoreSheet(score) }>View score sheet</a>
+                <a className="btn btn-small score-sheet" onClick={ () => showScoreSheet(score) }>Scores</a>
             </div>
         </div>
     );
