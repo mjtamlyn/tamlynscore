@@ -15,9 +15,20 @@ class SessionEntry {
         this.session.store.setDirty();
         this.session.store.delete({id: this.id});
         delete this.session.bosses.find(boss => boss.number === this.boss).lookup[this.target];
+        this.session.unallocatedEntries.push(this);
         this.boss = null;
         this.target = null;
         this.allocation = null;
+    }
+
+    setAllocation({ boss, target }) {
+        this.boss = boss;
+        this.target = target;
+        this.allocation = `${boss}${target}`;
+        this.session.bosses.find(boss => boss.number === this.boss).lookup[this.target] = this;
+        this.session.unallocatedEntries = this.session.unallocatedEntries.filter(entry => entry.id !== this.id);
+        this.session.store.setDirty();
+        this.session.store.set({id: this.id, value: { boss, target }});
     }
 }
 
@@ -91,6 +102,18 @@ class TargetListSession {
             number: lastBossNumber + 1,
             lookup: lookup,
         });
+    }
+
+    addStartBoss(lettersUsed) {
+        const firstBossNumber = this.bosses[0].number;
+        const lookup = {};
+        lettersUsed.forEach(letter => {
+            lookup[letter] = null;
+        });
+        this.bosses = [{
+            number: firstBossNumber - 1,
+            lookup: lookup,
+        }, ...this.bosses];
     }
 }
 

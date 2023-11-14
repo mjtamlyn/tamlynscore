@@ -614,7 +614,14 @@ class TargetListApi(CsrfExemptMixin, TargetList, View):
         data = json.loads(request.body)
         if data['action'] == 'DELETE':
             TargetAllocation.objects.get(session_entry__id=data['id']).delete()
-            return HttpResponse('ok')
+            return JsonResponse({'status': 'ok'})
+        elif data['action'] == 'SET':
+            allocation = TargetAllocation.objects.create(
+                session_entry_id=data['id'],
+                boss=data['value']['boss'],
+                target=data['value']['target'],
+            )
+            return JsonResponse({'status': 'ok', 'instance': self.get_json_data(allocation.session_entry)})
         return JsonResponse({'status': 'ok'})
 
 

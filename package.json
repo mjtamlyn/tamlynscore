@@ -29,6 +29,7 @@
     "eslint-plugin-react": "^7.33.2",
     "react": "^18.2.0",
     "react-dom": "^18.2.0",
+    "react-hook-mousetrap": "^2.0.4",
     "webpack": "^5.89.0",
     "webpack-bundle-tracker": "^2.0.1",
     "webpack-cli": "^5.1.4"
