@@ -5638,33 +5638,34 @@ body {
 /* line 8, ../../sass/_target_list.sass */
 .target-list .detail {
   font-weight: bold;
+  margin-right: 5px;
 }
-/* line 11, ../../sass/_target_list.sass */
+/* line 12, ../../sass/_target_list.sass */
 .target-list .boss {
   margin: 10px 0;
   border-bottom: 1px solid #6FB3FF;
 }
-/* line 15, ../../sass/_target_list.sass */
+/* line 16, ../../sass/_target_list.sass */
 .target-list .boss .archer-block {
   margin-bottom: 0;
   border-radius: 0;
   border-bottom: 0;
 }
-/* line 22, ../../sass/_target_list.sass */
+/* line 23, ../../sass/_target_list.sass */
 .target-list .archer-block .name {
   height: 28px;
 }
-/* line 25, ../../sass/_target_list.sass */
+/* line 26, ../../sass/_target_list.sass */
 .target-list .archer-block .bottom {
   min-height: 53px;
   overflow: auto;
 }
-/* line 29, ../../sass/_target_list.sass */
+/* line 30, ../../sass/_target_list.sass */
 .target-list .archer-block input {
   margin-top: -4px;
   outline: none;
 }
-/* line 33, ../../sass/_target_list.sass */
+/* line 34, ../../sass/_target_list.sass */
 .target-list .select {
   cursor: pointer;
 }

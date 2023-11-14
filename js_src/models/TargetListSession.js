@@ -22,7 +22,7 @@ class SessionEntry {
 }
 
 class TargetListSession {
-    constructor({ sessionTime, archersPerBoss, targetList }) {
+    constructor({ sessionTime, archersPerBoss, targetList, unallocatedEntries }) {
         this.sessionTime = sessionTime;
         this.archersPerBoss = archersPerBoss;
         this.archers = []
@@ -57,6 +57,27 @@ class TargetListSession {
                 number: boss.number,
                 lookup: lookup,
             };
+        });
+        this.unallocatedEntries = [];
+        unallocatedEntries.forEach(archer => {
+            const instance = new SessionEntry({
+                id: archer.id,
+                name: archer.name,
+                club: archer.club,
+                categories: {
+                    bowstyle: archer.bowstyle,
+                    novice: archer.novice,
+                    age: archer.age,
+                    gender: archer.gender,
+                },
+                boss: null,
+                target: null,
+                allocation: null,
+                searchtext: archer.text,
+                session: this,
+            });
+            this.unallocatedEntries.push(instance);
+            this.archers.push(archer);
         });
     }
 

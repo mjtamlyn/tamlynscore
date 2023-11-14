@@ -14,8 +14,8 @@ const ArcherBlock = ({ place, archer, editMode, deleteAllocation }) => {
         return (
             <div className="archer-block">
                 <div className="name">
-                    <span className="detail">{ place }</span>
-                    <span className="name">
+                    { place && <span className="detail">{ place }</span> }
+                    <span>
                         { archer.name }
                         { editMode && <span className="actions">
                             <a className="delete action-button" onClick={ deleteHandler }></a>
@@ -41,7 +41,7 @@ const ArcherBlock = ({ place, archer, editMode, deleteAllocation }) => {
         <div className="archer-block">
             <div className="name">
                 <span className="detail">{ place }</span>
-                { editMode && <span className="name">Select…</span> }
+                { editMode && <span>Select…</span> }
             </div>
             <div className="bottom"></div>
         </div>
@@ -77,10 +77,25 @@ const SessionList = ({ session, editMode }) => {
         setBosses([...session.bosses]);
     }
 
+    let unallocated = null;
+    if (session.unallocatedEntries.length && editMode) {
+        const unallocatedBlocks = session.unallocatedEntries.map(archer => {
+            console.log(archer);
+            return <ArcherBlock archer={ archer } editMode={ false } key={ archer.id } />
+        });
+        unallocated = (
+            <div className="unallocated">
+                <h4>Unallocated entries</h4>
+                { unallocatedBlocks }
+            </div>
+        );
+    }
+
     return (
         <>
             { displayBosses }
             { editMode && <a className="btn add" onClick={ addBossHandler }>Add target</a> }
+            { unallocated }
         </>
     );
 }

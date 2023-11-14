@@ -594,6 +594,7 @@ class TargetListApi(CsrfExemptMixin, TargetList, View):
                 'sessionTime': session.start.strftime('%A, %-d %B - %-I:%M%p'),
                 'archersPerBoss': session.archers_per_target,
                 'targetList': allocations,
+                'unallocatedEntries': json.loads(session_context['entries_json']),
             })
         return JsonResponse({
             'targetList': data,
