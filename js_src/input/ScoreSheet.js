@@ -7,16 +7,14 @@ const ScoreSheet = ({ score, toSummary }) => {
     const ends = [...Array(20).keys()];
     const scoreRows = ends.map((endNumber) => {
         const end = score.getEnd(endNumber + 1);
-        return (
-            <>
-                <div>{ end[0] || '-' }</div>
-                <div>{ end[1] || '-' }</div>
-                <div>{ end[2] || '-' }</div>
-                <div className="archers__score__total">{ score.getEndScore(endNumber + 1) }</div>
-                <div className="archers__score__total">{ score.getGoldCount(endNumber + 1) }</div>
-                <div className="archers__score__total">{ score.getRunningTotal(endNumber + 1) }</div>
-            </>
-        );
+        return [
+            <div key={ `${endNumber}|1` }>{ end[0] || '-' }</div>,
+            <div key={ `${endNumber}|2` }>{ end[1] || '-' }</div>,
+            <div key={ `${endNumber}|3` }>{ end[2] || '-' }</div>,
+            <div className="archers__score__total" key={ `${endNumber}|end` }>{ score.getEndScore(endNumber + 1) }</div>,
+            <div className="archers__score__total" key={ `${endNumber}|golds` }>{ score.getGoldCount(endNumber + 1) }</div>,
+            <div className="archers__score__total" key={ `${endNumber}|rt` }>{ score.getRunningTotal(endNumber + 1) }</div>,
+        ];
     });
     return (
         <>
