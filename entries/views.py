@@ -8,7 +8,7 @@ import re
 
 from django.core.cache import cache
 from django.db import IntegrityError
-from django.db.models import Prefetch, F
+from django.db.models import F, Prefetch
 from django.http import (
     Http404, HttpResponse, HttpResponseNotAllowed, HttpResponseRedirect,
     JsonResponse,
