@@ -22,20 +22,18 @@ const TargetInput = ({ scores, endNumber, toSummary }) => {
     const [activeScore, setActiveScore] = useState(initialActive);
 
     const setArrow = (number) => {
-        return (e) => {
-            activeScore.setScore(endNumber, cursorPosition, number);
-            if (cursorPosition + 1 === endLength) {
-                setCursorPosition(0);
-                const currentIndex = scores.indexOf(activeScore);
-                if (currentIndex + 1 < scores.length) {
-                    setActiveScore(scores[currentIndex + 1]);
-                } else {
-                    setCursorPosition(null);
-                    setActiveScore(null);
-                }
+        activeScore.setScore(endNumber, cursorPosition, number);
+        if (cursorPosition + 1 === endLength) {
+            setCursorPosition(0);
+            const currentIndex = scores.indexOf(activeScore);
+            if (currentIndex + 1 < scores.length) {
+                setActiveScore(scores[currentIndex + 1]);
             } else {
-                setCursorPosition(cursorPosition + 1);
+                setCursorPosition(null);
+                setActiveScore(null);
             }
+        } else {
+            setCursorPosition(cursorPosition + 1);
         }
     }
 
