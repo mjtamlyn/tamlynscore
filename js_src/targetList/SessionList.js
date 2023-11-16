@@ -1,36 +1,25 @@
-import React, { useState } from 'react';
+import React, { useState, useContext } from 'react';
 
+import { TargetListDispatchContext } from '../context/TargetListContext';
 import ArcherPills from '../utils/ArcherPills';
 import ArcherSelector from './ArcherSelector';
 
 const EmptyArcherBlock = ({ place, editMode, unallocatedEntries, setAllocation }) => {
     const [selectOpen, setSelectOpen] = useState(false);
 
-    const selectHandler = (e) => {
-        e.preventDefault();
-        setSelectOpen(!selectOpen);
-    };
-    const close = () => {
-        setSelectOpen(false);
-    };
-
     return (
         <div className="archer-block">
             <div className="name">
                 <span className="detail">{ place }</span>
-                { editMode && <span className="select" onClick={ selectHandler }>Select…</span> }
+                { editMode && <a className="select" onClick={ () => setSelectOpen(!selectOpen) }>Select…</a> }
             </div>
-            { selectOpen && <ArcherSelector archers={ unallocatedEntries } close={ close } onSelect={ setAllocation } /> }
+            { selectOpen && <ArcherSelector archers={ unallocatedEntries } close={ () => setSelectOpen(false) } onSelect={ setAllocation } /> }
             <div className="bottom"></div>
         </div>
     );
 };
 
 const ArcherBlock = ({ place, archer, editMode, deleteAllocation }) => {
-    const deleteHandler = (e) => {
-        e.preventDefault();
-        deleteAllocation();
-    };
     return (
         <div className="archer-block">
             <div className="name">
@@ -38,7 +27,7 @@ const ArcherBlock = ({ place, archer, editMode, deleteAllocation }) => {
                 <span>
                     { archer.name }
                     { editMode && <span className="actions">
-                        <a className="delete action-button" onClick={ deleteHandler }></a>
+                        <a className="delete action-button" onClick={ deleteAllocation }></a>
                     </span> }
                 </span>
             </div>
@@ -51,7 +40,8 @@ const ArcherBlock = ({ place, archer, editMode, deleteAllocation }) => {
 }
 
 const SessionList = ({ session, editMode }) => {
-    const [bosses, setBosses] = useState(session.bosses);
+    const dispatch = useContext(TargetListDispatchContext);
+    const bosses = session.bosses;
     const letters = ['A', 'B' , 'C', 'D', 'E', 'F', 'G'];
     const lettersUsed = letters.slice(0, session.archersPerBoss);
     const lastBossNumber = session.bosses.length ? session.bosses[session.bosses.length - 1].number : null;
@@ -66,57 +56,38 @@ const SessionList = ({ session, editMode }) => {
                     setBosses([...session.bosses]);
                 };
                 return (
-                    <ArcherBlock place={ `${boss.number}${letter}` } archer={ boss.lookup[letter] } key={ letter } editMode={ editMode } deleteAllocation={ deleteAllocation } />
+                    <ArcherBlock
+                        key={ letter }
+                        place={ `${boss.number}${letter}` }
+                        archer={ boss.lookup[letter] }
+                        editMode={ editMode }
+                        deleteAllocation={ () => dispatch({ type: 'deleteAllocation', sessionId: session.id, boss: boss.number, letter, archerId: boss.lookup[letter].id }) }
+                    />
                 );
             }
-            const setAllocation = (archer) => {
-                archer.setAllocation({ boss: boss.number, target: letter });
-                setBosses([...session.bosses]);
-            }
             return (
-                <EmptyArcherBlock place={ `${boss.number}${letter}` } key={ letter } editMode={ editMode } unallocatedEntries={ session.unallocatedEntries } setAllocation={ setAllocation } />
+                <EmptyArcherBlock
+                    place={ `${boss.number}${letter}` }
+                    key={ letter }
+                    editMode={ editMode }
+                    unallocatedEntries={ session.unallocatedEntries }
+                    setAllocation={ (archer) => dispatch({ type: 'setAllocation', sessionId: session.id, boss: boss.number, letter, archerId: archer.id }) }
+                />
             );
         });
 
-        const insertBossHandler = (e) => {
-            e.preventDefault();
-            session.insertBossAfter(boss.number, lettersUsed);
-            setBosses([...session.bosses]);
-        };
-
-        const deleteBossHandler = (e) => {
-            e.preventDefault();
-            session.removeBoss(boss.number);
-            setBosses([...session.bosses]);
-        };
-
         return (
             <div key={ boss.number }>
-                { editMode && bossIsEmpty && <a className="target-list__btn btn delete" onClick={ deleteBossHandler }>Remove empty target</a> }
+                { editMode && bossIsEmpty && <a className="target-list__btn btn delete" onClick={ () => dispatch({ type: 'removeBoss', sessionId: session.id, boss: boss.number }) }>Remove empty target</a> }
                 <div className="boss">
                     { blocks }
                 </div>
-                { editMode && boss.number !== lastBossNumber && <a className="target-list__btn btn insert" onClick={ insertBossHandler }>Insert target</a> }
+                { editMode && boss.number !== lastBossNumber && <a className="target-list__btn btn insert" onClick={ () => dispatch({ type: 'insertBossAfter', sessionId: session.id, boss: boss.number }) }>Insert target</a> }
             </div >
         );
     });
 
-    const addBossHandler = (e) => {
-        e.preventDefault();
-        session.addBoss(lettersUsed);
-        setBosses([...session.bosses]);
-    }
     const canStartAdd = bosses.length ? bosses[0].number > 1 : null;
-    const addStartBossHandler = (e) => {
-        e.preventDefault();
-        session.addStartBoss(lettersUsed);
-        setBosses([...session.bosses]);
-    }
-    const insertStartBossHandler = (e) => {
-        e.preventDefault();
-        session.insertBossAfter(0, lettersUsed);
-        setBosses([...session.bosses]);
-    }
 
     let unallocated = null;
     if (session.unallocatedEntries.length && editMode) {
@@ -133,10 +104,10 @@ const SessionList = ({ session, editMode }) => {
 
     return (
         <>
-            { editMode && canStartAdd && <a className="target-list__btn btn add" onClick={ addStartBossHandler }>Add target</a> }
-            { editMode && !canStartAdd && (bosses.length || null) && <a className="target-list__btn btn insert" onClick={ insertStartBossHandler }>Insert target</a> }
+            { editMode && canStartAdd && <a className="target-list__btn btn add" onClick={ () => dispatch({ type: 'addStartBoss', sessionId: session.id }) }>Add target</a> }
+            { editMode && !canStartAdd && (bosses.length || null) && <a className="target-list__btn btn insert" onClick={ () => dispatch({ type: 'insertBossAfter', sessionId: session.id, boss: 0 }) }>Insert target</a> }
             { displayBosses }
-            { editMode && <a className="target-list__btn btn add" onClick={ addBossHandler }>Add target</a> }
+            { editMode && <a className="target-list__btn btn add" onClick={ () => dispatch({ type: 'addBoss', sessionId: session.id }) }>Add target</a> }
             { unallocated }
         </>
     );

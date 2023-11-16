@@ -1,16 +1,18 @@
 import React from 'react';
 
-import Store from '../models/Store';
-import TargetListSession from '../models/TargetListSession';
+import { TargetListProvider } from '../context/TargetListContext';
 import View from '../utils/View';
+
 import TargetListEdit from './TargetListEdit';
 
 const TargetListView = ({ api }) => {
     return (
         <View api={ api } render={ data => {
-            const targetList = data.targetList.map(session => new TargetListSession({ ...session }));
-            const store = new Store({ api: api, data: targetList, dataName: 'targetList', autoSaveEnabled: false });
-            return <TargetListEdit targetList={ targetList } store={ store } />;
+            return (
+                <TargetListProvider api={ api } targetList={ data.targetList }>
+                    <TargetListEdit />
+                </TargetListProvider>
+            );
         } } Loading={
             () => <div>Loading...</div>
         }/>

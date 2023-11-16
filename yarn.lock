@@ -2871,6 +2871,11 @@ ignore@^5.2.0:
   resolved "https://registry.yarnpkg.com/ignore/-/ignore-5.2.0.tgz#6d3bac8fa7fe0d45d9f9be7bac2fc279577e345a"
   integrity sha512-CmxgYGiEPCLhfLnpPp1MoRmifwEIOgjcHXxOBjv7mY96c+eWScsOP9c112ZyLdWHi0FxHjI+4uVhKYp/gcdRmQ==
 
+immer@^10.0.3:
+  version "10.0.3"
+  resolved "https://registry.yarnpkg.com/immer/-/immer-10.0.3.tgz#a8de42065e964aa3edf6afc282dfc7f7f34ae3c9"
+  integrity sha512-pwupu3eWfouuaowscykeckFmVTpqbzW+rXFCX8rQLkZzM9ftBmU/++Ra+o+L27mz03zJTlyV4UUr+fdKNffo4A==
+
 import-fresh@^3.2.1:
   version "3.3.0"
   resolved "https://registry.yarnpkg.com/import-fresh/-/import-fresh-3.3.0.tgz#37162c25fcb9ebaa2e6e53d5b4d88ce17d9e0c2b"
@@ -4571,6 +4576,11 @@ uri-js@^4.2.2:
   integrity sha512-7rKUyy33Q1yc98pQ1DAmLtwX109F7TIfWlW1Ydo8Wl1ii1SeHieeh0HHfPeL2fMXK6z0s8ecKs9frCuLJvndBg==
   dependencies:
     punycode "^2.1.0"
+
+use-immer@^0.9.0:
+  version "0.9.0"
+  resolved "https://registry.yarnpkg.com/use-immer/-/use-immer-0.9.0.tgz#66e4e8f7ab75df45e96dfd5c56337f9fd49db9fd"
+  integrity sha512-/L+enLi0nvuZ6j4WlyK0US9/ECUtV5v9RUbtxnn5+WbtaXYUaOBoKHDNL9I5AETdurQ4rIFIj/s+Z5X80ATyKw==
 
 util-deprecate@^1.0.1, util-deprecate@~1.0.1:
   version "1.0.2"
