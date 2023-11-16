@@ -86,11 +86,6 @@ class Store {
         data[this.dataName] = this.data.map(item => item.serialize())
         this._sendRequest(data, this.save);
     }
-
-    action(action, data) {
-        this.setDirty();
-        this._sendRequest({ action, ...data }, () => this.action(action, data));
-    }
 }
 
 export default Store;
