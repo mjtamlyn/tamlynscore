@@ -1,0 +1,57 @@
+// Loader vars
+$loader-size: 30px
+$loader-color: $oxford
+$loader-time: 2s
+$loader-delay: 0s
+
+// Items vars
+$item-size: 10px
+$item-rotation: 0deg
+
+.loading
+  margin: 100px 0
+
+  &__spinner
+    margin: 0 auto
+    position: relative
+    width: $loader-size
+    height: $loader-size
+    &__center
+      width: $loader-size
+      height: $loader-size
+      background: $loader-color
+      border-radius: 50%
+      animation: center $loader-time ease-in-out infinite
+    &__item
+      position: absolute
+      width: $item-size
+      height: $item-size
+      top: ($loader-size - $item-size) /2
+      left: 0
+      right: 0
+      margin: auto
+      background: $loader-color
+      border-radius: 50%
+
+    &--white &__center
+      background: white
+    &--white &__item
+      background: white
+
+@for $i from 1 through 8
+  $loader-delay: $loader-delay + 0.2
+  $item-rotation: $item-rotation + 45
+  .loading__spinner__item--#{$i}
+    animation: anim-#{$i} $loader-time ease-in-out infinite $loader-delay
+    animation-fill-mode: backwards
+  @keyframes anim-#{$i}
+    0%, 60%, 100%
+      transform: rotate($item-rotation) translateX($loader-size) scale(1)
+    10%, 50%
+      transform: rotate($item-rotation) translateX(0) scale(1.5)
+
+@keyframes center
+  0%, 10%, 90%, 100%
+    transform: scale(0.7)
+  45%, 55%
+    transform: scale(1)
