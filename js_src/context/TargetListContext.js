@@ -1,10 +1,10 @@
 import React, { createContext, useEffect } from 'react';
 import { useImmerReducer } from 'use-immer';
 
+import useActionQueue from '../utils/useActionQueue';
+
 const TargetListContext = createContext(null);
 const TargetListDispatchContext = createContext(null);
-
-let requestId = 0;
 
 const getLetters = (session) => {
     const letters = ['A', 'B' , 'C', 'D', 'E', 'F', 'G'];
@@ -83,6 +83,7 @@ const deleteAllocation = (bosses, unallocatedEntries, number, target) => {
 
 const targetListReducer = (targetList, action) => {
     let session = null;
+    const actionQueue = targetList.actionQueue;
     if (action.sessionId) {
         session = targetList.sessions.find(session => session.id = action.sessionId);
     }
@@ -98,31 +99,22 @@ const targetListReducer = (targetList, action) => {
         }
         case 'insertBossAfter': {
             insertBossAfter(session.bosses, action.boss, getLetters(session));
-            targetList.actionsToSave.push({ type: 'SHIFTUP', requestId: requestId++, params: {session: action.sessionId, number: action.boss}});
+            actionQueue.doAction({ type: 'SHIFTUP', params: {session: action.sessionId, number: action.boss}});
             return;
         }
         case 'removeBoss': {
             removeBoss(session.bosses, action.boss);
-            targetList.actionsToSave.push({ type: 'SHIFTDOWN', requestId: requestId++, params: {session: action.sessionId, number: action.boss}});
+            actionQueue.doAction({ type: 'SHIFTDOWN', params: {session: action.sessionId, number: action.boss}});
             return;
         }
         case 'setAllocation': {
             setAllocation(session.bosses, session.unallocatedEntries, action.archerId, action.boss, action.letter);
-            targetList.actionsToSave.push({ type: 'SET', requestId: requestId++, params: {id: action.archerId, value: { boss: action.boss, target:action.letter }}});
+            actionQueue.doAction({ type: 'SET', params: {id: action.archerId, value: { boss: action.boss, target:action.letter }}});
             return;
         }
         case 'deleteAllocation': {
             deleteAllocation(session.bosses, session.unallocatedEntries, action.boss, action.letter);
-            targetList.actionsToSave.push({ type: 'DELETE', requestId: requestId++, params: {id: action.archerId}});
-            return;
-        }
-        case 'startRequest': {
-            targetList.actionsToSave.find(a => a.requestId === action.requestId).inProgress = true;
-            return;
-        }
-        case 'clearRequest': {
-            const index = targetList.actionsToSave.findIndex(a => a.requestId === action.requestId);
-            targetList.actionsToSave.splice(index, 1);
+            actionQueue.doAction({ type: 'DELETE', params: {id: action.archerId}});
             return;
         }
         default: {
@@ -133,7 +125,7 @@ const targetListReducer = (targetList, action) => {
 
 const setUpTargetList = (data) => {
     return {
-        actionsToSave: [],
+        actionQueue: data.actionQueue,
         sessions: data.map(session => {
             session.bosses = session.targetList.map(boss => {
                 const lookup = {};
@@ -154,29 +146,8 @@ const setUpTargetList = (data) => {
 };
 
 const TargetListProvider = ({ children, api, targetList: initialTargetList }) => {
+    initialTargetList.actionQueue = useActionQueue(api);
     const [targetList, dispatch] = useImmerReducer(targetListReducer, initialTargetList, setUpTargetList);
-
-    useEffect(() => {
-        if (!targetList.actionsToSave.length) return;
-
-        // only do one at a time for safety for now
-        const action = targetList.actionsToSave[0];
-        if (action.inProgress) return;
-        dispatch({ type: 'startRequest', requestId: action.requestId });
-        const data = { action: action.type, ...action.params };
-        fetch(api, {
-            method: 'POST',
-            credentials: 'same-origin',
-            body: JSON.stringify(data),
-        }).then((response) => {
-            dispatch({ type: 'clearRequest', requestId: action.requestId });
-            if (response.status !== 200) {
-                throw Error('Incorrect response code');
-            }
-        }).catch(() => {
-            throw Error('something went wrong');
-        });
-    }, [targetList.actionsToSave]);
 
     return (
         <TargetListContext.Provider value={ targetList }>
