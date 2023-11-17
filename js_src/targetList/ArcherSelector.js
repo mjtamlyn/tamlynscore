@@ -1,7 +1,6 @@
 import React, { useState, useEffect, useRef } from 'react';
 
-import useMousetrap from 'react-hook-mousetrap';
-
+import useMousetrap from '../utils/useMousetrap';
 import ArcherPills from '../utils/ArcherPills';
 import textMatcher from '../utils/textMatcher';
 
