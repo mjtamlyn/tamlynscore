@@ -1,11 +1,10 @@
-import { useEffect } from 'react';
+import { useEffect, useRef } from 'react';
 import { useImmer } from 'use-immer';
 
 
-let requestId = 0;
-
 const useActionQueue = (api) => {
     const [queue, setQueue] = useImmer([]);
+    const requestId = useRef(0);
 
     useEffect(() => {
         if (!queue.length) return;
@@ -37,7 +36,8 @@ const useActionQueue = (api) => {
     return {
         doAction: (action) => {
             setQueue((current) => {
-                current.push({ requestId: requestId++, ...action });
+                requestId.current = requestId.current + 1
+                current.push({ requestId: requestId.current, ...action });
             });
         },
     };
