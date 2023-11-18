@@ -13,7 +13,7 @@ const EmptyArcherBlock = ({ place, editMode, unallocatedEntries, setAllocation }
                 <span className="detail">{ place }</span>
                 { editMode && <a className="select" onClick={ () => setSelectOpen(!selectOpen) }>Select…</a> }
             </div>
-            { selectOpen && <ArcherSelector archers={ unallocatedEntries } close={ () => setSelectOpen(false) } onSelect={ setAllocation } /> }
+            { selectOpen && <ArcherSelector archers={ Array.from(unallocatedEntries.values()) } close={ () => setSelectOpen(false) } onSelect={ setAllocation } /> }
             <div className="bottom"></div>
         </div>
     );
@@ -44,60 +44,57 @@ const SessionList = ({ session, editMode }) => {
     const bosses = session.bosses;
     const letters = ['A', 'B' , 'C', 'D', 'E', 'F', 'G'];
     const lettersUsed = letters.slice(0, session.archersPerBoss);
-    const lastBossNumber = session.bosses.length ? session.bosses[session.bosses.length - 1].number : null;
 
-    const displayBosses = bosses.map(boss => {
+    const lastBossNumber = Array.from(bosses.keys()).pop();
+
+    const displayBosses = bosses.entries().map(([number, lookup]) => {
         let bossIsEmpty = true;
         const blocks = lettersUsed.map(letter => {
-            if (boss.lookup[letter]) {
+            if (lookup[letter]) {
                 bossIsEmpty = false;
-                const deleteAllocation = () => {
-                    boss.lookup[letter].deleteAllocation();
-                    setBosses([...session.bosses]);
-                };
                 return (
                     <ArcherBlock
                         key={ letter }
-                        place={ `${boss.number}${letter}` }
-                        archer={ boss.lookup[letter] }
+                        place={ `${number}${letter}` }
+                        archer={ lookup[letter] }
                         editMode={ editMode }
-                        deleteAllocation={ () => dispatch({ type: 'deleteAllocation', sessionId: session.id, boss: boss.number, letter, archerId: boss.lookup[letter].id }) }
+                        deleteAllocation={ () => dispatch({ type: 'deleteAllocation', sessionId: session.id, boss: number, letter, archerId: lookup[letter].id }) }
                     />
                 );
             }
             return (
                 <EmptyArcherBlock
-                    place={ `${boss.number}${letter}` }
+                    place={ `${number}${letter}` }
                     key={ letter }
                     editMode={ editMode }
                     unallocatedEntries={ session.unallocatedEntries }
-                    setAllocation={ (archer) => dispatch({ type: 'setAllocation', sessionId: session.id, boss: boss.number, letter, archerId: archer.id }) }
+                    setAllocation={ (archer) => dispatch({ type: 'setAllocation', sessionId: session.id, boss: number, letter, archerId: archer.id }) }
                 />
             );
         });
 
         return (
-            <div key={ boss.number }>
-                { editMode && bossIsEmpty && <a className="target-list__btn btn delete" onClick={ () => dispatch({ type: 'removeBoss', sessionId: session.id, boss: boss.number }) }>Remove empty target</a> }
+            <div key={ number }>
+                { editMode && bossIsEmpty && <a className="target-list__btn btn delete" onClick={ () => dispatch({ type: 'removeBoss', sessionId: session.id, boss: number }) }>Remove empty target</a> }
                 <div className="boss">
                     { blocks }
                 </div>
-                { editMode && boss.number !== lastBossNumber && <a className="target-list__btn btn insert" onClick={ () => dispatch({ type: 'insertBossAfter', sessionId: session.id, boss: boss.number }) }>Insert target</a> }
+                { editMode && number !== lastBossNumber && <a className="target-list__btn btn insert" onClick={ () => dispatch({ type: 'insertBossAfter', sessionId: session.id, boss: number }) }>Insert target</a> }
             </div >
         );
     });
 
-    const canStartAdd = bosses.length ? bosses[0].number > 1 : null;
+    const canStartAdd = bosses.size ? bosses.keys().next().value : null;
 
     let unallocated = null;
-    if (session.unallocatedEntries.length && editMode) {
-        const unallocatedBlocks = session.unallocatedEntries.map(archer => {
+    if (session.unallocatedEntries.size && editMode) {
+        const unallocatedBlocks = session.unallocatedEntries.values().map(archer => {
             return <ArcherBlock archer={ archer } editMode={ false } key={ archer.id } />
         });
         unallocated = (
             <div className="unallocated">
                 <h4>Unallocated entries</h4>
-                { unallocatedBlocks }
+                { Array.from(unallocatedBlocks) }
             </div>
         );
     }
@@ -105,8 +102,8 @@ const SessionList = ({ session, editMode }) => {
     return (
         <>
             { editMode && canStartAdd && <a className="target-list__btn btn add" onClick={ () => dispatch({ type: 'addStartBoss', sessionId: session.id }) }>Add target</a> }
-            { editMode && !canStartAdd && (bosses.length || null) && <a className="target-list__btn btn insert" onClick={ () => dispatch({ type: 'insertBossAfter', sessionId: session.id, boss: 0 }) }>Insert target</a> }
-            { displayBosses }
+            { editMode && !canStartAdd && (bosses.size || null) && <a className="target-list__btn btn insert" onClick={ () => dispatch({ type: 'insertBossAfter', sessionId: session.id, boss: 0 }) }>Insert target</a> }
+            { Array.from(displayBosses) }
             { editMode && <a className="target-list__btn btn add" onClick={ () => dispatch({ type: 'addBoss', sessionId: session.id }) }>Add target</a> }
             { unallocated }
         </>

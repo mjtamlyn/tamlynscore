@@ -9,7 +9,7 @@ const TargetListEdit = () => {
     const targetList = useContext(TargetListContext);
     const [editMode, setEditMode] = useState(false);
 
-    const sessionCount = targetList.sessions.length;
+    const sessionCount = targetList.sessions.size;
     let sessionColClass = {
         1: 'col3',
         2: 'col3',
@@ -20,14 +20,14 @@ const TargetListEdit = () => {
         sessionColClass = 'col2';
     }
 
-    const sessions = targetList.sessions.map(session => {
+    const sessions = Array.from(targetList.sessions.values().map(session => {
         return (
             <div className={ 'session ' + sessionColClass } key={ session.sessionTime }>
                 <h4>{ session.sessionTime }</h4>
                 <SessionList session={ session } editMode={ editMode } />
             </div>
         );
-    });
+    }));
     return (
         <div className="target-list module">
             <h2>Target List</h2>

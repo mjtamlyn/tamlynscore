@@ -178,7 +178,6 @@ var Arrows = new Class({
         }
         if (dir === 'left' || dir === 'right') {
             var inputs = row.getElements('td input[type=text]');
-            console.log(inputs);
             var current = inputs.indexOf(currentFocus);
             if (dir === 'right' && inputs[current + 1]) {
                 inputs[current + 1].focus();

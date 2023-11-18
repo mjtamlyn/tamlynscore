@@ -12,81 +12,89 @@ const getLetters = (session) => {
 };
 
 const addBoss = (bosses, letters) => {
-    const lastBossNumber = bosses.length ? bosses[bosses.length - 1].number : 0;
+    const lastBossNumber = bosses.size ? Array.from(bosses.keys()).pop() : 0;
     const lookup = {};
     letters.forEach(letter => {
         lookup[letter] = null;
     });
-    bosses.push({
-        number: lastBossNumber + 1,
-        lookup: lookup,
-    });
+    bosses.set(lastBossNumber + 1, lookup);
 };
 
 const addStartBoss = (bosses, letters) => {
-    const firstBossNumber = bosses[0].number;
+    const firstBossNumber = bosses.keys().next().value;
+
+    const oldBosses = Array.from(bosses.entries());
+    bosses.clear()
+
     const lookup = {};
     letters.forEach(letter => {
         lookup[letter] = null;
     });
-    bosses.insert(0, {
-        number: firstBossNumber - 1,
-        lookup: lookup,
-    });
+    bosses.set(firstBossNumber - 1, lookup);
+    oldBosses.forEach(([num, lkp]) => bosses.set(num, lkp));
 };
 
 const insertBossAfter = (bosses, number, letters) => {
-    const index = bosses.findIndex(boss => boss.number === number);
-    const lookup = {};
-    letters.forEach(letter => {
-        lookup[letter] = null;
-    });
-    bosses.filter(boss => boss.number > number).forEach(boss => {
-        boss.number++;
-        for (const [_, archer] of Object.entries(boss.lookup)) {
-            archer.boss++;
+    const oldBosses = Array.from(bosses.entries());
+    bosses.clear()
+    oldBosses.forEach(([num, lkp]) => {
+        if (num > number) {
+            num++;
+            for (const [_, archer] of Object.entries(lkp)) {
+                if (archer) {
+                    archer.boss++;
+                }
+            }
         }
-    });
-    bosses.splice(index + 1, 0, {
-        number: number + 1,
-        lookup: lookup,
+        bosses.set(num, lkp);
+
+        if (num === number) {
+            const lookup = {};
+            letters.forEach(letter => {
+                lookup[letter] = null;
+            });
+            bosses.set(number + 1, lookup);
+        }
     });
 };
 
 const removeBoss = (bosses, number) => {
-    bosses.filter(boss => boss.number > number).forEach(boss => {
-        boss.number--;
-        for (const [_, archer] of Object.entries(boss.lookup)) {
-            archer.boss--;
+    bosses.delete(number);
+
+    const oldBosses = Array.from(bosses.entries());
+    bosses.clear()
+    oldBosses.forEach(([num, lkp]) => {
+        if (num > number) {
+            num--;
+            for (const [_, archer] of Object.entries(lkp)) {
+                if (archer) {
+                    archer.boss--;
+                }
+            }
         }
+        bosses.set(num, lkp);
     });
-    const index = bosses.findIndex(boss => boss.number === number);
-    bosses.splice(index, 1);
 };
 
 const setAllocation = (bosses, unallocatedEntries, archerId, number, target) => {
-    const index = unallocatedEntries.findIndex(archer => archer.id === archerId);
-    const archer = unallocatedEntries[index];
+    const archer = unallocatedEntries.get(archerId);
     archer.boss = number;
     archer.target = target;
-    bosses.find(boss => boss.number === number).lookup[target] = archer;
-    unallocatedEntries.splice(index, 1);
+    bosses.get(number)[target] = archer;
+    unallocatedEntries.delete(archerId);
 };
 
 const deleteAllocation = (bosses, unallocatedEntries, number, target) => {
-    const archer = bosses.find(boss => boss.number === number).lookup[target];
-    delete bosses.find(boss => boss.number === number).lookup[target];
+    const archer = bosses.get(number)[target];
+    delete bosses.get(number)[target];
     archer.boss = null;
     archer.target = null;
-    unallocatedEntries.push(archer);
+    unallocatedEntries.set(archer.id, archer);
 };
 
 const targetListReducer = (targetList, action) => {
-    let session = null;
     const actionQueue = targetList.actionQueue;
-    if (action.sessionId) {
-        session = targetList.sessions.find(session => session.id = action.sessionId);
-    }
+    const session = targetList.sessions.get(action.sessionId);
 
     switch(action.type) {
         case 'addBoss': {
@@ -124,30 +132,39 @@ const targetListReducer = (targetList, action) => {
 };
 
 const setUpTargetList = (data) => {
+    const sessions = new Map();
+    data.targetList.forEach(session => {
+        const bosses = new Map();
+        session.targetList.forEach(boss => {
+            const lookup = {};
+            for (const [target, archer] of Object.entries(boss.archers)) {
+                if (archer) {
+                    lookup[target] = archer;
+                    continue;
+                }
+            }
+            bosses.set(boss.number, lookup);
+        });
+        const unallocatedEntries = new Map();
+        session.unallocatedEntries.forEach(entry => unallocatedEntries.set(entry.id, entry));
+        sessions.set(session.id, {
+            ...session,
+            bosses,
+            unallocatedEntries,
+        });
+    });
     return {
         actionQueue: data.actionQueue,
-        sessions: data.map(session => {
-            session.bosses = session.targetList.map(boss => {
-                const lookup = {};
-                for (const [target, archer] of Object.entries(boss.archers)) {
-                    if (archer) {
-                        lookup[target] = archer;
-                        continue;
-                    }
-                }
-                return {
-                    number: boss.number,
-                    lookup
-                };
-            });
-            return session;
-        }),
+        sessions,
     };
 };
 
 const TargetListProvider = ({ children, api, targetList: initialTargetList }) => {
-    initialTargetList.actionQueue = useActionQueue(api);
-    const [targetList, dispatch] = useImmerReducer(targetListReducer, initialTargetList, setUpTargetList);
+    const initialState = {
+        targetList: initialTargetList,
+        actionQueue: useActionQueue(api),
+    };
+    const [targetList, dispatch] = useImmerReducer(targetListReducer, initialState, setUpTargetList);
 
     return (
         <TargetListContext.Provider value={ targetList }>
