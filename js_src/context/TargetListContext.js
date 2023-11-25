@@ -126,7 +126,7 @@ const targetListReducer = (targetList, action) => {
             return;
         }
         default: {
-            throw Error('Unknown action: ' + action.type);
+            throw Error('TargetListContext: Unknown action: ' + action.type);
         }
     }
 };

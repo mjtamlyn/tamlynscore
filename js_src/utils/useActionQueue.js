@@ -1,9 +1,27 @@
 import { useEffect, useRef } from 'react';
-import { useImmer } from 'use-immer';
+import { useImmerReducer } from 'use-immer';
+
+
+const reducer = (queue, action) => {
+    switch (action.type) {
+        case 'addAction':
+            queue.push({ requestId: action.requestId, ...action.action });
+            return;
+        case 'startRequest':
+            queue.find(a => a.requestId === action.requestId).inProgress = true;
+            return;
+        case 'completeRequest':
+            const index = current.findIndex(a => a.requestId === action.requestId);
+            current.splice(index, 1);
+            return;
+        case 'default':
+            throw Error('useActionQueue: Unknown action: ' + action.type);
+    }
+};
 
 
 const useActionQueue = (api) => {
-    const [queue, setQueue] = useImmer([]);
+    const [queue, dispatch] = useImmerReducer(reducer, []);
     const requestId = useRef(0);
 
     useEffect(() => {
@@ -12,9 +30,7 @@ const useActionQueue = (api) => {
         // only do one at a time for safety for now
         const action = queue[0];
         if (action.inProgress) return;
-        setQueue((current) => {
-            current.find(a => a.requestId === action.requestId).inProgress = true;
-        });
+        dispatch({ type: 'startRequest', requestId: action.requestId });
         const data = { action: action.type, ...action.params };
         fetch(api, {
             method: 'POST',
@@ -24,10 +40,7 @@ const useActionQueue = (api) => {
             if (response.status !== 200) {
                 throw Error('Incorrect response code');
             }
-            setQueue((current) => {
-                const index = current.findIndex(a => a.requestId === action.requestId);
-                current.splice(index, 1);
-            });
+            dispatch({ type: 'startRequest', requestId: action.requestId });
         }).catch(() => {
             throw Error('something went wrong');
         });
@@ -35,10 +48,8 @@ const useActionQueue = (api) => {
 
     return {
         doAction: (action) => {
-            setQueue((current) => {
-                requestId.current = requestId.current + 1
-                current.push({ requestId: requestId.current, ...action });
-            });
+            requestId.current = requestId.current + 1
+            dispatch({ type: 'addAction', requestId: requestId.current, action });
         },
     };
 };
