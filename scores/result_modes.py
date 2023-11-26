@@ -517,10 +517,11 @@ class DoubleRound(BaseResultMode):
                 if session_entry.competition_entry not in results[category]:
                     results[category][session_entry.competition_entry] = []
                 results[category][session_entry.competition_entry].append(score)
+        categories_to_remove = []
         for category, scores in results.items():
             scores = OrderedDict((entry, rounds) for entry, rounds in scores.items() if len(rounds) >= 2)
             if not scores:
-                results.pop(category)
+                categories_to_remove.append(category)
                 continue
             for entry in scores:
                 scores[entry] = sorted(scores[entry], key=lambda s: s.target.session_entry.session_round.session.start)[:2]
@@ -532,10 +533,13 @@ class DoubleRound(BaseResultMode):
                 hits=sum(s.hits for s in sub_scores),
                 golds=sum(s.golds for s in sub_scores),
                 xs=sum(s.xs for s in sub_scores),
+                tiebreak=None,
             ) for entry, sub_scores in scores.items()]
             if not self.leaderboard:
                 new_scores = filter(lambda s: s.score > 0, new_scores)
             results[category] = self.sort_results(new_scores)
+        for category in categories_to_remove:
+            results.pop(category)
         return results
 
     def label_for_round(self, round):
