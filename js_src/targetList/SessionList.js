@@ -84,7 +84,7 @@ const SessionList = ({ session, editMode }) => {
         );
     });
 
-    const canStartAdd = bosses.size ? bosses.keys().next().value : null;
+    const canStartAdd = bosses.size ? bosses.keys().next().value > 1 : null;
 
     let unallocated = null;
     if (session.unallocatedEntries.size && editMode) {

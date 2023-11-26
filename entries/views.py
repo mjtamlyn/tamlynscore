@@ -558,6 +558,9 @@ class TargetList(CompetitionMixin, TemplateView):
 
 
 class TargetListApi(CsrfExemptMixin, TargetListBase, View):
+    class UnknownAction(Exception):
+        pass
+
     def render_to_response(self, context, **kwargs):
         target_list = context['target_list']
         data = []
@@ -590,33 +593,44 @@ class TargetListApi(CsrfExemptMixin, TargetListBase, View):
             },
         })
 
-    def post(self, request, slug):
-        if not self.is_admin:
-            return HttpResponseNotAllowed()
-        data = json.loads(request.body)
+    def handle_action(self, data):
         if data['action'] == 'DELETE':
             TargetAllocation.objects.get(session_entry__id=data['id']).delete()
-            return JsonResponse({'status': 'ok'})
+            return {'deleted': data['id']}
         elif data['action'] == 'SET':
             allocation = TargetAllocation.objects.create(
                 session_entry_id=data['id'],
                 boss=data['value']['boss'],
                 target=data['value']['target'],
             )
-            return JsonResponse({'status': 'ok', 'instance': self.get_json_data(allocation.session_entry)})
+            return {'created': self.get_json_data(allocation.session_entry)}
         elif data['action'] == 'SHIFTUP':
             updated = TargetAllocation.objects.filter(
                 session_entry__session_round__session=data['session'],
                 boss__gte=data['number'],
             ).update(boss=F('boss') + 1)
-            return JsonResponse({'status': 'ok', 'updated': updated})
+            return {'updated': updated}
         elif data['action'] == 'SHIFTDOWN':
             updated = TargetAllocation.objects.filter(
                 session_entry__session_round__session=data['session'],
                 boss__gte=data['number'],
             ).update(boss=F('boss') - 1)
-            return JsonResponse({'status': 'ok', 'updated': updated})
-        return JsonResponse({'status': 'UNKOWN ACTION'})
+            return {'updated': updated}
+        raise self.UnknownAction(data)
+
+    def post(self, request, slug):
+        if not self.is_admin:
+            return HttpResponseNotAllowed()
+        data = json.loads(request.body)
+        actions = data['actions']
+        response = []
+        for action in actions:
+            try:
+                result = self.handle_action(action)
+                response.append(result)
+            except self.UnknownAction:
+                return JsonResponse({'status': 'UNKOWN ACTION'})
+        return JsonResponse({'status': 'ok', 'actions': actions})
 
 
 class Registration(TargetListBase):

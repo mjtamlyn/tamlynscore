@@ -8,11 +8,15 @@ const reducer = (queue, action) => {
             queue.push({ requestId: action.requestId, ...action.action });
             return;
         case 'startRequest':
-            queue.find(a => a.requestId === action.requestId).inProgress = true;
+            action.requestIds.forEach(requestId => {
+                queue.find(a => a.requestId === requestId).inProgress = true;
+            });
             return;
         case 'completeRequest':
-            const index = current.findIndex(a => a.requestId === action.requestId);
-            current.splice(index, 1);
+            action.requestIds.forEach(requestId => {
+                const index = queue.findIndex(a => a.requestId === requestId);
+                queue.splice(index, 1);
+            });
             return;
         case 'default':
             throw Error('useActionQueue: Unknown action: ' + action.type);
@@ -27,20 +31,20 @@ const useActionQueue = (api) => {
     useEffect(() => {
         if (!queue.length) return;
 
-        // only do one at a time for safety for now
-        const action = queue[0];
-        if (action.inProgress) return;
-        dispatch({ type: 'startRequest', requestId: action.requestId });
-        const data = { action: action.type, ...action.params };
+        const firstAction = queue[0];
+        // If any actions are currently in progress, then don't start a new request
+        if (firstAction.inProgress) return;
+        dispatch({ type: 'startRequest', requestIds: queue.map(a => a.requestId) });
+        const actions = queue.map(a => { return { action: a.type, ...a.params } });
         fetch(api, {
             method: 'POST',
             credentials: 'same-origin',
-            body: JSON.stringify(data),
+            body: JSON.stringify({ actions }),
         }).then((response) => {
             if (response.status !== 200) {
                 throw Error('Incorrect response code');
             }
-            dispatch({ type: 'startRequest', requestId: action.requestId });
+            dispatch({ type: 'completeRequest', requestIds: queue.map(a => a.requestId) });
         }).catch(() => {
             throw Error('something went wrong');
         });
