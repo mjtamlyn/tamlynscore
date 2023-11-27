@@ -58,6 +58,7 @@ const useActionQueue = (api) => {
             body: JSON.stringify({ actions }),
         }).then((response) => {
             if (response.status !== 200) {
+                // TODO: This kind of error should display differently, not trigger the below .catch()
                 throw Error('Incorrect response code');
             }
             console.log('Data saved!');

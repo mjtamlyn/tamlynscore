@@ -1,8 +1,11 @@
 import React from 'react';
 
+import { ErrorBoundary } from 'react-error-boundary';
+
 import useQuery from '../utils/useQuery';
 import { CompetitionContext } from '../context/CompetitionContext';
 import { TargetListProvider } from '../context/TargetListContext';
+import ErrorState from '../utils/ErrorState';
 import Spinner from '../utils/Spinner';
 
 import TargetListEdit from './TargetListEdit';
@@ -22,11 +25,13 @@ const TargetListView = ({ api }) => {
     }
 
     return (
-        <CompetitionContext.Provider value={ data.competition }>
-            <TargetListProvider api={ api } targetList={ data.targetList }>
-                <TargetListEdit />
-            </TargetListProvider>
-        </CompetitionContext.Provider>
+        <ErrorBoundary FallbackComponent={ ErrorState }>
+            <CompetitionContext.Provider value={ data.competition }>
+                <TargetListProvider api={ api } targetList={ data.targetList }>
+                    <TargetListEdit />
+                </TargetListProvider>
+            </CompetitionContext.Provider>
+        </ErrorBoundary>
     );
 }
 

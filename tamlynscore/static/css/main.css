@@ -3826,6 +3826,20 @@ button.action-button {
   margin-left: 3px;
 }
 
+/* line 1, ../../sass/components/_error_state.sass */
+.error-state {
+  background-color: red;
+  border-radius: 5px;
+  color: white;
+  text-align: center;
+  margin: 20px auto;
+  padding: 20px;
+}
+/* line 9, ../../sass/components/_error_state.sass */
+.error-state__heading {
+  color: white;
+}
+
 /* line 1, ../../sass/components/_header_nav.sass */
 nav.header-nav {
   background: white;
@@ -4455,28 +4469,28 @@ ul.link-list li a:hover {
     transform: scale(1);
   }
 }
-/* line 17, ../../sass/main.sass */
+/* line 18, ../../sass/main.sass */
 body {
   color: #000F1F;
   background-image: linear-gradient(#f7f7f7 50px, transparent 150px);
 }
 
-/* line 22, ../../sass/main.sass */
+/* line 23, ../../sass/main.sass */
 .clear:before, .clear:after {
   display: table;
   content: " ";
 }
-/* line 25, ../../sass/main.sass */
+/* line 26, ../../sass/main.sass */
 .clear:after {
   clear: both;
 }
 
-/* line 29, ../../sass/main.sass */
+/* line 30, ../../sass/main.sass */
 .hidden {
   display: none;
 }
 
-/* line 32, ../../sass/main.sass */
+/* line 33, ../../sass/main.sass */
 .text-right {
   text-align: right;
 }
