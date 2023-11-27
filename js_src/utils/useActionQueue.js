@@ -2,34 +2,50 @@ import { useEffect, useRef } from 'react';
 import { useImmerReducer } from 'use-immer';
 
 
-const reducer = (queue, action) => {
+const reducer = (state, action) => {
     switch (action.type) {
         case 'addAction':
-            queue.push({ requestId: action.requestId, ...action.action });
+            state.queue.push({ requestId: action.requestId, ...action.action });
             return;
         case 'startRequest':
             action.requestIds.forEach(requestId => {
-                queue.find(a => a.requestId === requestId).inProgress = true;
+                state.queue.find(a => a.requestId === requestId).inProgress = true;
             });
+            return;
+        case 'requestFailed':
+            action.requestIds.forEach(requestId => {
+                state.queue.find(a => a.requestId === requestId).inProgress = false;
+            });
+            state.status = 'error';
+            state.delay += 1000;
+            return;
+        case 'retry':
+            // Don't change the queue items here so it can retry with additional data if needed
+            state.status = 'ok';
             return;
         case 'completeRequest':
             action.requestIds.forEach(requestId => {
-                const index = queue.findIndex(a => a.requestId === requestId);
-                queue.splice(index, 1);
+                const index = state.queue.findIndex(a => a.requestId === requestId);
+                state.queue.splice(index, 1);
             });
+            // Reset the retry delay
+            state.delay = 1000;
             return;
-        case 'default':
+        default:
             throw Error('useActionQueue: Unknown action: ' + action.type);
     }
 };
 
 
 const useActionQueue = (api) => {
-    const [queue, dispatch] = useImmerReducer(reducer, []);
+    const [{ queue, status, delay }, dispatch] = useImmerReducer(reducer, { queue: [], status: 'ok', delay: 1000 });
     const requestId = useRef(0);
 
     useEffect(() => {
         if (!queue.length) return;
+
+        // Do nothing when there's an error, wait for a retry action to unset this.
+        if (status === 'error') return;
 
         const firstAction = queue[0];
         // If any actions are currently in progress, then don't start a new request
@@ -44,11 +60,18 @@ const useActionQueue = (api) => {
             if (response.status !== 200) {
                 throw Error('Incorrect response code');
             }
+            console.log('Data saved!');
             dispatch({ type: 'completeRequest', requestIds: queue.map(a => a.requestId) });
-        }).catch(() => {
-            throw Error('something went wrong');
+        }).catch((e) => {
+            // TODO: if more than 10 retries have been attempted then we should display something
+            console.error('Save failed, will retry after', delay);
+            dispatch({ type: 'requestFailed', requestIds: queue.map(a => a.requestId) });
+            setTimeout(() => {
+                console.log('Retry initiated after', delay);
+                dispatch({ type: 'retry' });
+            }, delay);
         });
-    }, [queue]);
+    }, [queue, status]);
 
     return {
         doAction: (action) => {
