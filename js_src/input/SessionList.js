@@ -1,6 +1,11 @@
-import React from 'react';
+import React, { useContext } from 'react';
 
-const SessionList = ({ sessions, user, competition, setPage }) => {
+import { CompetitionContext } from '../context/CompetitionContext';
+
+
+const SessionList = ({ sessions, user, setPage }) => {
+    const competition = useContext(CompetitionContext);
+
     const sessionsRendered = sessions.map(session => {
         const goToPage = () => {
             setPage({

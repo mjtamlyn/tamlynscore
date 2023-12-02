@@ -1,11 +1,15 @@
 import React, { useState } from 'react';
 
+import { ErrorBoundary } from 'react-error-boundary';
+
 import Score from '../models/Score';
 import Store from '../models/Store';
 
+import { CompetitionContext } from '../context/CompetitionContext';
 import useQuery from '../utils/useQuery';
 import FullPageLoading from '../utils/FullPageLoading';
 import FullPageWrapper from '../utils/FullPageWrapper';
+import ErrorState from '../utils/ErrorState';
 
 import SessionList from './SessionList';
 import Target from './Target';
@@ -17,7 +21,11 @@ const SessionListPage = ({ api, setPage }) => {
 
     return (
         <FullPageWrapper competition={ data.competition }>
-            <SessionList sessions={ data.sessions } user={ data.user } competition={ data.competition } setPage={ setPage } />
+            <ErrorBoundary FallbackComponent={ ErrorState }>
+                <CompetitionContext.Provider value={ data.competition }>
+                    <SessionList sessions={ data.sessions } user={ data.user } setPage={ setPage } />
+                </CompetitionContext.Provider>
+            </ErrorBoundary>
         </FullPageWrapper>
     );
 };
@@ -31,14 +39,17 @@ const TargetPage = ({ api, setPage }) => {
     const store = new Store({ api: api, data: scores, dataName: 'scores' });
     return (
         <FullPageWrapper competition={ data.competition }>
-            <Target
-                session={ data.session }
-                user={ data.user }
-                competition={ data.competition }
-                scores={ store.data }
-                store={ store }
-                setPageRoot={ () => setPage({name: 'root', api: '/scoring/api/' }) }
-            />
+            <ErrorBoundary FallbackComponent={ ErrorState }>
+                <CompetitionContext.Provider value={ data.competition }>
+                    <Target
+                        session={ data.session }
+                        user={ data.user }
+                        scores={ store.data }
+                        store={ store }
+                        setPageRoot={ () => setPage({name: 'root', api: '/scoring/api/' }) }
+                    />
+                </CompetitionContext.Provider>
+            </ErrorBoundary>
         </FullPageWrapper>
     );
 };
@@ -50,11 +61,18 @@ const InputController = () => {
         'api': '/scoring/api/',
     });
 
+    let content = null;
     if (page.name === 'root') {
-        return <SessionListPage api={ page.api } setPage={ setPage } />;
+        content = <SessionListPage api={ page.api } setPage={ setPage } />;
     } else {
-        return <TargetPage api={ page.api } setPage={ setPage } />;
+        content = <TargetPage api={ page.api } setPage={ setPage } />;
     }
+
+    return (
+        <ErrorBoundary FallbackComponent={ ErrorState }>
+            { content }
+        </ErrorBoundary>
+    );
 };
 
 export default InputController;
