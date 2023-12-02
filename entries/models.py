@@ -57,6 +57,7 @@ class ResultsFormatFields(models.Model):
     use_custom_teams = models.BooleanField(default=False)
     allow_incomplete_teams = models.BooleanField(default=True)
     team_size = models.PositiveIntegerField(default=4, blank=True, null=True)
+    any_bow_team_size = models.PositiveIntegerField(blank=True, null=True)
     novice_team_size = models.PositiveIntegerField(blank=True, null=True)
     recurve_team_size = models.PositiveIntegerField(blank=True, null=True, default=None)
     barebow_team_size = models.PositiveIntegerField(blank=True, null=True, default=None)

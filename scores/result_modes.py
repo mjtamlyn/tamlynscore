@@ -696,6 +696,8 @@ class Team(BaseResultMode):
                 team_types += ['Non-compound Men', 'Non-compound Women']
             else:
                 team_types.append('Non-compound')
+        if competition.any_bow_team_size is not None:
+            team_types.append('All bows')
         if competition.recurve_team_size is not None:
             team_types.append('Recurve')
         if competition.barebow_team_size is not None:
@@ -723,6 +725,8 @@ class Team(BaseResultMode):
             if type in ['Longbow', 'Barebow'] and competition.use_county_teams:
                 # bit of a hack to treat compound team size as "minor team size"
                 team_size = competition.compound_team_size
+            if type == 'All bows' and competition.any_bow_team_size:
+                team_size = competition.any_bow_team_size
             if type == 'Recurve' and competition.recurve_team_size:
                 team_size = competition.recurve_team_size
             if type == 'Barebow' and competition.barebow_team_size:
@@ -782,6 +786,8 @@ class Team(BaseResultMode):
             if type in ['Junior Recurve', 'Junior Compound']:
                 return is_junior and 'Junior %s' % bowstyle == type
         is_non_compound = not score.target.session_entry.competition_entry.bowstyle.name == 'Compound'
+        if type == 'All bows':
+            return True
         if type == 'Non-compound':
             if not competition.novices_in_experienced_teams:
                 return is_non_compound and score.target.session_entry.competition_entry.novice == 'E'
