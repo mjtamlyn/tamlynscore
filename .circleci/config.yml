@@ -102,6 +102,7 @@ jobs:
                 name: Install pipenv dependencies
                 command: |
                     python -m venv .pip_venv
+                    find .pipenv
                     source .pip_venv/bin/activate
                     pip install pipenv
                     pipenv install --ignore-pipfile
