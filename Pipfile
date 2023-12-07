@@ -9,8 +9,6 @@ dj-static = "*"
 django = "*"
 django-braces = "*"
 django-debug-toolbar = "*"
-django-custom-user = "*"
-django-floppyforms = "*"
 factory-boy = "*"
 gunicorn = "*"
 pillow = "*"
@@ -25,6 +23,7 @@ django-qr-code = "*"
 django-webpack-loader = "*"
 django-bmemcached = "*"
 asgiref = "*"
+django-custom-user = "*"
 
 [dev-packages]
 

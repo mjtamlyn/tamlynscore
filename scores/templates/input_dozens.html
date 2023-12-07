@@ -8,7 +8,7 @@
 {% block competition_content %}
 <div class="module input-dozens">
     <h4>Enter arrow values for boss {{ boss }}, dozen {{ dozen }}</h4>
-    <form action="" method="post" autocomplete="off">
+    <form action="{{ request.get_full_path }}" method="post" autocomplete="off">
         <table class="target">
             <tr>
                 <th colspan="2">Archer</th>

@@ -1,7 +1,7 @@
 {
     "_meta": {
         "hash": {
-            "sha256": "df401036b4f5fb139945a8dd8d50ed1c9ea740d59c27847275e44d251f6e5244"
+            "sha256": "2df05609310d3bf2476e7ef25192ef050275cea5ccca3d76d10605ffd8aade8f"
         },
         "pipfile-spec": 6,
         "requires": {
@@ -89,14 +89,6 @@
             "index": "pypi",
             "markers": "python_version >= '3.8'",
             "version": "==4.2.0"
-        },
-        "django-floppyforms": {
-            "hashes": [
-                "sha256:5b3f6891463149b83c44d2bd6109ce32de3d848e2ff7dbc02c41c65562ddf633",
-                "sha256:d620f1ed7ae3fc0377803e5ba2df4afb2d4cdda7b13fdf0a71840da0b5e5aae8"
-            ],
-            "index": "pypi",
-            "version": "==1.9.0"
         },
         "django-qr-code": {
             "hashes": [

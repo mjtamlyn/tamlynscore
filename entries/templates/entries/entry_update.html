@@ -1,5 +1,4 @@
 {% extends 'entries/competition_detail.html' %}
-{% load floppyforms %}
 
 {% block scripts %}
 <script src="{{ STATIC_URL }}lib/jquery/jquery-2.1.3.min.js"></script>
@@ -10,6 +9,6 @@
     <a class="pull-right btn add" href="{% url 'club_create' %}?next={{ request.path }}">Add club</a>
 </p>
 {% with object.archer|stringformat:"s" as title_suffix %}
-    {% form form using "entries/entry_form_layout.html" with form_title="Update entry for "|add:title_suffix %}
+    {% include "entries/entry_form_layout.html" with form_title="Update entry for "|add:title_suffix %}
 {% endwith %}
 {% endblock %}

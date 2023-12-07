@@ -1,7 +1,5 @@
 {% extends 'base.html' %}
 
-{% load floppyforms %}
-
 {% block scripts %}
 <script src="{{ STATIC_URL }}lib/jquery/jquery-2.1.3.min.js"></script>
 <script src="{{ STATIC_URL }}js/jquery.datetimepicker.full.js"></script>
@@ -10,71 +8,109 @@
 {% endblock %}
 
 {% block content %}
-{% if form.instance.pk %}
-    <h1 id="title">{{ form.instance }}</h1>
-{% else %}
-    <h1 id="title">Add competition</h1>
-{% endif %}
+<h1 id="title">{% if form.instance.pk %}{{ form.instance }}{% else %}Add competition{% endif %}</h1>
 
-<form action="" method="post" class="page-form">
+<form action="{{ request.get_full_path }}" method="post" class="page-form">
     {% csrf_token %}
 
 	<div class="form-group">
 		<h2>General Information</h2>
 
-        {% formrow form.full_name form.short_name using 'form-item.html' %}
-        {% formrow form.date form.end_date using 'form-item.html' %}
+        <div class="form-row">
+            {{ form.full_name.as_field_group }}
+            {{ form.short_name.as_field_group }}
+        </div>
+        <div class="form-row">
+            {{ form.date.as_field_group }}
+            {{ form.end_date.as_field_group }}
+        </div>
 	</div>
 
 	<div class="form-group">
 		<h2>Scoring Details</h2>
 
-        {% formrow form.scoring_system form.arrows_entered_per_end using 'form-item.html' %}
-        {% formrow form.archers_per_target form.team_size form.compound_team_size using 'form-item.html' %}
+        <div class="form-row">
+            {{ form.scoring_system.as_field_group }}
+            {{ form.arrows_entered_per_end.as_field_group }}
+        </div>
+        <div class="form-row">
+            {{ form.archers_per_target.as_field_group }}
+            {{ form.team_size.as_field_group }}
+            {{ form.compound_team_size.as_field_group }}
+        </div>
+        <div class="form-row">
+            <div class="form-item">
+                <p class="help-text">Other team formats are available - please ask!</p>
+            </div>
+        </div>
 	</div>
 
 	<div class="form-group">
 		<h2>Sessions</h2>
 
-        <div id="session_group_1" class="form-flex-wrapper contains-subgroup">
+        <div id="session_group_1" class="form-row contains-subgroup">
     		<div id="session_1" class="form-subgroup form-flex-subgroup">
     			<h3>Session 1</h3>
-                {% formrow form.session_1_time using 'form-item.html' %}
-                {% formrow form.session_1_rounds using 'form-item.html' %}
+                <div class="form-row">
+                    {{ form.session_1_time.as_field_group }}
+                </div>
+                <div class="form-row">
+                    {{ form.session_1_rounds.as_field_group }}
+                </div>
     		</div>
 
             <div id="session_2" class="form-subgroup form-flex-subgroup">
                 <h3>Session 2</h3>
-                {% formrow form.session_2_time using 'form-item.html' %}
-                {% formrow form.session_2_rounds using 'form-item.html' %}
+                <div class="form-row">
+                    {{ form.session_2_time.as_field_group }}
+                </div>
+                <div class="form-row">
+                    {{ form.session_2_rounds.as_field_group }}
+                </div>
             </div>
         </div>
 
-        <div id="session_group_2" class="form-flex-wrapper contains-subgroup">
+        <div id="session_group_2" class="form-row contains-subgroup">
     		<div class="form-subgroup form-flex-subgroup">
     			<h3>Session 3</h3>
-                {% formrow form.session_3_time using 'form-item.html' %}
-                {% formrow form.session_3_rounds using 'form-item.html' %}
+                <div class="form-row">
+                    {{ form.session_3_time.as_field_group }}
+                </div>
+                <div class="form-row">
+                    {{ form.session_3_rounds.as_field_group }}
+                </div>
     		</div>
 
             <div class="form-subgroup form-flex-subgroup">
                 <h3>Session 4</h3>
-                {% formrow form.session_4_time using 'form-item.html' %}
-                {% formrow form.session_4_rounds using 'form-item.html' %}
+                <div class="form-row">
+                    {{ form.session_4_time.as_field_group }}
+                </div>
+                <div class="form-row">
+                    {{ form.session_4_rounds.as_field_group }}
+                </div>
             </div>
         </div>
 
-        <div id="session_group_3" class="form-flex-wrapper contains-subgroup">
+        <div id="session_group_3" class="form-row contains-subgroup">
     		<div class="form-subgroup form-flex-subgroup">
     			<h3>Session 5</h3>
-                {% formrow form.session_5_time using 'form-item.html' %}
-                {% formrow form.session_5_rounds using 'form-item.html' %}
+                <div class="form-row">
+                    {{ form.session_5_time.as_field_group }}
+                </div>
+                <div class="form-row">
+                    {{ form.session_5_rounds.as_field_group }}
+                </div>
     		</div>
 
             <div class="form-subgroup form-flex-subgroup">
                 <h3>Session 6</h3>
-                {% formrow form.session_6_time using 'form-item.html' %}
-                {% formrow form.session_6_rounds using 'form-item.html' %}
+                <div class="form-row">
+                    {{ form.session_6_time.as_field_group }}
+                </div>
+                <div class="form-row">
+                    {{ form.session_6_rounds.as_field_group }}
+                </div>
             </div>
         </div>
 
@@ -84,49 +120,80 @@
 	<div class="form-group">
 		<h2>Results and Leaderboards</h2>
 
-        <div class="form-flex-wrapper contains-subgroup">
+        <div class="form-row contains-subgroup">
             <div class="form-subgroup form-flex-subgroup">
                 <h3>Result modes</h3>
-                {% formrow form.result_modes using 'form-item.html' %}
+                <div class="form-row">
+                    {{ form.result_modes.as_field_group }}
+                </div>
             </div>
 
             <div class="form-subgroup form-flex-subgroup">
                 <h3>Leaderboard only modes</h3>
-                {% formrow form.leaderboard_only_modes using 'form-item.html' %}
+                <div class="form-row">
+                    {{ form.leaderboard_only_modes.as_field_group }}
+                </div>
             </div>
         </div>
 
-        <div class="form-flex-wrapper">
+        <div class="form-row">
             <div class="form-subgroup form-flex-subgroup">
                 <h3>Novices</h3>
-
-                {% formrow form.has_novices using 'form-item.html' %}
-                {% formrow form.novice_team_size using 'form-item.html' %}
+                <div class="form-row">
+                    {{ form.has_novices.as_field_group }}
+                </div>
+                <div class="form-row">
+                    {{ form.novice_team_size.as_field_group }}
+                </div>
             </div>
 
             <div class="form-subgroup form-flex-subgroup">
                 <h3>Juniors</h3>
-
-                {% formrow form.has_juniors using 'form-item.html' %}
-                {% formrow form.has_agb_age_groups using 'form-item.html' %}
-                {% formrow form.junior_team_size using 'form-item.html' %}
+                <div class="form-row">
+                    {{ form.has_juniors.as_field_group }}
+                </div>
+                <div class="form-row">
+                    {{ form.has_agb_age_groups.as_field_group }}
+                </div>
+                <div class="form-row">
+                    {{ form.junior_team_size.as_field_group }}
+                </div>
             </div>
         </div>
 
 		<div class="form-subgroup">
 			<h3>Individual Results</h3>
 
-            {% formrow form.has_guests form.novices_in_experienced_individual form.exclude_later_shoots using 'form-item.html' %}
+            <div class="form-row">
+                {{ form.has_guests.as_field_group }}
+                {{ form.novices_in_experienced_individual.as_field_group }}
+                {{ form.exclude_later_shoots.as_field_group }}
+            </div>
 		</div>
 
 		<div class="form-subgroup">
 			<h3>Team Results</h3>
 
-            {% formrow form.allow_incomplete_teams form.combine_rounds_for_team_scores form.novices_in_experienced_teams using 'form-item.html' %}
-            {% formrow form.force_mixed_teams form.strict_b_teams form.strict_c_teams using 'form-item.html' %}
-            {% formrow form.split_gender_teams form.use_county_teams form.use_custom_teams using 'form-item.html' %}
+            <div class="form-row">
+                {{ form.allow_incomplete_teams.as_field_group }}
+                {{ form.combine_rounds_for_team_scores.as_field_group }}
+                {{ form.novices_in_experienced_teams.as_field_group }}
+            </div>
+            <div class="form-row">
+                {{ form.force_mixed_teams.as_field_group }}
+                {{ form.strict_b_teams.as_field_group }}
+                {{ form.strict_c_teams.as_field_group }}
+            </div>
+            <div class="form-row">
+                {{ form.split_gender_teams.as_field_group }}
+                {{ form.use_county_teams.as_field_group }}
+                {{ form.use_custom_teams.as_field_group }}
+            </div>
 		</div>
 	</div>
+    {% comment %}
+
+    {% endcomment %}
 
 	<input type="submit" class="btn" />
 </form>

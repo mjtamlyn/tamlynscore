@@ -1,8 +1,9 @@
 {% extends 'entries/competition_detail.html' %}
-{% load floppyforms %}
 
 {% block competition_content %}
-	{% with object|stringformat:"s" as title_suffix %}
-		{% form form using "core/form_layout.html" with button_text="Delete" form_title="Confirm deleting entry for "|add:title_suffix %}
-	{% endwith %}
+    <form action="{{ request.get_full_path }}" method="post">
+        {% csrf_token %}
+        <h2>Confirm deleting entry for {{ object }}</h2>
+        {{ form }}
+    <p><input type="submit" class="btn delete" value="Delete"></p>
 {% endblock %}

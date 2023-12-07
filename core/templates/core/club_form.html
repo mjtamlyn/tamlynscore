@@ -1,6 +1,9 @@
 {% extends 'base.html' %}
-{% load floppyforms %}
 
 {% block content %}
-    {% form form using "core/form_layout.html" with form_title=form.instance.name %}
+    <form action="{{ request.get_full_path }}" method="post">
+        {% csrf_token %}
+        <h2>{{ form.instance.name|default:"Add club" }}</h2>
+        {{ form }}
+    <p><input type="submit" class="btn" value="Submit"></p>
 {% endblock %}

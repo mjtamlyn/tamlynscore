@@ -1,14 +1,8 @@
-{% load floppyforms %}
-
-<div class="form-flex-wrapper">
-{% for field in fields %}
-    <div class="form-item field-{{ field.name }} {% if field.choices %}select{% endif %}">
-        {% if field.errors %}
-        <p>Error! <strong>{{ field.errors }}</strong></p>
-        {% endif %}
-        {{ field.label_tag }}
-        {% formfield field %}
-        <p class="help-text">{{ field.help_text }}</p>
-    </div>
-{% endfor %}
+<div class="form-item field-{{ field.name }} {% if field.choices %}select{% endif %}">
+    {% if field.errors %}
+    <p>Error! <strong>{{ field.errors }}</strong></p>
+    {% endif %}
+    {{ field.label_tag }}
+    {{ field }}
+    <p class="help-text">{{ field.help_text }}</p>
 </div>

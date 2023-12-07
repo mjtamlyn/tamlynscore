@@ -14,7 +14,7 @@
 {% endif %}
 
 <p>Enter an archer name:</p>
-<form method="GET" action="">
+<form method="GET" action="{{ request.get_full_path }}">
     {{ search_form.query }}
     <input type="submit" class="btn" value="Search">
 </form>

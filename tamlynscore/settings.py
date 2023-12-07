@@ -65,6 +65,7 @@ TEMPLATES = [{
         ),
     },
 }]
+FORM_RENDERER = 'tamlynscore.utils.TamlynScoreFormRenderer'
 
 MIDDLEWARE = (
     'django.middleware.security.SecurityMiddleware',
@@ -98,10 +99,10 @@ INSTALLED_APPS = (
     'django.contrib.messages',
     'django.contrib.staticfiles',
     'django.contrib.admin',
+    'django.forms',
     'gunicorn',
     'debug_toolbar',
     'webpack_loader',
-    'floppyforms',
     'custom_user',
     'qr_code',
     'raven.contrib.django.raven_compat',

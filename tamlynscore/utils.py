@@ -1,3 +1,4 @@
+from django.forms.renderers import TemplatesSetting
 from django.utils.text import slugify
 
 
@@ -29,3 +30,8 @@ def generate_slug(cls, value, scope=None):
         count += 1
 
     return slug
+
+
+class TamlynScoreFormRenderer(TemplatesSetting):
+    form_template_name = "form-rows.html"
+    field_template_name = "form-item.html"

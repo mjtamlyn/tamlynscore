@@ -3,7 +3,7 @@
 {% block competition_content %}
 <h4>Input scores for {{ seed.label }} ({{ seed.session_round.category.name }} {{ seed.seed }})</h4>
 
-<form method="post" action="" novalidate>
+<form method="post" action="{{ request.get_full_path }}" novalidate>
 {% csrf_token %}
 {% for form in forms %}
     {% if form.form %}
