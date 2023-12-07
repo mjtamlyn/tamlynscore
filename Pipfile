@@ -9,8 +9,6 @@ dj-static = "*"
 django = "*"
 django-braces = "*"
 django-debug-toolbar = "*"
-django-custom-user = "*"
-django-floppyforms = "*"
 factory-boy = "*"
 gunicorn = "*"
 pillow = "*"
@@ -24,8 +22,10 @@ django-render-block = "*"
 django-qr-code = "*"
 django-webpack-loader = "*"
 django-bmemcached = "*"
+asgiref = "*"
+django-custom-user = "*"
 
 [dev-packages]
 
 [requires]
-python_version = "3.9"
+python_version = "3.12"

@@ -1,7 +1,7 @@
 import datetime
+from datetime import timezone
 
 from django.test import TestCase
-from django.utils import timezone
 
 from entries.forms import CompetitionForm
 from entries.models import Competition

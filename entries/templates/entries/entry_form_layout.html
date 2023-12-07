@@ -1,49 +1,70 @@
-{% extends "floppyforms/layouts/p.html" %}
-{% load floppyforms %}
+{% if form_title %}
+    <h2>{{ form_title }}</h2>
+{% endif %}
 
-{% block forms %}
-    {% if form_title %}
-        <h2>{{ form_title }}</h2>
-    {% endif %}
+{% if batch %}
+<div class="batch-status">
+    <p>Current row: <strong>{{ current_row }}</strong>. Rows to process: <strong>{{ batch_length }}</strong>.</p>
+</div>
+{% endif %}
 
-    {% if batch %}
-    <div class="batch-status">
-        <p>Current row: <strong>{{ current_row }}</strong>. Rows to process: <strong>{{ batch_length }}</strong>.</p>
-    </div>
-    {% endif %}
-
-    <form action="" method="post" class="page-form">
-        {% csrf_token %}
-        <div class="form-group">
-            <div class="form-group">
-                {% formrow form.agb_number form.guest using 'form-item.html' %}
-                {% formrow form.bowstyle form.update_bowstyle using 'form-item.html' %}
-                {% if form.club %}
-                    {% formrow form.club form.update_club using 'form-item.html' %}
-                {% endif %}
-                {% if form.county %}
-                    {% formrow form.county using 'form-item.html' %}
-                {% endif %}
-                {% if form.custom_team_name %}
-                    {% formrow form.custom_team_name using 'form-item.html' %}
-                {% endif %}
-                {% if form.novice %}
-                    {% formrow form.novice form.update_novice using 'form-item.html' %}
-                {% endif %}
-                {% if form.age %}
-                    {% formrow form.age form.update_age using 'form-item.html' %}
-                {% endif %}
-                {% if form.agb_age %}
-                    {% formrow form.agb_age form.update_agb_age using 'form-item.html' %}
-                {% endif %}
-                {% if form.ifaa_division %}
-                    {% formrow form.ifaa_division using 'form-item.html' %}
-                {% endif %}
-                {% if form.sessions %}
-                    {% formrow form.sessions using 'form-item.html' %}
-                {% endif %}
-            </div>
+<form action="{{ request.get_full_path }}" method="post" class="page-form">
+    {% csrf_token %}
+    <div class="form-group">
+        <div class="form-row">
+            {{ form.agb_number.as_field_group }}
+            {% if form.guest %}
+                {{ form.guest.as_field_group }}
+            {% endif %}
         </div>
-        <p><input type="submit" class="btn" {% if button_text %}value="{{ button_text }}"{% endif %}></p>
-    </form>
-{% endblock %}
+        <div class="form-row">
+            {{ form.bowstyle.as_field_group }}
+            {{ form.update_bowstyle.as_field_group }}
+        </div>
+        {% if form.club %}
+            <div class="form-row">
+                {{ form.club.as_field_group }}
+                {{ form.update_club.as_field_group }}
+            </div>
+        {% endif %}
+        {% if form.county %}
+            <div class="form-row">
+                {{ form.county.as_field_group }}
+            </div>
+        {% endif %}
+        {% if form.custom_team_name %}
+            <div class="form-row">
+                {{ form.custom_team_name.as_field_group }}
+            </div>
+        {% endif %}
+        {% if form.novice %}
+            <div class="form-row">
+                {{ form.novice.as_field_group }}
+                {{ form.update_novice.as_field_group }}
+            </div>
+        {% endif %}
+        {% if form.age %}
+            <div class="form-row">
+                {{ form.age.as_field_group }}
+                {{ form.update_age.as_field_group }}
+            </div>
+        {% endif %}
+        {% if form.agb_age %}
+            <div class="form-row">
+                {{ form.agb_age.as_field_group }}
+                {{ form.update_agb_age.as_field_group }}
+            </div>
+        {% endif %}
+        {% if form.ifaa_division %}
+            <div class="form-row">
+                {{ form.ifaa_division.as_field_group }}
+            </div>
+        {% endif %}
+        {% if form.sessions %}
+            <div class="form-row">
+                {{ form.sessions.as_field_group }}
+            </div>
+        {% endif %}
+    </div>
+    <p><input type="submit" class="btn" {% if button_text %}value="{{ button_text }}"{% endif %}></p>
+</form>

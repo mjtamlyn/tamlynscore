@@ -1,15 +1,14 @@
-{% extends 'base.html' %}
+{% extends 'entries/competition_detail.html' %}
 
-{% load floppyforms %}
-
-{% block content %}
-<form action="" method="post" class="page-form">
+{% block competition_content %}
+<form action="{{ request.get_full_path }}" method="post" class="page-form">
     {% csrf_token %}
 
 	<div class="form-group">
 		<h2>Add a batch of entries</h2>
-
-        {% formrow form.data using 'form-item.html' %}
+        <div class="form-row">
+            {{ form.data.as_field_group }}
+        </div>
         <input type="submit" class="btn" />
 	</div>
 </form>
