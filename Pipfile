@@ -24,8 +24,9 @@ django-render-block = "*"
 django-qr-code = "*"
 django-webpack-loader = "*"
 django-bmemcached = "*"
+asgiref = "*"
 
 [dev-packages]
 
 [requires]
-python_version = "3.9"
+python_version = "3.12"
