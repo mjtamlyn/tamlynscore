@@ -107,7 +107,7 @@ const targetListReducer = (targetList, action) => {
         }
         case 'insertBossAfter': {
             insertBossAfter(session.bosses, action.boss, getLetters(session));
-            actionQueue.doAction({ type: 'SHIFTUP', params: {session: action.sessionId, number: action.boss}});
+            actionQueue.doAction({ type: 'SHIFTUP', params: {session: action.sessionId, number: action.boss + 1}});
             return;
         }
         case 'removeBoss': {
