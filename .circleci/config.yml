@@ -24,7 +24,7 @@ references:
                 - v1-repo
 
     pip_cache_key: &pip_cache_key
-        v6-pip-cache
+        v7-pip-cache
 
     restore_pip: &restore_pip
         restore_cache:
@@ -32,9 +32,9 @@ references:
                 - *pip_cache_key
 
     pipenv_cache_key: &pipenv_cache_key
-        v1-pipenv-cache-{{ checksum "Pipfile.lock" }}
+        v2-pipenv-cache-{{ checksum "Pipfile.lock" }}
     pipenv_backup_cache_key: &pipenv_backup_cache_key
-        v1-pipenv-cache
+        v2-pipenv-cache
 
     restore_pipenv: &restore_pipenv
         restore_cache:
@@ -101,15 +101,15 @@ jobs:
             - run:
                 name: Install pipenv dependencies
                 command: |
-                    python -m venv .pip_venv
-                    find .pipenv
-                    source .pip_venv/bin/activate
+                    python -m venv .venv
+                    find .venv
+                    source .venv/bin/activate
                     pip install pipenv
                     pipenv install --ignore-pipfile
             - save_cache:
                 key: *pip_cache_key
                 paths:
-                    - .pip_venv
+                    - .venv
             - save_cache:
                 key: *pipenv_cache_key
                 paths:
