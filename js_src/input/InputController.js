@@ -1,13 +1,54 @@
 import React, { useState } from 'react';
 
-import Score from '../models/Score';
-import Store from '../models/Store';
+import { ErrorBoundary } from 'react-error-boundary';
+
+import { CompetitionContext } from '../context/CompetitionContext';
+import { InputScoresProvider } from '../context/InputScoresContext';
+import useQuery from '../utils/useQuery';
+import FullPageLoading from '../utils/FullPageLoading';
+import FullPageWrapper from '../utils/FullPageWrapper';
+import ErrorState from '../utils/ErrorState';
 
 import SessionList from './SessionList';
 import Target from './Target';
-import FullPageLoading from '../utils/FullPageLoading';
-import FullPageWrapper from '../utils/FullPageWrapper';
-import View from '../utils/View';
+
+
+const SessionListPage = ({ api, setPage }) => {
+    const [data, loading] = useQuery(api);
+    if (loading) return <FullPageLoading />;
+
+    return (
+        <FullPageWrapper competition={ data.competition }>
+            <ErrorBoundary FallbackComponent={ ErrorState }>
+                <CompetitionContext.Provider value={ data.competition }>
+                    <SessionList sessions={ data.sessions } user={ data.user } setPage={ setPage } />
+                </CompetitionContext.Provider>
+            </ErrorBoundary>
+        </FullPageWrapper>
+    );
+};
+
+
+const TargetPage = ({ api, setPage }) => {
+    const [data, loading] = useQuery(api);
+    if (loading) return <FullPageLoading />;
+
+    return (
+        <FullPageWrapper competition={ data.competition }>
+            <ErrorBoundary FallbackComponent={ ErrorState }>
+                <CompetitionContext.Provider value={ data.competition }>
+                    <InputScoresProvider scores={ data.scores } api={ api }>
+                        <Target
+                            session={ data.session }
+                            user={ data.user }
+                            setPageRoot={ () => setPage({name: 'root', api: '/scoring/api/' }) }
+                        />
+                    </InputScoresProvider>
+                </CompetitionContext.Provider>
+            </ErrorBoundary>
+        </FullPageWrapper>
+    );
+};
 
 
 const InputController = () => {
@@ -16,39 +57,18 @@ const InputController = () => {
         'api': '/scoring/api/',
     });
 
+    let content = null;
     if (page.name === 'root') {
-        return (
-            <View api={ page.api } Loading={ FullPageLoading } render={
-                data => {
-                    return (
-                        <FullPageWrapper competition={ data.competition }>
-                            <SessionList sessions={ data.sessions } user={ data.user } competition={ data.competition } setPage={ setPage } />
-                        </FullPageWrapper>
-                    );
-                }
-            } key={ page.name } />
-        );
+        content = <SessionListPage api={ page.api } setPage={ setPage } />;
     } else {
-        return (
-            <View api={ page.api } Loading={ FullPageLoading } render={ data => {
-                const scores = data.scores.map(score => new Score({ ...score }));
-                const store = new Store({ api: page.api, data: scores, dataName: 'scores' });
-                return (
-                    <FullPageWrapper competition={ data.competition }>
-                        <Target
-                            session={ data.session }
-                            user={ data.user }
-                            competition={ data.competition }
-                            scores={ store.data }
-                            store={ store }
-                            setPageRoot={ () => setPage({name: 'root', api: '/scoring/api/' }) }
-                            key={ page.name }
-                        />
-                    </FullPageWrapper>
-                );
-            } } />
-        );
+        content = <TargetPage api={ page.api } setPage={ setPage } />;
     }
+
+    return (
+        <ErrorBoundary FallbackComponent={ ErrorState }>
+            { content }
+        </ErrorBoundary>
+    );
 };
 
 export default InputController;

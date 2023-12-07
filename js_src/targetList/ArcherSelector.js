@@ -1,7 +1,6 @@
 import React, { useState, useEffect, useRef } from 'react';
 
-import useMousetrap from 'react-hook-mousetrap';
-
+import useMousetrap from '../utils/useMousetrap';
 import ArcherPills from '../utils/ArcherPills';
 import textMatcher from '../utils/textMatcher';
 
@@ -76,8 +75,7 @@ const ArcherSelector = ({ archers, onSelect, close, emptyLabel="Select…" }) =>
     };
 
     const archerList = archers.filter(archer => textMatcher(search, archer.searchtext)).map(archer => {
-        const clickHandler = (e) =>{
-            e.preventDefault();
+        const clickHandler = () =>{
             onSelect(archer);
             close();
         }

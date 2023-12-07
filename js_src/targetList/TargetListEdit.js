@@ -1,13 +1,15 @@
 import React, { useContext, useState } from 'react';
 
 import { CompetitionContext } from '../context/CompetitionContext';
+import { TargetListContext } from '../context/TargetListContext';
 import SessionList from './SessionList';
 
-const TargetListEdit = ({ targetList, store }) => {
+const TargetListEdit = () => {
     const competition = useContext(CompetitionContext);
+    const targetList = useContext(TargetListContext);
     const [editMode, setEditMode] = useState(false);
 
-    const sessionCount = targetList.length;
+    const sessionCount = targetList.sessions.size;
     let sessionColClass = {
         1: 'col3',
         2: 'col3',
@@ -18,14 +20,14 @@ const TargetListEdit = ({ targetList, store }) => {
         sessionColClass = 'col2';
     }
 
-    const sessions = targetList.map(session => {
+    const sessions = Array.from(targetList.sessions.values().map(session => {
         return (
             <div className={ 'session ' + sessionColClass } key={ session.sessionTime }>
                 <h4>{ session.sessionTime }</h4>
                 <SessionList session={ session } editMode={ editMode } />
             </div>
         );
-    });
+    }));
     return (
         <div className="target-list module">
             <h2>Target List</h2>

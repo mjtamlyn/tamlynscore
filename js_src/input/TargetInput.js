@@ -1,19 +1,22 @@
-import React, { useState } from 'react';
+import React, { useState, useContext } from 'react';
 
+import { InputScoresDispatchContext } from '../context/InputScoresContext';
+
+import { isEndComplete, getEnd } from './utils';
 import ArcherRow from './ArcherRow';
 import ScoreInput from './ScoreInput';
 
 
 const TargetInput = ({ scores, endNumber, toSummary }) => {
-    const endLength = 3;
+    const dispatch = useContext(InputScoresDispatchContext);
 
     let initialActive = null;
     let initialCursor = null;
 
     scores.forEach((score) => {
-        if (!score.isEndComplete(endNumber) && !initialActive) {
+        if (!isEndComplete(score, endNumber) && !initialActive) {
             initialActive = score;
-            initialCursor = score.getEnd(endNumber).length;
+            initialCursor = getEnd(score, endNumber).length;
         } else {
         }
     });
@@ -22,10 +25,10 @@ const TargetInput = ({ scores, endNumber, toSummary }) => {
     const [activeScore, setActiveScore] = useState(initialActive);
 
     const setArrow = (number) => {
-        activeScore.setScore(endNumber, cursorPosition, number);
-        if (cursorPosition + 1 === endLength) {
+        dispatch({ type: 'setScore', score: activeScore, endNumber, cursorPosition, number });
+        if (cursorPosition + 1 === activeScore.endLength) {
             setCursorPosition(0);
-            const currentIndex = scores.indexOf(activeScore);
+            const currentIndex = scores.findIndex(s => s.target === activeScore.target);
             if (currentIndex + 1 < scores.length) {
                 setActiveScore(scores[currentIndex + 1]);
             } else {
