@@ -2,10 +2,8 @@ import React, { useState } from 'react';
 
 import { ErrorBoundary } from 'react-error-boundary';
 
-import Score from '../models/Score';
-import Store from '../models/Store';
-
 import { CompetitionContext } from '../context/CompetitionContext';
+import { InputScoresProvider } from '../context/InputScoresContext';
 import useQuery from '../utils/useQuery';
 import FullPageLoading from '../utils/FullPageLoading';
 import FullPageWrapper from '../utils/FullPageWrapper';
@@ -35,19 +33,17 @@ const TargetPage = ({ api, setPage }) => {
     const [data, loading] = useQuery(api);
     if (loading) return <FullPageLoading />;
 
-    const scores = data.scores.map(score => new Score({ ...score }));
-    const store = new Store({ api: api, data: scores, dataName: 'scores' });
     return (
         <FullPageWrapper competition={ data.competition }>
             <ErrorBoundary FallbackComponent={ ErrorState }>
                 <CompetitionContext.Provider value={ data.competition }>
-                    <Target
-                        session={ data.session }
-                        user={ data.user }
-                        scores={ store.data }
-                        store={ store }
-                        setPageRoot={ () => setPage({name: 'root', api: '/scoring/api/' }) }
-                    />
+                    <InputScoresProvider scores={ data.scores } api={ api }>
+                        <Target
+                            session={ data.session }
+                            user={ data.user }
+                            setPageRoot={ () => setPage({name: 'root', api: '/scoring/api/' }) }
+                        />
+                    </InputScoresProvider>
                 </CompetitionContext.Provider>
             </ErrorBoundary>
         </FullPageWrapper>

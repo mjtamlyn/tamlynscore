@@ -1,19 +1,20 @@
 import React from 'react';
 
 import ArcherRowDetails from './ArcherRowDetails';
+import { getEnd, getEndScore, getGoldCount, getRunningTotal } from './utils';
 
 
 const ScoreSheet = ({ score, toSummary }) => {
     const ends = [...Array(20).keys()];
     const scoreRows = ends.map((endNumber) => {
-        const end = score.getEnd(endNumber + 1);
+        const end = getEnd(score, endNumber + 1);
         return [
             <div key={ `${endNumber}|1` }>{ end[0] || '-' }</div>,
             <div key={ `${endNumber}|2` }>{ end[1] || '-' }</div>,
             <div key={ `${endNumber}|3` }>{ end[2] || '-' }</div>,
-            <div className="archers__score__total" key={ `${endNumber}|end` }>{ score.getEndScore(endNumber + 1) }</div>,
-            <div className="archers__score__total" key={ `${endNumber}|golds` }>{ score.getGoldCount(endNumber + 1) }</div>,
-            <div className="archers__score__total" key={ `${endNumber}|rt` }>{ score.getRunningTotal(endNumber + 1) }</div>,
+            <div className="archers__score__total" key={ `${endNumber}|end` }>{ getEndScore(score, endNumber + 1) }</div>,
+            <div className="archers__score__total" key={ `${endNumber}|golds` }>{ getGoldCount(score, endNumber + 1) }</div>,
+            <div className="archers__score__total" key={ `${endNumber}|rt` }>{ getRunningTotal(score, endNumber + 1) }</div>,
         ];
     });
     return (
@@ -29,10 +30,10 @@ const ScoreSheet = ({ score, toSummary }) => {
                         { scoreRows }
                         <div style={ { gridColumnEnd: 'span 3' } } />
                         <div className="archers__score__grand-total">
-                            { score.getRunningTotal() }
+                            { getRunningTotal(score) }
                         </div>
                         <div className="archers__score__grand-total">
-                            { score.getGoldCount() }
+                            { getGoldCount(score) }
                         </div>
                     </div>
                 </div>

@@ -1,10 +1,11 @@
 import React from 'react';
 
+import { getEnd, getEndScore, getRunningTotal } from './utils';
 import ArcherRowDetails from './ArcherRowDetails';
 
 
 const ArcherRow = ({ score, endNumber, active, cursorPosition = null, setPosition }) => {
-    const currentArrows = score.getEnd(endNumber);
+    const currentArrows = getEnd(score, endNumber);
 
     let inputCls1 = 'archers__score__input';
     let inputCls2 = 'archers__score__input';
@@ -27,8 +28,8 @@ const ArcherRow = ({ score, endNumber, active, cursorPosition = null, setPositio
                 <div onClick={ setPosition(score, 0) } className={ inputCls1 }>{ currentArrows[0] || '\u00A0' }</div>
                 <div onClick={ setPosition(score, 1) } className={ inputCls2 }>{ currentArrows[1] }</div>
                 <div onClick={ setPosition(score, 2) } className={ inputCls3 }>{ currentArrows[2] }</div>
-                <div className="archers__score__total">{ score.getEndScore(endNumber) }</div>
-                <div className="archers__score__total">{ score.getRunningTotal(endNumber) }</div>
+                <div className="archers__score__total">{ getEndScore(score, endNumber) }</div>
+                <div className="archers__score__total">{ getRunningTotal(score, endNumber) }</div>
             </div>
         </div>
     )
