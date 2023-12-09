@@ -3717,28 +3717,47 @@ li {
   margin-right: 2px;
 }
 /* line 31, ../../sass/_buttons.sass */
+.btn.btn-toggle {
+  display: inline-flex;
+  padding: 0;
+}
+/* line 35, ../../sass/_buttons.sass */
+.btn.btn-toggle .btn-segment {
+  padding: 5px 10px;
+}
+/* line 38, ../../sass/_buttons.sass */
+.btn.btn-toggle .btn-segment.selected {
+  background: #6FB3FF;
+  box-shadow: 0 0 3px #004ca2 inset;
+  border-radius: 5px;
+}
+/* line 43, ../../sass/_buttons.sass */
+.btn.btn-toggle.btn-small .btn-segment {
+  padding: 3px 6px;
+}
+/* line 46, ../../sass/_buttons.sass */
 .btn.delete {
   background-color: #A21;
 }
-/* line 34, ../../sass/_buttons.sass */
+/* line 49, ../../sass/_buttons.sass */
 .btn.delete:hover {
   background-color: #d82b16;
 }
-/* line 37, ../../sass/_buttons.sass */
+/* line 52, ../../sass/_buttons.sass */
 .btn.score-sheet {
   background-color: #f65058;
 }
-/* line 40, ../../sass/_buttons.sass */
+/* line 55, ../../sass/_buttons.sass */
 .btn.score-sheet:hover {
   background-color: #f65058;
 }
-/* line 43, ../../sass/_buttons.sass */
+/* line 58, ../../sass/_buttons.sass */
 .btn.depressed {
   background-color: #0064d5;
   box-shadow: 0 0 5px #002147 inset;
 }
 
-/* line 47, ../../sass/_buttons.sass */
+/* line 62, ../../sass/_buttons.sass */
 button.action-button {
   font-size: inherit;
   background: none;
@@ -3747,7 +3766,7 @@ button.action-button {
   margin: 0;
 }
 
-/* line 56, ../../sass/_buttons.sass */
+/* line 71, ../../sass/_buttons.sass */
 .btn.add:before,
 .action-button.add:before {
   display: inline-block;
@@ -3758,7 +3777,7 @@ button.action-button {
   -moz-osx-font-smoothing: grayscale;
   content: "";
 }
-/* line 60, ../../sass/_buttons.sass */
+/* line 75, ../../sass/_buttons.sass */
 .btn.edit:before,
 .action-button.edit:before {
   display: inline-block;
@@ -3769,7 +3788,7 @@ button.action-button {
   -moz-osx-font-smoothing: grayscale;
   content: "";
 }
-/* line 64, ../../sass/_buttons.sass */
+/* line 79, ../../sass/_buttons.sass */
 .btn.delete:before,
 .action-button.delete:before {
   display: inline-block;
@@ -3780,7 +3799,7 @@ button.action-button {
   -moz-osx-font-smoothing: grayscale;
   content: "";
 }
-/* line 68, ../../sass/_buttons.sass */
+/* line 83, ../../sass/_buttons.sass */
 .btn.archive:before,
 .action-button.archive:before {
   display: inline-block;
@@ -3791,7 +3810,7 @@ button.action-button {
   -moz-osx-font-smoothing: grayscale;
   content: "";
 }
-/* line 72, ../../sass/_buttons.sass */
+/* line 87, ../../sass/_buttons.sass */
 .btn.insert:before,
 .action-button.insert:before {
   display: inline-block;
@@ -3802,7 +3821,7 @@ button.action-button {
   -moz-osx-font-smoothing: grayscale;
   content: "";
 }
-/* line 76, ../../sass/_buttons.sass */
+/* line 91, ../../sass/_buttons.sass */
 .btn.score-sheet:before,
 .action-button.score-sheet:before {
   display: inline-block;
@@ -3813,7 +3832,7 @@ button.action-button {
   -moz-osx-font-smoothing: grayscale;
   content: "";
 }
-/* line 80, ../../sass/_buttons.sass */
+/* line 95, ../../sass/_buttons.sass */
 .btn.reveal:after,
 .action-button.reveal:after {
   display: inline-block;
@@ -6062,7 +6081,7 @@ table.tree td.border-right {
 }
 /* line 47, ../../sass/_target_input.sass */
 #target-input .full-height-page__card {
-  margin: 30px;
+  margin: 15px;
   text-align: center;
   padding: 15px 10px;
   background-color: #6FB3FF;
@@ -6135,6 +6154,10 @@ table.tree td.border-right {
   font-weight: bold;
 }
 /* line 111, ../../sass/_target_input.sass */
+#target-input .archers__score-display-toggle {
+  text-align: right;
+}
+/* line 114, ../../sass/_target_input.sass */
 #target-input .archers__score {
   grid-column-end: span 3;
   display: grid;
@@ -6144,31 +6167,31 @@ table.tree td.border-right {
   text-align: center;
   overflow-x: auto;
 }
-/* line 120, ../../sass/_target_input.sass */
+/* line 123, ../../sass/_target_input.sass */
 #target-input .archers__score__heading {
   border-bottom: 1px solid #000F1F;
   font-weight: bold;
   font-size: smaller;
 }
-/* line 125, ../../sass/_target_input.sass */
+/* line 128, ../../sass/_target_input.sass */
 #target-input .archers__score__heading--span {
   grid-column-end: span 3;
 }
-/* line 128, ../../sass/_target_input.sass */
+/* line 131, ../../sass/_target_input.sass */
 #target-input .archers__score__total, #target-input .archers__score__grand-total {
   font-weight: bold;
 }
-/* line 132, ../../sass/_target_input.sass */
+/* line 135, ../../sass/_target_input.sass */
 #target-input .archers__score__grand-total {
   border-top: 1px solid #000F1F;
 }
-/* line 135, ../../sass/_target_input.sass */
+/* line 138, ../../sass/_target_input.sass */
 #target-input .archers__score__input {
   border: 1px solid transparent;
   transition: background-color 0.5s, padding 0.5s, border 0.5s;
   height: 100%;
 }
-/* line 140, ../../sass/_target_input.sass */
+/* line 143, ../../sass/_target_input.sass */
 #target-input .archers__summary {
   grid-column-end: span 3;
   display: flex;
@@ -6176,11 +6199,11 @@ table.tree td.border-right {
   align-items: baseline;
   font-weight: bold;
 }
-/* line 147, ../../sass/_target_input.sass */
+/* line 150, ../../sass/_target_input.sass */
 #target-input .archers__summary__legend {
   font-weight: normal;
 }
-/* line 151, ../../sass/_target_input.sass */
+/* line 154, ../../sass/_target_input.sass */
 #target-input .archers__row--current .archers__score__input {
   background-color: white;
   border: 1px solid #000F1F;
@@ -6188,13 +6211,13 @@ table.tree td.border-right {
   padding: 6px 0;
   font-weight: bold;
 }
-/* line 158, ../../sass/_target_input.sass */
+/* line 161, ../../sass/_target_input.sass */
 #target-input .archers__row--current .archers__score__input--active {
   box-shadow: 0 0 2px #D58100 inset;
   border-color: #D58100;
   background-color: #eeeeee;
 }
-/* line 163, ../../sass/_target_input.sass */
+/* line 166, ../../sass/_target_input.sass */
 #target-input .score-input {
   display: grid;
   grid-template-columns: repeat(4, 1fr);
@@ -6204,7 +6227,7 @@ table.tree td.border-right {
   padding: 5px;
   flex-grow: 1;
 }
-/* line 172, ../../sass/_target_input.sass */
+/* line 175, ../../sass/_target_input.sass */
 #target-input .score-input__control {
   font-size: 25px;
   font-weight: bold;
@@ -6213,38 +6236,38 @@ table.tree td.border-right {
   align-items: center;
   justify-content: center;
 }
-/* line 180, ../../sass/_target_input.sass */
+/* line 183, ../../sass/_target_input.sass */
 #target-input .score-input__control--gold {
   background-color: #ffe552;
 }
-/* line 182, ../../sass/_target_input.sass */
+/* line 185, ../../sass/_target_input.sass */
 #target-input .score-input__control--red {
   background-color: #f65058;
   color: white;
 }
-/* line 185, ../../sass/_target_input.sass */
+/* line 188, ../../sass/_target_input.sass */
 #target-input .score-input__control--blue {
   background-color: #00b4e4;
 }
-/* line 187, ../../sass/_target_input.sass */
+/* line 190, ../../sass/_target_input.sass */
 #target-input .score-input__control--black {
   background-color: #020202;
   color: white;
 }
-/* line 190, ../../sass/_target_input.sass */
+/* line 193, ../../sass/_target_input.sass */
 #target-input .score-input__control--white {
   background-color: #ffffff;
 }
-/* line 192, ../../sass/_target_input.sass */
+/* line 195, ../../sass/_target_input.sass */
 #target-input .score-input__control--green {
   background-color: #486F38;
   color: white;
 }
-/* line 196, ../../sass/_target_input.sass */
+/* line 199, ../../sass/_target_input.sass */
 #target-input .score-input__control--miss {
   grid-column-end: span 2;
 }
-/* line 199, ../../sass/_target_input.sass */
+/* line 202, ../../sass/_target_input.sass */
 #target-input .sync-status {
   position: fixed;
   bottom: 0;
