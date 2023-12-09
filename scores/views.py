@@ -741,6 +741,7 @@ class TargetAPISession(CsrfExemptMixin, EntryUserRequired, View):
                     'totalArrows': round_shot.arrows,
                     'endLength': session_entry.session_round.session.arrows_entered_per_end,
                     'endCount': round_shot.arrows / session_entry.session_round.session.arrows_entered_per_end,
+                    'splits': round_shot.splits,
                     'resultsOptions': {
                         'scoringHeadings': round_shot.score_sheet_headings,
                         'hasXs': round_shot.has_xs,

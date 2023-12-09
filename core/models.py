@@ -77,12 +77,16 @@ class Subround(models.Model):
     target_face = models.PositiveIntegerField()
 
     def __str__(self):
-        return u'{0} arrows at {1} {2} ({3}cm)'.format(
+        return '{0} arrows at {1} {2} ({3}cm)'.format(
             self.arrows,
             self.distance,
             self.get_unit_display(),
             self.target_face,
         )
+
+    @property
+    def distance_short(self):
+        return '{}{}'.format(self.distance, self.unit)
 
     class Meta:
         ordering = ('unit', '-distance', '-arrows', '-target_face')
@@ -118,6 +122,23 @@ class Round(models.Model):
             if subround.arrows >= arrows:
                 return subround
         raise Exception('There aren\'t that many dozens in that round!')
+
+    @property
+    def splits(self):
+        if self.can_split:
+            subround = self.subrounds.first()  # There should only be one anyway
+            return [{
+                'name': '%s-1' % subround.distance_short,
+                'arrows': subround.arrows / 2,
+            }, {
+                'name': '%s-2' % subround.distance_short,
+                'arrows': subround.arrows / 2,
+            }]
+        else:
+            return [{
+                'name': subround.distance_short,
+                'arrows': subround.arrows,
+            } for subround in self.subrounds.order_by('-distance')]
 
     @property
     def has_xs(self):

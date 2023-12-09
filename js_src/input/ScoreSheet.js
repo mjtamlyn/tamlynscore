@@ -87,6 +87,30 @@ const ScoreSheet = ({ score, toSummary }) => {
     );
 
     const columnsCount = endLength + 2 + score.round.resultsOptions.scoringHeadings.length + (endLength === 12 ? 2 : 0);
+    const totalsPadding = endLength === 12 ? 14 : endLength
+
+    const splits = [];
+    score.round.splits.forEach((split, index) => {
+        // TODO: at the moment this assumes the splits are the same length. Will fail on Yorks/Bristols.
+        splits.push(
+            <div style={ { gridColumnEnd: `span ${totalsPadding - 1}` } } key={ `${split.name}|padding` } />,
+            <div className="archers__score__split-title" key={ `${split.name}|name` }>{ split.name }</div>,
+            <div className="archers__score__grand-total" key={ `${split.name}|score` }>{ getEndScore(score, index + 1, split.arrows) }</div>,
+        );
+        if (score.round.resultsOptions.hasHits) {
+            splits.push(
+                <div className="archers__score__grand-total" key={ `${split.name}|hits` }>
+                    { getHitCount(score, index + 1, split.arrows) }
+                </div>
+            );
+        }
+        splits.push(
+            <div className="archers__score__grand-total" key={ `${split.name}|golds` }>
+                { getGoldCount(score, index + 1, split.arrows) }
+            </div>,
+            <div key={ `${split.name}|padding2` }></div>,
+        );
+    });
 
     return (
         <>
@@ -101,7 +125,7 @@ const ScoreSheet = ({ score, toSummary }) => {
                     <div className="archers__score" style={ { gridTemplateColumns: `repeat(${columnsCount}, 1fr)`} }>
                         { headings }
                         { scoreRows }
-                        <div style={ { gridColumnEnd: `span ${endLength === 12 ? 14 : endLength}` } } />
+                        <div style={ { gridColumnEnd: `span ${totalsPadding}` } } />
                         <div className="archers__score__grand-total">
                             { getRunningTotal(score) }
                         </div>
@@ -113,6 +137,8 @@ const ScoreSheet = ({ score, toSummary }) => {
                         <div className="archers__score__grand-total">
                             { getGoldCount(score) }
                         </div>
+                        <div></div>
+                        { splits }
                     </div>
                 </div>
             </div>
