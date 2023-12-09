@@ -40,6 +40,14 @@ function getEndScore(score, endNumber, endLength) {
     return sum(getEnd(score, endNumber, endLength));
 }
 
+function getHitCount(score, endNumber, endLength) {
+    let arrows = score.arrows;
+    if (endNumber) {
+        arrows = getEnd(score, endNumber, endLength);
+    }
+    return sum(arrows.map(a => ((a && a !== 'M') ? 1 : 0)));
+}
+
 function getGoldCount(score, endNumber, endLength) {
     let arrows = score.arrows;
     if (endNumber) {
@@ -49,4 +57,4 @@ function getGoldCount(score, endNumber, endLength) {
 }
 
 
-export { currentEnd, getEnd, isEndComplete, getEndScore, getRunningTotal, getGoldCount, getArrowsShot };
+export { currentEnd, getEnd, isEndComplete, getEndScore, getRunningTotal, getGoldCount, getHitCount, getArrowsShot };
