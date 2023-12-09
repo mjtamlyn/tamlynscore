@@ -5,30 +5,33 @@ import { getEnd, getEndScore, getGoldCount, getRunningTotal } from './utils';
 
 
 const ScoreSheet = ({ score, toSummary }) => {
-    const ends = [...Array(20).keys()];
+    const ends = [...Array(score.endCount).keys()];
+    const arrowNumbers = [...Array(score.endLength).keys()];
     const scoreRows = ends.map((endNumber) => {
         const end = getEnd(score, endNumber + 1);
+        const arrows = arrowNumbers.map(index => <div key={ `${endNumber}|${index}` }>{ end[index] || '-' }</div>);
         return [
-            <div key={ `${endNumber}|1` }>{ end[0] || '-' }</div>,
-            <div key={ `${endNumber}|2` }>{ end[1] || '-' }</div>,
-            <div key={ `${endNumber}|3` }>{ end[2] || '-' }</div>,
+            ...arrows,
             <div className="archers__score__total" key={ `${endNumber}|end` }>{ getEndScore(score, endNumber + 1) }</div>,
             <div className="archers__score__total" key={ `${endNumber}|golds` }>{ getGoldCount(score, endNumber + 1) }</div>,
             <div className="archers__score__total" key={ `${endNumber}|rt` }>{ getRunningTotal(score, endNumber + 1) }</div>,
         ];
     });
+
+    const columnsCount = score.endLength + 3;
+
     return (
         <>
             <div className="full-height-page__card">
                 <div className="archers__row">
                     <ArcherRowDetails score={ score } />
-                    <div className="archers__score" style={ { gridTemplateColumns: 'repeat(6, 1fr)'} }>
-                        <div className="archers__score__heading archers__score__heading--span">Arrows</div>
+                    <div className="archers__score" style={ { gridTemplateColumns: `repeat(${columnsCount}, 1fr)`} }>
+                        <div className="archers__score__heading archers__score__heading--span" style={ { gridColumnEnd: `span ${score.endLength}` } }>Arrows</div>
                         <div className="archers__score__heading">S</div>
                         <div className="archers__score__heading">10s</div>
                         <div className="archers__score__heading">RT</div>
                         { scoreRows }
-                        <div style={ { gridColumnEnd: 'span 3' } } />
+                        <div style={ { gridColumnEnd: `span ${score.endLength}` } } />
                         <div className="archers__score__grand-total">
                             { getRunningTotal(score) }
                         </div>

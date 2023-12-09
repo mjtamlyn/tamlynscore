@@ -6139,35 +6139,36 @@ table.tree td.border-right {
   grid-column-end: span 3;
   display: grid;
   grid-template-columns: repeat(5, 1fr);
-  grid-gap: 3px;
+  grid-gap: 3px 5px;
   align-items: baseline;
   text-align: center;
+  overflow-x: auto;
 }
-/* line 119, ../../sass/_target_input.sass */
+/* line 120, ../../sass/_target_input.sass */
 #target-input .archers__score__heading {
   border-bottom: 1px solid #000F1F;
-  font-weight: italic;
+  font-weight: bold;
   font-size: smaller;
 }
-/* line 124, ../../sass/_target_input.sass */
+/* line 125, ../../sass/_target_input.sass */
 #target-input .archers__score__heading--span {
   grid-column-end: span 3;
 }
-/* line 127, ../../sass/_target_input.sass */
+/* line 128, ../../sass/_target_input.sass */
 #target-input .archers__score__total, #target-input .archers__score__grand-total {
   font-weight: bold;
 }
-/* line 131, ../../sass/_target_input.sass */
+/* line 132, ../../sass/_target_input.sass */
 #target-input .archers__score__grand-total {
   border-top: 1px solid #000F1F;
 }
-/* line 134, ../../sass/_target_input.sass */
+/* line 135, ../../sass/_target_input.sass */
 #target-input .archers__score__input {
   border: 1px solid transparent;
   transition: background-color 0.5s, padding 0.5s, border 0.5s;
   height: 100%;
 }
-/* line 139, ../../sass/_target_input.sass */
+/* line 140, ../../sass/_target_input.sass */
 #target-input .archers__summary {
   grid-column-end: span 3;
   display: flex;
@@ -6175,11 +6176,11 @@ table.tree td.border-right {
   align-items: baseline;
   font-weight: bold;
 }
-/* line 146, ../../sass/_target_input.sass */
+/* line 147, ../../sass/_target_input.sass */
 #target-input .archers__summary__legend {
   font-weight: normal;
 }
-/* line 150, ../../sass/_target_input.sass */
+/* line 151, ../../sass/_target_input.sass */
 #target-input .archers__row--current .archers__score__input {
   background-color: white;
   border: 1px solid #000F1F;
@@ -6187,13 +6188,13 @@ table.tree td.border-right {
   padding: 6px 0;
   font-weight: bold;
 }
-/* line 157, ../../sass/_target_input.sass */
+/* line 158, ../../sass/_target_input.sass */
 #target-input .archers__row--current .archers__score__input--active {
   box-shadow: 0 0 2px #D58100 inset;
   border-color: #D58100;
   background-color: #eeeeee;
 }
-/* line 162, ../../sass/_target_input.sass */
+/* line 163, ../../sass/_target_input.sass */
 #target-input .score-input {
   display: grid;
   grid-template-columns: repeat(4, 1fr);
@@ -6203,7 +6204,7 @@ table.tree td.border-right {
   padding: 5px;
   flex-grow: 1;
 }
-/* line 171, ../../sass/_target_input.sass */
+/* line 172, ../../sass/_target_input.sass */
 #target-input .score-input__control {
   font-size: 25px;
   font-weight: bold;
@@ -6212,38 +6213,38 @@ table.tree td.border-right {
   align-items: center;
   justify-content: center;
 }
-/* line 179, ../../sass/_target_input.sass */
+/* line 180, ../../sass/_target_input.sass */
 #target-input .score-input__control--gold {
   background-color: #ffe552;
 }
-/* line 181, ../../sass/_target_input.sass */
+/* line 182, ../../sass/_target_input.sass */
 #target-input .score-input__control--red {
   background-color: #f65058;
   color: white;
 }
-/* line 184, ../../sass/_target_input.sass */
+/* line 185, ../../sass/_target_input.sass */
 #target-input .score-input__control--blue {
   background-color: #00b4e4;
 }
-/* line 186, ../../sass/_target_input.sass */
+/* line 187, ../../sass/_target_input.sass */
 #target-input .score-input__control--black {
   background-color: #020202;
   color: white;
 }
-/* line 189, ../../sass/_target_input.sass */
+/* line 190, ../../sass/_target_input.sass */
 #target-input .score-input__control--white {
   background-color: #ffffff;
 }
-/* line 191, ../../sass/_target_input.sass */
+/* line 192, ../../sass/_target_input.sass */
 #target-input .score-input__control--green {
   background-color: #486F38;
   color: white;
 }
-/* line 195, ../../sass/_target_input.sass */
+/* line 196, ../../sass/_target_input.sass */
 #target-input .score-input__control--miss {
   grid-column-end: span 2;
 }
-/* line 198, ../../sass/_target_input.sass */
+/* line 199, ../../sass/_target_input.sass */
 #target-input .sync-status {
   position: fixed;
   bottom: 0;

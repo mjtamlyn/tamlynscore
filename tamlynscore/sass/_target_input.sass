@@ -112,13 +112,14 @@
       grid-column-end: span 3
       display: grid
       grid-template-columns: repeat(5, 1fr)
-      grid-gap: 3px
+      grid-gap: 3px 5px
       align-items: baseline
       text-align: center
+      overflow-x: auto
 
       &__heading
         border-bottom: 1px solid $dark
-        font-weight: italic
+        font-weight: bold
         font-size: smaller
 
         &--span
