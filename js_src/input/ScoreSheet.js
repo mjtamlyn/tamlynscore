@@ -11,12 +11,12 @@ const byDozen = 'byDozen';
 const ScoreSheet = ({ score, toSummary }) => {
     const [displayMode, setDisplayMode] = useState(byEntered);
 
-    const totalArrows = score.endCount * score.endLength;
-    const endCount = (displayMode === byEntered) ? score.endCount : (totalArrows / 12);
-    const endLength = (displayMode === byEntered) ? score.endLength : 12;
+    const totalArrows = score.round.endCount * score.round.endLength;
+    const endCount = (displayMode === byEntered) ? score.round.endCount : (totalArrows / 12);
+    const endLength = (displayMode === byEntered) ? score.round.endLength : 12;
 
     let displayToggle = null;
-    if (!(totalArrows % 12) && score.endLength < 12) {
+    if (!(totalArrows % 12) && score.round.endLength < 12) {
         const toggleDisplayMode = (e) => {
             e.preventDefault();
             if (displayMode === byEntered) {
@@ -27,7 +27,7 @@ const ScoreSheet = ({ score, toSummary }) => {
         };
         displayToggle = (
             <a onClick={ toggleDisplayMode } className="btn btn-small btn-toggle archers__score__toggle">
-                <div className={ 'btn-segment ' + (displayMode === byEntered ? 'selected' : '') }>{ score.endLength }s</div>
+                <div className={ 'btn-segment ' + (displayMode === byEntered ? 'selected' : '') }>{ score.round.endLength }s</div>
                 <div className={ 'btn-segment ' + (displayMode === byDozen ? 'selected' : '') }>12s</div>
             </a>
         );

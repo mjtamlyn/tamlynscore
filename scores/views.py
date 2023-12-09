@@ -695,6 +695,10 @@ class TargetAPISession(CsrfExemptMixin, EntryUserRequired, View):
         user_entry = request.user.competition_entry
         competition = user_entry.competition
         session_entry = self.get_session_entry(user_entry)
+        # There's an assumption here that all archers are shooting the same
+        # round as the logged in archer. This could cause issues with split
+        # round targets, but this is very rare.
+        round_shot = session_entry.session_round.shot_round
         targets = self.get_targets(session_entry)
 
         for target in targets.filter(score__isnull=True):
@@ -719,8 +723,6 @@ class TargetAPISession(CsrfExemptMixin, EntryUserRequired, View):
                 'name': target.session_entry.competition_entry.archer.name,
                 'categories': categories,
                 'arrows': [a.json_value for a in target.score.arrow_set.order_by('arrow_of_round')],
-                'endLength': session_entry.session_round.session.arrows_entered_per_end,
-                'endCount': session_entry.session_round.shot_round.arrows / session_entry.session_round.session.arrows_entered_per_end,
             })
 
         return JsonResponse({
@@ -734,7 +736,17 @@ class TargetAPISession(CsrfExemptMixin, EntryUserRequired, View):
                 'isAdmin': False,
             },
             'session': {
-                'round': session_entry.session_round.shot_round.name,
+                'round': {
+                    'name': round_shot.name,
+                    'totalArrows': round_shot.arrows,
+                    'endLength': session_entry.session_round.session.arrows_entered_per_end,
+                    'endCount': round_shot.arrows / session_entry.session_round.session.arrows_entered_per_end,
+                    'resultsOptions': {
+                        'scoringHeadings': round_shot.scoring_headings,
+                        'hasXs': round_shot.has_xs,
+                        'hasHits': round_shot.has_hits,
+                    },
+                },
                 'start': {
                     'iso': session_entry.session_round.session.start,
                     'pretty': session_entry.session_round.session.start.strftime('%d %B %-I:%M%p'),

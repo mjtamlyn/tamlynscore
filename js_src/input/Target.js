@@ -15,7 +15,7 @@ const Target = ({ session, setPageRoot }) => {
     const scores = useContext(InputScoresContext).scores;
 
     const [endNumber, setEndNumber] = useState(Math.max(...scores.map(score => currentEnd(score))));
-    const maxEnds = Math.max(...scores.map(score => score.endCount));
+    const maxEnds = Math.max(...scores.map(score => score.round.endCount));
     const [subpage, setSubpage] = useState('overview');
 
     if (!scores.length) {
