@@ -180,56 +180,6 @@ class InputArrowsView(CompetitionMixin, TemplateView):
         return render(request, self.template, locals())
 
 
-class InputArrowsArcher(CompetitionMixin, TemplateView):
-    template_name = 'scores/input_arrows_archer.html'
-    admin_required = False
-
-    def get_context_data(self, **kwargs):
-        score = Score.objects.get(pk=self.kwargs['score_id'])
-        entry = score.target.session_entry
-        round = entry.session_round.shot_round
-        per_end = entry.session_round.session.arrows_entered_per_end
-        layout = [{
-            'scores': ['-'] * per_end,
-            'doz': 0,
-            'hits': 0,
-            'golds': 0,
-            'xs': 0,
-            'et1': 0,
-            'et2': 0,
-            'rt': 0,
-        } for i in range(int(round.arrows / per_end))]
-        arrows = score.arrow_set.order_by('arrow_of_round')
-        for arrow in arrows:
-            dozen = int((arrow.arrow_of_round - 1) / per_end)
-            point = arrow.arrow_of_round % per_end - 1
-            layout[dozen]['scores'][point] = str(arrow)
-            layout[dozen]['doz'] += arrow.arrow_value
-            if point < 6 and point >= 0:
-                layout[dozen]['et1'] += arrow.arrow_value
-            else:
-                layout[dozen]['et2'] += arrow.arrow_value
-            if arrow.arrow_value:
-                layout[dozen]['hits'] += 1
-            if arrow.arrow_value == 10 or (arrow.arrow_value == 9 and round.scoring_type == 'F'):
-                layout[dozen]['golds'] += 1
-            if arrow.is_x:
-                layout[dozen]['xs'] += 1
-        rt = 0
-        for dozen in layout:
-            rt += dozen['doz']
-            dozen['rt'] = rt
-        context = super().get_context_data(**kwargs)
-        context.update({
-            'entry': entry,
-            'layout': layout,
-            'score': score,
-            'round': round,
-            'per_end': per_end,
-        })
-        return context
-
-
 class InputDozens(CompetitionMixin, TemplateView):
     template_name = 'input_dozens.html'
     next_url_name = 'input_scores'
@@ -294,6 +244,56 @@ class InputDozens(CompetitionMixin, TemplateView):
             return HttpResponseRedirect(success_url)
         next_exists = self.get_next_exists(session_id, boss)
         return render(request, self.template, locals())
+
+
+class ScoreSheet(CompetitionMixin, TemplateView):
+    template_name = 'scores/score_sheet.html'
+    admin_required = False
+
+    def get_context_data(self, **kwargs):
+        score = Score.objects.get(pk=self.kwargs['score_id'])
+        entry = score.target.session_entry
+        round = entry.session_round.shot_round
+        per_end = entry.session_round.session.arrows_entered_per_end
+        layout = [{
+            'scores': ['-'] * per_end,
+            'doz': 0,
+            'hits': 0,
+            'golds': 0,
+            'xs': 0,
+            'et1': 0,
+            'et2': 0,
+            'rt': 0,
+        } for i in range(int(round.arrows / per_end))]
+        arrows = score.arrow_set.order_by('arrow_of_round')
+        for arrow in arrows:
+            dozen = int((arrow.arrow_of_round - 1) / per_end)
+            point = arrow.arrow_of_round % per_end - 1
+            layout[dozen]['scores'][point] = str(arrow)
+            layout[dozen]['doz'] += arrow.arrow_value
+            if point < 6 and point >= 0:
+                layout[dozen]['et1'] += arrow.arrow_value
+            else:
+                layout[dozen]['et2'] += arrow.arrow_value
+            if arrow.arrow_value:
+                layout[dozen]['hits'] += 1
+            if arrow.arrow_value == 10 or (arrow.arrow_value == 9 and round.scoring_type == 'F'):
+                layout[dozen]['golds'] += 1
+            if arrow.is_x:
+                layout[dozen]['xs'] += 1
+        rt = 0
+        for dozen in layout:
+            rt += dozen['doz']
+            dozen['rt'] = rt
+        context = super().get_context_data(**kwargs)
+        context.update({
+            'entry': entry,
+            'layout': layout,
+            'score': score,
+            'round': round,
+            'per_end': per_end,
+        })
+        return context
 
 
 class PDFResultsRenderer(object):
