@@ -302,6 +302,7 @@ class ScoreSheet(CompetitionMixin, TemplateView):
 class ScoreSheetAPI(CompetitionMixin, DetailView):
     model = Score
     pk_url_kwarg = 'score_id'
+    admin_required = False
 
     def get_queryset(self):
         qs = super().get_queryset()
@@ -310,11 +311,12 @@ class ScoreSheetAPI(CompetitionMixin, DetailView):
     def render_to_response(self, context, **response_kwargs):
         score = context['object']
         return JsonResponse({
-            'competition': serializers.competition(self.competition),
+            'competition': serializers.competition(self.competition, is_admin=self.is_admin),
             'round': serializers.round_shot(
                 round_shot=score.target.session_entry.session_round.shot_round,
                 session=score.target.session_entry.session_round.session,
             ),
+            'sessionId': score.target.session_entry.session_round.session_id,
             'score': serializers.score(
                 competition=self.competition,
                 entry=score.target.session_entry.competition_entry,
@@ -731,6 +733,7 @@ class TargetAPISession(CsrfExemptMixin, EntryUserRequired, View):
             'user': user_entry.archer.name,
             'competition': serializers.competition(user_entry.competition),
             'session': {
+                'id': session_entry.session_round.session.id,
                 'round': serializers.round_shot(round_shot, session_entry.session_round.session),
                 'start': {
                     'iso': session_entry.session_round.session.start,

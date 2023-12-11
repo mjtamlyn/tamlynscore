@@ -1,5 +1,6 @@
-import React, { useState } from 'react';
+import React, { useContext, useState } from 'react';
 
+import { CompetitionContext } from '../context/CompetitionContext';
 import ArcherRowDetails from './ArcherRowDetails';
 import { getEnd, getEndScore, getHitCount, getGoldCount, getRunningTotal } from './utils';
 
@@ -9,6 +10,7 @@ const byDozen = 'byDozen';
 
 
 const ScoreSheet = ({ score, showDetails }) => {
+    const competition = useContext(CompetitionContext);
     const [displayMode, setDisplayMode] = useState(byEntered);
 
     const totalArrows = score.round.endCount * score.round.endLength;
@@ -57,6 +59,14 @@ const ScoreSheet = ({ score, showDetails }) => {
         if (score.round.resultsOptions.hasHits) {
             totals.splice(1, 0, <div className="archers__score__total" key={ `${endNumber}|hits` }>{ getHitCount(score, endNumber + 1, endLength) }</div>);
         }
+        if (competition.isAdmin && displayMode === byEntered) {
+            const href = `${competition.url}input-arrows/${score.sessionId}/doz${endNumber + 1}/boss${score.boss}/`;
+            totals.push(
+                <div key={ `${endNumber}|edit` }>
+                    <a className="btn btn-small" href={ href }>Edit</a>
+                </div>
+            );
+        }
         return [
             ...arrows,
             ...totals,
@@ -85,8 +95,11 @@ const ScoreSheet = ({ score, showDetails }) => {
     headings.push(
         <div className="archers__score__heading" key="RT">RT</div>
     );
+    if (competition.isAdmin && displayMode === byEntered) {
+        headings.push(<div className="archers__score__heading">Edit</div>);
+    }
 
-    const columnsCount = endLength + 2 + score.round.resultsOptions.scoringHeadings.length + (endLength === 12 ? 2 : 0);
+    const columnsCount = endLength + 2 + score.round.resultsOptions.scoringHeadings.length + (endLength === 12 ? 2 : 0) + ((competition.isAdmin && displayMode === byEntered) ? 1 : 0);
     const totalsPadding = endLength === 12 ? 14 : endLength
 
     const splits = [];

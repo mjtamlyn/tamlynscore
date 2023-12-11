@@ -23,10 +23,13 @@ const ScoreSheetPage = ({ scoreApi }) => {
 
     const score = data.score;
     score.round = data.round;
+    score.sessionId = data.sessionId;
 
     return (
         <ErrorBoundary FallbackComponent={ ErrorState }>
             <CompetitionContext.Provider value={ data.competition }>
+                <h2>Scoresheet for { score.name }</h2>
+                <h3>{ score.target } - { score.round.name }</h3>
                 <div id="target-input">
                     <ScoreSheet score={ score } />
                 </div>

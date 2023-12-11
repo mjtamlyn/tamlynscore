@@ -36,6 +36,7 @@ def score(competition, entry, score):
     return {
         'id': score.id,
         'target': score.target.label,
+        'boss': score.target.boss,
         'name': entry.archer.name,
         'categories': categories,
         'arrows': [a.json_value for a in score.arrow_set.order_by('arrow_of_round')],
