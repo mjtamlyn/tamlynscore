@@ -166,6 +166,8 @@ class Round(models.Model):
             return ['10+X', 'X']
         elif self.scoring_type == 'I':
             return ['10s']
+        elif self.is_ifaa:
+            return []
         else:
             return ['H', 'G']
 

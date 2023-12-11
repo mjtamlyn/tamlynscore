@@ -18,7 +18,7 @@ const ScoreSheet = ({ score, showDetails }) => {
     const endLength = (displayMode === byEntered) ? score.round.endLength : 12;
 
     let displayToggle = null;
-    if (!(totalArrows % 12) && score.round.endLength < 12) {
+    if (!(totalArrows % 12) && !(12 % score.round.endLength) && score.round.endLength < 12) {
         const toggleDisplayMode = (e) => {
             e.preventDefault();
             if (displayMode === byEntered) {
@@ -52,16 +52,26 @@ const ScoreSheet = ({ score, showDetails }) => {
         }
 
         const totals = [
-            <div className="archers__score__total" key={ `${endNumber}|end` }>{ getEndScore(score, endNumber + 1, endLength) }</div>,
-            <div className="archers__score__total" key={ `${endNumber}|golds` }>{ getGoldCount(score, endNumber + 1, endLength) }</div>,
-            <div className="archers__score__total" key={ `${endNumber}|rt` }>{ getRunningTotal(score, endNumber + 1, endLength) }</div>,
-        ]
+            <div className="archers__score__total" key={ `${endNumber}|end` }>{ getEndScore(score, endNumber + 1, endLength) }</div>
+        ];
         if (score.round.resultsOptions.hasHits) {
-            totals.splice(1, 0, <div className="archers__score__total" key={ `${endNumber}|hits` }>{ getHitCount(score, endNumber + 1, endLength) }</div>);
+            totals.push(
+                <div className="archers__score__total" key={ `${endNumber}|hits` }>{ getHitCount(score, endNumber + 1, endLength) }</div>
+            );
+        }
+        if (score.round.resultsOptions.hasGolds) {
+            totals.push(
+                <div className="archers__score__total" key={ `${endNumber}|golds` }>{ getGoldCount(score, endNumber + 1, endLength) }</div>
+            )
         }
         if (score.round.resultsOptions.hasXs) {
-            totals.splice(2, 0, <div className="archers__score__total" key={ `${endNumber}|xs` }>{ getXCount(score, endNumber + 1, endLength) }</div>);
+            totals.push(
+                <div className="archers__score__total" key={ `${endNumber}|xs` }>{ getXCount(score, endNumber + 1, endLength) }</div>
+            );
         }
+        totals.push(
+            <div className="archers__score__total" key={ `${endNumber}|rt` }>{ getRunningTotal(score, endNumber + 1, endLength) }</div>
+        )
         if (competition.isAdmin && displayMode === byEntered) {
             const href = `${competition.url}input-arrows/${score.sessionId}/doz${endNumber + 1}/boss${score.boss}/`;
             totals.push(
@@ -120,11 +130,13 @@ const ScoreSheet = ({ score, showDetails }) => {
                 </div>
             );
         }
-        splits.push(
-            <div className="archers__score__grand-total" key={ `${split.name}|golds` }>
-                { getGoldCount(score, index + 1, split.arrows) }
-            </div>
-        );
+        if (score.round.resultsOptions.hasGolds) {
+            splits.push(
+                <div className="archers__score__grand-total" key={ `${split.name}|golds` }>
+                    { getGoldCount(score, index + 1, split.arrows) }
+                </div>
+            );
+        }
         if (score.round.resultsOptions.hasXs) {
             splits.push(
                 <div className="archers__score__grand-total" key={ `${split.name}|xs` }>
@@ -158,9 +170,11 @@ const ScoreSheet = ({ score, showDetails }) => {
                             { getHitCount(score) }
                         </div>
                     }
-                    <div className="archers__score__grand-total">
-                        { getGoldCount(score) }
-                    </div>
+                    { score.round.resultsOptions.hasGolds &&
+                        <div className="archers__score__grand-total">
+                            { getGoldCount(score) }
+                        </div>
+                    }
                     { score.round.resultsOptions.hasXs &&
                         <div className="archers__score__grand-total">
                             { getXCount(score) }

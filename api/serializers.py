@@ -20,6 +20,7 @@ def round_shot(round_shot, session):
             'scoringHeadings': round_shot.score_sheet_headings,
             'hasXs': round_shot.has_xs,
             'hasHits': round_shot.has_hits,
+            'hasGolds': round_shot.has_golds,
             'gold9s': round_shot.gold_9s,
         },
     }
