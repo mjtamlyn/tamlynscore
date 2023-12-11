@@ -1,0 +1,13 @@
+{% extends 'entries/competition_detail.html' %}
+
+{% load render_bundle from webpack_loader %}
+
+{% block scripts %}
+{% render_bundle 'score_sheet' 'js' %}
+{% endblock %}
+
+{% block competition_content %}
+<div class="module input-arrows">
+    <div id="app" data-score-api="{% url 'score_sheet_api' slug=competition.slug score_id=score.pk %}"></div>
+</div>
+{% endblock %}

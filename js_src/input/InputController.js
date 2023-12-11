@@ -37,7 +37,7 @@ const TargetPage = ({ api, setPage }) => {
         <FullPageWrapper competition={ data.competition }>
             <ErrorBoundary FallbackComponent={ ErrorState }>
                 <CompetitionContext.Provider value={ data.competition }>
-                    <InputScoresProvider scores={ data.scores } api={ api }>
+                    <InputScoresProvider scores={ data.scores } round={ data.session.round } api={ api }>
                         <Target
                             session={ data.session }
                             user={ data.user }

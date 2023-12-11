@@ -45,7 +45,7 @@
       padding: 100px 30px
 
     &__card
-      margin: 30px
+      margin: 15px
       text-align: center
       padding: 15px 10px
       background-color: $lightblue
@@ -98,6 +98,9 @@
       grid-gap: 3px
       align-items: baseline
 
+      &--no-bg
+        background-color: inherit
+
       &__actions
         grid-column-end: span 3
         padding: 0
@@ -108,17 +111,22 @@
     &__name
       font-weight: bold
 
+    &__score-display-toggle
+      text-align: right
+      font-size: smaller
+
     &__score
       grid-column-end: span 3
       display: grid
       grid-template-columns: repeat(5, 1fr)
-      grid-gap: 3px
+      grid-gap: 3px 5px
       align-items: baseline
       text-align: center
+      overflow-x: auto
 
       &__heading
         border-bottom: 1px solid $dark
-        font-weight: italic
+        font-weight: bold
         font-size: smaller
 
         &--span
@@ -127,6 +135,10 @@
       &__total,
       &__grand-total
         font-weight: bold
+
+      &__split-title
+        font-size: smaller
+        text-wrap: nowrap
 
       &__grand-total
         border-top: 1px solid $dark

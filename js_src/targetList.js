@@ -8,7 +8,7 @@ import TargetListView from './targetList/TargetListView';
 
 enableMapSet()
 
-let app = document.getElementById('app');
+const app = document.getElementById('app');
 
 if (app) {
     const root = createRoot(app);

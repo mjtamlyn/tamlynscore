@@ -28,6 +28,21 @@
     &:before
       margin-right: 2px
 
+  &.btn-toggle
+    display: inline-flex
+    padding: 0
+
+    .btn-segment
+      padding: 5px 10px
+
+      &.selected
+        background: $lightblue
+        box-shadow: 0 0 3px $blue inset
+        border-radius: 5px
+
+    &.btn-small .btn-segment
+      padding: 3px 6px
+
   &.delete
     background-color: $red
 

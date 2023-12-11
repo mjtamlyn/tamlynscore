@@ -42,16 +42,16 @@ const inputScoresReducer = (scores, action) => {
     switch (action.type) {
         case 'setScore': {
             const score = scores.scores.find(s => s.target === action.score.target);
-            let arrowNumber = (action.endNumber - 1) * score.endLength + action.cursorPosition;
+            let arrowNumber = (action.endNumber - 1) * score.round.endLength + action.cursorPosition;
             if (score.arrows.length < arrowNumber) {
                 arrowNumber = score.arrows.length;
             }
             score.arrows[arrowNumber] = action.number;
             const end = getEnd(score, action.endNumber);
             if (!isDescending(end)) {
-                const startNum = (action.endNumber - 1) * score.endLength;
-                const endNum = startNum + score.endLength;
-                score.arrows.splice(startNum, score.endLength, ...end.toSorted(compareArrows));
+                const startNum = (action.endNumber - 1) * score.round.endLength;
+                const endNum = startNum + score.round.endLength;
+                score.arrows.splice(startNum, score.round.endLength, ...end.toSorted(compareArrows));
                 for (let i=startNum; i<endNum; i++) {
                     actionQueue.doAction({ type: 'SETARROW', params: {score: score.id, arrowOfRound: i + 1, arrowValue: score.arrows[i] }});
                 }
@@ -66,16 +66,12 @@ const inputScoresReducer = (scores, action) => {
     }
 };
 
-const setUpScores = (data) => {
-    return data
-};
-
-const InputScoresProvider = ({ children, api, scores: initialScores }) => {
+const InputScoresProvider = ({ children, api, round, scores: initialScores }) => {
     const initialState = {
-        scores: initialScores,
+        scores: initialScores.map(score => { return { round, ...score } }),
         actionQueue: useActionQueue(api),
     };
-    const [scores, dispatch] = useImmerReducer(inputScoresReducer, initialState, setUpScores);
+    const [scores, dispatch] = useImmerReducer(inputScoresReducer, initialState);
 
     return (
         <InputScoresContext.Provider value={ scores }>

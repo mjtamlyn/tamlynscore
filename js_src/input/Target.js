@@ -3,7 +3,7 @@ import React, { useContext, useState } from 'react';
 import { InputScoresContext } from '../context/InputScoresContext';
 
 import EventHeader from './EventHeader';
-import ScoreSheet from './ScoreSheet';
+import ScoreSheetModal from './ScoreSheetModal';
 import ScoresOverview from './ScoresOverview';
 import StoreStatus from './StoreStatus';
 import TargetInput from './TargetInput';
@@ -15,7 +15,7 @@ const Target = ({ session, setPageRoot }) => {
     const scores = useContext(InputScoresContext).scores;
 
     const [endNumber, setEndNumber] = useState(Math.max(...scores.map(score => currentEnd(score))));
-    const maxEnds = Math.max(...scores.map(score => score.endCount));
+    const maxEnds = Math.max(...scores.map(score => score.round.endCount));
     const [subpage, setSubpage] = useState('overview');
 
     if (!scores.length) {
@@ -78,7 +78,7 @@ const Target = ({ session, setPageRoot }) => {
         return (
             <>
                 <EventHeader round={ session.round } pageTitle="Score sheet" setPageRoot={ setPageRoot } />
-                <ScoreSheet score={ subpage.score } toSummary={ toSummary } />
+                <ScoreSheetModal score={ subpage.score } toSummary={ toSummary } />
             </>
         );
     }
