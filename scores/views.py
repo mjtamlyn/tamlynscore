@@ -745,7 +745,7 @@ class TargetAPISession(CsrfExemptMixin, EntryUserRequired, View):
             },
             'scores': [serializers.score(
                 competition=competition,
-                entry = target.session_entry.competition_entry,
+                entry=target.session_entry.competition_entry,
                 score=target.score,
             ) for target in targets],
         })

@@ -8,6 +8,7 @@ def competition(competition, is_admin=False):
         'isAdmin': is_admin,
     }
 
+
 def round_shot(round_shot, session):
     return {
         'name': round_shot.name,
@@ -21,6 +22,7 @@ def round_shot(round_shot, session):
             'hasHits': round_shot.has_hits,
         },
     }
+
 
 def score(competition, entry, score):
     categories = {
