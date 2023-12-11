@@ -149,6 +149,10 @@ class Round(models.Model):
         return not self.is_ifaa
 
     @property
+    def gold_9s(self):
+        return self.scoring_type == 'F'
+
+    @property
     def has_hits(self):
         if self.scoring_type in ['X', 'I']:
             return False

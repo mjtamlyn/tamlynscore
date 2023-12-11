@@ -6,6 +6,12 @@ function sum(array) {
         if (b === 'M') {
             b = 0;
         }
+        if (a === 'X') {
+            a = 10;
+        }
+        if (b === 'X') {
+            b = 10;
+        }
         return a + b;
     }, 0);
 }
@@ -53,8 +59,20 @@ function getGoldCount(score, endNumber, endLength) {
     if (endNumber) {
         arrows = getEnd(score, endNumber, endLength);
     }
-    return sum(arrows.map(a => ((a === 10) ? 1 : 0)));
+    if (score.round.resultsOptions.gold9s) {
+        return sum(arrows.map(a => (a === 9) ? 1 : 0));
+    }
+    return sum(arrows.map(a => ((a === 10 || a === 'X') ? 1 : 0)));
+}
+
+function getXCount(score, endNumber, endLength) {
+    let arrows = score.arrows;
+    if (endNumber) {
+        arrows = getEnd(score, endNumber, endLength);
+    }
+    return sum(arrows.map(a => ((a && a === 'X') ? 1 : 0)));
 }
 
 
-export { currentEnd, getEnd, isEndComplete, getEndScore, getRunningTotal, getGoldCount, getHitCount, getArrowsShot };
+
+export { currentEnd, getEnd, isEndComplete, getEndScore, getRunningTotal, getGoldCount, getHitCount, getXCount, getArrowsShot };

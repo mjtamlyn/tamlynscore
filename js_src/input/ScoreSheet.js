@@ -2,7 +2,7 @@ import React, { useContext, useState } from 'react';
 
 import { CompetitionContext } from '../context/CompetitionContext';
 import ArcherRowDetails from './ArcherRowDetails';
-import { getEnd, getEndScore, getHitCount, getGoldCount, getRunningTotal } from './utils';
+import { getEnd, getEndScore, getHitCount, getGoldCount, getXCount, getRunningTotal } from './utils';
 
 
 const byEntered = 'byEntered';
@@ -58,6 +58,9 @@ const ScoreSheet = ({ score, showDetails }) => {
         ]
         if (score.round.resultsOptions.hasHits) {
             totals.splice(1, 0, <div className="archers__score__total" key={ `${endNumber}|hits` }>{ getHitCount(score, endNumber + 1, endLength) }</div>);
+        }
+        if (score.round.resultsOptions.hasXs) {
+            totals.splice(2, 0, <div className="archers__score__total" key={ `${endNumber}|xs` }>{ getXCount(score, endNumber + 1, endLength) }</div>);
         }
         if (competition.isAdmin && displayMode === byEntered) {
             const href = `${competition.url}input-arrows/${score.sessionId}/doz${endNumber + 1}/boss${score.boss}/`;
@@ -120,7 +123,16 @@ const ScoreSheet = ({ score, showDetails }) => {
         splits.push(
             <div className="archers__score__grand-total" key={ `${split.name}|golds` }>
                 { getGoldCount(score, index + 1, split.arrows) }
-            </div>,
+            </div>
+        );
+        if (score.round.resultsOptions.hasXs) {
+            splits.push(
+                <div className="archers__score__grand-total" key={ `${split.name}|xs` }>
+                    { getXCount(score, index + 1, split.arrows) }
+                </div>
+            );
+        }
+        splits.push(
             <div key={ `${split.name}|padding2` }></div>,
         );
     });
@@ -149,6 +161,11 @@ const ScoreSheet = ({ score, showDetails }) => {
                     <div className="archers__score__grand-total">
                         { getGoldCount(score) }
                     </div>
+                    { score.round.resultsOptions.hasXs &&
+                        <div className="archers__score__grand-total">
+                            { getXCount(score) }
+                        </div>
+                    }
                     <div></div>
                     { splits }
                 </div>
