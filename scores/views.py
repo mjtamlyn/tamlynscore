@@ -14,7 +14,9 @@ from django.http import (
 )
 from django.shortcuts import redirect, render
 from django.urls import reverse
-from django.views.generic import ListView, RedirectView, TemplateView, View
+from django.views.generic import (
+    DetailView, ListView, RedirectView, TemplateView, View,
+)
 
 from braces.views import CsrfExemptMixin, MessageMixin
 from reportlab.lib import colors
@@ -25,6 +27,7 @@ from reportlab.platypus import (
 )
 from reportlab.rl_config import defaultPageSize
 
+from api import serializers
 from entries.models import (
     CompetitionEntry, EntryUser, ResultsMode, Session, SessionEntry,
     SessionRound, TargetAllocation,
@@ -294,6 +297,30 @@ class ScoreSheet(CompetitionMixin, TemplateView):
             'per_end': per_end,
         })
         return context
+
+
+class ScoreSheetAPI(CompetitionMixin, DetailView):
+    model = Score
+    pk_url_kwarg = 'score_id'
+
+    def get_queryset(self):
+        qs = super().get_queryset()
+        return qs.filter(target__session_entry__competition_entry__competition=self.competition)
+
+    def render_to_response(self, context, **response_kwargs):
+        score = context['object']
+        return JsonResponse({
+            'competition': serializers.competition(self.competition),
+            'round': serializers.round_shot(
+                round_shot=score.target.session_entry.session_round.shot_round,
+                session=score.target.session_entry.session_round.session,
+            ),
+            'score': serializers.score(
+                competition=self.competition,
+                entry=score.target.session_entry.competition_entry,
+                score=score,
+            )
+        })
 
 
 class PDFResultsRenderer(object):
@@ -656,11 +683,7 @@ class TargetAPIRoot(EntryUserRequired, View):
         sessions = entry.sessionentry_set.filter(targetallocation__isnull=False).order_by('session_round__session__start')
         return JsonResponse({
             'user': entry.archer.name,
-            'competition': {
-                'name': entry.competition.full_name,
-                'short': entry.competition.short_name,
-                'url': entry.competition.get_absolute_url(),
-            },
+            'competition': serializers.competition(entry.competition),
             'sessions': [{
                 'round': se.session_round.shot_round.name,
                 'start': {
@@ -704,50 +727,11 @@ class TargetAPISession(CsrfExemptMixin, EntryUserRequired, View):
         for target in targets.filter(score__isnull=True):
             Score.objects.create(target=target)
 
-        scores = []
-        for target in targets:
-            entry = target.session_entry.competition_entry
-            categories = {
-                'bowstyle': entry.bowstyle.name,
-                'gender': entry.archer.get_gender_display(),
-            }
-            if competition.has_novices and entry.novice == 'N':
-                categories['novice'] = entry.get_novice_display()
-            if competition.has_juniors and entry.age == 'J':
-                categories['age'] = entry.get_age_display()
-            if competition.has_agb_age_groups and entry.agb_age:
-                categories['age'] = entry.get_agb_age_display()
-            scores.append({
-                'id': target.score.id,
-                'target': target.label,
-                'name': target.session_entry.competition_entry.archer.name,
-                'categories': categories,
-                'arrows': [a.json_value for a in target.score.arrow_set.order_by('arrow_of_round')],
-            })
-
         return JsonResponse({
             'user': user_entry.archer.name,
-            'competition': {
-                'name': user_entry.competition.full_name,
-                'short': user_entry.competition.short_name,
-                'url': user_entry.competition.get_absolute_url(),
-                'hasNovices': user_entry.competition.has_novices,
-                'hasAges': user_entry.competition.has_agb_age_groups or user_entry.competition.has_juniors,
-                'isAdmin': False,
-            },
+            'competition': serializers.competition(user_entry.competition),
             'session': {
-                'round': {
-                    'name': round_shot.name,
-                    'totalArrows': round_shot.arrows,
-                    'endLength': session_entry.session_round.session.arrows_entered_per_end,
-                    'endCount': round_shot.arrows / session_entry.session_round.session.arrows_entered_per_end,
-                    'splits': round_shot.splits,
-                    'resultsOptions': {
-                        'scoringHeadings': round_shot.score_sheet_headings,
-                        'hasXs': round_shot.has_xs,
-                        'hasHits': round_shot.has_hits,
-                    },
-                },
+                'round': serializers.round_shot(round_shot, session_entry.session_round.session),
                 'start': {
                     'iso': session_entry.session_round.session.start,
                     'pretty': session_entry.session_round.session.start.strftime('%d %B %-I:%M%p'),
@@ -756,7 +740,11 @@ class TargetAPISession(CsrfExemptMixin, EntryUserRequired, View):
                     reverse('target-api-session', kwargs={'session': session_entry.session_round.session_id})
                 ),
             },
-            'scores': scores,
+            'scores': [serializers.score(
+                competition=competition,
+                entry = target.session_entry.competition_entry,
+                score=target.score,
+            ) for target in targets],
         })
 
     def _parse_value(self, sent):

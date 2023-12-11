@@ -8,7 +8,7 @@ const byEntered = 'byEntered';
 const byDozen = 'byDozen';
 
 
-const ScoreSheet = ({ score, toSummary }) => {
+const ScoreSheet = ({ score, showDetails }) => {
     const [displayMode, setDisplayMode] = useState(byEntered);
 
     const totalArrows = score.round.endCount * score.round.endLength;
@@ -114,36 +114,31 @@ const ScoreSheet = ({ score, toSummary }) => {
 
     return (
         <>
-            <div className="full-height-page__card">
-                { displayToggle && 
-                    <div className="archers__score-display-toggle">
-                        Display in { displayToggle }
-                    </div>
-                }
-                <div className="archers__row">
-                    <ArcherRowDetails score={ score } />
-                    <div className="archers__score" style={ { gridTemplateColumns: `repeat(${columnsCount}, 1fr)`} }>
-                        { headings }
-                        { scoreRows }
-                        <div style={ { gridColumnEnd: `span ${totalsPadding}` } } />
-                        <div className="archers__score__grand-total">
-                            { getRunningTotal(score) }
-                        </div>
-                        { score.round.resultsOptions.hasHits &&
-                            <div className="archers__score__grand-total">
-                                { getHitCount(score) }
-                            </div>
-                        }
-                        <div className="archers__score__grand-total">
-                            { getGoldCount(score) }
-                        </div>
-                        <div></div>
-                        { splits }
-                    </div>
+            { displayToggle && 
+                <div className="archers__score-display-toggle">
+                    Display in { displayToggle }
                 </div>
-            </div>
-            <div className="actions">
-                <a className="actions__button" onClick={ toSummary }>Back</a>
+            }
+            <div className="archers__row archers__row--no-bg">
+                { showDetails && <ArcherRowDetails score={ score } /> }
+                <div className="archers__score" style={ { gridTemplateColumns: `repeat(${columnsCount}, 1fr)`} }>
+                    { headings }
+                    { scoreRows }
+                    <div style={ { gridColumnEnd: `span ${totalsPadding}` } } />
+                    <div className="archers__score__grand-total">
+                        { getRunningTotal(score) }
+                    </div>
+                    { score.round.resultsOptions.hasHits &&
+                        <div className="archers__score__grand-total">
+                            { getHitCount(score) }
+                        </div>
+                    }
+                    <div className="archers__score__grand-total">
+                        { getGoldCount(score) }
+                    </div>
+                    <div></div>
+                    { splits }
+                </div>
             </div>
         </>
     );

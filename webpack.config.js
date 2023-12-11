@@ -8,6 +8,7 @@ const devModeServer = 'http://localhost:8080';
 
 const config = {
     entry: {
+        'score_sheet': './js_src/scoreSheet.js',
         'target_input': './js_src/targetInput.js',
         'target_list': './js_src/targetList.js'
     },

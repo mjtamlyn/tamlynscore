@@ -1,9 +1,18 @@
 {% extends 'entries/competition_detail.html' %}
 
+{% load render_bundle from webpack_loader %}
+
+{% block scripts %}
+{% render_bundle 'score_sheet' 'js' %}
+{% endblock %}
+
 {% block competition_content %}
 <div class="module input-arrows">
     <h2>Scoresheet for {{ entry.competition_entry.archer }}<h2>
     <h3>{{ score.target.boss }}{{ score.target.target }} - {{ round }}</h3>
+
+    <div id="app" data-score-api="{% url 'score_sheet_api' slug=competition.slug score_id=score.pk %}"></div>
+
     <table class="score-sheet">
 
         <thead>

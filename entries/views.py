@@ -31,6 +31,7 @@ from reportlab.platypus import (
 )
 from reportlab.rl_config import defaultPageSize
 
+from api import serializers
 from core.models import Archer
 from scores.mixins import ResultModeMixin
 
@@ -583,14 +584,7 @@ class TargetListApi(CsrfExemptMixin, TargetListBase, View):
             })
         return JsonResponse({
             'targetList': data,
-            'competition': {
-                'name': self.competition.full_name,
-                'short': self.competition.short_name,
-                'url': self.competition.get_absolute_url(),
-                'hasNovices': self.competition.has_novices,
-                'hasAges': self.competition.has_agb_age_groups or self.competition.has_juniors,
-                'isAdmin': self.is_admin,
-            },
+            'competition': serializers.competition(self.competition, is_admin=self.is_admin),
         })
 
     def handle_action(self, data):
