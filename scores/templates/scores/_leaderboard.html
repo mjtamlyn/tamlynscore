@@ -46,7 +46,7 @@
                     {% for detail in score.details %}
                         <td>{{ detail }}</td>
                     {% endfor %}
-                    {% if score.score and score.pk %}
+                    {% if score.score and score.pk and score.target.session_entry.session_round.session.can_show_scoresheet %}
                         <td><a href="{% url 'score_sheet' slug=score.target.session_entry.competition_entry.competition.slug score_id=score.pk %}" class="score-sheet-link"></a></td>
                     {% endif %}
                 </tr>

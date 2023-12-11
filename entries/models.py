@@ -167,6 +167,10 @@ class Session(models.Model):
         return self.scoring_system == SCORING_ARCHER
 
     @property
+    def can_show_scoresheet(self):
+        return self.scoring_system in [SCORING_FULL, SCORING_ARCHER]
+
+    @property
     def input_view_name(self):
         return {
             SCORING_FULL: 'input_arrows',
