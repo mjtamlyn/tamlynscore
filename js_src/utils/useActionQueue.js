@@ -6,11 +6,13 @@ const reducer = (state, action) => {
     switch (action.type) {
         case 'addAction':
             state.queue.push({ requestId: action.requestId, ...action.action });
+            state.status = 'pending';
             return;
         case 'startRequest':
             action.requestIds.forEach(requestId => {
                 state.queue.find(a => a.requestId === requestId).inProgress = true;
             });
+            state.status = 'sending';
             return;
         case 'requestFailed':
             action.requestIds.forEach(requestId => {
@@ -21,7 +23,7 @@ const reducer = (state, action) => {
             return;
         case 'retry':
             // Don't change the queue items here so it can retry with additional data if needed
-            state.status = 'ok';
+            state.status = 'pending';
             return;
         case 'completeRequest':
             action.requestIds.forEach(requestId => {
@@ -30,6 +32,7 @@ const reducer = (state, action) => {
             });
             // Reset the retry delay
             state.delay = 1000;
+            state.status = 'ok';
             return;
         default:
             throw Error('useActionQueue: Unknown action: ' + action.type);
@@ -79,6 +82,7 @@ const useActionQueue = (api) => {
             requestId.current = requestId.current + 1
             dispatch({ type: 'addAction', requestId: requestId.current, action });
         },
+        status,
     };
 };
 

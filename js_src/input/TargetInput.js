@@ -1,6 +1,6 @@
 import React, { useState, useContext } from 'react';
 
-import { InputScoresDispatchContext } from '../context/InputScoresContext';
+import { InputScoresDispatchContext, InputScoresQueueContext } from '../context/InputScoresContext';
 
 import { isEndComplete, getEnd } from './utils';
 import ArcherRow from './ArcherRow';
@@ -8,6 +8,7 @@ import ScoreInput from './ScoreInput';
 
 
 const TargetInput = ({ scores, round, endNumber, toSummary }) => {
+    const actionQueue = useContext(InputScoresQueueContext);
     const dispatch = useContext(InputScoresDispatchContext);
 
     let initialActive = null;
@@ -60,6 +61,7 @@ const TargetInput = ({ scores, round, endNumber, toSummary }) => {
                     Save
                 </div>
             </div>
+            <div className="sync-status">{ actionQueue.status }</div>
         </>
     );
 };

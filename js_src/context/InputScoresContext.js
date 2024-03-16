@@ -6,6 +6,7 @@ import useActionQueue from '../utils/useActionQueue';
 
 const InputScoresContext = createContext(null);
 const InputScoresDispatchContext = createContext(null);
+const InputScoresQueueContext = createContext(null);
 
 
 function compareArrows(a, b) {
@@ -67,19 +68,22 @@ const inputScoresReducer = (scores, action) => {
 };
 
 const InputScoresProvider = ({ children, api, round, scores: initialScores }) => {
+    const actionQueue = useActionQueue(api);
     const initialState = {
         scores: initialScores.map(score => { return { round, ...score } }),
-        actionQueue: useActionQueue(api),
+        actionQueue: actionQueue,
     };
     const [scores, dispatch] = useImmerReducer(inputScoresReducer, initialState);
 
     return (
-        <InputScoresContext.Provider value={ scores }>
-            <InputScoresDispatchContext.Provider value={ dispatch }>
-                { children }
-            </InputScoresDispatchContext.Provider>
-        </InputScoresContext.Provider>
+        <InputScoresQueueContext.Provider value={ actionQueue }>
+            <InputScoresContext.Provider value={ scores }>
+                <InputScoresDispatchContext.Provider value={ dispatch }>
+                    { children }
+                </InputScoresDispatchContext.Provider>
+            </InputScoresContext.Provider>
+        </InputScoresQueueContext.Provider>
     );
 };
 
-export { InputScoresContext, InputScoresDispatchContext, InputScoresProvider };
+export { InputScoresContext, InputScoresDispatchContext, InputScoresQueueContext, InputScoresProvider };
