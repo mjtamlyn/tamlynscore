@@ -268,7 +268,8 @@ class EntryCreateForm(forms.Form):
         self.competition = competition
         self.session_rounds = SessionRound.objects.filter(session__competition=competition)
         current = self.get_current_obj()
-        self.fields['bowstyle'].label = 'Bowstyle (%s)' % current.bowstyle
+        self.fields['bowstyle'].label = 'Bowstyle (%s)' % archer.bowstyle
+        self.fields['bowstyle'].initial = current.bowstyle
         if archer.agb_number:
             self.initial['agb_number'] = archer.agb_number
         if self.competition.use_county_teams:
@@ -280,31 +281,35 @@ class EntryCreateForm(forms.Form):
             self.fields['county'].widget.attrs.update({'autofocus': ''})
         else:
             self.fields['club'] = forms.ModelChoiceField(
-                label='Club (%s)' % current.club if current.club else 'Club',
+                label='Club (%s)' % archer.club if archer.club else 'Club',
                 queryset=Club.objects,
                 required=False,
+                initial=current.club,
             )
             self.fields['club'].widget.attrs.update({'autofocus': ''})
             self.fields['update_club'] = forms.BooleanField(required=False)
         if self.competition.has_novices:
             self.fields['novice'] = forms.ChoiceField(
-                label='Experienced/Novice (%s)' % current.get_novice_display(),
+                label='Experienced/Novice (%s)' % archer.get_novice_display(),
                 choices=(('', '---------'),) + NOVICE_CHOICES,
                 required=False,
+                initial=current.novice,
             )
             self.fields['update_novice'] = forms.BooleanField(required=False)
         if self.competition.has_juniors:
             self.fields['age'] = forms.ChoiceField(
-                label='Age (%s)' % current.get_age_display(),
+                label='Age (%s)' % archer.get_age_display(),
                 choices=(('', '---------'),) + SIMPLE_AGE_CHOICES,
                 required=False,
+                initial=current.age,
             )
             self.fields['update_age'] = forms.BooleanField(required=False)
         if self.competition.has_agb_age_groups:
             self.fields['agb_age'] = forms.ChoiceField(
-                label='Age Group (%s)' % current.get_agb_age_display(),
+                label='Age Group (%s)' % archer.get_agb_age_display(),
                 choices=(('', '---------'),) + AGB_AGE_CHOICES,
                 required=False,
+                initial=current.agb_age,
             )
             self.fields['update_agb_age'] = forms.BooleanField(required=False)
         if len(self.session_rounds) > 1:

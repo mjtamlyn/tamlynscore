@@ -9,6 +9,9 @@
 {% endif %}
 
 <form action="{{ request.get_full_path }}" method="post" class="page-form">
+    <p class="help-text">
+    Values in brackets are the default for the athlete. You can update these for future events using the checkboxes.
+    </p>
     {% csrf_token %}
     <div class="form-group">
         <div class="form-row">
