@@ -7,7 +7,7 @@ import ArcherRow from './ArcherRow';
 import ScoreInput from './ScoreInput';
 
 
-const TargetInput = ({ scores, endNumber, toSummary }) => {
+const TargetInput = ({ scores, round, endNumber, toSummary }) => {
     const dispatch = useContext(InputScoresDispatchContext);
 
     let initialActive = null;
@@ -54,7 +54,7 @@ const TargetInput = ({ scores, endNumber, toSummary }) => {
             <div className="archers">
                 { scoresRendered }
             </div>
-            { (cursorPosition !== null ) && <ScoreInput setArrow={ setArrow } /> }
+            { (cursorPosition !== null ) && <ScoreInput setArrow={ setArrow } hasXs={ round.resultsOptions.hasXs } /> }
             <div className="actions">
                 <div className="actions__button" onClick={ toSummary }>
                     Save

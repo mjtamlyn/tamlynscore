@@ -180,6 +180,16 @@
     padding: 5px
     flex-grow: 1
 
+    &--has-xs
+      grid-template-rows: repeat(2, 0.5fr) repeat(2, 1fr)
+
+      .score-input__control--gold
+        grid-row-end: span 2
+      .score-input__control--red
+        grid-row-end: span 2
+      .score-input__control--small
+        grid-row-end: span 1
+
     &__control
       font-size: 25px
       font-weight: bold

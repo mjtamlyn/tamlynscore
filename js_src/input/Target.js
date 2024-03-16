@@ -63,12 +63,11 @@ const Target = ({ session, setPageRoot }) => {
     } else if (subpage === 'input') {
         const toSummary = () => {
             setSubpage('overview');
-            // TODO: store.save();
         };
         return (
             <>
                 <EventHeader round={ session.round } pageTitle={ 'End ' + endNumber } setPageRoot={ setPageRoot } />
-                <TargetInput scores={ scores } endNumber={ endNumber } toSummary={ toSummary } />
+                <TargetInput round={ session.round } scores={ scores } endNumber={ endNumber } toSummary={ toSummary } />
             </>
         );
     } else if (subpage.name === 'scoresheet') {

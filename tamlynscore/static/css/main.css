@@ -6238,6 +6238,22 @@ table.tree td.border-right {
   flex-grow: 1;
 }
 /* line 183, ../../sass/_target_input.sass */
+#target-input .score-input--has-xs {
+  grid-template-rows: repeat(2, 0.5fr) repeat(2, 1fr);
+}
+/* line 186, ../../sass/_target_input.sass */
+#target-input .score-input--has-xs .score-input__control--gold {
+  grid-row-end: span 2;
+}
+/* line 188, ../../sass/_target_input.sass */
+#target-input .score-input--has-xs .score-input__control--red {
+  grid-row-end: span 2;
+}
+/* line 190, ../../sass/_target_input.sass */
+#target-input .score-input--has-xs .score-input__control--small {
+  grid-row-end: span 1;
+}
+/* line 193, ../../sass/_target_input.sass */
 #target-input .score-input__control {
   font-size: 25px;
   font-weight: bold;
@@ -6246,38 +6262,38 @@ table.tree td.border-right {
   align-items: center;
   justify-content: center;
 }
-/* line 191, ../../sass/_target_input.sass */
+/* line 201, ../../sass/_target_input.sass */
 #target-input .score-input__control--gold {
   background-color: #ffe552;
 }
-/* line 193, ../../sass/_target_input.sass */
+/* line 203, ../../sass/_target_input.sass */
 #target-input .score-input__control--red {
   background-color: #f65058;
   color: white;
 }
-/* line 196, ../../sass/_target_input.sass */
+/* line 206, ../../sass/_target_input.sass */
 #target-input .score-input__control--blue {
   background-color: #00b4e4;
 }
-/* line 198, ../../sass/_target_input.sass */
+/* line 208, ../../sass/_target_input.sass */
 #target-input .score-input__control--black {
   background-color: #020202;
   color: white;
 }
-/* line 201, ../../sass/_target_input.sass */
+/* line 211, ../../sass/_target_input.sass */
 #target-input .score-input__control--white {
   background-color: #ffffff;
 }
-/* line 203, ../../sass/_target_input.sass */
+/* line 213, ../../sass/_target_input.sass */
 #target-input .score-input__control--green {
   background-color: #486F38;
   color: white;
 }
-/* line 207, ../../sass/_target_input.sass */
+/* line 217, ../../sass/_target_input.sass */
 #target-input .score-input__control--miss {
   grid-column-end: span 2;
 }
-/* line 210, ../../sass/_target_input.sass */
+/* line 220, ../../sass/_target_input.sass */
 #target-input .sync-status {
   position: fixed;
   bottom: 0;
