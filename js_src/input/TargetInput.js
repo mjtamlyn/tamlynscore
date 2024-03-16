@@ -26,7 +26,7 @@ const TargetInput = ({ scores, endNumber, toSummary }) => {
 
     const setArrow = (number) => {
         dispatch({ type: 'setScore', score: activeScore, endNumber, cursorPosition, number });
-        if (cursorPosition + 1 === activeScore.endLength) {
+        if (cursorPosition + 1 === activeScore.round.endLength) {
             setCursorPosition(0);
             const currentIndex = scores.findIndex(s => s.target === activeScore.target);
             if (currentIndex + 1 < scores.length) {
