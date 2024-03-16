@@ -21,7 +21,7 @@ const ArcherRow = ({ score, endNumber, active, cursorPosition = null, setPositio
 
     const boxes = [...Array(endLength).keys()].map((index) => {
         return (
-            <InputBox onClick={ setPosition(score, index) } active={ active && cursorPosition === index } value={ currentArrows[index] } />
+            <InputBox onClick={ setPosition(score, index) } active={ active && cursorPosition === index } value={ currentArrows[index] } key={ index } />
         );
     });
 
