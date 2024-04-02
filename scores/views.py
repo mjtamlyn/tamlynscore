@@ -576,10 +576,10 @@ class RankingsExport(ResultModeMixin, CompetitionMixin, View):
         h2h_rounds = OlympicSessionRound.objects.filter(session__competition=self.competition)
         self.annotate_h2h_data(h2h_rounds, archer_details)
         response = HttpResponse(content_type='text/csv')
-        response['Content-Disposition'] = 'attachment; filename="%s-rankings-export.pdf"' % self.competition.slug
+        response['Content-Disposition'] = 'attachment; filename="%s-rankings-export.csv"' % self.competition.slug
         writer = csv.writer(response)
         writer.writerow(headings)
-        writer.writerows(archer_details.values())
+        writer.writerows(sorted(archer_details.values(), key=lambda a: (str(a[6]), a[5], a[4], a[7] or 10000)))
         return response
 
     def get_entries(self):
@@ -638,7 +638,7 @@ class RankingsExport(ResultModeMixin, CompetitionMixin, View):
                     entry = result.target.session_entry.competition_entry
                     archers[entry.pk] += [
                         shot_round,
-                        result.placing,
+                        result.placing if not result.retired else None,
                         result.score,
                         result.golds,
                         result.xs,
