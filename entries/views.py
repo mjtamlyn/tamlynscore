@@ -5,7 +5,9 @@ import itertools
 import json
 import math
 import re
+import zoneinfo
 
+from django.conf import settings
 from django.core.cache import cache
 from django.db import IntegrityError
 from django.db.models import F, Prefetch
@@ -577,7 +579,7 @@ class TargetListApi(CsrfExemptMixin, TargetListBase, View):
                 })
             data.append({
                 'id': session.pk,
-                'sessionTime': session.start.strftime('%A, %-d %B - %-I:%M%p'),
+                'sessionTime': session.start.astimezone(zoneinfo.ZoneInfo(settings.TIME_ZONE)).strftime('%A, %-d %B - %-I:%M%p'),
                 'archersPerBoss': session.archers_per_target,
                 'targetList': allocations,
                 'unallocatedEntries': session_context['entries_json'],

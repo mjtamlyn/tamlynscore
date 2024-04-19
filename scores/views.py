@@ -3,8 +3,10 @@ import csv
 import functools
 import json
 import math
+import zoneinfo
 from itertools import groupby
 
+from django.conf import settings
 from django.contrib.auth import login
 from django.core.cache import cache
 from django.db.models import Count, Max
@@ -690,7 +692,7 @@ class TargetAPIRoot(EntryUserRequired, View):
                 'round': se.session_round.shot_round.name,
                 'start': {
                     'iso': se.session_round.session.start,
-                    'pretty': se.session_round.session.start.strftime('%d %B %-I:%M%p'),
+                    'pretty': se.session_round.session.start.astimezone(zoneinfo.ZoneInfo(settings.TIME_ZONE)).strftime('%d %B %-I:%M%p'),
                 },
                 'target': se.targetallocation.label,
                 'api': request.build_absolute_uri(

@@ -77,6 +77,7 @@ MIDDLEWARE = (
     'django.contrib.messages.middleware.MessageMiddleware',
     'django.middleware.clickjacking.XFrameOptionsMiddleware',
     'debug_toolbar.middleware.DebugToolbarMiddleware',
+    'tamlynscore.middleware.TimezoneMiddleware',
 )
 
 ROOT_URLCONF = os.environ.get('ROOT_URLCONF', 'tamlynscore.urls')
