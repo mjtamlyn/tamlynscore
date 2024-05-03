@@ -65,6 +65,13 @@ function getGoldCount(score, endNumber, endLength) {
     return sum(arrows.map(a => ((a === 10 || a === 'X') ? 1 : 0)));
 }
 
+function getGoldLabel(score) {
+    if (score.round.resultsOptions.gold9s) {
+        return '9s';
+    }
+    return '10s';
+}
+
 function getXCount(score, endNumber, endLength) {
     let arrows = score.arrows;
     if (endNumber) {
@@ -75,4 +82,4 @@ function getXCount(score, endNumber, endLength) {
 
 
 
-export { currentEnd, getEnd, isEndComplete, getEndScore, getRunningTotal, getGoldCount, getHitCount, getXCount, getArrowsShot };
+export { currentEnd, getEnd, isEndComplete, getEndScore, getRunningTotal, getGoldCount, getGoldLabel, getHitCount, getXCount, getArrowsShot };

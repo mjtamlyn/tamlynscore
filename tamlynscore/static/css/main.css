@@ -6254,6 +6254,14 @@ table.tree td.border-right {
   grid-row-end: span 1;
 }
 /* line 193, ../../sass/_target_input.sass */
+#target-input .score-input--gold-9s {
+  grid-template-columns: repeat(2, 1fr);
+}
+/* line 196, ../../sass/_target_input.sass */
+#target-input .score-input--gold-9s .score-input__control--miss {
+  grid-column-end: span 1;
+}
+/* line 199, ../../sass/_target_input.sass */
 #target-input .score-input__control {
   font-size: 25px;
   font-weight: bold;
@@ -6262,38 +6270,38 @@ table.tree td.border-right {
   align-items: center;
   justify-content: center;
 }
-/* line 201, ../../sass/_target_input.sass */
+/* line 207, ../../sass/_target_input.sass */
 #target-input .score-input__control--gold {
   background-color: #ffe552;
 }
-/* line 203, ../../sass/_target_input.sass */
+/* line 209, ../../sass/_target_input.sass */
 #target-input .score-input__control--red {
   background-color: #f65058;
   color: white;
 }
-/* line 206, ../../sass/_target_input.sass */
+/* line 212, ../../sass/_target_input.sass */
 #target-input .score-input__control--blue {
   background-color: #00b4e4;
 }
-/* line 208, ../../sass/_target_input.sass */
+/* line 214, ../../sass/_target_input.sass */
 #target-input .score-input__control--black {
   background-color: #020202;
   color: white;
 }
-/* line 211, ../../sass/_target_input.sass */
+/* line 217, ../../sass/_target_input.sass */
 #target-input .score-input__control--white {
   background-color: #ffffff;
 }
-/* line 213, ../../sass/_target_input.sass */
+/* line 219, ../../sass/_target_input.sass */
 #target-input .score-input__control--green {
   background-color: #486F38;
   color: white;
 }
-/* line 217, ../../sass/_target_input.sass */
+/* line 223, ../../sass/_target_input.sass */
 #target-input .score-input__control--miss {
   grid-column-end: span 2;
 }
-/* line 220, ../../sass/_target_input.sass */
+/* line 226, ../../sass/_target_input.sass */
 #target-input .sync-status {
   position: fixed;
   bottom: 0;

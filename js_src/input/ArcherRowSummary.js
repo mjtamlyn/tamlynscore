@@ -1,7 +1,7 @@
 import React from 'react';
 
 import ArcherRowDetails from './ArcherRowDetails';
-import { getRunningTotal, getGoldCount, getArrowsShot } from './utils';
+import { getRunningTotal, getGoldCount, getGoldLabel, getArrowsShot } from './utils';
 
 
 const ArcherRowSummary = ({ score, showScoreSheet }) => {
@@ -13,7 +13,7 @@ const ArcherRowSummary = ({ score, showScoreSheet }) => {
                     { getRunningTotal(score) } <small className="archers__summary__legend">total</small>
                 </div>
                 <div className="archers__summary__golds">
-                    { getGoldCount(score) } <small className="archers__summary__legend">10s</small>
+                    { getGoldCount(score) } <small className="archers__summary__legend">{ getGoldLabel(score) }</small>
                 </div>
                 <div className="archers__summary__arrows-shot">
                     { getArrowsShot(score) } / { score.round.totalArrows } <small className="archers__summary__legend">arrows shot</small>
