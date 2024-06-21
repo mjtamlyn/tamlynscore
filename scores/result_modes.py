@@ -933,7 +933,7 @@ class H2HSeedings(ByRound, Team, BaseResultMode):
             if entry.bowstyle in category.bowstyles.all():
                 if ((category.gender is None or category.gender == entry.archer.gender) and
                         (category.novice is None or category.novice == entry.novice) and
-                        (not category.ages or entry.agb_age in category.age)):
+                        (not category.ages or entry.agb_age in category.ages)):
                     categories.append(category)
         return categories
 
