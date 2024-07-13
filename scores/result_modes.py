@@ -176,7 +176,9 @@ class BaseResultMode(object):
         return self.subrounds[shot_round]
 
     def score_details(self, score, section):
-        from entries.models import SCORING_ARCHER, SCORING_DOZENS, SCORING_FULL, SCORING_TOTALS
+        from entries.models import (
+            SCORING_ARCHER, SCORING_DOZENS, SCORING_FULL, SCORING_TOTALS,
+        )
         scores = []
         if self.include_distance_breakdown:
             shot_round = score.target.session_entry.session_round.shot_round
