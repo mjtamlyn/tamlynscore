@@ -176,7 +176,7 @@ class BaseResultMode(object):
         return self.subrounds[shot_round]
 
     def score_details(self, score, section):
-        from entries.models import SCORING_DOZENS, SCORING_FULL, SCORING_TOTALS
+        from entries.models import SCORING_ARCHER, SCORING_DOZENS, SCORING_FULL, SCORING_TOTALS
         scores = []
         if self.include_distance_breakdown:
             shot_round = score.target.session_entry.session_round.shot_round
@@ -190,7 +190,7 @@ class BaseResultMode(object):
                     score = score.source
                     subround_scores = []
 
-                    if score.target.session_entry.session_round.session.scoring_system == SCORING_FULL:
+                    if score.target.session_entry.session_round.session.scoring_system in [SCORING_FULL, SCORING_ARCHER]:
                         counter = 1
                         for subround in subrounds:
                             subround_scores.append(score.arrow_set.filter(arrow_of_round__in=range(counter, counter + subround.arrows)).aggregate(models.Sum('arrow_value'))['arrow_value__sum'] or 0)
