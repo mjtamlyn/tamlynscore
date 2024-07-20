@@ -9,7 +9,7 @@ const ErrorState = ({ error, resetErrorBoundary }) => {
             <p>Sorry!</p>
             <p>&nbsp;</p>
             <p>Info for nerds:</p>
-            <pre>{ error.message }</pre>
+            <pre>{ error && error.message || 'No info?' }</pre>
         </div>
     );
 };

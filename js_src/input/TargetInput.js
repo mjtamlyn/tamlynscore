@@ -1,6 +1,7 @@
 import React, { useState, useContext } from 'react';
 
 import { InputScoresDispatchContext, InputScoresQueueContext } from '../context/InputScoresContext';
+import ErrorState from '../utils/ErrorState';
 
 import { isEndComplete, getEnd } from './utils';
 import ArcherRow from './ArcherRow';
@@ -62,6 +63,7 @@ const TargetInput = ({ scores, round, endNumber, toSummary }) => {
                 </div>
             </div>
             <div className="sync-status">{ actionQueue.status }</div>
+            { actionQueue.status === 'error' && <ErrorState error={ actionQueue.error } /> }
         </>
     );
 };

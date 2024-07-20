@@ -18,8 +18,16 @@ const reducer = (state, action) => {
             action.requestIds.forEach(requestId => {
                 state.queue.find(a => a.requestId === requestId).inProgress = false;
             });
-            state.status = 'error';
+            state.status = 'retry';
             state.delay += 1000;
+            return;
+        case 'giveUp':
+            console.log(action);
+            action.requestIds.forEach(requestId => {
+                state.queue.find(a => a.requestId === requestId).inProgress = false;
+            });
+            state.status = 'error';
+            state.error = action.error;
             return;
         case 'retry':
             // Don't change the queue items here so it can retry with additional data if needed
@@ -41,14 +49,14 @@ const reducer = (state, action) => {
 
 
 const useActionQueue = (api) => {
-    const [{ queue, status, delay }, dispatch] = useImmerReducer(reducer, { queue: [], status: 'ok', delay: 1000 });
+    const [{ queue, status, error, delay }, dispatch] = useImmerReducer(reducer, { queue: [], status: 'ok', delay: 1000 });
     const requestId = useRef(0);
 
     useEffect(() => {
         if (!queue.length) return;
 
         // Do nothing when there's an error, wait for a retry action to unset this.
-        if (status === 'error') return;
+        if (status === 'error' || status === 'retry') return;
 
         const firstAction = queue[0];
         // If any actions are currently in progress, then don't start a new request
@@ -67,7 +75,11 @@ const useActionQueue = (api) => {
             console.log('Data saved!');
             dispatch({ type: 'completeRequest', requestIds: queue.map(a => a.requestId) });
         }).catch((e) => {
-            // TODO: if more than 10 retries have been attempted then we should display something
+            if (delay >= 3000) {
+                console.error('Giving up retrying');
+                dispatch({ type: 'giveUp', requestIds: queue.map(a => a.requestId), error: e });
+                return;
+            }
             console.error('Save failed, will retry after', delay);
             dispatch({ type: 'requestFailed', requestIds: queue.map(a => a.requestId) });
             setTimeout(() => {
@@ -83,6 +95,7 @@ const useActionQueue = (api) => {
             dispatch({ type: 'addAction', requestId: requestId.current, action });
         },
         status,
+        error,
     };
 };
 
