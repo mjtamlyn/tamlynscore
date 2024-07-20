@@ -5,7 +5,7 @@ import { useImmerReducer } from 'use-immer';
 const reducer = (state, action) => {
     switch (action.type) {
         case 'addAction':
-            state.queue.push({ requestId: action.requestId, ...action.action });
+            state.queue.push({ requestId: action.requestId, complete: false, inProgress: false, ...action.action });
             state.status = 'pending';
             return;
         case 'startRequest':
@@ -35,8 +35,8 @@ const reducer = (state, action) => {
             return;
         case 'completeRequest':
             action.requestIds.forEach(requestId => {
-                const index = state.queue.findIndex(a => a.requestId === requestId);
-                state.queue.splice(index, 1);
+                state.queue.find(a => a.requestId === requestId).inProgress = false;
+                state.queue.find(a => a.requestId === requestId).complete = true;
             });
             // Reset the retry delay
             state.delay = 1000;
@@ -54,15 +54,15 @@ const useActionQueue = (api) => {
 
     useEffect(() => {
         if (!queue.length) return;
+        if (!queue.find(a => !a.complete)) return;
 
         // Do nothing when there's an error, wait for a retry action to unset this.
         if (status === 'error' || status === 'retry') return;
 
-        const firstAction = queue[0];
         // If any actions are currently in progress, then don't start a new request
-        if (firstAction.inProgress) return;
-        dispatch({ type: 'startRequest', requestIds: queue.map(a => a.requestId) });
-        const actions = queue.map(a => { return { action: a.type, ...a.params } });
+        if (queue.find(a => a.inProgress)) return;
+        dispatch({ type: 'startRequest', requestIds: queue.filter(a => !a.complete).map(a => a.requestId) });
+        const actions = queue.filter(a => !a.complete).map(a => { return { action: a.type, ...a.params } });
         fetch(api, {
             method: 'POST',
             credentials: 'same-origin',
