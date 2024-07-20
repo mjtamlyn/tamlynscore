@@ -54,7 +54,9 @@ const inputScoresReducer = (scores, action) => {
                 const endNum = startNum + score.round.endLength;
                 score.arrows.splice(startNum, score.round.endLength, ...end.toSorted(compareArrows));
                 for (let i=startNum; i<endNum; i++) {
-                    actionQueue.doAction({ type: 'SETARROW', params: {score: score.id, arrowOfRound: i + 1, arrowValue: score.arrows[i] }});
+                    if (score.arrows[i]) {
+                        actionQueue.doAction({ type: 'SETARROW', params: {score: score.id, arrowOfRound: i + 1, arrowValue: score.arrows[i] }});
+                    }
                 }
             } else {
                 actionQueue.doAction({ type: 'SETARROW', params: {score: score.id, arrowOfRound: arrowNumber + 1, arrowValue: action.number }});
