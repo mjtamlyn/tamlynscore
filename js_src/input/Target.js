@@ -5,7 +5,6 @@ import { InputScoresContext } from '../context/InputScoresContext';
 import EventHeader from './EventHeader';
 import ScoreSheetModal from './ScoreSheetModal';
 import ScoresOverview from './ScoresOverview';
-import StoreStatus from './StoreStatus';
 import TargetInput from './TargetInput';
 
 import { currentEnd, isEndComplete } from './utils';
