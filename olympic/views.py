@@ -121,23 +121,35 @@ class FieldPlanMixin(CompetitionMixin):
         return layout
 
     def get_context_data(self, **kwargs):
-        context = super(FieldPlanMixin, self).get_context_data(**kwargs)
+        context = super().get_context_data(**kwargs)
         context['field_plan'] = self.get_field_plan()
         return context
 
 
-class OlympicSetup(OlympicMixin, FieldPlanMixin, FormView):
+class OlympicSetup(OlympicMixin, ResultModeMixin, FieldPlanMixin, FormView):
     form_class = SetupForm
     template_name = 'olympic/setup.html'
 
     def get_form_kwargs(self):
-        kwargs = super(OlympicSetup, self).get_form_kwargs()
+        kwargs = super().get_form_kwargs()
         kwargs['session_rounds'] = self.session_rounds
         return kwargs
 
     def form_valid(self, form):
         form.save()
-        return super(OlympicSetup, self).form_valid(form)
+        return super().form_valid(form)
+
+    def get_context_data(self, **kwargs):
+        context = super().get_context_data(**kwargs)
+        scores = self.get_scores()
+        mode = H2HSeedings(include_distance_breakdown=False, hide_golds=False)
+        results = mode.get_results(self.competition, scores)
+        numbers = []
+        for (r, r_cat) in results.items():
+            for (cat, entries) in r_cat.items():
+                numbers.append([r, cat, len(entries)])
+        context['numbers'] = numbers
+        return context
 
     def get_success_url(self):
         return self.request.get_full_path()
@@ -261,7 +273,7 @@ class OlympicScoreSheet(ScoreSheetsPdf):
                     self.do_sponsors = False
 
     def update_style(self):
-        super(OlympicScoreSheet, self).update_style()
+        super().update_style()
         arrows = self.session_round.shot_round.arrows_per_end
         ends = self.session_round.shot_round.ends
         total_cols = 3 if self.session_round.shot_round.match_type == 'T' else 2
@@ -746,7 +758,7 @@ class OlympicTree(OlympicTreeMixin, CompetitionMixin, TemplateView):
         return tree
 
     def get_context_data(self, **kwargs):
-        context = super(OlympicTree, self).get_context_data(**kwargs)
+        context = super().get_context_data(**kwargs)
         olympic_rounds = OlympicSessionRound.objects.filter(session__competition=self.competition).order_by('id')
         rounds = []
         for round in olympic_rounds:

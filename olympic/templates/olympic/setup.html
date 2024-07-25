@@ -3,6 +3,13 @@
 {% block olympic_content %}
 <h3>Set up field plan</h3>
 
+<p>
+{% for round, category, entry_count in numbers %}
+    {{ round.round.shot_round.distance }}m {{ category.name }} - {{ entry_count }} archer(s)
+    <br />
+{% endfor %}
+</p>
+
 <div class="field-plan">
     <table class="table field-plan">
         {% for row in field_plan %}
