@@ -464,9 +464,10 @@ class TargetListBase(CompetitionMixin, ListView):
             archers_per_target = session.archers_per_target
             allocations = options['targets']
             num_entries = SessionEntry.objects.filter(session_round__session=session).count()
+            num_on_line = SessionEntry.objects.filter(session_round__session=session, competition_entry__stay_on_line=True).count()
             current_bosses = [allocation.boss for allocation in allocations]
             min_boss = min(current_bosses) if current_bosses else 1
-            needed_bosses = int(math.ceil(num_entries / float(archers_per_target)))
+            needed_bosses = int(math.ceil((num_entries + num_on_line) / float(archers_per_target)))
             current_max_boss = max(current_bosses) if current_bosses else 1
             bosses = range(min_boss, max(needed_bosses, current_max_boss) + 1)
 
@@ -522,6 +523,8 @@ class TargetListBase(CompetitionMixin, ListView):
                 'gender': entry.competition_entry.get_gender_display(),
                 'bowstyle': entry.competition_entry.bowstyle.name,
             },
+            'stayOnLine': entry.competition_entry.stay_on_line,
+            'round': entry.session_round.shot_round.name,
         }
         if self.competition.has_novices and entry.competition_entry.novice == 'N':
             data['categories']['novice'] = entry.competition_entry.get_novice_display()
@@ -529,9 +532,10 @@ class TargetListBase(CompetitionMixin, ListView):
             data['categories']['age'] = entry.competition_entry.get_age_display()
         if self.competition.has_agb_age_groups and entry.competition_entry.agb_age:
             data['categories']['age'] = entry.competition_entry.get_agb_age_display()
-        data['searchtext'] = '%s %s %s' % (
+        data['searchtext'] = '%s %s %s %s' % (
             entry.competition_entry.archer,
             entry.competition_entry.club,
+            entry.session_round.shot_round.name,
             ' '.join(data['categories'].values()),
         )
         return data

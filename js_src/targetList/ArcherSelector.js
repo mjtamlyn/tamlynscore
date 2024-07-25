@@ -30,22 +30,24 @@ const ArcherSelector = ({ archers, onSelect, close, emptyLabel="Select…" }) =>
 
     useMousetrap('down', (e) => {
         e.preventDefault();
+        const matchingArchers = archers.filter(archer => textMatcher(search, archer.searchtext));
         if (selected === null) {
             setSelected(archers[0]);
         } else {
-            const index = archers.indexOf(selected);
-            if (index < archers.length - 1) {
-                setSelected(archers[index + 1]);
+            const index = matchingArchers.indexOf(selected);
+            if (index < matchingArchers.length - 1) {
+                setSelected(matchingArchers[index + 1]);
             }
         }
     });
 
     useMousetrap('up', (e) => {
         e.preventDefault();
+        const matchingArchers = archers.filter(archer => textMatcher(search, archer.searchtext));
         if (selected !== null) {
-            const index = archers.indexOf(selected);
+            const index = matchingArchers.indexOf(selected);
             if (index > 0) {
-                setSelected(archers[index - 1]);
+                setSelected(matchingArchers[index - 1]);
             } else {
                 setSelected(null);
             }
@@ -81,11 +83,11 @@ const ArcherSelector = ({ archers, onSelect, close, emptyLabel="Select…" }) =>
         }
         return (
             <li className="archer-selector__row" aria-selected={ selected === archer ? true : null } ref={ selected === archer ? selectedRef : null } key={ archer.id } onClick={ clickHandler }>
-                { archer.name }
+                { archer.name } { archer.stayOnLine && <strong>STAY ON LINE</strong> }
                 <br />
-                { archer.club }
+                { archer.club } <ArcherPills categories={ archer.categories } />
                 <br />
-                <ArcherPills categories={ archer.categories } />
+                { archer.round }
             </li>
         );
     });

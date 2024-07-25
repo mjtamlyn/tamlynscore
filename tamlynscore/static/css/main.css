@@ -4192,33 +4192,47 @@ ul.link-list li a:hover {
   overflow: auto;
 }
 /* line 15, ../../sass/components/_archer_block.sass */
+.archer-block .stay-on-line {
+  font-weight: bold;
+  float: right;
+}
+/* line 19, ../../sass/components/_archer_block.sass */
 .archer-block .actions {
   float: right;
   line-height: 28px;
   font-size: 16px;
 }
-/* line 20, ../../sass/components/_archer_block.sass */
+/* line 24, ../../sass/components/_archer_block.sass */
 .archer-block .actions .action-button {
   cursor: pointer;
 }
-/* line 22, ../../sass/components/_archer_block.sass */
+/* line 26, ../../sass/components/_archer_block.sass */
 .archer-block .actions .action-button:before {
   padding: 5px 0px 6px 0px;
 }
-/* line 25, ../../sass/components/_archer_block.sass */
+/* line 29, ../../sass/components/_archer_block.sass */
 .archer-block .entries ul {
   display: none;
 }
-/* line 27, ../../sass/components/_archer_block.sass */
+/* line 31, ../../sass/components/_archer_block.sass */
 .archer-block .entries ul.open {
   display: block;
 }
-/* line 30, ../../sass/components/_archer_block.sass */
+/* line 34, ../../sass/components/_archer_block.sass */
 .archer-block .bottom {
   padding: 0 10px;
 }
+/* line 37, ../../sass/components/_archer_block.sass */
+.archer-block .bottom.blocked {
+  background-color: #eeeeee;
+  font-weight: bold;
+}
+/* line 41, ../../sass/components/_archer_block.sass */
+.archer-block .bottom.blocked p {
+  margin: 18px 0;
+}
 
-/* line 33, ../../sass/components/_archer_block.sass */
+/* line 44, ../../sass/components/_archer_block.sass */
 .pill {
   font-size: 11px;
   line-height: 2em;
@@ -4229,29 +4243,29 @@ ul.link-list li a:hover {
   white-space: nowrap;
   border-radius: 0.5em;
 }
-/* line 43, ../../sass/components/_archer_block.sass */
+/* line 54, ../../sass/components/_archer_block.sass */
 .pill--men, .pill.men {
   background-color: #A62;
 }
-/* line 46, ../../sass/components/_archer_block.sass */
+/* line 57, ../../sass/components/_archer_block.sass */
 .pill--women, .pill.women {
   background-color: #F57;
 }
-/* line 50, ../../sass/components/_archer_block.sass */
+/* line 61, ../../sass/components/_archer_block.sass */
 .pill--recurve, .pill.recurve {
   background-color: #A21;
 }
-/* line 53, ../../sass/components/_archer_block.sass */
+/* line 64, ../../sass/components/_archer_block.sass */
 .pill--compound, .pill.compound {
   background-color: #6C4;
   color: #000F1F;
 }
-/* line 57, ../../sass/components/_archer_block.sass */
+/* line 68, ../../sass/components/_archer_block.sass */
 .pill--barebow, .pill.barebow {
   background-color: #6FB3FF;
   color: #000F1F;
 }
-/* line 61, ../../sass/components/_archer_block.sass */
+/* line 72, ../../sass/components/_archer_block.sass */
 .pill--longbow, .pill.longbow {
   background-color: #000F1F;
 }

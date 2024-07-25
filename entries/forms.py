@@ -261,6 +261,7 @@ class EntryCreateForm(forms.Form):
     )
     update_bowstyle = forms.BooleanField(required=False)
     agb_number = forms.IntegerField(required=False, label='ArcheryGB number')
+    stay_on_line = forms.BooleanField(required=False)
 
     def __init__(self, archer, competition, **kwargs):
         super(EntryCreateForm, self).__init__(**kwargs)
@@ -421,6 +422,7 @@ class EntryCreateForm(forms.Form):
             entry.guest = self.cleaned_data['guest']
         if self.competition.ifaa_rules:
             entry.ifaa_division = self.cleaned_data['ifaa_division']
+        entry.stay_on_line = self.cleaned_data['stay_on_line']
 
     def create_session_entries(self, entry):
         if len(self.session_rounds) == 1:

@@ -4,22 +4,30 @@ import { TargetListDispatchContext } from '../context/TargetListContext';
 import ArcherPills from '../utils/ArcherPills';
 import ArcherSelector from './ArcherSelector';
 
-const EmptyArcherBlock = ({ place, editMode, unallocatedEntries, setAllocation }) => {
+const EmptyArcherBlock = ({ place, editMode, blocked, unallocatedEntries, setAllocation }) => {
     const [selectOpen, setSelectOpen] = useState(false);
 
     return (
         <div className="archer-block">
             <div className="name">
                 <span className="detail">{ place }</span>
-                { editMode && <a className="select" onClick={ () => setSelectOpen(!selectOpen) }>Select…</a> }
+                { editMode && !blocked && <a className="select" onClick={ () => setSelectOpen(!selectOpen) }>Select…</a> }
             </div>
             { selectOpen && <ArcherSelector archers={ Array.from(unallocatedEntries.values()) } close={ () => setSelectOpen(false) } onSelect={ setAllocation } /> }
-            <div className="bottom"></div>
+            <div className={ "bottom" + (blocked ? " blocked" : "") }>{ blocked && <p>SPACE RESERVED</p> }</div>
         </div>
     );
 };
 
 const ArcherBlock = ({ place, archer, editMode, deleteAllocation }) => {
+    let clubRow = <p>{ archer.club } <ArcherPills categories={ archer.categories } /></p>;
+    if (archer.stayOnLine) {
+        clubRow = (
+            <p>
+                { archer.club } <span className="stay-on-line">STAY ON LINE</span> <ArcherPills categories={ archer.categories } />
+            </p>
+        );
+    }
     return (
         <div className="archer-block">
             <div className="name">
@@ -32,8 +40,8 @@ const ArcherBlock = ({ place, archer, editMode, deleteAllocation }) => {
                 </span>
             </div>
             <div className="bottom">
-                <p>{ archer.club }</p>
-                <p><ArcherPills categories={ archer.categories } /></p>
+                { clubRow }
+                <p>{ archer.round }</p>
             </div>
         </div>
     );
@@ -62,10 +70,18 @@ const SessionList = ({ session, editMode }) => {
                     />
                 );
             }
+            let blocked = false;
+            if (session.archersPerBoss === 4) {
+                const alternateLetters = {'A': 'C', 'C': 'A', 'B': 'D', 'D': 'B'};
+                if (lookup[alternateLetters[letter]] && lookup[alternateLetters[letter]].stayOnLine) {
+                    blocked = true;
+                }
+            }
             return (
                 <EmptyArcherBlock
                     place={ `${number}${letter}` }
                     key={ letter }
+                    blocked={ blocked }
                     editMode={ editMode }
                     unallocatedEntries={ session.unallocatedEntries }
                     setAllocation={ (archer) => dispatch({ type: 'setAllocation', sessionId: session.id, boss: number, letter, archerId: archer.id }) }
