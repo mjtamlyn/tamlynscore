@@ -76,12 +76,21 @@ const removeBoss = (bosses, number) => {
     });
 };
 
-const setAllocation = (bosses, unallocatedEntries, archerId, number, target) => {
+const setAllocation = (bosses, archersPerBoss, unallocatedEntries, archerId, number, target) => {
     const archer = unallocatedEntries.get(archerId);
+    if (archer.stayOnLine) {
+        if (archersPerBoss === 4) {
+            const alternateLetters = {'A': 'C', 'C': 'A', 'B': 'D', 'D': 'B'};
+            if (bosses.get(number)[alternateLetters[target]]) {
+                return false;
+            }
+        }
+    }
     archer.boss = number;
     archer.target = target;
     bosses.get(number)[target] = archer;
     unallocatedEntries.delete(archerId);
+    return true;
 };
 
 const deleteAllocation = (bosses, unallocatedEntries, number, target) => {
@@ -116,8 +125,10 @@ const targetListReducer = (targetList, action) => {
             return;
         }
         case 'setAllocation': {
-            setAllocation(session.bosses, session.unallocatedEntries, action.archerId, action.boss, action.letter);
-            actionQueue.doAction({ type: 'SET', params: {id: action.archerId, value: { boss: action.boss, target:action.letter }}});
+            const ok = setAllocation(session.bosses, session.archersPerBoss, session.unallocatedEntries, action.archerId, action.boss, action.letter);
+            if (ok) {
+                actionQueue.doAction({ type: 'SET', params: {id: action.archerId, value: { boss: action.boss, target:action.letter }}});
+            }
             return;
         }
         case 'deleteAllocation': {

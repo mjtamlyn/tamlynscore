@@ -304,6 +304,7 @@ class CompetitionEntry(models.Model):
     age = models.CharField(max_length=1, choices=SIMPLE_AGE_CHOICES, default='S')
     agb_age = models.CharField(max_length=3, choices=AGB_AGE_CHOICES, default='', blank=True)
     novice = models.CharField(max_length=1, choices=NOVICE_CHOICES, default='E')
+    stay_on_line = models.BooleanField(default=False)
     ifaa_division = models.CharField(max_length=2, choices=IFAA_DIVISIONS, default='', blank=True)
 
     guest = models.BooleanField(default=False)
