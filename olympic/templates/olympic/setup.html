@@ -10,23 +10,26 @@
 {% endfor %}
 </p>
 
-<div class="field-plan">
+<dvi class="field-plan">
     <table class="table field-plan">
-        {% for row in field_plan %}
         <tr>
-            {% for detail in row %}
-                {% if detail %}
-                    {% if not detail.category %}
-                        <th>{{ detail }}</th>
-                    {% elif detail.width %}
-                        <td colspan="{{ detail.width }}" class="centered">
-                            {{ detail.category.code }}<br>
-                            {{ detail.level }}
-                        </td>
-                    {% endif %}
-                {% else %}
-                    <td class="empty"></td>
-                {% endif %}
+            <td class="empty"></td>
+            {% for target in targets %}
+            <th>{{ target }}</th>
+            {% endfor %}
+        </tr>
+        {% for timing in matches_by_spans %}
+        <tr>
+            <th>{{ timing.name }}</th>
+            {% for match in timing.targets %}
+            {% if match.span %}
+                <td colspan="{{ match.span }}" class="centered">
+                    {{ match.category_short }}<br />
+                    {{ match.round }}
+                </td>
+            {% elif not match.match %}
+                <td class="empty"></td>
+            {% endif %}
             {% endfor %}
         </tr>
         {% endfor %}

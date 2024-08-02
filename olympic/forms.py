@@ -45,7 +45,7 @@ class SetupForm(forms.Form):
         (9, 'Pass I'),
         (10, 'Pass J'),
     )
-    session_round = forms.ModelChoiceField(SessionRound.objects)
+    session_round = forms.ChoiceField()
     start = forms.IntegerField(label='Start target')
     level = forms.TypedChoiceField(coerce=int, choices=LEVEL_CHOICES)
     timing = forms.TypedChoiceField(label='Pass', coerce=int, choices=TIMING_CHOICES)
@@ -54,12 +54,12 @@ class SetupForm(forms.Form):
     delete = forms.BooleanField(required=False)
 
     def __init__(self, session_rounds, **kwargs):
-        self.session_rounds = session_rounds
         super(SetupForm, self).__init__(**kwargs)
-        self.fields['session_round'].queryset = session_rounds
+        self.fields['session_round'].choices = [(None, '-----------')] + [(session_round.id, session_round.category.name) for session_round in session_rounds]
+        self.sr_lookup = {sr.id: sr for sr in session_rounds}
 
     def save(self):
-        sr = self.cleaned_data['session_round']
+        sr = self.sr_lookup[int(self.cleaned_data['session_round'])]
         kwargs = {
             'level': self.cleaned_data['level'],
             'start': self.cleaned_data['start'],

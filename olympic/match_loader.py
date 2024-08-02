@@ -8,6 +8,7 @@ class MatchLoader:
 
     def __init__(self, competition):
         self.competition = competition
+        self.session_rounds = []
         self.matches = []
         self.categories = []
         self.timings = []
@@ -35,6 +36,8 @@ class MatchLoader:
 
     def setup(self):
         for match in self.matches:
+            if match.session_round not in self.session_rounds:
+                self.session_rounds.append(match.session_round)
             if match.session_round.category not in self.categories:
                 self.categories.append(match.session_round.category)
             target = match.target_2 or match.target
@@ -165,10 +168,12 @@ class MatchLoader:
                     'match': match,
                 }
                 if not match:
+                    targets.append(details)
                     continue
                 details.update({
                     'category': match.session_round.category.name,
-                    'distance': match.session_round.shot_round.short_name,
+                    'category_short': match.session_round.category.short_code(),
+                    'distance': match.session_round.shot_round.short_name(),
                     'round': self.LEVELS[match.level - 1],
                     'seed_1': match.seed_1,
                     'seed_2': match.seed_2,
@@ -193,4 +198,27 @@ class MatchLoader:
                     details['score_2'] = None
                     details['is_second_target'] = True
                 targets.append(details)
+        return layout
+
+    def matches_by_spans(self):
+        """Used for setup and field plan PDF"""
+        layout = self.matches_by_time()
+        for timing in layout:
+            current = None
+            check = None
+            if timing['targets'][0]['match']:
+                current = timing['targets'][0]
+                check = (current['category_short'], current['round'])
+                current['span'] = 1
+            for target in timing['targets'][1:]:
+                if not target['match']:
+                    current = None
+                    check = None
+                    continue
+                if check and check == (target['category_short'], target['round']):
+                    current['span'] += 1
+                else:
+                    target['span'] = 1
+                    current = target
+                    check = (target['category_short'], target['round'])
         return layout

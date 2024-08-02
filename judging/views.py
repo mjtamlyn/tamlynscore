@@ -9,7 +9,6 @@ from entries.models import SessionEntry
 from entries.views import CompetitionMixin, Registration
 from olympic.match_loader import MatchLoader
 from olympic.models import Seeding
-from olympic.views import FieldPlanMixin
 
 from .models import Judge
 
@@ -53,7 +52,7 @@ class JudgeInspection(JudgeMixin, Registration):
         return self.get(request, slug)
 
 
-class JudgeMatches(FieldPlanMixin, JudgeMixin, TemplateView):
+class JudgeMatches(JudgeMixin, TemplateView):
     template_name = 'judging/matches.html'
 
     def get_context_data(self, **kwargs):

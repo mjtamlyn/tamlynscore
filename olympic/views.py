@@ -16,6 +16,7 @@ from reportlab.rl_config import defaultPageSize
 
 from entries.views import CompetitionMixin, HeadedPdfView, ScoreSheetsPdf
 from olympic.forms import ResultForm, SetupForm
+from olympic.match_loader import MatchLoader
 from olympic.models import Match, OlympicSessionRound, Result, Seeding
 from scores.models import Score
 from scores.result_modes import H2HSeedings
@@ -73,60 +74,7 @@ class OlympicIndex(OlympicMixin, ResultModeMixin, TemplateView):
         return redirect('olympic_index', slug=self.competition.slug)
 
 
-class FieldPlanMixin(CompetitionMixin):
-    def setup(self, request, *args, **kwargs):
-        super().setup(request, *args, **kwargs)
-        self.session_rounds = OlympicSessionRound.objects.filter(session__competition=self.competition)
-
-    def get_matches(self):
-        return Match.objects.filter(session_round__session__competition=self.competition).select_related('session_round', 'session_round__category')
-
-    def get_field_plan(self):
-        matches = self.get_matches()
-        if len(matches) == 0:
-            return None
-        max_timing = (max(matches, key=lambda m: m.timing)).timing
-        last_match = max(matches, key=lambda m: (m.target_2 or m.target))
-        max_target = last_match.target_2 or last_match.target
-        if matches[0].session_round.shot_round.team_type:
-            max_target += 1
-        levels = ['Finals', 'Semis', 'Quarters', '1/8', '1/16', '1/32', '1/64', '1/128']
-        passes = 'ABCDEFGHIJK'
-
-        layout = [[{} for i in range(max_target + 1)] for j in range(max_timing + 1)]
-        for i, row in enumerate(layout[1:]):
-            row[0] = 'Pass %s' % passes[i]
-        for i in range(max_target):
-            layout[0][i + 1] = i + 1
-        for m in matches:
-            layout[m.timing][m.target] = {
-                'category': m.session_round.category,
-                'level': levels[m.level - 1],
-            }
-            if m.target_2:
-                layout[m.timing][m.target_2] = {
-                    'category': m.session_round.category,
-                    'level': levels[m.level - 1],
-                }
-        for row in layout[1:]:
-            current = {}
-            for spot in row[1:]:
-                if spot and not spot.get('category') == current.get('category'):
-                    current = spot
-                    current['width'] = 1
-                elif spot:
-                    current['width'] += 1
-                elif spot is None:
-                    current = {}
-        return layout
-
-    def get_context_data(self, **kwargs):
-        context = super().get_context_data(**kwargs)
-        context['field_plan'] = self.get_field_plan()
-        return context
-
-
-class OlympicSetup(OlympicMixin, ResultModeMixin, FieldPlanMixin, FormView):
+class OlympicSetup(OlympicMixin, ResultModeMixin, FormView):
     form_class = SetupForm
     template_name = 'olympic/setup.html'
 
@@ -139,8 +87,17 @@ class OlympicSetup(OlympicMixin, ResultModeMixin, FieldPlanMixin, FormView):
         form.save()
         return super().form_valid(form)
 
+    def post(self, *args, **kwargs):
+        self.session_rounds = OlympicSessionRound.objects.filter(session__competition=self.competition)
+        return super().post(*args, **kwargs)
+
     def get_context_data(self, **kwargs):
+        matches = MatchLoader(self.competition)
+        matches.load_all()
+        self.session_rounds = matches.session_rounds
+
         context = super().get_context_data(**kwargs)
+
         scores = self.get_scores()
         mode = H2HSeedings(include_distance_breakdown=False, hide_golds=False)
         results = mode.get_results(self.competition, scores)
@@ -149,6 +106,10 @@ class OlympicSetup(OlympicMixin, ResultModeMixin, FieldPlanMixin, FormView):
             for (cat, entries) in r_cat.items():
                 numbers.append([r, cat, len(entries)])
         context['numbers'] = numbers
+
+        context['targets'] = matches.targets
+        context['matches_by_spans'] = matches.matches_by_spans()
+
         return context
 
     def get_success_url(self):
@@ -835,7 +796,7 @@ class OlympicTreePdf(OlympicTreeMixin, OlympicResults):
         return elements
 
 
-class FieldPlan(FieldPlanMixin, HeadedPdfView):
+class FieldPlan(CompetitionMixin, HeadedPdfView):
     title = 'Field plan'
     PAGE_HEIGHT = defaultPageSize[0]
     PAGE_WIDTH = defaultPageSize[1]
@@ -845,16 +806,19 @@ class FieldPlan(FieldPlanMixin, HeadedPdfView):
         doc.bottomMargin = 0.4 * inch
 
     def get_elements(self):
-        field_plan = self.get_field_plan()
-        widths = [35] + [11] * (len(field_plan[0]) - 1)
-        table_style = self.get_table_style(field_plan)
-        table_data = [[None] + field_plan[0][1:]]
-        for row in field_plan[1:]:
-            table_row = [row[0]]
-            for target in row[1:]:
-                if target.get('width'):
-                    table_row.append('%s\n%s' % (target['category'].code(), target['level']))
-                elif target.get('category') or not target:
+        matches = MatchLoader(self.competition)
+        matches.load_all()
+        spans = matches.matches_by_spans()
+
+        widths = [35] + [20 if len(matches.targets) <= 32 else 11] * len(matches.targets)
+        table_style = self.get_table_style(spans)
+        table_data = [[None] + matches.targets]
+        for timing in spans:
+            table_row = [timing['name']]
+            for target in timing['targets']:
+                if target.get('span'):
+                    table_row.append('%s\n%s' % (target['category_short'], target['round']))
+                elif not target['match']:
                     table_row.append(None)
                 else:
                     table_row.append(target)
@@ -874,11 +838,11 @@ class FieldPlan(FieldPlanMixin, HeadedPdfView):
             ('BOX', (0, 0), (0, -1), 1, colors.black),
             ('BOX', (0, 0), (-1, 0), 1, colors.black),
         ]
-        for j, row in enumerate(data[1:], 1):
-            for i, target in enumerate(row[1:], 1):
-                if target.get('width', 0):
-                    table_style.append(('SPAN', (i, j), (i + target['width'] - 1, j)))
-                if not target:
+        for j, timing in enumerate(data, 1):
+            for i, target in enumerate(timing['targets'], 1):
+                if target.get('span', 0):
+                    table_style.append(('SPAN', (i, j), (i + target['span'] - 1, j)))
+                if not target['match']:
                     table_style.append(('BACKGROUND', (i, j), (i, j), colors.lightgrey))
         return table_style
 
