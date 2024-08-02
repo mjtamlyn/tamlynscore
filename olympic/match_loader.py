@@ -21,7 +21,11 @@ class MatchLoader:
         self.match_lookup_by_seed = {}
 
     def load_all(self):
-        self.matches = Match.objects.filter(session_round__session__competition=self.competition).select_related('session_round', 'session_round__shot_round', 'session_round__category').prefetch_related('session_round__category__bowstyles', 'result_set', 'result_set__seed__entry__archer')
+        self.matches = Match.objects.filter(session_round__session__competition=self.competition).select_related(
+            'session_round', 'session_round__shot_round', 'session_round__category',
+        ).prefetch_related(
+            'session_round__category__bowstyles', 'result_set', 'result_set__seed__entry__archer',
+        )
 
         session_rounds = {m.session_round for m in self.matches}
         self.match_lookup = {(m.session_round, m.level, m.match): m for m in self.matches}

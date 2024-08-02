@@ -8,7 +8,6 @@ from braces.views import MessageMixin
 from entries.models import SessionEntry
 from entries.views import CompetitionMixin, Registration
 from olympic.match_loader import MatchLoader
-from olympic.models import Seeding
 
 from .models import Judge
 
