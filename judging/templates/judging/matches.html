@@ -3,7 +3,8 @@
 {% block bodyclass %}registration{% endblock %}
 
 {% block judge_content %}
-{% for pass in layout %}
+
+{% for pass in matches_by_time %}
 <h3>{{ pass.name }}</h3>
 <table class="table">
     {% for target in pass.targets %}
@@ -15,9 +16,11 @@
         <td {% if target.is_bye %}class="bye"{% endif %}>
             {% if target.seed_1 or target.seed_2 %}
                 {% if target.seed_1 %}<strong>{{ target.seed_1 }}</strong>{% endif %} {{ target.archer_1 }}
+                {% if target.score_1 is not None %}<strong>{{ target.score_1 }}</strong>{% endif %}
                 {% if not target.has_second_target and not target.is_second_target %}
-                    v
-                    {% if target.seed_2 %}<strong>{{ target.seed_2 }}</strong>{% endif %} {{ target.archer_2 }}
+                    {% if target.score_1 is not None %}-{% else %}v{% endif %}
+                    {% if target.score_2 is not None %}<strong>{{ target.score_2 }}</strong>{% endif %}
+                    {{ target.archer_2 }} {% if target.seed_2 %}<strong>{{ target.seed_2 }}</strong>{% endif %}
                 {% endif %}
             {% endif %}
         </td>
@@ -26,4 +29,5 @@
 </table>
 
 {% endfor %}
+
 {% endblock %}
