@@ -79,15 +79,11 @@ class MatchLoader:
                     seeds = [next_match_number, (2 ** match.level) + 1 - next_match_number]
                     if next_match_number % 2:
                         seeds.reverse()
-                    if match.seed_1:
-                        archer = match.archer_1
-                    if match.seed_2:
-                        archer = match.archer_2
                     if effective_seed == seeds[0]:
-                        next_match.archer_1 = archer
+                        next_match.archer_1 = archer.entry.archer
                         next_match.seed_1 = seed
                     else:
-                        next_match.archer_2 = archer
+                        next_match.archer_2 = archer.entry.archer
                         next_match.seed_2 = seed
 
             elif match.level == self.max_levels[match.session_round] and self.seeding_lookup:
