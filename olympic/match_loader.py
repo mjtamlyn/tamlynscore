@@ -118,7 +118,9 @@ class MatchLoader:
                 if match.is_bye:
                     seed = match.seed_1 or match.seed_2
                     next_match_number = match.match if match.match <= 2 ** (match.level - 2) else 2 ** (match.level - 1) + 1 - match.match
-                    next_match = self.match_lookup[(match.session_round, match.level - 1, next_match_number)]
+                    next_match = self.match_lookup.get((match.session_round, match.level - 1, next_match_number), None)
+                    if not next_match:
+                        continue
                     next_match.pre_filled = True
                     seeds = [next_match_number, (2 ** match.level) + 1 - next_match_number]
                     if next_match_number % 2:
