@@ -76,8 +76,8 @@ class MatchLoader:
                     next_match = self.match_lookup[(match.session_round, match.level - 1, next_match_number)]
                     next_match.pre_filled = True
                     effective_seed = Match.objects._effective_seed(seed, match.level - 1)
-                    seeds = [next_match_number, (2 ** match.level) + 1 - next_match_number]
-                    if next_match_number % 2:
+                    seeds = [next_match_number, (2 ** (match.level - 1)) + 1 - next_match_number]
+                    if not next_match_number % 2:
                         seeds.reverse()
                     if effective_seed == seeds[0]:
                         next_match.archer_1 = archer.entry.archer
@@ -119,7 +119,7 @@ class MatchLoader:
                         continue
                     next_match.pre_filled = True
                     seeds = [next_match_number, (2 ** match.level) + 1 - next_match_number]
-                    if next_match_number % 2:
+                    if not next_match_number % 2:
                         seeds.reverse()
                     if match.seed_1:
                         archer = match.archer_1
