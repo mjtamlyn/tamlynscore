@@ -69,7 +69,7 @@ class MatchLoader:
 
         # Handle various cases of the matches
         for match in self.matches:
-            if match.result_set.all():
+            if len(match.result_set.all()) == 2:
                 self.setup_completed_match(match)
             elif match.level == self.max_levels[match.session_round] and self.seeding_lookup:
                 self.setup_first_round_match(match)
@@ -97,6 +97,11 @@ class MatchLoader:
             seed_instance = match.results[0].seed if match.results[0].win else match.results[1].seed
             seed = seed_instance.seed
             self.setup_next_match(match, seed_instance.entry.archer, seed)
+            # And the bronze if necessary
+            if match.level == 2:
+                seed_instance = match.results[0].seed if not match.results[0].win else match.results[1].seed
+                seed = seed_instance.seed
+                self.setup_next_match(match, seed_instance.entry.archer, seed, bronze=True)
 
     def setup_first_round_match(self, match):
         match.results = []
@@ -177,8 +182,11 @@ class MatchLoader:
         match.archer_1 = match.archer_2 = 'TBC'
         match.score_1 = match.score_2 = None
 
-    def setup_next_match(self, match, archer, seed):
-        next_match_number = match.match if match.match <= 2 ** (match.level - 2) else 2 ** (match.level - 1) + 1 - match.match
+    def setup_next_match(self, match, archer, seed, bronze=False):
+        if bronze:
+            next_match_number = 2
+        else:
+            next_match_number = match.match if match.match <= 2 ** (match.level - 2) else 2 ** (match.level - 1) + 1 - match.match
         next_match = self.match_lookup.get((match.session_round, match.level - 1, next_match_number), None)
         if not next_match:
             return
