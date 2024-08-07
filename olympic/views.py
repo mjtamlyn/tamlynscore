@@ -121,30 +121,41 @@ class OlympicInputIndex(OlympicMixin, DetailView):
     model = OlympicSessionRound
     pk_url_kwarg = 'round_id'
     context_object_name = 'round'
-    labels = ['Bronze', 'Final', 'Semi', '1/4', '1/8', '1/16', '1/32', '1/64']
 
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
-        highest_level = Match.objects.filter(session_round=self.object).order_by('-level')[0].level
-        seedings = self.object.seeding_set.select_related('entry', 'entry__archer').order_by('seed')
-        matches = self.object.match_set.prefetch_related('result_set')
-        lookup = {}
-        for match in matches:
-            for result in match.result_set.all():
-                lookup[(result.seed_id, match.level, match.match)] = result
-        for seeding in seedings:
+        matches = MatchLoader(self.competition)
+        matches.load_round(self.object)
+        seedings = []
+        for seed in sorted(matches.seeding_lookup.values(), key=lambda s: s.seed):
+            my_matches = matches.match_lookup_by_seed[seed]
             results = []
-            for level in range(1, highest_level + 1):
-                match_number = Match.objects.match_number_for_seed(seeding.seed, level)
-                result = lookup.get((seeding.pk, level, match_number))
-                results.append(result)
-            seeding.results = list(reversed(results))
-            result = lookup.get((seeding.pk, 1, 2))
-            seeding.results.append(result)
-        context.update({
-            'seedings': seedings,
-            'levels': reversed(self.labels[:highest_level + 1]),
-        })
+            level = matches.max_levels[self.object]
+            while level > my_matches[0].level:
+                results.append(None)
+                level -= 1
+            for match in my_matches:
+                if not match.results:
+                    results.append(None)
+                    continue
+                if match.seed_1 == seed.seed:
+                    result = match.results[0]
+                elif match.seed_2 == seed.seed:
+                    result = match.results[1]
+                else:
+                    results.append(None)
+                    continue
+                results.append({
+                    'score': result.total,
+                    'win': result.win,
+                })
+            seedings.append({
+                'seed': seed,
+                'results': results,
+            })
+        context['levels'] = reversed(matches.LEVELS[:matches.max_levels[self.object]])
+        context['seedings'] = seedings
+
         return context
 
 

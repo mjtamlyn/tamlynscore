@@ -32,6 +32,19 @@ class MatchLoader:
 
         self.setup(self.session_rounds, seedings)
 
+    def load_round(self, session_round):
+        self.matches = Match.objects.filter(session_round=session_round).select_related(
+            'session_round', 'session_round__shot_round', 'session_round__category',
+        ).prefetch_related(
+            'session_round__category__bowstyles', 'result_set', 'result_set__seed__entry__archer',
+        )
+        session_rounds = {session_round}
+        seedings = Seeding.objects.filter(session_round=session_round).select_related(
+            'entry__archer',
+        )
+
+        self.setup(session_rounds, seedings)
+
     def setup(self, session_rounds, seedings):
         # Fill in lookups first
         self.match_lookup = {(m.session_round, m.level, m.match): m for m in self.matches}
@@ -82,7 +95,7 @@ class MatchLoader:
                 self.setup_empty_match(match)
 
     def setup_completed_match(self, match):
-        match.results = sorted(match.result_set.all(), key=lambda r: r.seed.seed)
+        match.results = sorted(match.result_set.all(), key=lambda r: Match.objects._effective_seed(r.seed.seed, match.level))
         if not match.match % 2:
             match.results.reverse()
         match.seed_1 = match.results[0].seed.seed
