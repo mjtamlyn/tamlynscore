@@ -32,6 +32,19 @@ class MatchLoader:
 
         self.setup(self.session_rounds, seedings)
 
+    def load_round(self, session_round):
+        self.matches = Match.objects.filter(session_round=session_round).select_related(
+            'session_round', 'session_round__shot_round', 'session_round__category',
+        ).prefetch_related(
+            'session_round__category__bowstyles', 'result_set', 'result_set__seed__entry__archer',
+        )
+        session_rounds = {session_round}
+        seedings = Seeding.objects.filter(session_round=session_round).select_related(
+            'entry__archer',
+        )
+
+        self.setup(session_rounds, seedings)
+
     def setup(self, session_rounds, seedings):
         # Fill in lookups first
         self.match_lookup = {(m.session_round, m.level, m.match): m for m in self.matches}
@@ -42,10 +55,7 @@ class MatchLoader:
             level = self.max_levels[seed.session_round]
             seeds_matches = []
             while level:
-                effective_seed = Match.objects.effective_seed(seed.seed, level)
-                n_matches = Match.objects.n_matches_for_level(level)
-                n_archers = Match.objects.n_archers_for_level(level)
-                match_number = effective_seed if effective_seed <= n_matches else n_archers - effective_seed
+                match_number = Match.objects.match_number_for_seed(seed.seed, level)
                 match = self.match_lookup.get((seed.session_round, level, match_number))
                 if match:
                     seeds_matches.append(match)
@@ -80,9 +90,11 @@ class MatchLoader:
                 self.handle_pre_filled(match)
             else:
                 self.setup_empty_match(match)
+            if not match.results and len(match.result_set.all()):
+                self.add_incomplete_results(match)
 
     def setup_completed_match(self, match):
-        match.results = sorted(match.result_set.all(), key=lambda r: r.seed.seed)
+        match.results = sorted(match.result_set.all(), key=lambda r: Match.objects.effective_seed(r.seed.seed, match.level))
         if not match.match % 2:
             match.results.reverse()
         match.seed_1 = match.results[0].seed.seed
@@ -99,6 +111,17 @@ class MatchLoader:
             self.setup_next_match(match, winner.entry.archer, winner.seed)
             loser = match.results[0].seed if not match.results[0].win else match.results[1].seed
             self.setup_next_match(match, loser.entry.archer, loser.seed, win=False)
+
+    def add_incomplete_results(self, match):
+        # This should only happen when we have only one half of a match
+        result = match.result_set.all()[0]
+        effective_seed = Match.objects.effective_seed(result.seed.seed, match.level)
+        if match.seed_1 == effective_seed:
+            match.score_1 = result.total
+            match.results = [result, None]
+        if match.seed_2 == effective_seed:
+            match.score_2 = result.total
+            match.results = [None, result]
 
     def setup_first_round_match(self, match):
         match.results = []
@@ -138,8 +161,9 @@ class MatchLoader:
     def setup_second_round_match(self, match):
         # In the case there is no first round match for a given archer, they
         # don't get written in for a BYE, so we need to find those here.
-
         # Higher seed first
+        match.results = []
+
         seed = self.seeding_lookup.get((match.session_round_id, match.match))
         if not seed:
             return self.setup_empty_match(match)
