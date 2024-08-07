@@ -26,19 +26,31 @@ class MatchLoader:
         ).prefetch_related(
             'session_round__category__bowstyles', 'result_set', 'result_set__seed__entry__archer',
         )
-
         session_rounds = {m.session_round for m in self.matches}
-        self.match_lookup = {(m.session_round, m.level, m.match): m for m in self.matches}
-
         seedings = Seeding.objects.filter(session_round__in=session_rounds).select_related(
             'entry__archer',
         )
+
+        self.setup(session_rounds, seedings)
+
+    def setup(self, session_rounds, seedings):
+        # Fill in lookups first
+        self.match_lookup = {(m.session_round, m.level, m.match): m for m in self.matches}
         self.seeding_lookup = {(s.session_round_id, s.seed): s for s in seedings}
         self.max_levels = {session_round: max(m.level for m in self.matches if m.session_round == session_round) for session_round in session_rounds}
 
-        self.setup()
+        for seed in seedings:
+            level = self.max_levels[seed.session_round]
+            seeds_matches = []
+            while level:
+                effective_seed = Match.objects._effective_seed(seed.seed, level)
+                match_number = effective_seed if effective_seed <= 2 ** (level - 1) else 2 ** level + 1 - effective_seed
+                match = self.match_lookup.get((seed.session_round, level, match_number))
+                if match:
+                    seeds_matches.append(match)
+                level -= 1
+            self.match_lookup_by_seed[seed] = seeds_matches
 
-    def setup(self):
         for match in self.matches:
             if match.session_round not in self.session_rounds:
                 self.session_rounds.append(match.session_round)
@@ -51,110 +63,149 @@ class MatchLoader:
                 self.timings = self.TIMINGS[:match.timing]
                 self.passes = self.PASSES[:match.timing]
                 match.pass_label = self.PASSES[match.timing - 1]
-
             self.match_lookup_by_range[(match.timing, match.target)] = match
             if match.target_2:
                 self.match_lookup_by_range[(match.timing, match.target_2)] = match
 
+        # Handle various cases of the matches
+        for match in self.matches:
             if match.result_set.all():
-                match.results = list(match.result_set.all())
-                if not match.match % 2:
-                    match.results.reverse()
-                match.seed_1 = match.results[0].seed.seed
-                match.archer_1 = match.results[0].seed.entry.archer
-                match.score_1 = match.results[0].total
-                match.seed_2 = match.results[1].seed.seed
-                match.archer_2 = match.results[1].seed.entry.archer
-                match.score_2 = match.results[1].total
-                match.is_bye = False
-
-                # Fill in next match if we have a result
-                if match.results[0].win or match.results[1].win:
-                    archer = match.results[0].seed if match.results[0].win else match.results[1].seed
-                    seed = archer.seed
-                    next_match_number = match.match if match.match <= 2 ** (match.level - 2) else 2 ** (match.level - 1) + 1 - match.match
-                    next_match = self.match_lookup[(match.session_round, match.level - 1, next_match_number)]
-                    next_match.pre_filled = True
-                    effective_seed = Match.objects._effective_seed(seed, match.level - 1)
-                    seeds = [next_match_number, (2 ** (match.level - 1)) + 1 - next_match_number]
-                    if not next_match_number % 2:
-                        seeds.reverse()
-                    if effective_seed == seeds[0]:
-                        next_match.archer_1 = archer.entry.archer
-                        next_match.seed_1 = seed
-                    else:
-                        next_match.archer_2 = archer.entry.archer
-                        next_match.seed_2 = seed
-
+                self.setup_completed_match(match)
             elif match.level == self.max_levels[match.session_round] and self.seeding_lookup:
-                match.results = []
-                seeds = [match.match, (2 ** match.level) + 1 - match.match]
-                if not match.match % 2:
-                    seeds.reverse()
-                seed_1 = self.seeding_lookup.get((match.session_round_id, seeds[0]), None)
-                if seed_1:
-                    match.seed_1 = seeds[0]
-                    match.archer_1 = seed_1.entry.archer
-                else:
-                    match.seed_1 = None
-                    match.archer_1 = 'BYE'
-                seed_2 = self.seeding_lookup.get((match.session_round_id, seeds[1]), None)
-                if seed_2:
-                    match.seed_2 = seed_2.seed
-                    match.archer_2 = seed_2.entry.archer
-                else:
-                    match.seed_2 = None
-                    match.archer_2 = 'BYE'
-                match.is_bye = False
-                if (seed_2 and not seed_1) or (seed_1 and not seed_2):
-                    match.is_bye = True
-                match.score_1 = match.score_2 = None
-
-                # Fill in next match
-                if match.is_bye:
-                    seed = match.seed_1 or match.seed_2
-                    next_match_number = match.match if match.match <= 2 ** (match.level - 2) else 2 ** (match.level - 1) + 1 - match.match
-                    next_match = self.match_lookup.get((match.session_round, match.level - 1, next_match_number), None)
-                    if not next_match:
-                        continue
-                    next_match.pre_filled = True
-                    seeds = [next_match_number, (2 ** match.level) + 1 - next_match_number]
-                    if not next_match_number % 2:
-                        seeds.reverse()
-                    if match.seed_1:
-                        archer = match.archer_1
-                    if match.seed_2:
-                        archer = match.archer_2
-                    if seed == seeds[0]:
-                        next_match.archer_1 = archer
-                        next_match.seed_1 = seed
-                    else:
-                        next_match.archer_2 = archer
-                        next_match.seed_2 = seed
-
+                self.setup_first_round_match(match)
+            elif match.level + 1 == self.max_levels[match.session_round] and self.seeding_lookup:
+                self.setup_second_round_match(match)
             elif getattr(match, 'pre_filled', False):
-                # Fill in some defaults
-                match.results = []
-                match.is_bye = False
-                match.score_1 = match.score_2 = None
-                if not hasattr(match, 'seed_1'):
-                    match.seed_1 = None
-                if not hasattr(match, 'seed_2'):
-                    match.seed_2 = None
-                if not hasattr(match, 'archer_1'):
-                    match.archer_1 = 'TBC'
-                if not hasattr(match, 'archer_2'):
-                    match.archer_2 = 'TBC'
-
+                self.handle_pre_filled(match)
             else:
-                match.results = []
-                match.is_bye = False
-                seeds = [match.match, (2 ** match.level) + 1 - match.match]
-                if not match.match % 2:
-                    seeds.reverse()
-                match.seed_1, match.seed_2 = seeds
-                match.archer_1 = match.archer_2 = 'TBC'
-                match.score_1 = match.score_2 = None
+                self.setup_empty_match(match)
+
+    def setup_completed_match(self, match):
+        match.results = sorted(match.result_set.all(), key=lambda r: r.seed.seed)
+        if not match.match % 2:
+            match.results.reverse()
+        match.seed_1 = match.results[0].seed.seed
+        match.archer_1 = match.results[0].seed.entry.archer
+        match.score_1 = match.results[0].total
+        match.seed_2 = match.results[1].seed.seed
+        match.archer_2 = match.results[1].seed.entry.archer
+        match.score_2 = match.results[1].total
+        match.is_bye = False
+
+        # Fill in next match if we have a result
+        if match.results[0].win or match.results[1].win:
+            seed_instance = match.results[0].seed if match.results[0].win else match.results[1].seed
+            seed = seed_instance.seed
+            self.setup_next_match(match, seed_instance.entry.archer, seed)
+
+    def setup_first_round_match(self, match):
+        match.results = []
+        seeds = [match.match, (2 ** match.level) + 1 - match.match]
+        if not match.match % 2:
+            seeds.reverse()
+        seed_1 = self.seeding_lookup.get((match.session_round_id, seeds[0]), None)
+        if seed_1:
+            match.seed_1 = seeds[0]
+            match.archer_1 = seed_1.entry.archer
+        else:
+            match.seed_1 = None
+            match.archer_1 = 'BYE'
+        seed_2 = self.seeding_lookup.get((match.session_round_id, seeds[1]), None)
+        if seed_2:
+            match.seed_2 = seed_2.seed
+            match.archer_2 = seed_2.entry.archer
+        else:
+            match.seed_2 = None
+            match.archer_2 = 'BYE'
+        match.is_bye = False
+        if (seed_2 and not seed_1) or (seed_1 and not seed_2):
+            match.is_bye = True
+        match.score_1 = match.score_2 = None
+
+        # Fill in next match
+        if match.is_bye:
+            seed = match.seed_1 or match.seed_2
+            archer = match.archer_1 if match.seed_1 else match.archer_2
+            self.setup_next_match(match, archer, seed)
+
+    def setup_second_round_match(self, match):
+        # In the case there is no first round match for a given archer, they
+        # don't get written in for a BYE, so we need to find those here.
+
+        # Higher seed first
+        seed = self.seeding_lookup.get((match.session_round_id, match.match))
+        if not seed:
+            return self.setup_empty_match(match)
+
+        matches = self.match_lookup_by_seed[seed]
+        if match == matches[0]:
+            seeds = [match.match, (2 ** match.level) + 1 - match.match]
+            if not match.match % 2:
+                seeds.reverse()
+            match.seed_1, match.seed_2 = seeds
+            match.score_1 = match.score_2 = None
+            match.is_bye = False
+            if seeds[0] == seed.seed:
+                match.archer_1 = seed.entry.archer
+                match.archer_2 = 'TBC'
+            else:
+                match.archer_1 = 'TBC'
+                match.archer_2 = seed.entry.archer
+            if getattr(match, 'pre_filled', False):
+                self.handle_pre_filled(match)
+            else: # We could have both seeds to fill in here
+                other_seed = 2 ** match.level + 1 - match.match
+                other_seeding = self.seeding_lookup.get((match.session_round_id, other_seed))
+                if not other_seeding:
+                    return
+                matches = self.match_lookup_by_seed[other_seeding]
+                if match == matches[0]:
+                    if seeds[0] == other_seed:
+                        match.archer_1 = other_seeding.entry.archer
+                    else:
+                        match.archer_2 = other_seeding.entry.archer
+        else:
+            self.setup_empty_match(match)
+
+    def setup_empty_match(self, match):
+        match.results = []
+        match.is_bye = False
+        seeds = [match.match, (2 ** match.level) + 1 - match.match]
+        if not match.match % 2:
+            seeds.reverse()
+        match.seed_1, match.seed_2 = seeds
+        match.archer_1 = match.archer_2 = 'TBC'
+        match.score_1 = match.score_2 = None
+
+    def setup_next_match(self, match, archer, seed):
+        next_match_number = match.match if match.match <= 2 ** (match.level - 2) else 2 ** (match.level - 1) + 1 - match.match
+        next_match = self.match_lookup.get((match.session_round, match.level - 1, next_match_number), None)
+        if not next_match:
+            return
+        next_match.pre_filled = True
+        effective_seed = Match.objects._effective_seed(seed, match.level - 1)
+        seeds = [next_match_number, (2 ** (match.level - 1)) + 1 - next_match_number]
+        if not next_match_number % 2:
+            seeds.reverse()
+        if effective_seed == seeds[0]:
+            next_match.archer_1 = archer
+            next_match.seed_1 = seed
+        else:
+            next_match.archer_2 = archer
+            next_match.seed_2 = seed
+
+    def handle_pre_filled(self, match):
+        match.results = []
+        match.is_bye = False
+        match.score_1 = match.score_2 = None
+        if not hasattr(match, 'seed_1'):
+            match.seed_1 = None
+        if not hasattr(match, 'seed_2'):
+            match.seed_2 = None
+        if not hasattr(match, 'archer_1'):
+            match.archer_1 = 'TBC'
+        if not hasattr(match, 'archer_2'):
+            match.archer_2 = 'TBC'
 
     def matches_by_time(self):
         layout = [{
