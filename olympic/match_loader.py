@@ -158,7 +158,8 @@ class MatchLoader:
                 match.archer_2 = seed.entry.archer
             if getattr(match, 'pre_filled', False):
                 self.handle_pre_filled(match)
-            else: # We could have both seeds to fill in here
+            else:
+                # We could have both seeds to fill in here
                 other_seed = 2 ** match.level + 1 - match.match
                 other_seeding = self.seeding_lookup.get((match.session_round_id, other_seed))
                 if not other_seeding:
