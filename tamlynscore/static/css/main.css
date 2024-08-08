@@ -6042,6 +6042,50 @@ table.tree td.border-right {
   border-right: 1px solid #bbb;
 }
 
+/* line 31, ../../sass/_olympic.sass */
+.olympic-match-entry {
+  display: flex;
+  flex-wrap: wrap;
+  text-align: center;
+}
+/* line 36, ../../sass/_olympic.sass */
+.olympic-match-entry__form {
+  width: 100%;
+}
+/* line 39, ../../sass/_olympic.sass */
+.olympic-match-entry__match {
+  width: 50%;
+}
+/* line 42, ../../sass/_olympic.sass */
+.olympic-match-entry__archers {
+  width: 100%;
+  display: flex;
+  justify-content: center;
+}
+
+/* line 49, ../../sass/_olympic.sass */
+.match-sets {
+  width: 100%;
+}
+/* line 51, ../../sass/_olympic.sass */
+.match-sets > div {
+  display: flex;
+  flex-wrap: wrap;
+  text-align: center;
+  justify-content: center;
+}
+/* line 57, ../../sass/_olympic.sass */
+.match-sets > div > label {
+  width: 100%;
+  font-weight: bold;
+  margin-top: 1em;
+}
+/* line 62, ../../sass/_olympic.sass */
+.match-sets input[type="radio"] {
+  display: inline !important;
+  width: auto !important;
+}
+
 /* line 2, ../../sass/_target_input.sass */
 #target-input .header-title {
   height: 44px;
