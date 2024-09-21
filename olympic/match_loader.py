@@ -1,4 +1,4 @@
-from .models import Match, Seeding
+from .models import Match, Seeding, OlympicSessionRound
 
 
 class MatchLoader:
@@ -22,22 +22,22 @@ class MatchLoader:
 
     def load_all(self):
         self.matches = Match.objects.filter(session_round__session__competition=self.competition).select_related(
-            'session_round', 'session_round__shot_round', 'session_round__category',
+            'session_round',
         ).prefetch_related(
-            'session_round__category__bowstyles', 'result_set', 'result_set__seed__entry__archer',
+            'result_set', 'result_set__seed__entry__archer',
         )
-        session_rounds = {m.session_round for m in self.matches}
-        seedings = Seeding.objects.filter(session_round__in=session_rounds).select_related(
+        self.session_rounds = set(OlympicSessionRound.objects.filter(session__competition=self.competition).select_related('category', 'shot_round').prefetch_related('category__bowstyles'))
+        seedings = Seeding.objects.filter(session_round__in=self.session_rounds).select_related(
             'entry__archer',
         )
 
-        self.setup(session_rounds, seedings)
+        self.setup(self.session_rounds, seedings)
 
     def setup(self, session_rounds, seedings):
         # Fill in lookups first
         self.match_lookup = {(m.session_round, m.level, m.match): m for m in self.matches}
         self.seeding_lookup = {(s.session_round_id, s.seed): s for s in seedings}
-        self.max_levels = {session_round: max(m.level for m in self.matches if m.session_round == session_round) for session_round in session_rounds}
+        self.max_levels = {session_round: max((m.level for m in self.matches if m.session_round == session_round), default=1) for session_round in session_rounds}
 
         for seed in seedings:
             level = self.max_levels[seed.session_round]
