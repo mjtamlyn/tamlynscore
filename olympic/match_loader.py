@@ -1,4 +1,4 @@
-from .models import Match, Seeding, OlympicSessionRound
+from .models import Match, OlympicSessionRound, Seeding
 
 
 class MatchLoader:
