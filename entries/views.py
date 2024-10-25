@@ -1,6 +1,7 @@
 import collections
 import copy
 import functools
+import io
 import itertools
 import json
 import math
@@ -23,13 +24,14 @@ from django.views.generic import (
 )
 
 from braces.views import CsrfExemptMixin, MessageMixin, SuperuserRequiredMixin
+from qr_code.qrcode.maker import _options_from_args, make_qr
 from render_block import render_block_to_string
 from reportlab.lib import colors
 from reportlab.lib.styles import getSampleStyleSheet
 from reportlab.lib.units import inch
 from reportlab.platypus import (
-    KeepTogether, PageBreak, Paragraph, SimpleDocTemplate, Spacer, Table,
-    TableStyle,
+    Image, KeepTogether, PageBreak, Paragraph, SimpleDocTemplate, Spacer,
+    Table, TableStyle,
 )
 from reportlab.rl_config import defaultPageSize
 
@@ -885,10 +887,14 @@ class ScoreSheetsPdf(CompetitionMixin, HeadedPdfView):
                 continue
             for target, entry in entries:
                 table_data = self.header_table_for_entry(target, entry)
-                header_table = Table(table_data, [0.6 * inch, 2.5 * inch, 3.9 * inch])
+                header_table = Table(table_data, [0.6 * inch, 2.5 * inch, 2.5 * inch, 0.9 * inch])
                 if self.competition.ifaa_rules:
                     header_table.setStyle(TableStyle([
-                         ('SPAN', (1, 1), (2, 1)),
+                        ('SPAN', (1, 1), (2, 1)),
+                    ]))
+                else:
+                    header_table.setStyle(TableStyle([
+                        ('SPAN', (-1, 0), (-1, -1)),
                     ]))
                 elements.append(KeepTogether([self.spacer, header_table, self.spacer] + score_sheet_elements))
             elements.append(PageBreak())
@@ -897,6 +903,7 @@ class ScoreSheetsPdf(CompetitionMixin, HeadedPdfView):
 
     def header_table_for_entry(self, target, entry):
         if entry:
+            target_allocation = entry
             entry = entry.session_entry.competition_entry
             category = u'{1} {0}'.format(entry.get_gender_display(), entry.bowstyle)
             if self.competition.ifaa_rules:
@@ -915,6 +922,22 @@ class ScoreSheetsPdf(CompetitionMixin, HeadedPdfView):
                     None,
                 ],
             ]
+            if target_allocation.session_entry.session_round.session.device_scoring:
+                try:
+                    entry_user = entry.entryuser
+                except EntryUser.DoesNotExist:
+                    try:
+                        entry_user = EntryUser.objects.create(competition_entry=entry)
+                    except IntegrityError:
+                        pass  # I think this happens with double session entries
+                login_url = self.request.build_absolute_uri(reverse('entry-authenticate', kwargs={
+                    'id': entry_user.uuid,
+                }))
+                qr_options = _options_from_args({'image_format': 'png'})
+                qr_data = make_qr(login_url, qr_options)
+                out = io.BytesIO()
+                qr_data.save(out, **qr_options.kw_save())
+                header_elements[0].append(Image(out, 75, 75))
             category_labels = []
             if self.competition.has_novices:
                 category_labels.append(entry.get_novice_display())
