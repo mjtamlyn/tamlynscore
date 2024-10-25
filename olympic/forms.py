@@ -22,6 +22,7 @@ class SetupForm(forms.Form):
         ('three-quarter', 'Only allocate 3/4 of the matches'),
         ('first-half', 'Only allocate first half of the matches / Final only'),
         ('second-half', 'Only allocate second half of the matches / Bronze only'),
+        ('full-ranked', 'Create all matches for a fully ranked H2H'),
     )
     LEVEL_CHOICES = (
         (1, 'Finals'),
@@ -81,6 +82,8 @@ class SetupForm(forms.Form):
             kwargs['first_half_only'] = True
         if self.cleaned_data['matches'] == 'second-half':
             kwargs['second_half_only'] = True
+        if self.cleaned_data['matches'] == 'full-ranked':
+            kwargs['full_ranked'] = True
         if self.cleaned_data['delete']:
             sr.remove_matches(self.cleaned_data['level'])
         else:

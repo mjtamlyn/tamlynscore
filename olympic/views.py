@@ -536,6 +536,8 @@ class OlympicTreeMixin(object):
                 matches = [None] * int(level ** 2)
                 layout = olympic_round._get_match_layout(int(level))
                 for match in old_matches:
+                    if match.match > len(layout): # TODO: Ignore lower rankings for full ranked for now?
+                        continue
                     index = layout.index(match.match)
                     matches[index] = match
             elif level == 1:

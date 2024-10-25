@@ -249,6 +249,11 @@ class MatchLoader:
                 })
                 if match.level == 1 and match.match == 2:
                     details['round'] = 'Bronze'
+                elif match.match > (2 ** (match.level - 1)):
+                    # TODO: This logic needs expanding for more than 5-8th full ranked
+                    details['round'] = '5th ' + details['round']  
+                    if match.level == 1:
+                        details['round'] = '%dth Final' % (match.match * 2 - 1)
                 if match.target_2:
                     details['has_second_target'] = True
                 if match.target_2 and match.target_2 == target:

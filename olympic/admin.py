@@ -6,11 +6,17 @@ from olympic.models import (
 
 
 class MatchAdmin(admin.ModelAdmin):
-    list_filter = ('level', 'session_round')
+    raw_id_fields = ('session_round',)
+
+    def get_queryset(self, request):
+        return super(MatchAdmin, self).get_queryset(request).select_related()
 
 
 class OlympicSessionRoundAdmin(admin.ModelAdmin):
     raw_id_fields = ('session', 'ranking_rounds',)
+
+    def get_queryset(self, request):
+        return super(OlympicSessionRoundAdmin, self).get_queryset(request).select_related()
 
 
 class ResultAdmin(admin.ModelAdmin):

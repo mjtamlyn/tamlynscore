@@ -154,14 +154,17 @@ class OlympicSessionRound(models.Model):
             seedings = [item for item in seedings if item > 2 ** (level - 2) - 2 ** (level - 3)]
         return seedings
 
-    def _get_target_mapping(self, level, start=1, expanded=False, half_only=False, quarter_only=False, eighth_only=False, three_quarters=False):
+    def _get_target_mapping(self, level, start=1, expanded=False, half_only=False, quarter_only=False, eighth_only=False, three_quarters=False, offset=0):
         layout = self._get_match_layout(level, half_only, quarter_only, eighth_only, three_quarters)
-        return [(m, layout.index(m) * (1 + int(expanded)) + start) for m in layout]
+        return [(m + offset, layout.index(m) * (1 + int(expanded)) + start) for m in layout]
 
-    def make_matches(self, level, start=1, expanded=False, half_only=False, quarter_only=False, eighth_only=False, three_quarters=False, first_half_only=False, second_half_only=False, timing=None):
+    def make_matches(self, level, start=1, expanded=False, half_only=False, quarter_only=False, eighth_only=False, three_quarters=False, first_half_only=False, second_half_only=False, full_ranked=False, timing=None):
         if not first_half_only and not second_half_only:
             self.remove_matches(level)
         mapping = self._get_target_mapping(level, start, expanded, half_only, quarter_only, eighth_only, three_quarters)
+        if full_ranked:
+            # TODO: This is not really full_ranked yet, it's just "5th-8th"
+            mapping += self._get_target_mapping(level, start + 2, expanded, offset=2)
         size = len(mapping)
         if first_half_only:
             mapping = mapping[:int(size / 2)]
