@@ -158,7 +158,11 @@ class OlympicSessionRound(models.Model):
         layout = self._get_match_layout(level, half_only, quarter_only, eighth_only, three_quarters)
         return [(m + offset, layout.index(m) * (1 + int(expanded)) + start) for m in layout]
 
-    def make_matches(self, level, start=1, expanded=False, half_only=False, quarter_only=False, eighth_only=False, three_quarters=False, first_half_only=False, second_half_only=False, full_ranked=False, timing=None):
+    def make_matches(
+            self, level, start=1, expanded=False, half_only=False,
+            quarter_only=False, eighth_only=False, three_quarters=False,
+            first_half_only=False, second_half_only=False, full_ranked=False,
+            timing=None):
         if not first_half_only and not second_half_only:
             self.remove_matches(level)
         mapping = self._get_target_mapping(level, start, expanded, half_only, quarter_only, eighth_only, three_quarters)
