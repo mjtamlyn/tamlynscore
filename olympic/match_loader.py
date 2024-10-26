@@ -97,17 +97,31 @@ class MatchLoader:
             seed_instance = match.results[0].seed if match.results[0].win else match.results[1].seed
             seed = seed_instance.seed
             self.setup_next_match(match, seed_instance.entry.archer, seed)
-            # And the bronze if necessary
-            if match.level == 2:
+            # Is there a "loser" match for this round? e.g. bronze, or full ranked
+            effective_match = match.match
+            offset = 0
+            while effective_match > (2 ** (match.level - 1)):
+                offset += 2 ** match.level
+                effective_match -= 2 ** (match.level - 1)
+            next_match_number = int(offset / 2) + 2 ** (match.level - 2) + (effective_match if effective_match <= 2 ** (match.level - 2) else 2 ** (match.level - 1) + 1 - effective_match)
+            losers_match = self.match_lookup.get((match.session_round, match.level - 1, next_match_number), None)
+            if losers_match:
                 seed_instance = match.results[0].seed if not match.results[0].win else match.results[1].seed
                 seed = seed_instance.seed
-                self.setup_next_match(match, seed_instance.entry.archer, seed, bronze=True)
+                self.setup_next_match(match, seed_instance.entry.archer, seed, next_match=losers_match)
 
     def setup_first_round_match(self, match):
         match.results = []
-        seeds = [match.match, (2 ** match.level) + 1 - match.match]
-        if not match.match % 2:
+
+        effective_match = match.match
+        offset = 0
+        while effective_match > (2 ** (match.level - 1)):
+            offset += 2 ** match.level
+            effective_match -= 2 ** (match.level - 1)
+        seeds = [offset + effective_match, offset + (2 ** match.level) + 1 - effective_match]
+        if not effective_match % 2:
             seeds.reverse()
+
         seed_1 = self.seeding_lookup.get((match.session_round_id, seeds[0]), None)
         if seed_1:
             match.seed_1 = seeds[0]
@@ -176,19 +190,26 @@ class MatchLoader:
     def setup_empty_match(self, match):
         match.results = []
         match.is_bye = False
-        seeds = [match.match, (2 ** match.level) + 1 - match.match]
-        if not match.match % 2:
+
+        effective_match = match.match
+        offset = 0
+        while effective_match > (2 ** (match.level - 1)):
+            offset += 2 ** match.level
+            effective_match -= 2 ** (match.level - 1)
+        seeds = [offset + effective_match, offset + (2 ** match.level) + 1 - effective_match]
+        if not effective_match % 2:
             seeds.reverse()
+
         match.seed_1, match.seed_2 = seeds
         match.archer_1 = match.archer_2 = 'TBC'
         match.score_1 = match.score_2 = None
 
-    def setup_next_match(self, match, archer, seed, bronze=False):
-        if bronze:
-            next_match_number = 2
-        else:
+    def setup_next_match(self, match, archer, seed, next_match=None):
+        if not next_match:
             next_match_number = match.match if match.match <= 2 ** (match.level - 2) else 2 ** (match.level - 1) + 1 - match.match
-        next_match = self.match_lookup.get((match.session_round, match.level - 1, next_match_number), None)
+            next_match = self.match_lookup.get((match.session_round, match.level - 1, next_match_number), None)
+        else:
+            next_match_number = next_match.match
         if not next_match:
             return
         next_match.pre_filled = True
