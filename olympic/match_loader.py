@@ -206,15 +206,29 @@ class MatchLoader:
 
     def setup_next_match(self, match, archer, seed, next_match=None):
         if not next_match:
-            next_match_number = match.match if match.match <= 2 ** (match.level - 2) else 2 ** (match.level - 1) + 1 - match.match
-            next_match = self.match_lookup.get((match.session_round, match.level - 1, next_match_number), None)
+            if match.match > (2 ** (match.level - 1)):
+                effective_match = match.match - 2 ** (match.level - 1)
+                # TODO: This logic needs expanding for more than 5-8th full ranked
+                next_match_number = 2 ** (match.level - 1) + effective_match if effective_match <= 2 ** (match.level - 2) else 2 ** (match.level - 1) + 1 - effective_match
+                next_match = self.match_lookup.get((match.session_round, match.level - 1, next_match_number), None)
+            else:
+                next_match_number = match.match if match.match <= 2 ** (match.level - 2) else 2 ** (match.level - 1) + 1 - match.match
+                next_match = self.match_lookup.get((match.session_round, match.level - 1, next_match_number), None)
         else:
             next_match_number = next_match.match
         if not next_match:
             return
         next_match.pre_filled = True
-        effective_seed = Match.objects._effective_seed(seed, match.level - 1)
-        seeds = [next_match_number, (2 ** (match.level - 1)) + 1 - next_match_number]
+
+        effective_match = match.match
+        offset = 0
+        while effective_match > (2 ** (match.level - 1)):
+            offset += 2 ** match.level
+            effective_match -= 2 ** (match.level - 1)
+        seeds = [offset + effective_match, offset + (2 ** match.level) + 1 - effective_match]
+
+        effective_seed = Match.objects._effective_seed(seed, match.level - 1) + offset
+
         if not next_match_number % 2:
             seeds.reverse()
         if effective_seed == seeds[0]:
