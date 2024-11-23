@@ -142,7 +142,8 @@ class OlympicSessionRound(models.Model):
     def _get_match_layout(self, level, half_only=False, quarter_only=False, eighth_only=False, three_quarters=False):
         seedings = [1, 2]
         for m in range(2, level):
-            seedings = map(lambda x: [x, 2 ** m + 1 - x] if x % 2 else [2 ** m + 1 - x, x], seedings)
+            n_arch = Match.objects.n_archers_for_level(level)
+            seedings = map(lambda x: [x, n_arch + 1 - x] if x % 2 else [n_arch + 1 - x, x], seedings)
             seedings = [item for sublist in seedings for item in sublist]
         if half_only:
             seedings = [item for item in seedings if item > 2 ** (level - 2)]
@@ -272,27 +273,38 @@ class Seeding(models.Model):
 
 class MatchManager(models.Manager):
 
-    def _match_number_for_seed(self, seed, level):
+    def n_matches_for_level(self, level):
+        return 2 ** (level - 1)
+
+    def n_archers_for_level(self, level):
+        return self.n_matches_for_level(level) * 2
+
+    def match_number_for_seed(self, seed, level):
         if level == 1:
             return 1
-        # get supremum
+
+        # get to the first level archer would have their "seed" match
         n = 1
-        while 2 ** n < seed:
+        while self.n_archers_for_level(n) < seed:
             n += 1
+
+        # if we are still at a lower level than the current one, then the
+        # archer will be in the same seed as their match
         # move seed down til we get to level
-        while n >= level and seed > 2 ** (level - 1):
-            if seed <= 2 ** (n - 1):
-                n -= 1
-                continue
-            seed = 2 ** n - seed + 1
+        if n < level:
+            return seed
+
+        # step down "knocking out" each seed
+        while seed > self.n_matches_for_level(level):
+            seed = self.n_archers_for_level(n) - seed + 1
             n -= 1
         return seed
 
-    def _effective_seed(self, seed, level):
-        return self._match_number_for_seed(seed, level + 1)
+    def effective_seed(self, seed, level):
+        return self.match_number_for_seed(seed, level + 1)
 
     def match_for_seed(self, seed, level):
-        match_number = self._match_number_for_seed(seed.seed, level)
+        match_number = self.match_number_for_seed(seed.seed, level)
         match = self.get(level=level, session_round=seed.session_round, match=match_number)
         return match
 
@@ -301,8 +313,8 @@ class MatchManager(models.Manager):
             match = self.match_for_seed(seed, level)
         except self.model.DoesNotExist:
             return None
-        effective_seed = self._effective_seed(seed.seed, level)
-        if match.target_2 and effective_seed * 2 > 2 ** level:
+        effective_seed = self.effective_seed(seed.seed, level)
+        if match.target_2 and effective_seed > self.n_matches_for_level(level):
             return (match.target_2, match.timing)
         return (match.target, match.timing)
 
@@ -313,7 +325,7 @@ class MatchManager(models.Manager):
         highest_level = highest_level[0].level
         matches = []
         for level in range(1, highest_level + 1):
-            if highest_seed and 2 ** level + 1 - seed.seed > highest_seed:
+            if highest_seed and self.n_archers_for_level(level) + 1 - seed.seed > highest_seed:
                 matches.append((None, None))
             else:
                 matches.append(self.target_for_seed(seed, level))
@@ -336,6 +348,26 @@ class Match(models.Model):
 
     def __str__(self):
         return u'Match {0} at level {1} on round {2}'.format(self.match, self.level, self.session_round)
+
+    @property
+    def n_archers_this_round(self):
+        return Match.objects.n_archers_for_level(self.level)
+
+    @property
+    def n_matches_this_round(self):
+        return Match.objects.n_matches_for_level(self.level)
+
+    @property
+    def n_archers_next_round(self):
+        if self.level == 1:
+            return None
+        return Match.objects.n_archers_for_level(self.level - 1)
+
+    @property
+    def n_matches_next_round(self):
+        if self.level == 1:
+            return None
+        return Match.objects.n_matches_for_level(self.level - 1)
 
 
 class Result(models.Model):

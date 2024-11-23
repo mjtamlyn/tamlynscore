@@ -43,7 +43,7 @@ class MatchLoader:
             level = self.max_levels[seed.session_round]
             seeds_matches = []
             while level:
-                effective_seed = Match.objects._effective_seed(seed.seed, level)
+                effective_seed = Match.objects.effective_seed(seed.seed, level)
                 match_number = effective_seed if effective_seed <= 2 ** (level - 1) else 2 ** level + 1 - effective_seed
                 match = self.match_lookup.get((seed.session_round, level, match_number))
                 if match:
@@ -227,7 +227,7 @@ class MatchLoader:
             effective_match -= 2 ** (match.level - 1)
         seeds = [offset + effective_match, offset + (2 ** match.level) + 1 - effective_match]
 
-        effective_seed = Match.objects._effective_seed(seed, match.level - 1) + offset
+        effective_seed = Match.objects.effective_seed(seed, match.level - 1) + offset
 
         if not next_match_number % 2:
             seeds.reverse()

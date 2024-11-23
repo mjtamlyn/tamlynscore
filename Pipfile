@@ -24,6 +24,7 @@ django-webpack-loader = "*"
 django-bmemcached = "*"
 asgiref = "*"
 django-custom-user = "*"
+coverage = "*"
 
 [dev-packages]
 

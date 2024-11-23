@@ -6,6 +6,7 @@ from factory.django import DjangoModelFactory
 
 from core import models as core_models
 from entries import models as entries_models
+from olympic import models as olympic_models
 from scores.result_modes import ByRound
 
 
@@ -115,3 +116,44 @@ class ResultsModeFactory(DjangoModelFactory):
         model = entries_models.ResultsMode
     competition = factory.SubFactory(CompetitionFactory)
     mode = ByRound().slug
+
+
+class OlympicRoundFactory(DjangoModelFactory):
+    class Meta:
+        model = olympic_models.OlympicRound
+    # By default makes individual set-system matches at 18m
+    distance = '18'
+    match_type = 'T'
+    team_type = ''
+
+
+class CategoryFactory(DjangoModelFactory):
+    class Meta:
+        model = olympic_models.Category
+
+    @factory.post_generation
+    def bowstyles(self, create, extracted, **kwargs):
+        if not create or not extracted:
+            return
+        self.bowstyles.add(*extracted)
+
+
+class OlympicSessionRoundFactory(DjangoModelFactory):
+    class Meta:
+        model = olympic_models.OlympicSessionRound
+    session = factory.SubFactory(SessionFactory)
+    shot_round = factory.SubFactory(OlympicRoundFactory)
+    category = factory.SubFactory(CategoryFactory)
+    exclude_ranking_rounds = False
+    cut = None
+
+
+class MatchFactory(DjangoModelFactory):
+    class Meta:
+        model = olympic_models.Match
+    session_round = factory.SubFactory(OlympicSessionRoundFactory)
+    target = 1
+    target_2 = None
+    level = 1
+    match = 1
+    timing = 1
