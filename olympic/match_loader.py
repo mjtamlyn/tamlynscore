@@ -2,7 +2,6 @@ from .models import Match, OlympicSessionRound, Seeding
 
 
 class MatchLoader:
-    LEVELS = ['Final', 'Semis', 'Quarters', '1/8', '1/16', '1/32', '1/64', '1/128']
     TIMINGS = [1, 2, 3, 4, 5, 6, 7, 8, 9, 10]
     PASSES = 'ABCDEFGHIJK'
 
@@ -271,7 +270,8 @@ class MatchLoader:
                     'category': match.session_round.category.name,
                     'category_short': match.session_round.category.code,
                     'distance': match.session_round.shot_round.short_name(),
-                    'round': self.LEVELS[match.level - 1],
+                    'round': match.round_name,
+                    'match_name': match.match_name,
                     'seed_1': match.seed_1,
                     'seed_2': match.seed_2,
                     'archer_1': match.archer_1,
@@ -282,13 +282,6 @@ class MatchLoader:
                     'has_second_target': False,
                     'is_second_target': False,
                 })
-                if match.level == 1 and match.match == 2:
-                    details['round'] = 'Bronze'
-                elif match.match > (2 ** (match.level - 1)):
-                    # TODO: This logic needs expanding for more than 5-8th full ranked
-                    details['round'] = '5th ' + details['round']
-                    if match.level == 1:
-                        details['round'] = '%dth Final' % (match.match * 2 - 1)
                 if match.target_2:
                     details['has_second_target'] = True
                 if match.target_2 and match.target_2 == target:

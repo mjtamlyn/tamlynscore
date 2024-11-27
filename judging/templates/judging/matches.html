@@ -12,7 +12,7 @@
         <th>{{ target.number }}</th>
         <td>{{ target.distance|default:"" }}</td>
         <td>{{ target.category|default:"" }}</td>
-        <td>{{ target.round|default:"" }}</td>
+        <td>{{ target.match_name|default:"" }}</td>
         <td {% if target.is_bye %}class="bye"{% endif %}>
             {% if target.seed_1 or target.seed_2 %}
                 {% if target.seed_1 %}<strong>{{ target.seed_1 }}</strong>{% endif %} {{ target.archer_1 }}

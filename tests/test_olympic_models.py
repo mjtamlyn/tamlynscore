@@ -139,3 +139,45 @@ class TestMatch(TestCase):
         )
         for seed, level, effective in examples:
             self.assertEqual(Match.objects.effective_seed(seed, level), effective)
+
+    def test_for_placing(self):
+        examples = (
+            (1, 1, 1),  # Final
+            (1, 2, 3),  # Bronze
+            (2, 1, 1),  # Semis
+            (2, 2, 1),  # Semis
+            (2, 4, 5),  # 5th semi
+            (2, 8, 13),  # 13th semi
+        )
+        for level, match, placing in examples:
+            m = MatchFactory(level=level, match=match)
+            self.assertEqual(m.for_placing, placing)
+
+    def test_effective_match(self):
+        examples = (
+            (1, 1, 1),  # Final
+            (1, 2, 1),  # Bronze
+            (1, 4, 1),  # 7th Final
+            (2, 1, 1),  # Semi 1
+            (2, 2, 2),  # Semi 2
+            (2, 4, 2),  # 5th semi 2
+            (2, 7, 1),  # 13th semi 1
+        )
+        for level, match, effective_match in examples:
+            m = MatchFactory(level=level, match=match)
+            self.assertEqual(m.effective_match, effective_match, 'Level %s, Match %s' % (level, match))
+
+    def test_round_name_and_match(self):
+        examples = (
+            (1, 1, 'Final', 'Final'),
+            (1, 2, 'Bronze', 'Bronze'),
+            (1, 4, '7th Final', '7th Final'),
+            (2, 1, 'Semis', 'Semis Match 1'),
+            (2, 2, 'Semis', 'Semis Match 2'),
+            (2, 4, '5th Semis', '5th Semis Match 2'),
+            (2, 7, '13th Semis', '13th Semis Match 1'),
+        )
+        for level, match, round_name, match_name in examples:
+            m = MatchFactory(level=level, match=match)
+            self.assertEqual(m.round_name, round_name, 'Level %s, Match %s' % (level, match))
+            self.assertEqual(m.match_name, match_name, 'Level %s, Match %s' % (level, match))

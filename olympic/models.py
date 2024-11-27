@@ -329,6 +329,24 @@ class Match(models.Model):
         return u'Match {0} at level {1} on round {2}'.format(self.match, self.level, self.session_round)
 
     @property
+    def match_name(self):
+        """Name for this specific match, respecting for_placing"""
+        if self.level == 1:
+            return self.round_name
+        return '%s Match %s' % (self.round_name, self.effective_match)
+
+    @property
+    def round_name(self):
+        """Name for the round, respecting "for_placing"."""
+        levels = ['Final', 'Semis', 'Quarters', '1/8', '1/16', '1/32', '1/64', '1/128', '1/256']
+        for_placing = self.for_placing
+        if for_placing == 1:
+            return levels[self.level - 1]
+        if for_placing == 3:
+            return 'Bronze'
+        return '%sth %s' % (for_placing, levels[self.level - 1])
+
+    @property
     def n_archers_this_round(self):
         return Match.objects.n_archers_for_level(self.level)
 
@@ -347,6 +365,22 @@ class Match(models.Model):
         if self.level == 1:
             return None
         return Match.objects.n_matches_for_level(self.level - 1)
+
+    @property
+    def for_placing(self):
+        round_size = self.n_matches_this_round
+        counter = 0
+        while self.match > (counter + 1) * round_size:
+            counter += 1
+        return 1 + counter * round_size * 2
+
+    @property
+    def effective_match(self):
+        round_size = self.n_matches_this_round
+        effective_match = self.match
+        while effective_match > round_size:
+            effective_match -= round_size
+        return effective_match
 
 
 class Result(models.Model):
