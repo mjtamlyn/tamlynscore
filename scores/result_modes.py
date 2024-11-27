@@ -1048,7 +1048,7 @@ class Weekend(BaseResultMode):
             results = sorted(weekend_results, key=lambda s: (s.xs, s.hits, s.golds))
             for i, result in enumerate(results, 1):
                 result.placing = i
-            full_results[category.category.short_name] = results
+            full_results[category.category.name] = results
 
         headers = ['Pl.'] + self.get_main_headers(competition) + ['720', 'H2H', '1440', 'Total']
         section = ResultSection('Weekend results', None, headers)

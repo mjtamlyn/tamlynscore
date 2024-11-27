@@ -58,22 +58,12 @@ class Category(models.Model):
     def __str__(self):
         return u'Category: {0}'.format(self.name)
 
+    @property
     def code(self):
         code = ''
         if self.novice:
             code += self.novice
         code += ''.join([str(b)[0] for b in self.bowstyles.all()])
-        if self.ages:
-            code += ''.join(self.ages)
-        if self.gender:
-            code += self.get_gender_display()[0]
-        return code
-
-    def short_code(self):
-        code = ''
-        if self.novice:
-            code = self.novice
-        code += str(self.bowstyles.all()[0])[0]
         if self.ages:
             code += ''.join(self.ages)
         if self.gender:
@@ -91,17 +81,6 @@ class Category(models.Model):
         if self.gender:
             name += self.get_gender_display() + ' '
         return name.strip()
-
-    @property
-    def short_name(self):
-        name = ''
-        if self.ages:
-            name += ', '.join([dict(AGB_AGE_CHOICES)[age] for age in self.ages]) + ' '
-        if self.novice:
-            name += self.get_novice_display() + ' '
-        if self.gender:
-            name += self.get_gender_display() + ' '
-        return name + str(self.bowstyles.all()[0])
 
 
 class OlympicSessionRound(models.Model):

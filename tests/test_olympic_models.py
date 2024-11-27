@@ -2,7 +2,9 @@ from django.test import TestCase
 
 from olympic.models import Match
 
-from .factories import MatchFactory, OlympicRoundFactory
+from .factories import (
+    BowstyleFactory, CategoryFactory, MatchFactory, OlympicRoundFactory,
+)
 
 
 class TestOlympicRound(TestCase):
@@ -22,6 +24,45 @@ class TestOlympicRound(TestCase):
             r = OlympicRoundFactory(team_type=team_type)
             self.assertEqual(r.ends, ends)
             self.assertEqual(r.arrows_per_end, arrows)
+
+
+class TestCategoryNames(TestCase):
+
+    @classmethod
+    def setUpTestData(cls):
+        cls.rec = BowstyleFactory.create(name='Recurve')
+        cls.bb = BowstyleFactory.create(name='Barebow')
+
+    def test_rm(self):
+        c = CategoryFactory.create(bowstyles=[self.rec], gender='G')
+        self.assertEqual(c.name, 'Recurve Men')
+        self.assertEqual(c.code, 'RM')
+        self.assertEqual(str(c), 'Category: Recurve Men')
+
+    def test_ungendered(self):
+        c = CategoryFactory.create(bowstyles=[self.bb])
+        self.assertEqual(c.name, 'Barebow')
+        self.assertEqual(c.code, 'B')
+
+    def test_age_group(self):
+        c = CategoryFactory.create(bowstyles=[self.rec], gender='L', ages=['U18'])
+        self.assertEqual(c.name, 'Recurve U18 Women')
+        self.assertEqual(c.code, 'RU18W')
+
+    def test_multiple_age_group(self):
+        c = CategoryFactory.create(bowstyles=[self.rec], gender='L', ages=['U18', 'U16'])
+        self.assertEqual(c.name, 'Recurve U18, U16 Women')
+        self.assertEqual(c.code, 'RU18U16W')
+
+    def test_multiple_bows(self):
+        c = CategoryFactory.create(bowstyles=[self.rec, self.bb], gender='G')
+        self.assertEqual(c.name, 'Recurve, Barebow Men')
+        self.assertEqual(c.code, 'RBM')
+
+    def test_novice(self):
+        c = CategoryFactory.create(bowstyles=[self.rec], novice='N')
+        self.assertEqual(c.name, 'Novice Recurve')
+        self.assertEqual(c.code, 'NR')
 
 
 class TestMatch(TestCase):

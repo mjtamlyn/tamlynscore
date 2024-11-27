@@ -269,7 +269,7 @@ class MatchLoader:
                     continue
                 details.update({
                     'category': match.session_round.category.name,
-                    'category_short': match.session_round.category.short_code(),
+                    'category_short': match.session_round.category.code,
                     'distance': match.session_round.shot_round.short_name(),
                     'round': self.LEVELS[match.level - 1],
                     'seed_1': match.seed_1,
