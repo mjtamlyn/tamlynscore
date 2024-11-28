@@ -135,7 +135,7 @@ class OlympicInputIndex(OlympicMixin, DetailView):
         for seeding in seedings:
             results = []
             for level in range(1, highest_level + 1):
-                match_number = Match.objects._match_number_for_seed(seeding.seed, level)
+                match_number = Match.objects.match_number_for_seed(seeding.seed, level)
                 result = lookup.get((seeding.pk, level, match_number))
                 results.append(result)
             seeding.results = list(reversed(results))
@@ -283,7 +283,7 @@ class OlympicScoreSheet(ScoreSheetsPdf):
                         bronze_target = bronze_timing = None
                     else:
                         bronze_target, bronze_timing = bronze_match.target, bronze_match.timing
-                        effective_seed = Match.objects._effective_seed(seeding.seed, 1)
+                        effective_seed = Match.objects.effective_seed(seeding.seed, 1)
                         if bronze_match.target_2 and effective_seed == 2:
                             bronze_target = bronze_match.target_2
 
@@ -572,12 +572,12 @@ class OlympicTreeMixin(object):
                         seedings_dict.pop(seeds[1])
                 results = match.result_set.all()
                 if results:
-                    results = sorted(results, key=lambda r: Match.objects._effective_seed(r.seed.seed, level))
+                    results = sorted(results, key=lambda r: Match.objects.effective_seed(r.seed.seed, level))
                     if m % 2:
                         results.reverse()
                     if len(results) == 1:
                         r = results[0]
-                        seed = Match.objects._effective_seed(r.seed.seed, level)
+                        seed = Match.objects.effective_seed(r.seed.seed, level)
                         if seed == seeds[0]:
                             results = [r, None]
                         else:
@@ -594,12 +594,12 @@ class OlympicTreeMixin(object):
                     qualified_seeds = []
                     for previous in filter(None, previous_matches):
                         for r in previous.result_set.all():
-                            if Match.objects._effective_seed(r.seed.seed, level) in seeds and r.win:
+                            if Match.objects.effective_seed(r.seed.seed, level) in seeds and r.win:
                                 qualified_seeds.append(r)
                     if qualified_seeds:
                         if len(qualified_seeds) == 1:
                             r = qualified_seeds[0]
-                            seed = Match.objects._effective_seed(r.seed.seed, level)
+                            seed = Match.objects.effective_seed(r.seed.seed, level)
                             if seed == seeds[0]:
                                 qualified_seeds = [r, None]
                             else:
@@ -623,7 +623,7 @@ class OlympicTreeMixin(object):
                         continue
                     bronze = bronze[0]
                     results = bronze.result_set.select_related()
-                    results = sorted(results, key=lambda r: Match.objects._effective_seed(r.seed.seed, level))
+                    results = sorted(results, key=lambda r: Match.objects.effective_seed(r.seed.seed, level))
                     if self.total_levels == 2:
                         table_data.append([''] * len(table_data[-1]))
                         table_data.append([''] * len(table_data[-1]))
@@ -637,7 +637,7 @@ class OlympicTreeMixin(object):
                     if results:
                         if len(results) == 1:
                             r = results[0]
-                            seed = Match.objects._effective_seed(r.seed.seed, level)
+                            seed = Match.objects.effective_seed(r.seed.seed, level)
                             if seed == seeds[0]:
                                 results = [r, None]
                             else:
@@ -654,13 +654,13 @@ class OlympicTreeMixin(object):
                         qualified_seeds = []
                         for previous in previous_matches:
                             for r in previous.result_set.all():
-                                if Match.objects._effective_seed(r.seed.seed, level) in seeds and not r.win:
+                                if Match.objects.effective_seed(r.seed.seed, level) in seeds and not r.win:
                                     qualified_seeds.append(r)
                         if not qualified_seeds:
                             continue
                         if len(qualified_seeds) == 1:
                             r = qualified_seeds[0]
-                            seed = Match.objects._effective_seed(r.seed.seed, level)
+                            seed = Match.objects.effective_seed(r.seed.seed, level)
                             if seed == seeds[0]:
                                 qualified_seeds = [r, None]
                             else:

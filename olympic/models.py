@@ -1,3 +1,5 @@
+import math
+
 from django.contrib.postgres.fields import ArrayField
 from django.db import models
 from django.utils.functional import cached_property
@@ -58,22 +60,12 @@ class Category(models.Model):
     def __str__(self):
         return u'Category: {0}'.format(self.name)
 
+    @property
     def code(self):
         code = ''
         if self.novice:
             code += self.novice
-        code += ''.join([str(b)[0] for b in self.bowstyles.all()])
-        if self.ages:
-            code += ''.join(self.ages)
-        if self.gender:
-            code += self.get_gender_display()[0]
-        return code
-
-    def short_code(self):
-        code = ''
-        if self.novice:
-            code = self.novice
-        code += str(self.bowstyles.all()[0])[0]
+        code += ''.join([str(b)[0] for b in self.bowstyles.order_by()])
         if self.ages:
             code += ''.join(self.ages)
         if self.gender:
@@ -85,23 +77,12 @@ class Category(models.Model):
         name = ''
         if self.novice:
             name += self.get_novice_display() + ' '
-        name += u', '.join([str(b) for b in self.bowstyles.all()]) + ' '
+        name += u', '.join([str(b) for b in self.bowstyles.order_by('id')]) + ' '
         if self.ages:
             name += ', '.join([dict(AGB_AGE_CHOICES)[age] for age in self.ages]) + ' '
         if self.gender:
             name += self.get_gender_display() + ' '
         return name.strip()
-
-    @property
-    def short_name(self):
-        name = ''
-        if self.ages:
-            name += ', '.join([dict(AGB_AGE_CHOICES)[age] for age in self.ages]) + ' '
-        if self.novice:
-            name += self.get_novice_display() + ' '
-        if self.gender:
-            name += self.get_gender_display() + ' '
-        return name + str(self.bowstyles.all()[0])
 
 
 class OlympicSessionRound(models.Model):
@@ -142,7 +123,8 @@ class OlympicSessionRound(models.Model):
     def _get_match_layout(self, level, half_only=False, quarter_only=False, eighth_only=False, three_quarters=False):
         seedings = [1, 2]
         for m in range(2, level):
-            seedings = map(lambda x: [x, 2 ** m + 1 - x] if x % 2 else [2 ** m + 1 - x, x], seedings)
+            n_arch = Match.objects.n_archers_for_level(level)
+            seedings = map(lambda x: [x, n_arch + 1 - x] if x % 2 else [n_arch + 1 - x, x], seedings)
             seedings = [item for sublist in seedings for item in sublist]
         if half_only:
             seedings = [item for item in seedings if item > 2 ** (level - 2)]
@@ -272,27 +254,38 @@ class Seeding(models.Model):
 
 class MatchManager(models.Manager):
 
-    def _match_number_for_seed(self, seed, level):
+    def n_matches_for_level(self, level):
+        return 2 ** (level - 1)
+
+    def n_archers_for_level(self, level):
+        return self.n_matches_for_level(level) * 2
+
+    def match_number_for_seed(self, seed, level):
         if level == 1:
             return 1
-        # get supremum
+
+        # get to the first level archer would have their "seed" match
         n = 1
-        while 2 ** n < seed:
+        while self.n_archers_for_level(n) < seed:
             n += 1
+
+        # if we are still at a lower level than the current one, then the
+        # archer will be in the same seed as their match
         # move seed down til we get to level
-        while n >= level and seed > 2 ** (level - 1):
-            if seed <= 2 ** (n - 1):
-                n -= 1
-                continue
-            seed = 2 ** n - seed + 1
+        if n < level:
+            return seed
+
+        # step down "knocking out" each seed
+        while seed > self.n_matches_for_level(level):
+            seed = self.n_archers_for_level(n) - seed + 1
             n -= 1
         return seed
 
-    def _effective_seed(self, seed, level):
-        return self._match_number_for_seed(seed, level + 1)
+    def effective_seed(self, seed, level):
+        return self.match_number_for_seed(seed, level + 1)
 
     def match_for_seed(self, seed, level):
-        match_number = self._match_number_for_seed(seed.seed, level)
+        match_number = self.match_number_for_seed(seed.seed, level)
         match = self.get(level=level, session_round=seed.session_round, match=match_number)
         return match
 
@@ -301,8 +294,8 @@ class MatchManager(models.Manager):
             match = self.match_for_seed(seed, level)
         except self.model.DoesNotExist:
             return None
-        effective_seed = self._effective_seed(seed.seed, level)
-        if match.target_2 and effective_seed * 2 > 2 ** level:
+        effective_seed = self.effective_seed(seed.seed, level)
+        if match.target_2 and effective_seed > self.n_matches_for_level(level):
             return (match.target_2, match.timing)
         return (match.target, match.timing)
 
@@ -313,7 +306,7 @@ class MatchManager(models.Manager):
         highest_level = highest_level[0].level
         matches = []
         for level in range(1, highest_level + 1):
-            if highest_seed and 2 ** level + 1 - seed.seed > highest_seed:
+            if highest_seed and self.n_archers_for_level(level) + 1 - seed.seed > highest_seed:
                 matches.append((None, None))
             else:
                 matches.append(self.target_for_seed(seed, level))
@@ -336,6 +329,66 @@ class Match(models.Model):
 
     def __str__(self):
         return u'Match {0} at level {1} on round {2}'.format(self.match, self.level, self.session_round)
+
+    @property
+    def match_name(self):
+        """Name for this specific match, respecting for_placing"""
+        if self.level == 1:
+            return self.round_name
+        return '%s Match %s' % (self.round_name, self.effective_match)
+
+    @property
+    def round_name(self):
+        """Name for the round, respecting "for_placing"."""
+        levels = ['Final', 'Semis', 'Quarters', '1/8', '1/16', '1/32', '1/64', '1/128', '1/256']
+        for_placing = self.for_placing
+        if for_placing == 1:
+            return levels[self.level - 1]
+        if for_placing == 3:
+            return 'Bronze'
+        return '%sth %s' % (for_placing, levels[self.level - 1])
+
+    @property
+    def n_archers_this_round(self):
+        return Match.objects.n_archers_for_level(self.level)
+
+    @property
+    def n_matches_this_round(self):
+        return Match.objects.n_matches_for_level(self.level)
+
+    @property
+    def n_archers_next_round(self):
+        if self.level == 1:
+            return None
+        return Match.objects.n_archers_for_level(self.level - 1)
+
+    @property
+    def n_matches_next_round(self):
+        if self.level == 1:
+            return None
+        return Match.objects.n_matches_for_level(self.level - 1)
+
+    @property
+    def for_placing(self):
+        round_size = self.n_matches_this_round
+        counter = 0
+        while self.match > (counter + 1) * round_size:
+            counter += 1
+        return 1 + counter * round_size * 2
+
+    @property
+    def effective_match(self):
+        round_size = self.n_matches_this_round
+        effective_match = self.match
+        while effective_match > round_size:
+            effective_match -= round_size
+        return effective_match
+
+    def get_next_match_number(self, win=True):
+        next_number = math.ceil(self.effective_match / 2)
+        if win:
+            return (self.for_placing - 1) / 2 + next_number
+        return (self.for_placing + self.n_archers_next_round - 1) / 2 + next_number
 
 
 class Result(models.Model):

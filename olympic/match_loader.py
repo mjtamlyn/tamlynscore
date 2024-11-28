@@ -2,7 +2,6 @@ from .models import Match, OlympicSessionRound, Seeding
 
 
 class MatchLoader:
-    LEVELS = ['Final', 'Semis', 'Quarters', '1/8', '1/16', '1/32', '1/64', '1/128']
     TIMINGS = [1, 2, 3, 4, 5, 6, 7, 8, 9, 10]
     PASSES = 'ABCDEFGHIJK'
 
@@ -43,8 +42,10 @@ class MatchLoader:
             level = self.max_levels[seed.session_round]
             seeds_matches = []
             while level:
-                effective_seed = Match.objects._effective_seed(seed.seed, level)
-                match_number = effective_seed if effective_seed <= 2 ** (level - 1) else 2 ** level + 1 - effective_seed
+                effective_seed = Match.objects.effective_seed(seed.seed, level)
+                n_matches = Match.objects.n_matches_for_level(level)
+                n_archers = Match.objects.n_archers_for_level(level)
+                match_number = effective_seed if effective_seed <= n_matches else n_archers - effective_seed
                 match = self.match_lookup.get((seed.session_round, level, match_number))
                 if match:
                     seeds_matches.append(match)
@@ -94,20 +95,21 @@ class MatchLoader:
 
         # Fill in next match if we have a result
         if match.results[0].win or match.results[1].win:
-            seed_instance = match.results[0].seed if match.results[0].win else match.results[1].seed
-            seed = seed_instance.seed
-            self.setup_next_match(match, seed_instance.entry.archer, seed)
-            # And the bronze if necessary
-            if match.level == 2:
-                seed_instance = match.results[0].seed if not match.results[0].win else match.results[1].seed
-                seed = seed_instance.seed
-                self.setup_next_match(match, seed_instance.entry.archer, seed, bronze=True)
+            winner = match.results[0].seed if match.results[0].win else match.results[1].seed
+            self.setup_next_match(match, winner.entry.archer, winner.seed)
+            loser = match.results[0].seed if not match.results[0].win else match.results[1].seed
+            self.setup_next_match(match, loser.entry.archer, loser.seed, win=False)
 
     def setup_first_round_match(self, match):
         match.results = []
-        seeds = [match.match, (2 ** match.level) + 1 - match.match]
-        if not match.match % 2:
+
+        effective_match = match.effective_match
+        for_placing = match.for_placing
+        n_archers = match.n_archers_this_round
+        seeds = [for_placing + effective_match - 1, for_placing + n_archers - effective_match]
+        if not effective_match % 2 and match.level != 1:
             seeds.reverse()
+
         seed_1 = self.seeding_lookup.get((match.session_round_id, seeds[0]), None)
         if seed_1:
             match.seed_1 = seeds[0]
@@ -144,8 +146,8 @@ class MatchLoader:
 
         matches = self.match_lookup_by_seed[seed]
         if match == matches[0]:
-            seeds = [match.match, (2 ** match.level) + 1 - match.match]
-            if not match.match % 2:
+            seeds = [match.match, match.n_archers_this_round + 1 - match.match]
+            if not match.match % 2 and match.level != 1:
                 seeds.reverse()
             match.seed_1, match.seed_2 = seeds
             match.score_1 = match.score_2 = None
@@ -160,7 +162,7 @@ class MatchLoader:
                 self.handle_pre_filled(match)
             else:
                 # We could have both seeds to fill in here
-                other_seed = 2 ** match.level + 1 - match.match
+                other_seed = match.n_archers_this_round + 1 - match.match
                 other_seeding = self.seeding_lookup.get((match.session_round_id, other_seed))
                 if not other_seeding:
                     return
@@ -176,25 +178,31 @@ class MatchLoader:
     def setup_empty_match(self, match):
         match.results = []
         match.is_bye = False
-        seeds = [match.match, (2 ** match.level) + 1 - match.match]
-        if not match.match % 2:
+
+        effective_match = match.effective_match
+        for_placing = match.for_placing
+        n_archers = match.n_archers_this_round
+        seeds = [for_placing + effective_match - 1, for_placing + n_archers - effective_match]
+        if not effective_match % 2 and match.level != 1:
             seeds.reverse()
+
         match.seed_1, match.seed_2 = seeds
         match.archer_1 = match.archer_2 = 'TBC'
         match.score_1 = match.score_2 = None
 
-    def setup_next_match(self, match, archer, seed, bronze=False):
-        if bronze:
-            next_match_number = 2
-        else:
-            next_match_number = match.match if match.match <= 2 ** (match.level - 2) else 2 ** (match.level - 1) + 1 - match.match
+    def setup_next_match(self, match, archer, seed, win=True):
+        if match.level == 1:
+            return
+        next_match_number = match.get_next_match_number(win=win)
         next_match = self.match_lookup.get((match.session_round, match.level - 1, next_match_number), None)
         if not next_match:
             return
         next_match.pre_filled = True
-        effective_seed = Match.objects._effective_seed(seed, match.level - 1)
-        seeds = [next_match_number, (2 ** (match.level - 1)) + 1 - next_match_number]
-        if not next_match_number % 2:
+
+        seeds = [next_match.effective_match, next_match.n_archers_this_round + 1 - next_match.effective_match]
+        effective_seed = Match.objects.effective_seed(seed, next_match.level)
+
+        if not next_match_number % 2 and next_match.level != 1:  # don't flip seeds for bronze
             seeds.reverse()
         if effective_seed == seeds[0]:
             next_match.archer_1 = archer
@@ -234,9 +242,10 @@ class MatchLoader:
                     continue
                 details.update({
                     'category': match.session_round.category.name,
-                    'category_short': match.session_round.category.short_code(),
+                    'category_short': match.session_round.category.code,
                     'distance': match.session_round.shot_round.short_name(),
-                    'round': self.LEVELS[match.level - 1],
+                    'round': match.round_name,
+                    'match_name': match.match_name,
                     'seed_1': match.seed_1,
                     'seed_2': match.seed_2,
                     'archer_1': match.archer_1,
@@ -247,13 +256,6 @@ class MatchLoader:
                     'has_second_target': False,
                     'is_second_target': False,
                 })
-                if match.level == 1 and match.match == 2:
-                    details['round'] = 'Bronze'
-                elif match.match > (2 ** (match.level - 1)):
-                    # TODO: This logic needs expanding for more than 5-8th full ranked
-                    details['round'] = '5th ' + details['round']
-                    if match.level == 1:
-                        details['round'] = '%dth Final' % (match.match * 2 - 1)
                 if match.target_2:
                     details['has_second_target'] = True
                 if match.target_2 and match.target_2 == target:
