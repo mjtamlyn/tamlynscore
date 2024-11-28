@@ -181,3 +181,17 @@ class TestMatch(TestCase):
             m = MatchFactory(level=level, match=match)
             self.assertEqual(m.round_name, round_name, 'Level %s, Match %s' % (level, match))
             self.assertEqual(m.match_name, match_name, 'Level %s, Match %s' % (level, match))
+
+    def test_get_next_match_number(self):
+        examples = (
+            (2, 1, True, 1),  # 1st Semi win
+            (2, 2, True, 1),  # 2nd Semi win
+            (2, 1, False, 2),  # 1st Semi loss
+            (2, 2, False, 2),  # 2nd Semi loss
+            (3, 6, True, 5),  # 9th place quarter final 2 win
+            (3, 6, False, 7),  # 9th place quarter final 2 loss
+            (2, 7, False, 8),  # 13th place semi final loss
+        )
+        for level, match, win, next_match in examples:
+            m = MatchFactory(level=level, match=match)
+            self.assertEqual(m.get_next_match_number(win=win), next_match, '%s: %s' % (m.match_name, 'win' if win else 'loss'))
