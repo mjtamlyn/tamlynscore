@@ -198,7 +198,7 @@ class OlympicInput(OlympicMixin, TemplateView):
             'label': self.labels[0],
         })
         return forms
-    
+
     def get_progression_forms(self, seed, data=None):
         loader = MatchLoader(self.competition)
         loader.load_round(seed.session_round)
