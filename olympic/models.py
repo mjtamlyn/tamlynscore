@@ -63,7 +63,7 @@ class Category(models.Model):
         code = ''
         if self.novice:
             code += self.novice
-        code += ''.join([str(b)[0] for b in self.bowstyles.all()])
+        code += ''.join([str(b)[0] for b in self.bowstyles.order_by()])
         if self.ages:
             code += ''.join(self.ages)
         if self.gender:
@@ -75,7 +75,7 @@ class Category(models.Model):
         name = ''
         if self.novice:
             name += self.get_novice_display() + ' '
-        name += u', '.join([str(b) for b in self.bowstyles.all()]) + ' '
+        name += u', '.join([str(b) for b in self.bowstyles.order_by('id')]) + ' '
         if self.ages:
             name += ', '.join([dict(AGB_AGE_CHOICES)[age] for age in self.ages]) + ' '
         if self.gender:
