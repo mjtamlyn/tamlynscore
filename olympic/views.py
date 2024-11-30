@@ -244,6 +244,7 @@ class OlympicScoreSheet(ScoreSheetsPdf):
     def setMargins(self, doc):
         doc.topMargin = 0.4 * inch
         doc.bottomMargin = 0.2 * inch
+        doc.leftMargin = doc.rightMargin = 0.2 * inch
 
     def get_elements(self):
         elements = []
