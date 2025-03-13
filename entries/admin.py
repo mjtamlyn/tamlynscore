@@ -16,6 +16,18 @@ class CompetitionEntryAdmin(admin.ModelAdmin):
     raw_id_fields = ('archer',)
 
 
+class SessionAdmin(admin.ModelAdmin):
+    list_display = ('competition', 'start')
+    ordering = ('-start',)
+    raw_id_fields = ('competition',)
+
+
+class SessionRoundAdmin(admin.ModelAdmin):
+    list_display = ('session__competition', 'session__start', 'shot_round')
+    ordering = ('-session__start',)
+    raw_id_fields = ('session',)
+
+
 class ResultModeAdmin(admin.ModelAdmin):
     list_display = ('competition', 'mode')
 
@@ -38,8 +50,8 @@ admin.site.register(Tournament)
 admin.site.register(Sponsor)
 admin.site.register(Competition, CompetitionAdmin)
 admin.site.register(ResultsMode, ResultModeAdmin)
-admin.site.register(Session)
-admin.site.register(SessionRound)
+admin.site.register(Session, SessionAdmin)
+admin.site.register(SessionRound, SessionRoundAdmin)
 admin.site.register(CompetitionEntry, CompetitionEntryAdmin)
 admin.site.register(SessionEntry, SessionEntryAdmin)
 admin.site.register(TargetAllocation, TargetAllocationAdmin)
