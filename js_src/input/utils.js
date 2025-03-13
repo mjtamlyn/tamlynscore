@@ -80,6 +80,14 @@ function getXCount(score, endNumber, endLength) {
     return sum(arrows.map(a => ((a && a === 'X') ? 1 : 0)));
 }
 
+function getElevenCount(score, endNumber, endLength) {
+    let arrows = score.arrows;
+    if (endNumber) {
+        arrows = getEnd(score, endNumber, endLength);
+    }
+    return sum(arrows.map(a => ((a && a === 11) ? 1 : 0)));
+}
 
 
-export { currentEnd, getEnd, isEndComplete, getEndScore, getRunningTotal, getGoldCount, getGoldLabel, getHitCount, getXCount, getArrowsShot };
+
+export { currentEnd, getEnd, isEndComplete, getEndScore, getRunningTotal, getGoldCount, getGoldLabel, getHitCount, getXCount, getElevenCount, getArrowsShot };

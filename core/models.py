@@ -17,6 +17,7 @@ SCORING_TYPES = (
     ('T', 'AGB Indoor - Ten Zone, no Xs, with hits'),
     ('X', 'WA Outdoor - Ten Zone, with Xs, no hits'),
     ('I', 'WA Indoor - Ten Zone, no Xs, no hits'),
+    ('E', 'Xs are 11 - Eleven Zone, no hits'),
     ('W', 'Worcester'),
     ('S', 'Score only (e.g. IFAA Indoor)'),
 )
@@ -149,12 +150,16 @@ class Round(models.Model):
         return not self.is_ifaa
 
     @property
+    def has_elevens(self):
+        return self.scoring_type == 'E'
+
+    @property
     def gold_9s(self):
         return self.scoring_type == 'F'
 
     @property
     def has_hits(self):
-        if self.scoring_type in ['X', 'I']:
+        if self.scoring_type in ['X', 'I', 'E']:
             return False
         if self.is_ifaa:
             return False
@@ -164,6 +169,8 @@ class Round(models.Model):
     def score_sheet_headings(self):
         if self.scoring_type == 'X':
             return ['10+X', 'X']
+        if self.scoring_type == 'E':
+            return ['11s', '10s']
         elif self.scoring_type == 'I':
             return ['10s']
         elif self.is_ifaa:
@@ -175,6 +182,8 @@ class Round(models.Model):
     def scoring_headings(self):
         if self.scoring_type == 'X':
             return ['10s+Xs', 'Xs']
+        if self.scoring_type == 'E':
+            return ['11s', '10s']
         elif self.scoring_type == 'I':
             return ['10s']
         else:

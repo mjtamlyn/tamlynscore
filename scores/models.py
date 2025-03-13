@@ -40,7 +40,7 @@ class Score(models.Model):
     score = models.PositiveIntegerField(default=0, db_index=True)
     hits = models.PositiveIntegerField(default=0)
     golds = models.PositiveIntegerField(default=0)
-    xs = models.PositiveIntegerField(default=0)
+    xs = models.PositiveIntegerField(default=0)  # Also used for 11s
 
     tiebreak = models.PositiveIntegerField(default=0)
 
@@ -72,12 +72,14 @@ class Score(models.Model):
                 self.score += arrow.arrow_value
                 if scoring_type in ['F', 'T', 'W'] and arrow.arrow_value > 0:
                     self.hits += 1
-                if ((scoring_type in ['T', 'X', 'I'] and arrow.arrow_value == 10) or
+                if ((scoring_type in ['T', 'X', 'I', 'E'] and arrow.arrow_value == 10) or
                     (scoring_type == 'F' and arrow.arrow_value == 9) or
                     (scoring_type == 'W' and arrow.arrow_value == 5)
                 ):
                     self.golds += 1
                 if scoring_type == 'X' and arrow.is_x:
+                    self.xs += 1
+                if scoring_type == 'E' and arrow.arrow_value == 11:
                     self.xs += 1
         elif self.target.session_entry.session_round.session.scoring_system == SCORING_DOZENS:
             self.score = self.dozen_set.aggregate(total=models.Sum('total'))['total'] or 0 + self.alteration

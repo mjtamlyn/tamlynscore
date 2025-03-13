@@ -13,6 +13,7 @@ var Arrows = new Class({
         '88': 'X', // x key
         '189': 'X', // - key
         '77': 'M', // m key
+        '69': '11', // e key
         '192': 'M', // ` key
         '223': 'M', // ` key (alternative code)
         // keypad keys
@@ -109,6 +110,7 @@ var Arrows = new Class({
         var ET2 = 0;
         var hits = 0;
         var golds = 0;
+        var elevens = 0;
         var xs = 0;
         var rt = parseInt(row.getElement('.rt').get('rel'));
         if (isNaN(rt)) {
@@ -133,6 +135,9 @@ var Arrows = new Class({
             if (value == 10) {
                 golds += 1;
             }
+            if (value == 11) {
+                elevens += 1;
+            }
         });
         var values = {
             'et1': ET1,
@@ -142,6 +147,7 @@ var Arrows = new Class({
             'golds': golds,
             '10s': golds,
             '10s+xs': golds,
+            '11s': elevens,
             'xs': xs,
             'rt': rt + ET1 + ET2,
         };

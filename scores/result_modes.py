@@ -241,6 +241,15 @@ class BaseResultMode(object):
                     score.golds,
                     score.xs,
                 ]
+        elif section.round.scoring_type == 'E':
+            scores += [
+                score.score,
+            ]
+            if not self.hide_golds:
+                scores += [
+                    score.xs,
+                    score.golds,
+                ]
         elif section.round.scoring_type == 'I':
             scores += [
                 score.score,
