@@ -123,7 +123,7 @@ class OlympicSessionRound(models.Model):
     def _get_match_layout(self, level, half_only=False, quarter_only=False, eighth_only=False, three_quarters=False):
         seedings = [1, 2]
         for m in range(2, level):
-            n_arch = Match.objects.n_archers_for_level(level)
+            n_arch = Match.objects.n_archers_for_level(m)
             seedings = map(lambda x: [x, n_arch + 1 - x] if x % 2 else [n_arch + 1 - x, x], seedings)
             seedings = [item for sublist in seedings for item in sublist]
         if half_only:
