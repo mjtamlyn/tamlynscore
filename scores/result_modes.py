@@ -145,6 +145,8 @@ class BaseResultMode(object):
         headers.append('Score')
         if round.scoring_type == 'X':
             headers += ['10s', 'Xs']
+        elif round.scoring_type == 'E':
+            headers += ['11s', '10s']
         elif round.scoring_type == 'I':
             headers += ['10s']
         elif round.scoring_type == 'S':
@@ -310,6 +312,8 @@ class BySession(BaseResultMode):
         headers.append('Score')
         if round.scoring_type == 'X':
             headers += ['10s', 'Xs']
+        elif round.scoring_type == 'E':
+            headers += ['11s', '10s']
         elif round.scoring_type == 'I':
             headers += ['10s']
         elif round.scoring_type == 'S':
