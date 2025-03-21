@@ -2,7 +2,7 @@ import React, { useContext, useState } from 'react';
 
 import { CompetitionContext } from '../context/CompetitionContext';
 import ArcherRowDetails from './ArcherRowDetails';
-import { getEnd, getEndScore, getHitCount, getGoldCount, getXCount, getRunningTotal } from './utils';
+import { getEnd, getElevenCount, getEndScore, getHitCount, getGoldCount, getXCount, getRunningTotal } from './utils';
 
 
 const byEntered = 'byEntered';
@@ -58,6 +58,11 @@ const ScoreSheet = ({ score, showDetails }) => {
             totals.push(
                 <div className="archers__score__total" key={ `${endNumber}|hits` }>{ getHitCount(score, endNumber + 1, endLength) }</div>
             );
+        }
+        if (score.round.resultsOptions.hasElevens) {
+            totals.push(
+                <div className="archers__score__total" key={ `${endNumber}|elevens` }>{ getElevenCount(score, endNumber + 1, endLength) }</div>
+            )
         }
         if (score.round.resultsOptions.hasGolds) {
             totals.push(
@@ -130,6 +135,13 @@ const ScoreSheet = ({ score, showDetails }) => {
                 </div>
             );
         }
+        if (score.round.resultsOptions.hasElevens) {
+            splits.push(
+                <div className="archers__score__grand-total" key={ `${split.name}|elevens` }>
+                    { getElevenCount(score, index + 1, split.arrows) }
+                </div>
+            );
+        }
         if (score.round.resultsOptions.hasGolds) {
             splits.push(
                 <div className="archers__score__grand-total" key={ `${split.name}|golds` }>
@@ -168,6 +180,11 @@ const ScoreSheet = ({ score, showDetails }) => {
                     { score.round.resultsOptions.hasHits &&
                         <div className="archers__score__grand-total">
                             { getHitCount(score) }
+                        </div>
+                    }
+                    { score.round.resultsOptions.hasElevens &&
+                        <div className="archers__score__grand-total">
+                            { getElevenCount(score) }
                         </div>
                     }
                     { score.round.resultsOptions.hasGolds &&

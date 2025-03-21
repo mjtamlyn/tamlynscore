@@ -6252,30 +6252,30 @@ table.tree td.border-right {
   flex-grow: 1;
 }
 /* line 183, ../../sass/_target_input.sass */
-#target-input .score-input--has-xs {
+#target-input .score-input--has-xs, #target-input .score-input--has-elevens {
   grid-template-rows: repeat(2, 0.5fr) repeat(2, 1fr);
 }
-/* line 186, ../../sass/_target_input.sass */
-#target-input .score-input--has-xs .score-input__control--gold {
+/* line 187, ../../sass/_target_input.sass */
+#target-input .score-input--has-xs .score-input__control--gold, #target-input .score-input--has-elevens .score-input__control--gold {
   grid-row-end: span 2;
 }
-/* line 188, ../../sass/_target_input.sass */
-#target-input .score-input--has-xs .score-input__control--red {
+/* line 189, ../../sass/_target_input.sass */
+#target-input .score-input--has-xs .score-input__control--red, #target-input .score-input--has-elevens .score-input__control--red {
   grid-row-end: span 2;
 }
-/* line 190, ../../sass/_target_input.sass */
-#target-input .score-input--has-xs .score-input__control--small {
+/* line 191, ../../sass/_target_input.sass */
+#target-input .score-input--has-xs .score-input__control--small, #target-input .score-input--has-elevens .score-input__control--small {
   grid-row-end: span 1;
 }
-/* line 193, ../../sass/_target_input.sass */
+/* line 194, ../../sass/_target_input.sass */
 #target-input .score-input--gold-9s {
   grid-template-columns: repeat(2, 1fr);
 }
-/* line 196, ../../sass/_target_input.sass */
+/* line 197, ../../sass/_target_input.sass */
 #target-input .score-input--gold-9s .score-input__control--miss {
   grid-column-end: span 1;
 }
-/* line 199, ../../sass/_target_input.sass */
+/* line 200, ../../sass/_target_input.sass */
 #target-input .score-input__control {
   font-size: 25px;
   font-weight: bold;
@@ -6284,38 +6284,38 @@ table.tree td.border-right {
   align-items: center;
   justify-content: center;
 }
-/* line 207, ../../sass/_target_input.sass */
+/* line 208, ../../sass/_target_input.sass */
 #target-input .score-input__control--gold {
   background-color: #ffe552;
 }
-/* line 209, ../../sass/_target_input.sass */
+/* line 210, ../../sass/_target_input.sass */
 #target-input .score-input__control--red {
   background-color: #f65058;
   color: white;
 }
-/* line 212, ../../sass/_target_input.sass */
+/* line 213, ../../sass/_target_input.sass */
 #target-input .score-input__control--blue {
   background-color: #00b4e4;
 }
-/* line 214, ../../sass/_target_input.sass */
+/* line 215, ../../sass/_target_input.sass */
 #target-input .score-input__control--black {
   background-color: #020202;
   color: white;
 }
-/* line 217, ../../sass/_target_input.sass */
+/* line 218, ../../sass/_target_input.sass */
 #target-input .score-input__control--white {
   background-color: #ffffff;
 }
-/* line 219, ../../sass/_target_input.sass */
+/* line 220, ../../sass/_target_input.sass */
 #target-input .score-input__control--green {
   background-color: #486F38;
   color: white;
 }
-/* line 223, ../../sass/_target_input.sass */
+/* line 224, ../../sass/_target_input.sass */
 #target-input .score-input__control--miss {
   grid-column-end: span 2;
 }
-/* line 226, ../../sass/_target_input.sass */
+/* line 227, ../../sass/_target_input.sass */
 #target-input .sync-status {
   position: fixed;
   bottom: 0;

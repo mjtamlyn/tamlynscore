@@ -21,6 +21,7 @@ def round_shot(round_shot, session):
             'hasXs': round_shot.has_xs,
             'hasHits': round_shot.has_hits,
             'hasGolds': round_shot.has_golds,
+            'hasElevens': round_shot.has_elevens,
             'gold9s': round_shot.gold_9s,
         },
     }

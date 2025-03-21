@@ -266,6 +266,7 @@ class ScoreSheet(CompetitionMixin, TemplateView):
             'hits': 0,
             'golds': 0,
             'xs': 0,
+            'elevens': 0,
             'et1': 0,
             'et2': 0,
             'rt': 0,
@@ -284,6 +285,8 @@ class ScoreSheet(CompetitionMixin, TemplateView):
                 layout[dozen]['hits'] += 1
             if arrow.arrow_value == 10 or (arrow.arrow_value == 9 and round.scoring_type == 'F'):
                 layout[dozen]['golds'] += 1
+            if arrow.arrow_value == 11:
+                layout[dozen]['elevens'] += 1
             if arrow.is_x:
                 layout[dozen]['xs'] += 1
         rt = 0

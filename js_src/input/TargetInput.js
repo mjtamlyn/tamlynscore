@@ -56,7 +56,7 @@ const TargetInput = ({ scores, round, endNumber, toSummary }) => {
             <div className="archers">
                 { scoresRendered }
             </div>
-            { (cursorPosition !== null ) && <ScoreInput setArrow={ setArrow } hasXs={ round.resultsOptions.hasXs } gold9s={ round.resultsOptions.gold9s } /> }
+            { (cursorPosition !== null ) && <ScoreInput setArrow={ setArrow } hasXs={ round.resultsOptions.hasXs } gold9s={ round.resultsOptions.gold9s } hasElevens={ round.resultsOptions.hasElevens } /> }
             <div className="actions">
                 <div className="actions__button" onClick={ toSummary }>
                     Save
