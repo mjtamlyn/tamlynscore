@@ -1,7 +1,49 @@
-{% extends 'entries/competition_detail.html' %}
+{% extends 'olympic_index.html' %}
 
-{% block competition_content %}
-<h4>Input scores for {{ seed.label }} ({{ seed.session_round.category.name }} {{ seed.seed }})</h4>
+{% block olympic_content %}
+<h3>Input scores for {{ seed.label }} ({{ seed.session_round.category.name }} {{ seed.seed }})</h3>
+
+<div class="olympic-match-entry">
+{% for match in progression_forms.matches %}
+<div class="olympic-match-entry__match">
+    <h4>{{ match.level }}</h4>
+    {% if match.form %}
+        <form class="olympic-match-entry__form" method="post" action="{{ request.get_full_path }}">
+            {% csrf_token %}
+            <div class="form-group">
+                <div class="form-row">
+                    <div class="olympic-match-entry__archers">
+                        <span>
+                            {% if match.match.archer_1 == seed.entry.archer %}<strong>{% endif %}
+                            {{ match.match.archer_1 }}
+                            {% if match.match.archer_1 == seed.entry.archer %}</strong>{% endif %}
+                        </span>
+                        <span>&nbsp;v&nbsp;</span>
+                        <span>
+                            {% if match.match.archer_2 == seed.entry.archer %}<strong>{% endif %}
+                            {{ match.match.archer_2 }}
+                            {% if match.match.archer_2 == seed.entry.archer %}</strong>{% endif %}
+                        </span>
+                    </div>
+                </div>
+                <div class="form-row">
+                    {{ match.form.score }}
+                </div>
+                <div class="form-row">
+                    <div class="form-item">
+                        <input type="submit" class="btn" />
+                    </div>
+                </div>
+            </div>
+        </form>
+    {% elif match.is_bye %}
+        <p><strong>BYE</strong></p>
+    {% elif match.is_pending %}
+        <p><strong>Opponent pending...</strong></p>
+    {% endif %}
+</div>
+{% endfor %}
+</div>
 
 <form method="post" action="{{ request.get_full_path }}" novalidate>
 {% csrf_token %}
