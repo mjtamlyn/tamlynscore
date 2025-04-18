@@ -54,6 +54,7 @@
                     <ul>
                         <li><a class="edit" href="{% url 'competition_update' slug=competition.slug %}">Edit</a></lu>
                         <li><a href="{% url 'rankings_export' slug=competition.slug %}">Rankings Export</a></li>
+                        <li><a href="{% url 'membership_verification' slug=competition.slug %}">Membership Verification</a></li>
                     </ul>
                 </li>
             {% endif %}

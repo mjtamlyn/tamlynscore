@@ -11,6 +11,7 @@ urlpatterns = [
     path('<slug:slug>/score-sheet/<int:score_id>/api/', views.ScoreSheetAPI.as_view(), name='score_sheet_api'),
     path('<slug:slug>/results/<slug:mode>/<slug:format>/', views.Results.as_view(), name='results'),
     path('<slug:slug>/rankings-export.csv', views.RankingsExport.as_view(), name='rankings_export'),
+    path('<slug:slug>/membership-verification.csv', views.MembershipVerification.as_view(), name='membership_verification'),
 
     # Redirects
     path('<slug:slug>/input-arrows/archer/<int:score_id>/', redirects.input_arrows_archer),

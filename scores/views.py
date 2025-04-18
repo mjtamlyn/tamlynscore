@@ -658,6 +658,16 @@ class RankingsExport(ResultModeMixin, CompetitionMixin, View):
         return archers
 
 
+class MembershipVerification(ResultModeMixin, CompetitionMixin, View):
+    def get(self, request, *args, **kwargs):
+        entries = CompetitionEntry.objects.filter(competition=self.competition).select_related('archer')
+        response = HttpResponse(content_type='text/csv')
+        response['Content-Disposition'] = 'attachment; filename="%s-membership-verification.csv"' % self.competition.slug
+        writer = csv.writer(response)
+        writer.writerows([(entry.archer.agb_number,) for entry in entries])
+        return response
+
+
 class EntryAuthenticate(MessageMixin, RedirectView):
     permanent = False
 
