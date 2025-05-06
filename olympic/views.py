@@ -15,7 +15,7 @@ from reportlab.platypus import (
 from reportlab.rl_config import defaultPageSize
 
 from entries.views import CompetitionMixin, HeadedPdfView, ScoreSheetsPdf
-from olympic.forms import ResultForm, SetupForm
+from olympic.forms import ResultForm, SetsMatchForm, SetupForm
 from olympic.match_loader import MatchLoader
 from olympic.models import Match, OlympicSessionRound, Result, Seeding
 from scores.models import Score
@@ -121,30 +121,41 @@ class OlympicInputIndex(OlympicMixin, DetailView):
     model = OlympicSessionRound
     pk_url_kwarg = 'round_id'
     context_object_name = 'round'
-    labels = ['Bronze', 'Final', 'Semi', '1/4', '1/8', '1/16', '1/32', '1/64']
 
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
-        highest_level = Match.objects.filter(session_round=self.object).order_by('-level')[0].level
-        seedings = self.object.seeding_set.select_related('entry', 'entry__archer').order_by('seed')
-        matches = self.object.match_set.prefetch_related('result_set')
-        lookup = {}
-        for match in matches:
-            for result in match.result_set.all():
-                lookup[(result.seed_id, match.level, match.match)] = result
-        for seeding in seedings:
+        matches = MatchLoader(self.competition)
+        matches.load_round(self.object)
+        seedings = []
+        for seed in sorted(matches.seeding_lookup.values(), key=lambda s: s.seed):
+            my_matches = matches.match_lookup_by_seed[seed]
             results = []
-            for level in range(1, highest_level + 1):
-                match_number = Match.objects.match_number_for_seed(seeding.seed, level)
-                result = lookup.get((seeding.pk, level, match_number))
-                results.append(result)
-            seeding.results = list(reversed(results))
-            result = lookup.get((seeding.pk, 1, 2))
-            seeding.results.append(result)
-        context.update({
-            'seedings': seedings,
-            'levels': reversed(self.labels[:highest_level + 1]),
-        })
+            level = matches.max_levels[self.object]
+            while level > my_matches[0].level:
+                results.append(None)
+                level -= 1
+            for match in my_matches:
+                if not getattr(match, 'results', None):
+                    results.append(None)
+                    continue
+                if match.seed_1 == seed.seed:
+                    result = match.results[0]
+                elif match.seed_2 == seed.seed:
+                    result = match.results[1]
+                else:
+                    results.append(None)
+                    continue
+                results.append({
+                    'score': result.total,
+                    'win': result.win,
+                })
+            seedings.append({
+                'seed': seed,
+                'results': results,
+            })
+        context['levels'] = reversed(matches.LEVELS[:matches.max_levels[self.object]])
+        context['seedings'] = seedings
+
         return context
 
 
@@ -153,21 +164,20 @@ class OlympicInput(OlympicMixin, TemplateView):
 
     labels = ['Bronze', 'Final', 'Semi', '1/4', '1/8', '1/16', '1/32', '1/64']
 
-    def get_forms(self):
-        self.seed = get_object_or_404(Seeding.objects.select_related(), pk=self.kwargs['seed_pk'])
-        self.results = self.seed.result_set.all()
-        highest_level = Match.objects.filter(session_round=self.seed.session_round).order_by('-level')[0].level
+    def get_forms(self, seed):
+        self.results = seed.result_set.all()
+        highest_level = Match.objects.filter(session_round=seed.session_round).order_by('-level')[0].level
         forms = []
         for i in range(1, highest_level + 1):
             try:
-                match = Match.objects.match_for_seed(self.seed, i)
+                match = Match.objects.match_for_seed(seed, i)
             except Match.DoesNotExist:
                 match = None
             if match:
                 try:
-                    instance = Result.objects.get(match=match, seed=self.seed)
+                    instance = Result.objects.get(match=match, seed=seed)
                 except Result.DoesNotExist:
-                    instance = Result(match=match, seed=self.seed)
+                    instance = Result(match=match, seed=seed)
                 form = ResultForm(instance=instance, data=self.request.POST if self.request.method == 'POST' else None, prefix='level-%s' % i)
             else:
                 form = None
@@ -176,11 +186,11 @@ class OlympicInput(OlympicMixin, TemplateView):
                 'match': match,
                 'label': self.labels[match.level] if match else None,
             })
-        bronze = Match.objects.get(session_round=self.seed.session_round, level=1, match=2)
+        bronze = Match.objects.get(session_round=seed.session_round, level=1, match=2)
         try:
-            instance = Result.objects.get(match=bronze, seed=self.seed)
+            instance = Result.objects.get(match=bronze, seed=seed)
         except Result.DoesNotExist:
-            instance = Result(match=bronze, seed=self.seed)
+            instance = Result(match=bronze, seed=seed)
         form = ResultForm(instance=instance, data=self.request.POST if self.request.method == 'POST' else None, prefix='bronze')
         forms.append({
             'form': form,
@@ -189,25 +199,67 @@ class OlympicInput(OlympicMixin, TemplateView):
         })
         return forms
 
+    def get_progression_forms(self, seed, data=None):
+        loader = MatchLoader(self.competition)
+        loader.load_round(seed.session_round)
+        possible_matches = loader.match_lookup_by_seed[seed]
+        matches = []
+        max_level = loader.max_levels[seed.session_round]
+
+        levels = list(reversed(loader.LEVELS[:max_level]))
+
+        level = loader.max_levels[seed.session_round]
+        while level > possible_matches[0].level:
+            matches.append({
+                'level': levels[max_level - level],
+                'match': None,
+            })
+            level -= 1
+        for match in possible_matches:
+            if match.is_bye:
+                matches.append({
+                    'level': levels[max_level - match.level],
+                    'match': None,
+                    'is_bye': True,
+                })
+            elif match.archer_1 == seed.entry.archer or match.archer_2 == seed.entry.archer:
+                if match.archer_1 == 'TBC' or match.archer_2 == 'TBC':
+                    matches.append({
+                        'level': levels[max_level - match.level],
+                        'match': match,
+                        'is_pending': True,
+                    })
+                else:
+                    matches.append({
+                        'level': levels[max_level - match.level],
+                        'match': match,
+                        'form': SetsMatchForm(instance=match, prefix=match.level, data=data),
+                    })
+        return {
+            'matches': matches,
+        }
+
     def get_context_data(self, **kwargs):
+        seed = get_object_or_404(Seeding.objects.select_related(), pk=self.kwargs['seed_pk'])
         context = super().get_context_data(**kwargs)
-        forms = self.get_forms()
+        forms = self.get_forms(seed)
+        progression_forms = self.get_progression_forms(seed)
         context.update({
-            'seed': self.seed,
+            'seed': seed,
             'results': self.results,
             'forms': forms,
+            'progression_forms': progression_forms,
         })
         return context
 
     def post(self, request, *args, **kwargs):
-        forms = self.get_forms()
-        for form in forms:
-            if form['form']:
-                if form['form'].is_valid():
-                    form['form'].save()
-                elif form['form'].instance.pk:
-                    form['form'].instance.delete()
-        return HttpResponseRedirect(reverse('olympic_input_index', kwargs={'slug': self.competition.slug, 'round_id': self.seed.session_round_id}))
+        seed = get_object_or_404(Seeding.objects.select_related(), pk=self.kwargs['seed_pk'])
+        progression_forms = self.get_progression_forms(seed, data=request.POST)
+        for match in progression_forms['matches']:
+            form = match.get('form')
+            if form and form.is_valid():
+                form.save()
+        return HttpResponseRedirect(reverse('olympic_input_index', kwargs={'slug': self.competition.slug, 'round_id': seed.session_round_id}))
 
 
 class OlympicScoreSheet(ScoreSheetsPdf):
