@@ -277,7 +277,8 @@ class MatchManager(models.Manager):
 
         # step down "knocking out" each seed
         while seed > self.n_matches_for_level(level):
-            seed = self.n_archers_for_level(n) - seed + 1
+            if seed > self.n_archers_for_level(n) - seed + 1:
+                seed = self.n_archers_for_level(n) - seed + 1
             n -= 1
         return seed
 

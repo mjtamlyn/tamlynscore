@@ -208,6 +208,8 @@ class CompetitionUpdate(CompetitionMixin, FormView):
 
     def form_valid(self, form):
         self.competition = form.save()
+        for session in self.competition.session_set.all():
+            cache.delete('bosses_cache_%d' % session.id)
         return super(CompetitionUpdate, self).form_valid(form)
 
     def get_success_url(self):
