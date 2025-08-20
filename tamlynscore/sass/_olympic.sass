@@ -27,3 +27,38 @@ table.tree
       border-bottom: 1px solid #bbb
     &.border-right
       border-right: 1px solid #bbb
+
+.olympic-match-entry
+  display: flex
+  flex-wrap: wrap
+  text-align: center
+
+  &__form
+    width: 100%
+
+  &__match
+    width: 50%
+
+  &__archers
+    width: 100%
+    display: flex
+    justify-content: center
+
+
+// H2H sets (probably temporary style)
+.match-sets
+  width: 100%
+  & > div
+    display: flex
+    flex-wrap: wrap
+    text-align: center
+    justify-content: center
+
+  & > div > label
+    width: 100%
+    font-weight: bold
+    margin-top: 1em
+
+  & input[type="radio"]
+    display: inline !important
+    width: auto !important

@@ -1,12 +1,84 @@
 from django import forms
 
-from .models import Result
+from .models import Result, Seeding
 
 
 class ResultForm(forms.ModelForm):
     class Meta:
         model = Result
         exclude = ('match', 'seed')
+
+
+class SetsMatchForm(forms.Form):
+    SCORE_CHOICES = {
+        'Not started': {
+            '0-0': '0-0',
+        },
+        'Set 1': {
+            '2-0': '2-0',
+            '1-1': '1-1',
+            '0-2': '0-2',
+        },
+        'Set 2': {
+            '4-0': '4-0',
+            '3-1': '3-1',
+            '2-2': '2-2',
+            '1-3': '1-3',
+            '0-4': '0-4',
+        },
+        'Set 3': {
+            '6-0': '6-0',
+            '5-1': '5-1',
+            '4-2': '4-2',
+            '3-3': '3-3',
+            '2-4': '2-4',
+            '1-5': '1-5',
+            '0-6': '0-6',
+        },
+        'Set 4': {
+            '7-1': '7-1',
+            '6-2': '6-2',
+            '5-3': '5-3',
+            '4-4': '4-4',
+            '3-5': '3-5',
+            '2-6': '2-6',
+            '1-7': '1-7',
+        },
+        'Set 5': {
+            '7-3': '7-3',
+            '6-4': '6-4',
+            '5-5': '5-5',
+            '4-6': '4-6',
+            '3-7': '3-7',
+        },
+        'S/O': {
+            '6-5': '6-5',
+            '5-6': '5-6',
+        },
+    }
+    score = forms.ChoiceField(choices=SCORE_CHOICES, widget=forms.RadioSelect(attrs={'class': 'match-sets'}), required=True)
+
+    def __init__(self, instance, initial=None, **kwargs):
+        self.match = instance
+        if len(getattr(self.match, 'results', [])) == 2:
+            initial = {'score': '%s-%s' % (self.match.score_1, self.match.score_2)}
+        super().__init__(initial=initial, **kwargs)
+
+    def save(self):
+        score_1, score_2 = map(int, self.cleaned_data['score'].split('-'))
+        self.update_score(self.match, self.match.seed_1, score_1)
+        self.update_score(self.match, self.match.seed_2, score_2)
+
+    def update_score(self, match, seed, score):
+        seeding = Seeding.objects.get(session_round=match.session_round, seed=seed)
+        try:
+            instance = Result.objects.get(match=match, seed=seeding)
+        except Result.DoesNotExist:
+            instance = Result(match=match, seed=seeding)
+        instance.total = score
+        if instance.total >= 6:
+            instance.win = True
+        instance.save()
 
 
 class SetupForm(forms.Form):
