@@ -1159,7 +1159,10 @@ class SessionScoreSheetsPdf(ScoreSheetsPdf):
             else:
                 shot_round = current_shot_round
             table_data = self.header_table_for_entry(target, entry)
-            header_table = Table(table_data, [0.6 * inch, 2.5 * inch, 4 * inch])
+            header_table = Table(table_data, [0.6 * inch, 2.5 * inch, 2.5 * inch, 0.9 * inch])
+            header_table.setStyle(TableStyle([
+                ('SPAN', (-1, 0), (-1, -1)),
+            ]))
             sheet_elements = [
                 self.spacer,
                 self.Para(shot_round, 'h1'),
