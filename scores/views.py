@@ -588,7 +588,10 @@ class RankingsExport(ResultModeMixin, CompetitionMixin, View):
         return response
 
     def get_entries(self):
-        return CompetitionEntry.objects.filter(competition=self.competition).select_related('archer', 'club', 'bowstyle')
+        return CompetitionEntry.objects.filter(
+            competition=self.competition,
+            sessionentry__targetallocation__isnull=False,
+        ).select_related('archer', 'club', 'bowstyle')
 
     def get_scores(self):
         return Score.objects.filter(
