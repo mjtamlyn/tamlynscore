@@ -618,8 +618,10 @@ class RankingsExport(ResultModeMixin, CompetitionMixin, View):
 
     def get_division(self, entry):
         division = ''
-        if entry.archer.gender == 'G':
+        if entry.gender == 'G':
             division += 'M'
+        elif entry.gender == 'O':
+            division += 'O'
         else:
             division += 'W'
         if self.competition.has_agb_age_groups and self.competition.split_categories_on_agb_age:

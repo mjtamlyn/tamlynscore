@@ -30,7 +30,7 @@ def round_shot(round_shot, session):
 def score(competition, entry, score):
     categories = {
         'bowstyle': entry.bowstyle.name,
-        'gender': entry.archer.get_gender_display(),
+        'gender': entry.get_gender_display(),
     }
     if competition.has_novices and entry.novice == 'N':
         categories['novice'] = entry.get_novice_display()

@@ -5,8 +5,8 @@ from django.db import models
 from django.urls import reverse
 
 from core.models import (
-    AGB_AGE_CHOICES, IFAA_DIVISIONS, NOVICE_CHOICES, SIMPLE_AGE_CHOICES,
-    Archer, Bowstyle, Club, County, Round,
+    AGB_AGE_CHOICES, GENDER_CHOICES, IFAA_DIVISIONS, NOVICE_CHOICES,
+    SIMPLE_AGE_CHOICES, Archer, Bowstyle, Club, County, Round,
 )
 from scores.result_modes import get_result_modes
 from tamlynscore.utils import generate_slug
@@ -42,6 +42,7 @@ class Sponsor(models.Model):
 
 
 class ResultsFormatFields(models.Model):
+    use_open_gender = models.BooleanField(default=True)
     has_guests = models.BooleanField(default=False)
     has_novices = models.BooleanField(default=False)
     has_juniors = models.BooleanField(default=False)
@@ -298,6 +299,7 @@ class CompetitionEntry(models.Model):
     competition = models.ForeignKey(Competition, on_delete=models.CASCADE)
 
     archer = models.ForeignKey(Archer, on_delete=models.CASCADE)
+    gender = models.CharField(max_length=1, choices=GENDER_CHOICES)
     club = models.ForeignKey(Club, blank=True, null=True, on_delete=models.CASCADE)
     county = models.ForeignKey(County, blank=True, null=True, on_delete=models.CASCADE)
     bowstyle = models.ForeignKey(Bowstyle, on_delete=models.CASCADE)
@@ -332,10 +334,10 @@ class CompetitionEntry(models.Model):
         return name
 
     def get_gender_display(self):
+        names = {'G': 'Men', 'L': 'Women', 'O': 'Open'}
         if self.competition.ifaa_rules:
             names = {'G': 'Male', 'L': 'Female'}
-            return names[self.archer.gender]
-        return self.archer.get_gender_display()
+        return names[self.gender]
 
 
 class EntryUser(models.Model):

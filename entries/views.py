@@ -510,7 +510,7 @@ class TargetListBase(CompetitionMixin, ListView):
                 e.session_round.shot_round_id,
                 e.competition_entry.bowstyle.name,
                 e.competition_entry.team_name(),
-                e.competition_entry.archer.gender,
+                e.competition_entry.gender,
                 e.competition_entry.age,
                 e.competition_entry.novice,
                 e.competition_entry.archer.name,

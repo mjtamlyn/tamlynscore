@@ -753,7 +753,7 @@ class Team(BaseResultMode):
                 lady_found = False
                 mixed_team_found = False
                 for i, score in enumerate(club_scores):
-                    if score.target.session_entry.competition_entry.archer.gender == 'G':
+                    if score.target.session_entry.competition_entry.gender in ['G', 'O']:
                         gent_found = True
                     else:
                         lady_found = True
@@ -811,14 +811,14 @@ class Team(BaseResultMode):
             if not competition.novices_in_experienced_teams:
                 return (is_non_compound and
                         score.target.session_entry.competition_entry.novice == 'E' and
-                        score.target.session_entry.competition_entry.archer.gender == 'G')
-            return is_non_compound and score.target.session_entry.competition_entry.archer.gender == 'G'
+                        score.target.session_entry.competition_entry.gender == 'G')
+            return is_non_compound and score.target.session_entry.competition_entry.gender == 'G'
         if type == 'Non-compound Women':
             if not competition.novices_in_experienced_teams:
                 return (is_non_compound and
                         score.target.session_entry.competition_entry.novice == 'E' and
-                        score.target.session_entry.competition_entry.archer.gender == 'L')
-            return is_non_compound and score.target.session_entry.competition_entry.archer.gender == 'L'
+                        score.target.session_entry.competition_entry.gender == 'L')
+            return is_non_compound and score.target.session_entry.competition_entry.gender == 'L'
         if type in ['Recurve', 'Compound', 'Barebow', 'Longbow']:
             bowstyle = score.target.session_entry.competition_entry.bowstyle.name
             return bowstyle == type
@@ -946,7 +946,7 @@ class H2HSeedings(ByRound, Team, BaseResultMode):
         categories = []
         for category in self.categories:
             if entry.bowstyle in category.bowstyles.all():
-                if ((category.gender is None or category.gender == entry.archer.gender) and
+                if ((category.gender is None or category.gender == entry.gender) and
                         (category.novice is None or category.novice == entry.novice) and
                         (not category.ages or entry.agb_age in category.ages)):
                     categories.append(category)
