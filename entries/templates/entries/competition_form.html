@@ -145,6 +145,9 @@
                 <div class="form-row">
                     {{ form.novice_team_size.as_field_group }}
                 </div>
+                <div class="form-row">
+                    {{ form.novices_in_experienced_individual.as_field_group }}
+                </div>
             </div>
 
             <div class="form-subgroup form-flex-subgroup">
@@ -168,8 +171,8 @@
 			<h3>Individual Results</h3>
 
             <div class="form-row">
+                {{ form.use_open_gender.as_field_group }}
                 {{ form.has_guests.as_field_group }}
-                {{ form.novices_in_experienced_individual.as_field_group }}
                 {{ form.exclude_later_shoots.as_field_group }}
             </div>
 		</div>
