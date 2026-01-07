@@ -49,7 +49,8 @@ class CompetitionForm(forms.Form):
     has_guests = forms.BooleanField(required=False, label='Allow guest entries')
     has_novices = forms.BooleanField(required=False, label='Use a novice category')
     has_juniors = forms.BooleanField(required=False, label='Use a general junior category')
-    has_agb_age_groups = forms.BooleanField(required=False, label='Use ArcheryGB style age groups')
+    has_agb_age_groups = forms.BooleanField(required=False, label='Use Archery GB age groups')
+    split_categories_on_agb_age = forms.BooleanField(required=False, label='Split categories by Archery GB age group')
     exclude_later_shoots = forms.BooleanField(required=False, help_text='Only the first session can count for results')
 
     # Fields about team results
@@ -260,7 +261,7 @@ class EntryCreateForm(forms.Form):
         required=False,
     )
     update_bowstyle = forms.BooleanField(required=False)
-    agb_number = forms.IntegerField(required=False, label='ArcheryGB number')
+    agb_number = forms.IntegerField(required=False, label='Archery GB number')
     stay_on_line = forms.BooleanField(required=False)
 
     def __init__(self, archer, competition, **kwargs):

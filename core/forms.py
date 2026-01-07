@@ -8,6 +8,8 @@ class ArcherForm(forms.ModelForm):
         super(ArcherForm, self).__init__(*args, **kwargs)
         self.fields['name'].widget.attrs.update({'autofocus': ''})
         self.fields['bowstyle'].queryset = Bowstyle.objects.filter(ifaa_only=False)
+        self.fields['agb_age'].label = 'Age group'
+        self.fields['agb_number'].label = 'Archery GB Number'
 
         if competition:
             if competition.ifaa_rules:
@@ -33,7 +35,7 @@ class ArcherForm(forms.ModelForm):
 
     class Meta:
         model = Archer
-        fields = ['name', 'gender', 'club', 'bowstyle', 'age', 'novice', 'agb_number']
+        fields = ['name', 'gender', 'club', 'bowstyle', 'agb_age', 'novice', 'agb_number']
 
 
 class ClubArcherForm(ArcherForm):
