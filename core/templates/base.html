@@ -37,7 +37,10 @@
                     <div class="user">
                         {% if user.is_authenticated %}
                         <span class="name">{{ user }}</span>
-                        <a href="{% url 'logout' %}" class="logout">Log Out</a>
+                        <form method="POST" action="{% url 'logout' %}">
+                            {% csrf_token %}
+                            <a onclick="this.closest('form').submit()" class="logout">Log Out</a>
+                        </form>
                         {% elif user.is_archer %}
                         <a href="{% url 'target-input' %}" class="nav-link nav-link--priority">Enter scores</a>
                         <a href="{% url 'logout' %}" class="nav-link">Log Out</a>

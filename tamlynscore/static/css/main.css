@@ -3934,6 +3934,10 @@ nav.header-nav .user {
   display: flex;
 }
 /* line 57, ../../sass/components/_header_nav.sass */
+nav.header-nav .user .logout {
+  cursor: pointer;
+}
+/* line 60, ../../sass/components/_header_nav.sass */
 nav.header-nav .user span.name {
   display: block;
   margin-right: 10px;
@@ -3942,11 +3946,11 @@ nav.header-nav .user span.name {
   min-width: 0;
 }
 @media (max-width: 500px) {
-  /* line 65, ../../sass/components/_header_nav.sass */
+  /* line 68, ../../sass/components/_header_nav.sass */
   nav.header-nav .user span.name .narrow {
     display: block;
   }
-  /* line 67, ../../sass/components/_header_nav.sass */
+  /* line 70, ../../sass/components/_header_nav.sass */
   nav.header-nav .user span.name .wide {
     display: none;
   }
