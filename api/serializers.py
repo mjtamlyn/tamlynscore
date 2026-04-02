@@ -9,7 +9,8 @@ def competition(competition, is_admin=False):
     }
 
 
-def round_shot(round_shot, session):
+def round_shot(session_round, session):
+    round_shot = session_round.shot_round
     return {
         'name': round_shot.name,
         'totalArrows': round_shot.arrows,
@@ -17,12 +18,13 @@ def round_shot(round_shot, session):
         'endCount': round_shot.arrows / session.arrows_entered_per_end,
         'splits': round_shot.splits,
         'resultsOptions': {
-            'scoringHeadings': round_shot.score_sheet_headings,
-            'hasXs': round_shot.has_xs,
-            'hasHits': round_shot.has_hits,
-            'hasGolds': round_shot.has_golds,
-            'hasElevens': round_shot.has_elevens,
-            'gold9s': round_shot.gold_9s,
+            'scoringHeadings': session_round.score_sheet_headings,
+            'hasXs': session_round.has_xs,
+            'xsAre10s': session_round.xs_are_10s,
+            'hasHits': session_round.has_hits,
+            'hasGolds': session_round.has_golds,
+            'hasElevens': session_round.has_elevens,
+            'gold9s': session_round.gold_9s,
         },
     }
 

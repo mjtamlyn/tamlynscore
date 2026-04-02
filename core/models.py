@@ -15,7 +15,8 @@ DISTANCE_UNITS = (
 SCORING_TYPES = (
     ('F', 'Five Zone Imperial'),
     ('T', 'AGB Indoor - Ten Zone, no Xs, with hits'),
-    ('X', 'WA Outdoor - Ten Zone, with Xs, no hits'),
+    ('X', 'WA Outdoor - (pre-2026)'),
+    ('Y', 'WA Outdoor - Ten Zone, with Xs, no hits'),
     ('I', 'WA Indoor - Ten Zone, no Xs, no hits'),
     ('E', 'Xs are 11 - Eleven Zone, no hits'),
     ('W', 'Worcester'),
@@ -140,54 +141,6 @@ class Round(models.Model):
                 'name': subround.distance_short,
                 'arrows': subround.arrows,
             } for subround in self.subrounds.order_by('-distance')]
-
-    @property
-    def has_xs(self):
-        return self.scoring_type == 'X'
-
-    @property
-    def has_golds(self):
-        return not self.is_ifaa
-
-    @property
-    def has_elevens(self):
-        return self.scoring_type == 'E'
-
-    @property
-    def gold_9s(self):
-        return self.scoring_type == 'F'
-
-    @property
-    def has_hits(self):
-        if self.scoring_type in ['X', 'I', 'E']:
-            return False
-        if self.is_ifaa:
-            return False
-        return True
-
-    @property
-    def score_sheet_headings(self):
-        if self.scoring_type == 'X':
-            return ['10+X', 'X']
-        if self.scoring_type == 'E':
-            return ['11s', '10s']
-        elif self.scoring_type == 'I':
-            return ['10s']
-        elif self.is_ifaa:
-            return []
-        else:
-            return ['H', 'G']
-
-    @property
-    def scoring_headings(self):
-        if self.scoring_type == 'X':
-            return ['10s+Xs', 'Xs']
-        if self.scoring_type == 'E':
-            return ['11s', '10s']
-        elif self.scoring_type == 'I':
-            return ['10s']
-        else:
-            return ['Hits', 'Golds']
 
 
 class Bowstyle(models.Model):

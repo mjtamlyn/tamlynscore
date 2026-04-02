@@ -64,12 +64,17 @@ const ScoreSheet = ({ score, showDetails }) => {
                 <div className="archers__score__total" key={ `${endNumber}|elevens` }>{ getElevenCount(score, endNumber + 1, endLength) }</div>
             )
         }
+        if (score.round.resultsOptions.hasXs && !score.round.resultsOptions.xsAre10s) {
+            totals.push(
+                <div className="archers__score__total" key={ `${endNumber}|xs` }>{ getXCount(score, endNumber + 1, endLength) }</div>
+            );
+        }
         if (score.round.resultsOptions.hasGolds) {
             totals.push(
                 <div className="archers__score__total" key={ `${endNumber}|golds` }>{ getGoldCount(score, endNumber + 1, endLength) }</div>
             )
         }
-        if (score.round.resultsOptions.hasXs) {
+        if (score.round.resultsOptions.hasXs && score.round.resultsOptions.xsAre10s) {
             totals.push(
                 <div className="archers__score__total" key={ `${endNumber}|xs` }>{ getXCount(score, endNumber + 1, endLength) }</div>
             );
@@ -142,6 +147,13 @@ const ScoreSheet = ({ score, showDetails }) => {
                 </div>
             );
         }
+        if (score.round.resultsOptions.hasXs && !score.round.resultsOptions.xsAre10s) {
+            splits.push(
+                <div className="archers__score__grand-total" key={ `${split.name}|xs` }>
+                    { getXCount(score, index + 1, split.arrows) }
+                </div>
+            );
+        }
         if (score.round.resultsOptions.hasGolds) {
             splits.push(
                 <div className="archers__score__grand-total" key={ `${split.name}|golds` }>
@@ -149,7 +161,7 @@ const ScoreSheet = ({ score, showDetails }) => {
                 </div>
             );
         }
-        if (score.round.resultsOptions.hasXs) {
+        if (score.round.resultsOptions.hasXs && score.round.resultsOptions.xsAre10s) {
             splits.push(
                 <div className="archers__score__grand-total" key={ `${split.name}|xs` }>
                     { getXCount(score, index + 1, split.arrows) }
@@ -187,12 +199,17 @@ const ScoreSheet = ({ score, showDetails }) => {
                             { getElevenCount(score) }
                         </div>
                     }
+                    { score.round.resultsOptions.hasXs && !score.round.resultsOptions.xsAre10s &&
+                        <div className="archers__score__grand-total">
+                            { getXCount(score) }
+                        </div>
+                    }
                     { score.round.resultsOptions.hasGolds &&
                         <div className="archers__score__grand-total">
                             { getGoldCount(score) }
                         </div>
                     }
-                    { score.round.resultsOptions.hasXs &&
+                    { score.round.resultsOptions.hasXs && score.round.resultsOptions.xsAre10s &&
                         <div className="archers__score__grand-total">
                             { getXCount(score) }
                         </div>

@@ -965,8 +965,8 @@ class ScoreSheetsPdf(CompetitionMixin, HeadedPdfView):
             dozens = int(subround.arrows / 12)
             extra = subround.arrows % 12
             total_rows = dozens + 2
-            scoring_labels = ['ET', 'S'] + session_round.shot_round.score_sheet_headings + ['RT']
-            if session_round.shot_round.scoring_type == 'I':
+            scoring_labels = ['ET', 'Score'] + session_round.score_sheet_headings + ['RT']
+            if session_round.scoring_type == 'I':
                 self.total_cols -= 1
             table_data = [['J', subround_title] + [None] * 5 + ['ET'] + [None] * 6 + scoring_labels]
             table_data += [[None for i in range(self.total_cols)] for j in range(total_rows - 1)]
@@ -1216,8 +1216,8 @@ class RunningSlipsPdf(ScoreSheetsPdf):
     def get_full_running_slip_elements(self, all_entries):
         dozens = self.session_round.shot_round.arrows / 12
         elements = []
-        headings = self.session_round.shot_round.score_sheet_headings
-        if self.session_round.shot_round.scoring_type == 'I':
+        headings = self.session_round.score_sheet_headings
+        if self.session_round.scoring_type == 'I':
             self.total_cols -= 1
         while all_entries:
             entries_group, all_entries = all_entries[:6], all_entries[6:]

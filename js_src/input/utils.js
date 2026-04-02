@@ -62,6 +62,9 @@ function getGoldCount(score, endNumber, endLength) {
     if (score.round.resultsOptions.gold9s) {
         return sum(arrows.map(a => (a === 9) ? 1 : 0));
     }
+    if (!score.round.resultsOptions.xsAre10s) {
+        return sum(arrows.map(a => (a === 10) ? 1 : 0));
+    }
     return sum(arrows.map(a => ((a === 10 || a === 'X') ? 1 : 0)));
 }
 
