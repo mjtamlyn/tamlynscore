@@ -60,9 +60,13 @@ class Score(models.Model):
     def __str__(self):
         return u'Score for {0}'.format(self.target)
 
+    @property
+    def scoring_type(self):
+        return self.target.session_entry.session_round.scoring_type
+
     def update_score(self):
         if self.target.session_entry.session_round.session.scoring_system in [SCORING_FULL, SCORING_ARCHER]:
-            scoring_type = self.target.session_entry.session_round.scoring_type
+            scoring_type = self.scoring_type
             arrows = self.arrow_set.all()
             self.score = self.alteration
             self.hits = 0

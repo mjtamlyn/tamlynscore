@@ -92,7 +92,13 @@ class BaseResultMode(object):
         raise ImproperlyConfigured('Subclasses must implement get_results')
 
     def sort_results(self, scores):
-        scores = sorted(scores, key=lambda s: (-int(s.retired), s.score, s.hits, s.golds, s.xs, s.tiebreak), reverse=True)
+        if not scores:
+            return []
+        scoring_type = scores[0].scoring_type
+        if scoring_type == 'Y':
+            scores = sorted(scores, key=lambda s: (-int(s.retired), s.score, s.xs, s.golds, s.tiebreak), reverse=True)
+        else:
+            scores = sorted(scores, key=lambda s: (-int(s.retired), s.score, s.hits, s.golds, s.xs, s.tiebreak), reverse=True)
         placing = 0
         current_score = None
         placing_counter = 1
@@ -660,7 +666,7 @@ class Team(BaseResultMode):
             - aggregate and order
         - repeat for each team type
         """
-        clubs, round = self.split_by_club(scores, competition, leaderboard)
+        clubs, session_round = self.split_by_club(scores, competition, leaderboard)
         if not clubs:
             return {}
         results = OrderedDict()
@@ -668,7 +674,7 @@ class Team(BaseResultMode):
             type_results = self.get_team_scores(competition, clubs, type)
             if type_results:
                 results[type] = type_results
-        return {self.get_section_for_round(round, competition, is_team=True): results}
+        return {self.get_section_for_round(session_round.shot_round, session_round.scoring_type, competition, is_team=True): results}
 
     def split_by_club(self, scores, competition, leaderboard, valid_rounds=None):
         from entries.models import Competition, SessionRound
@@ -688,7 +694,7 @@ class Team(BaseResultMode):
             ).order_by('session__start').select_related('shot_round')
         else:
             session_rounds = valid_rounds
-        round = None
+        session_round = None
         clubs = {}
         for score in scores:
             if not leaderboard and not score.score:
@@ -696,8 +702,8 @@ class Team(BaseResultMode):
             session_entry = score.target.session_entry
             if session_entry.session_round not in session_rounds:
                 continue
-            if round is None:
-                round = session_entry.session_round.shot_round
+            if session_round is None:
+                session_round = session_entry.session_round
             club = session_entry.competition_entry.team_name()
             if not club:
                 continue
@@ -708,7 +714,7 @@ class Team(BaseResultMode):
             if club not in clubs:
                 clubs[club] = []
             clubs[club].append(score)
-        return clubs, round
+        return clubs, session_round
 
     def get_team_types(self, competition):
         # TODO: support team types properly
@@ -747,7 +753,13 @@ class Team(BaseResultMode):
             club_scores = [s for s in club_scores if self.is_valid_for_type(s, type, competition)]
             if competition.combine_rounds_for_team_scores:
                 club_scores = self.combine_rounds(club_scores)
-            club_scores = sorted(club_scores, key=lambda s: (s.score, s.hits, s.golds, s.xs), reverse=True)
+            if not club_scores:
+                continue
+            scoring_type = club_scores[0].scoring_type
+            if scoring_type == 'Y':
+                club_scores = sorted(club_scores, key=lambda s: (s.score, s.hits, s.xs, s.golds), reverse=True)
+            else:
+                club_scores = sorted(club_scores, key=lambda s: (s.score, s.hits, s.golds, s.xs), reverse=True)
             team_size = competition.team_size
             if type == 'Novice' and competition.novice_team_size:
                 team_size = competition.novice_team_size
@@ -802,6 +814,7 @@ class Team(BaseResultMode):
                 tiebreak=0,
                 club=club,
                 team=club_scores,
+                scoring_type=club_scores[0].scoring_type,
             )
             club_results.append((club, team))
         return self.sort_results([c[1] for c in club_results])
