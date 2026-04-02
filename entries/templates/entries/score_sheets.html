@@ -10,7 +10,9 @@
                 <div class="score-sheets-block">
                     <h4>{{ round.shot_round }}</h4>
                     <a class="btn" href="{% url 'score_sheets_pdf' slug=competition.slug round_id=round.pk %}">Score sheets</a>
-                    <a class="btn" href="{% url 'running_slips_pdf' slug=competition.slug round_id=round.pk %}">Running slips</a>
+                    {% if round.session.scoring_system == 'F' or round.session.scoring_system == 'D'  %}
+                        <a class="btn" href="{% url 'running_slips_pdf' slug=competition.slug round_id=round.pk %}">Running slips</a>
+                    {% endif %}
                 </div>
             {% endfor %}
             {% if rounds|length > 1 %}
