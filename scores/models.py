@@ -60,9 +60,13 @@ class Score(models.Model):
     def __str__(self):
         return u'Score for {0}'.format(self.target)
 
+    @property
+    def scoring_type(self):
+        return self.target.session_entry.session_round.scoring_type
+
     def update_score(self):
         if self.target.session_entry.session_round.session.scoring_system in [SCORING_FULL, SCORING_ARCHER]:
-            scoring_type = self.target.session_entry.session_round.shot_round.scoring_type
+            scoring_type = self.scoring_type
             arrows = self.arrow_set.all()
             self.score = self.alteration
             self.hits = 0
@@ -77,7 +81,9 @@ class Score(models.Model):
                     (scoring_type == 'W' and arrow.arrow_value == 5)
                 ):
                     self.golds += 1
-                if scoring_type == 'X' and arrow.is_x:
+                if (scoring_type == 'Y' and arrow.arrow_value == 10 and not arrow.is_x):
+                    self.golds += 1
+                if scoring_type in ['X', 'Y'] and arrow.is_x:
                     self.xs += 1
                 if scoring_type == 'E' and arrow.arrow_value == 11:
                     self.xs += 1

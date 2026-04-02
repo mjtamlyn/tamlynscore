@@ -98,7 +98,7 @@ class OlympicSessionRound(models.Model):
 
     @cached_property
     def scoring_type(self):
-        return self.ranking_rounds.all()[0].shot_round.scoring_type
+        return self.ranking_rounds.all()[0].scoring_type
 
     def set_seedings(self, scores):
         for i, score in enumerate(scores):

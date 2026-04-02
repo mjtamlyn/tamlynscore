@@ -26,9 +26,10 @@ class ScoreMock(object):
 
 class ResultSection(object):
 
-    def __init__(self, label, round=None, headers=None):
+    def __init__(self, label, round=None, scoring_type=None, headers=None):
         self.label = label
         self.round = round
+        self.scoring_type = scoring_type
         self.headers = headers
 
     def __str__(self):
@@ -91,7 +92,13 @@ class BaseResultMode(object):
         raise ImproperlyConfigured('Subclasses must implement get_results')
 
     def sort_results(self, scores):
-        scores = sorted(scores, key=lambda s: (-int(s.retired), s.score, s.hits, s.golds, s.xs, s.tiebreak), reverse=True)
+        if not scores:
+            return []
+        scoring_type = scores[0].scoring_type
+        if scoring_type == 'Y':
+            scores = sorted(scores, key=lambda s: (-int(s.retired), s.score, s.xs, s.golds, s.tiebreak), reverse=True)
+        else:
+            scores = sorted(scores, key=lambda s: (-int(s.retired), s.score, s.hits, s.golds, s.xs, s.tiebreak), reverse=True)
         placing = 0
         current_score = None
         placing_counter = 1
@@ -125,7 +132,7 @@ class BaseResultMode(object):
             results.append(score)
         return results
 
-    def get_section_for_round(self, round, competition, is_team=False):
+    def get_section_for_round(self, round, scoring_type, competition, is_team=False):
         headers = ['Pl.'] + self.get_main_headers(competition)
         if competition.has_juniors or not competition.split_categories_on_agb_age and not is_team:
             headers += ['Age']
@@ -143,19 +150,22 @@ class BaseResultMode(object):
                     '%s%s-2' % (subround.distance, subround.unit),
                 ]
         headers.append('Score')
-        if round.scoring_type == 'X':
+        if scoring_type == 'X':
             headers += ['10s', 'Xs']
-        elif round.scoring_type == 'E':
+        elif scoring_type == 'Y':
+            headers += ['Xs', '10s']
+        elif scoring_type == 'E':
             headers += ['11s', '10s']
-        elif round.scoring_type == 'I':
+        elif scoring_type == 'I':
             headers += ['10s']
-        elif round.scoring_type == 'S':
+        elif scoring_type == 'S':
             pass
         else:
             headers += ['Hits', 'Golds']
         return ResultSection(
             label=self.label_for_round(round),
             round=round,
+            scoring_type=scoring_type,
             headers=headers,
         )
 
@@ -234,7 +244,7 @@ class BaseResultMode(object):
                 score.golds,
                 score.xs,
             ]
-        elif section.round.scoring_type == 'X':
+        elif section.scoring_type == 'X':
             scores += [
                 score.score,
             ]
@@ -243,7 +253,7 @@ class BaseResultMode(object):
                     score.golds,
                     score.xs,
                 ]
-        elif section.round.scoring_type == 'E':
+        elif section.scoring_type == 'Y':
             scores += [
                 score.score,
             ]
@@ -252,7 +262,16 @@ class BaseResultMode(object):
                     score.xs,
                     score.golds,
                 ]
-        elif section.round.scoring_type == 'I':
+        elif section.scoring_type == 'E':
+            scores += [
+                score.score,
+            ]
+            if not self.hide_golds:
+                scores += [
+                    score.xs,
+                    score.golds,
+                ]
+        elif section.scoring_type == 'I':
             scores += [
                 score.score,
             ]
@@ -260,7 +279,7 @@ class BaseResultMode(object):
                 scores += [
                     score.golds,
                 ]
-        elif section.round.scoring_type == 'S':
+        elif section.scoring_type == 'S':
             scores += [score.score]
         else:
             scores += [
@@ -308,10 +327,12 @@ class BySession(BaseResultMode):
         self.leaderboard = leaderboard
         sessions = self.get_sessions(competition)
         headers = ['Pl.'] + self.get_main_headers(competition)
-        round = scores[0].target.session_entry.session_round.shot_round
+        round = scores[0].target.session_entry.session_round
         headers.append('Score')
         if round.scoring_type == 'X':
             headers += ['10s', 'Xs']
+        elif round.scoring_type == 'Y':
+            headers += ['Xs', '10s']
         elif round.scoring_type == 'E':
             headers += ['11s', '10s']
         elif round.scoring_type == 'I':
@@ -323,7 +344,8 @@ class BySession(BaseResultMode):
         return OrderedDict((
             ResultSection(
                 session.start.strftime('%Y/%m/%d %I:%M %p'),
-                round=round,
+                round=round.shot_round,
+                scoring_type=round.scoring_type,
                 headers=headers,
             ),
             self.get_session_results(competition, session, scores),
@@ -377,9 +399,9 @@ class ByRound(BaseResultMode):
         self.leaderboard = leaderboard
         rounds = self.get_rounds(competition)
         return OrderedDict((
-            self.get_section_for_round(round, competition),
+            self.get_section_for_round(round, scoring_type, competition),
             self.get_round_results(competition, [round], scores)
-        ) for round in rounds)
+        ) for round, scoring_type in rounds)
 
     def get_rounds(self, competition):
         from entries.models import Competition, SessionRound
@@ -399,7 +421,7 @@ class ByRound(BaseResultMode):
         rounds = []
         for round in session_rounds:
             if round.shot_round not in rounds:
-                rounds.append(round.shot_round)
+                rounds.append((round.shot_round, round.scoring_type))
         return rounds
 
     def get_round_results(self, competition, rounds, scores, category=None):
@@ -478,9 +500,9 @@ class ByRoundProgressional(ByRound, BaseResultMode):
         self.leaderboard = leaderboard
         rounds = self.get_rounds(competition)
         return OrderedDict((
-            self.get_section_for_round(round, competition),
+            self.get_section_for_round(round, scoring_type, competition),
             self.get_round_results(competition, round, scores)
-        ) for round in rounds)
+        ) for (round, scoring_type) in rounds)
 
 
 class DoubleRound(BaseResultMode):
@@ -499,9 +521,9 @@ class DoubleRound(BaseResultMode):
         self.leaderboard = leaderboard
         rounds, valid_session_rounds = self.get_rounds(competition)
         return OrderedDict((
-            self.get_section_for_round(round, competition),
+            self.get_section_for_round(round, scoring_type, competition),
             self.get_round_results(competition, round, valid_session_rounds, scores)
-        ) for round in rounds)
+        ) for (round, scoring_type) in rounds)
 
     def get_rounds(self, competition):
         from entries.models import SessionRound
@@ -513,7 +535,7 @@ class DoubleRound(BaseResultMode):
         valid_session_rounds = []
         for round in session_rounds:
             if round.shot_round not in rounds:
-                rounds.append(round.shot_round)
+                rounds.append((round.shot_round, round.scoring_type))
             valid_session_rounds.append(round)
         return rounds, valid_session_rounds
 
@@ -578,11 +600,11 @@ class CombinedRounds(BaseResultMode):
         self.leaderboard = leaderboard
         self.include_distance_breakdown = True
 
-        shot_round = SessionRound.objects.filter(session__competition=competition).order_by('session__start').exclude(
+        session_round = SessionRound.objects.filter(session__competition=competition).order_by('session__start').exclude(
             olympicsessionround__exclude_ranking_rounds=True,
-        ).first().shot_round
+        ).first()
         headers = ['Pl.'] + self.get_main_headers(competition)
-        section = ResultSection('Combined scores', shot_round, headers)
+        section = ResultSection('Combined scores', session_round.shot_round, session_round.scoring_type, headers)
         return {
             section: self.get_round_results(competition, scores)
         }
@@ -644,7 +666,7 @@ class Team(BaseResultMode):
             - aggregate and order
         - repeat for each team type
         """
-        clubs, round = self.split_by_club(scores, competition, leaderboard)
+        clubs, session_round = self.split_by_club(scores, competition, leaderboard)
         if not clubs:
             return {}
         results = OrderedDict()
@@ -652,7 +674,7 @@ class Team(BaseResultMode):
             type_results = self.get_team_scores(competition, clubs, type)
             if type_results:
                 results[type] = type_results
-        return {self.get_section_for_round(round, competition, is_team=True): results}
+        return {self.get_section_for_round(session_round.shot_round, session_round.scoring_type, competition, is_team=True): results}
 
     def split_by_club(self, scores, competition, leaderboard, valid_rounds=None):
         from entries.models import Competition, SessionRound
@@ -672,7 +694,7 @@ class Team(BaseResultMode):
             ).order_by('session__start').select_related('shot_round')
         else:
             session_rounds = valid_rounds
-        round = None
+        session_round = None
         clubs = {}
         for score in scores:
             if not leaderboard and not score.score:
@@ -680,8 +702,8 @@ class Team(BaseResultMode):
             session_entry = score.target.session_entry
             if session_entry.session_round not in session_rounds:
                 continue
-            if round is None:
-                round = session_entry.session_round.shot_round
+            if session_round is None:
+                session_round = session_entry.session_round
             club = session_entry.competition_entry.team_name()
             if not club:
                 continue
@@ -692,7 +714,7 @@ class Team(BaseResultMode):
             if club not in clubs:
                 clubs[club] = []
             clubs[club].append(score)
-        return clubs, round
+        return clubs, session_round
 
     def get_team_types(self, competition):
         # TODO: support team types properly
@@ -731,7 +753,13 @@ class Team(BaseResultMode):
             club_scores = [s for s in club_scores if self.is_valid_for_type(s, type, competition)]
             if competition.combine_rounds_for_team_scores:
                 club_scores = self.combine_rounds(club_scores)
-            club_scores = sorted(club_scores, key=lambda s: (s.score, s.hits, s.golds, s.xs), reverse=True)
+            if not club_scores:
+                continue
+            scoring_type = club_scores[0].scoring_type
+            if scoring_type == 'Y':
+                club_scores = sorted(club_scores, key=lambda s: (s.score, s.hits, s.xs, s.golds), reverse=True)
+            else:
+                club_scores = sorted(club_scores, key=lambda s: (s.score, s.hits, s.golds, s.xs), reverse=True)
             team_size = competition.team_size
             if type == 'Novice' and competition.novice_team_size:
                 team_size = competition.novice_team_size
@@ -786,6 +814,7 @@ class Team(BaseResultMode):
                 tiebreak=0,
                 club=club,
                 team=club_scores,
+                scoring_type=club_scores[0].scoring_type,
             )
             club_results.append((club, team))
         return self.sort_results([c[1] for c in club_results])
@@ -1064,7 +1093,7 @@ class Weekend(BaseResultMode):
             full_results[category.category.name] = results
 
         headers = ['Pl.'] + self.get_main_headers(competition) + ['720', 'H2H', '1440', 'Total']
-        section = ResultSection('Weekend results', None, headers)
+        section = ResultSection('Weekend results', None, None, headers)
         return {section: full_results}
 
 

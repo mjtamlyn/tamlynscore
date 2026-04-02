@@ -34,11 +34,6 @@ class ResultModeMixin(object):
             'target__session_entry__competition_entry__novice',
             'target__session_entry__competition_entry__bowstyle',
             'target__session_entry__competition_entry__archer__gender',
-            'disqualified',
-            '-score',
-            '-is_actual_zero',
-            '-golds',
-            '-xs'
         )
         return scores
 

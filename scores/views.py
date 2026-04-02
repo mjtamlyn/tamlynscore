@@ -257,49 +257,9 @@ class ScoreSheet(CompetitionMixin, TemplateView):
 
     def get_context_data(self, **kwargs):
         score = Score.objects.get(pk=self.kwargs['score_id'])
-        entry = score.target.session_entry
-        round = entry.session_round.shot_round
-        per_end = entry.session_round.session.arrows_entered_per_end
-        layout = [{
-            'scores': ['-'] * per_end,
-            'doz': 0,
-            'hits': 0,
-            'golds': 0,
-            'xs': 0,
-            'elevens': 0,
-            'et1': 0,
-            'et2': 0,
-            'rt': 0,
-        } for i in range(int(round.arrows / per_end))]
-        arrows = score.arrow_set.order_by('arrow_of_round')
-        for arrow in arrows:
-            dozen = int((arrow.arrow_of_round - 1) / per_end)
-            point = arrow.arrow_of_round % per_end - 1
-            layout[dozen]['scores'][point] = str(arrow)
-            layout[dozen]['doz'] += arrow.arrow_value
-            if point < 6 and point >= 0:
-                layout[dozen]['et1'] += arrow.arrow_value
-            else:
-                layout[dozen]['et2'] += arrow.arrow_value
-            if arrow.arrow_value:
-                layout[dozen]['hits'] += 1
-            if arrow.arrow_value == 10 or (arrow.arrow_value == 9 and round.scoring_type == 'F'):
-                layout[dozen]['golds'] += 1
-            if arrow.arrow_value == 11:
-                layout[dozen]['elevens'] += 1
-            if arrow.is_x:
-                layout[dozen]['xs'] += 1
-        rt = 0
-        for dozen in layout:
-            rt += dozen['doz']
-            dozen['rt'] = rt
         context = super().get_context_data(**kwargs)
         context.update({
-            'entry': entry,
-            'layout': layout,
             'score': score,
-            'round': round,
-            'per_end': per_end,
         })
         return context
 
@@ -318,7 +278,7 @@ class ScoreSheetAPI(CompetitionMixin, DetailView):
         return JsonResponse({
             'competition': serializers.competition(self.competition, is_admin=self.is_admin),
             'round': serializers.round_shot(
-                round_shot=score.target.session_entry.session_round.shot_round,
+                session_round=score.target.session_entry.session_round,
                 session=score.target.session_entry.session_round.session,
             ),
             'sessionId': score.target.session_entry.session_round.session_id,
@@ -741,7 +701,7 @@ class TargetAPISession(CsrfExemptMixin, EntryUserRequired, View):
         # There's an assumption here that all archers are shooting the same
         # round as the logged in archer. This could cause issues with split
         # round targets, but this is very rare.
-        round_shot = session_entry.session_round.shot_round
+        round_shot = session_entry.session_round
         targets = self.get_targets(session_entry)
 
         for target in targets.filter(score__isnull=True):

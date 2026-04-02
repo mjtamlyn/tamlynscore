@@ -5,8 +5,8 @@ from django.db import models
 from django.urls import reverse
 
 from core.models import (
-    AGB_AGE_CHOICES, IFAA_DIVISIONS, NOVICE_CHOICES, SIMPLE_AGE_CHOICES,
-    Archer, Bowstyle, Club, County, Round,
+    AGB_AGE_CHOICES, IFAA_DIVISIONS, NOVICE_CHOICES, SCORING_TYPES,
+    SIMPLE_AGE_CHOICES, Archer, Bowstyle, Club, County, Round,
 )
 from scores.result_modes import get_result_modes
 from tamlynscore.utils import generate_slug
@@ -200,6 +200,12 @@ class Session(models.Model):
 class SessionRound(models.Model):
     session = models.ForeignKey(Session, on_delete=models.CASCADE)
     shot_round = models.ForeignKey(Round, on_delete=models.CASCADE)
+    scoring_type = models.CharField(max_length=1, choices=SCORING_TYPES)
+
+    def save(self, *args, **kwargs):
+        if not self.scoring_type:
+            self.scoring_type = self.shot_round.scoring_type
+        super().save(*args, **kwargs)
 
     def target_list(self):
         entries = self.sessionentry_set.count()
@@ -292,6 +298,62 @@ class SessionRound(models.Model):
 
     def __str__(self):
         return u'{0}, {1}'.format(self.session, self.shot_round)
+
+    @property
+    def has_xs(self):
+        return self.scoring_type in ['X', 'Y']
+
+    @property
+    def xs_are_10s(self):
+        return self.scoring_type == 'X'
+
+    @property
+    def has_golds(self):
+        return not self.shot_round.is_ifaa
+
+    @property
+    def has_elevens(self):
+        return self.scoring_type == 'E'
+
+    @property
+    def gold_9s(self):
+        return self.scoring_type == 'F'
+
+    @property
+    def has_hits(self):
+        if self.scoring_type in ['X', 'Y', 'I', 'E']:
+            return False
+        if self.shot_round.is_ifaa:
+            return False
+        return True
+
+    @property
+    def score_sheet_headings(self):
+        if self.scoring_type == 'X':
+            return ['10+X', 'X']
+        if self.scoring_type == 'Y':
+            return ['Xs', '10s']
+        if self.scoring_type == 'E':
+            return ['11s', '10s']
+        elif self.scoring_type == 'I':
+            return ['10s']
+        elif self.shot_round.is_ifaa:
+            return []
+        else:
+            return ['H', 'G']
+
+    @property
+    def scoring_headings(self):
+        if self.scoring_type == 'X':
+            return ['10s+Xs', 'Xs']
+        if self.scoring_type == 'Y':
+            return ['Xs', '10s']
+        if self.scoring_type == 'E':
+            return ['11s', '10s']
+        elif self.scoring_type == 'I':
+            return ['10s']
+        else:
+            return ['Hits', 'Golds']
 
 
 class CompetitionEntry(models.Model):
