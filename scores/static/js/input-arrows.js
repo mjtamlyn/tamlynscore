@@ -121,9 +121,15 @@ var Arrows = new Class({
             if (value == 'M' || value == '') {
                 return;
             }
+            if (value == 10) {
+                golds += 1;
+            }
             if (value == 'X') {
                 xs += 1;
                 value = 10;
+            }
+            if (value == 11) {
+                elevens += 1;
             }
             value = parseInt(value);
             if (index < 6) {
@@ -132,12 +138,6 @@ var Arrows = new Class({
                 ET2 += value;
             }
             hits += 1;
-            if (value == 10) {
-                golds += 1;
-            }
-            if (value == 11) {
-                elevens += 1;
-            }
         });
         var values = {
             'et1': ET1,

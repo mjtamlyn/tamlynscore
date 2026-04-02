@@ -346,7 +346,7 @@ class SessionRound(models.Model):
     def scoring_headings(self):
         if self.scoring_type == 'X':
             return ['10s+Xs', 'Xs']
-        if self.scoring_type == 'Y':
+        elif self.scoring_type == 'Y':
             return ['Xs', '10s']
         if self.scoring_type == 'E':
             return ['11s', '10s']
