@@ -540,51 +540,63 @@ class RankingsExport(ResultModeMixin, CompetitionMixin, View):
         self.annotate_round_data(by_round_results, archer_details)
         h2h_rounds = OlympicSessionRound.objects.filter(session__competition=self.competition)
         self.annotate_h2h_data(h2h_rounds, archer_details)
-        response = HttpResponse(content_type='text/csv')
+        archer_details = self.trim_incomplete(archer_details)
+        response = HttpResponse(content_type='text/plain')
         response['Content-Disposition'] = 'attachment; filename="%s-rankings-export.csv"' % self.competition.slug
         writer = csv.writer(response)
         writer.writerow(headings)
-        writer.writerows(sorted(archer_details.values(), key=lambda a: (str(a[6]), a[5], a[4], a[7] or 10000)))
+        # Sort by round, division, class then placing
+        writer.writerows(sorted(archer_details.values(), key=lambda a: (str(a[8]), a[7], a[6], a[10] or 10000)))
         return response
 
     def get_entries(self):
         return CompetitionEntry.objects.filter(
             competition=self.competition,
             sessionentry__targetallocation__isnull=False,
-        ).select_related('archer', 'club', 'bowstyle')
+        ).select_related('archer', 'club', 'bowstyle', 'competition')
 
     def get_scores(self):
         return Score.objects.filter(
-            target__session_entry__competition_entry__competition=self.competition
+            target__session_entry__competition_entry__competition=self.competition,
+            retired=False,
+        ).exclude(
+            score=0,
+            is_actual_zero=False,
         ).select_related(
-            'target__session_entry',
+            'target__session_entry__competition_entry__competition',
+            'target__session_entry__competition_entry__bowstyle',
+            'target__session_entry__competition_entry__archer',
+            'target__session_entry__session_round__shot_round',
+        ).prefetch_related(
+            'arrow_set',
         )
 
     def get_headings(self):
-        headings = ['AGB Number', 'First Name', 'Last Name', 'Club', 'Bowstyle', 'Division']
+        headings = [
+            'AGB Number',
+            'First Name',
+            'Last Name',
+            'Club',
+            'Category',
+            'Canonical Category',
+            'Class',
+            'Division',
+        ]
         max_number_of_rounds = self.competition.competitionentry_set.annotate(session_count=Count('sessionentry')).aggregate(count=Max('session_count'))['count'] or 0
         for i in range(max_number_of_rounds):
             headings += [
                 'Round %s' % (i + 1),
+                'Round Code',
                 'Placing',
                 'Score',
+                'Xs',
                 '10s',
-                'Xs'
+                'Arrow values',
             ]
         has_h2h = OlympicSessionRound.objects.filter(session__competition=self.competition).exists()
         if has_h2h:
             headings += ['H2H Placing']
         return headings
-
-    def get_division(self, entry):
-        division = ''
-        if entry.archer.gender == 'G':
-            division += 'M'
-        else:
-            division += 'W'
-        if self.competition.has_agb_age_groups and self.competition.split_categories_on_agb_age:
-            division = entry.agb_age + division
-        return division
 
     def archer_details(self, entries, scores):
         data = {}
@@ -594,8 +606,10 @@ class RankingsExport(ResultModeMixin, CompetitionMixin, View):
                 ' '.join(entry.archer.name.split(' ')[:-1]),
                 entry.archer.name.split(' ')[-1],
                 entry.team_name(),
-                entry.bowstyle.name[0],
-                self.get_division(entry),
+                entry.category,
+                entry.canonical_category,
+                entry.clss,
+                entry.get_division(simple=True),
             ]
         return data
 
@@ -606,10 +620,12 @@ class RankingsExport(ResultModeMixin, CompetitionMixin, View):
                     entry = result.target.session_entry.competition_entry
                     archers[entry.pk] += [
                         shot_round,
+                        shot_round.round.codename,
                         result.placing if not result.retired else None,
                         result.score,
-                        result.golds,
                         result.xs,
+                        result.golds,
+                        result.source.arrows_string,
                     ]
         return archers
 
@@ -619,6 +635,10 @@ class RankingsExport(ResultModeMixin, CompetitionMixin, View):
             for seeding in results:
                 archers[seeding.entry_id] += [seeding.rank]
         return archers
+
+    def trim_incomplete(self, archer_details):
+        full_length = max(len(r) for r in archer_details.values())
+        return dict([(k, v) for k, v in archer_details.items() if len(v) == full_length])
 
 
 class MembershipVerification(ResultModeMixin, CompetitionMixin, View):
