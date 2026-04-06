@@ -96,6 +96,7 @@ class Subround(models.Model):
 
 class Round(models.Model):
     name = models.CharField(max_length=100, unique=True)
+    codename = models.CharField(max_length=50, help_text='archeryutils round codename', default='UKNOWN')
     subrounds = models.ManyToManyField(Subround)
     longest_distance = models.IntegerField(default=0)  # Used for ordering results
     scoring_type = models.CharField(max_length=1, choices=SCORING_TYPES)
