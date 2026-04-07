@@ -126,45 +126,50 @@ const ScoreSheet = ({ score, showDetails }) => {
     const totalsPadding = endLength === 12 ? 14 : endLength
 
     const splits = [];
+    var currentArrowPosition = 0;
     score.round.splits.forEach((split, index) => {
-        // TODO: at the moment this assumes the splits are the same length. Will fail on Yorks/Bristols.
+        const splitScore = {
+            arrows: score.arrows.slice(currentArrowPosition, currentArrowPosition + split.arrows),
+            round: score.round,
+        };
+        currentArrowPosition += split.arrows;
         splits.push(
             <div style={ { gridColumnEnd: `span ${totalsPadding - 1}` } } key={ `${split.name}|padding` } />,
             <div className="archers__score__split-title" key={ `${split.name}|name` }>{ split.name }</div>,
-            <div className="archers__score__grand-total" key={ `${split.name}|score` }>{ getEndScore(score, index + 1, split.arrows) }</div>,
+            <div className="archers__score__grand-total" key={ `${split.name}|score` }>{ getRunningTotal(splitScore) }</div>,
         );
         if (score.round.resultsOptions.hasHits) {
             splits.push(
                 <div className="archers__score__grand-total" key={ `${split.name}|hits` }>
-                    { getHitCount(score, index + 1, split.arrows) }
+                    { getHitCount(splitScore) }
                 </div>
             );
         }
         if (score.round.resultsOptions.hasElevens) {
             splits.push(
                 <div className="archers__score__grand-total" key={ `${split.name}|elevens` }>
-                    { getElevenCount(score, index + 1, split.arrows) }
+                    { getElevenCount(splitScore) }
                 </div>
             );
         }
         if (score.round.resultsOptions.hasXs && !score.round.resultsOptions.xsAre10s) {
             splits.push(
                 <div className="archers__score__grand-total" key={ `${split.name}|xs` }>
-                    { getXCount(score, index + 1, split.arrows) }
+                    { getXCount(splitScore) }
                 </div>
             );
         }
         if (score.round.resultsOptions.hasGolds) {
             splits.push(
                 <div className="archers__score__grand-total" key={ `${split.name}|golds` }>
-                    { getGoldCount(score, index + 1, split.arrows) }
+                    { getGoldCount(splitScore) }
                 </div>
             );
         }
         if (score.round.resultsOptions.hasXs && score.round.resultsOptions.xsAre10s) {
             splits.push(
                 <div className="archers__score__grand-total" key={ `${split.name}|xs` }>
-                    { getXCount(score, index + 1, split.arrows) }
+                    { getXCount(splitScore) }
                 </div>
             );
         }
