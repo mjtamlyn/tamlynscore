@@ -110,13 +110,10 @@ class Score(models.Model):
         string = ''
         for a in arrows:
             if a.is_x:
-                string += 'X'
-            elif a.arrow_value == 10:
-                string += 'T'
-            elif a.arrow_value == 0:
-                string += 'M'
+                string += 'L'
             else:
-                string += str(a.arrow_value)
+                letters = 'ABCDEFGHIJK'
+                string += letters[a.arrow_value]
         return string
 
 
