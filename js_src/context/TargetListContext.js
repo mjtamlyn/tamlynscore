@@ -1,4 +1,4 @@
-import React, { createContext, useEffect } from 'react';
+import React, { createContext } from 'react';
 import { useImmerReducer } from 'use-immer';
 
 import useActionQueue from '../utils/useActionQueue';
@@ -40,7 +40,7 @@ const insertBossAfter = (bosses, number, letters) => {
     oldBosses.forEach(([num, lkp]) => {
         if (num > number) {
             num++;
-            for (const [_, archer] of Object.entries(lkp)) {
+            for (const [_, archer] of Object.entries(lkp)) { // eslint-disable-line no-unused-vars
                 if (archer) {
                     archer.boss++;
                 }
@@ -66,7 +66,7 @@ const removeBoss = (bosses, number) => {
     oldBosses.forEach(([num, lkp]) => {
         if (num > number) {
             num--;
-            for (const [_, archer] of Object.entries(lkp)) {
+            for (const [_, archer] of Object.entries(lkp)) { // eslint-disable-line no-unused-vars
                 if (archer) {
                     archer.boss--;
                 }

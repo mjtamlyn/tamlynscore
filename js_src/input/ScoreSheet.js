@@ -127,7 +127,7 @@ const ScoreSheet = ({ score, showDetails }) => {
 
     const splits = [];
     var currentArrowPosition = 0;
-    score.round.splits.forEach((split, index) => {
+    score.round.splits.forEach((split) => {
         const splitScore = {
             arrows: score.arrows.slice(currentArrowPosition, currentArrowPosition + split.arrows),
             round: score.round,

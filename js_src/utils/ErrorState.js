@@ -1,7 +1,7 @@
 import React from 'react';
 
 
-const ErrorState = ({ error, resetErrorBoundary }) => {
+const ErrorState = ({ error }) => {
     return (
         <div className="error-state">
             <h1 className="error-state__heading">It’s a miss!</h1>

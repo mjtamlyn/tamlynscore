@@ -19,7 +19,6 @@ const TargetInput = ({ scores, round, endNumber, toSummary }) => {
         if (!isEndComplete(score, endNumber) && !initialActive) {
             initialActive = score;
             initialCursor = getEnd(score, endNumber).length;
-        } else {
         }
     });
 
@@ -43,7 +42,7 @@ const TargetInput = ({ scores, round, endNumber, toSummary }) => {
     }
 
     const setPosition = (score, position) => {
-        return (e) => {
+        return () => {
             setActiveScore(score);
             setCursorPosition(position);
         }
