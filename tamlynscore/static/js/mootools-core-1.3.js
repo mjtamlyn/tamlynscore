@@ -1679,7 +1679,7 @@ function parser(
 	}
 
 	return '';
-};
+}
 
 // Slick NS
 
@@ -1759,7 +1759,7 @@ local.setDocument = function(document){
 		id = 'slick_getbyid_test';
 		testNode.innerHTML = '<a id="'+id+'"></a>';
 		this.isHTMLDocument = !!document.getElementById(id);
-	} catch(e){};
+	} catch(e){}
 
 	if (this.isHTMLDocument){
 		
@@ -1774,7 +1774,7 @@ local.setDocument = function(document){
 			testNode.innerHTML = 'foo</foo>';
 			selected = testNode.getElementsByTagName('*');
 			starSelectsClosed = (selected && selected.length && selected[0].nodeName.charAt(0) == '/');
-		} catch(e){};
+		} catch(e){}
 
 		this.brokenStarGEBTN = starSelectsComments || starSelectsClosed;
 
@@ -1783,33 +1783,33 @@ local.setDocument = function(document){
 			testNode.innerHTML = 'foo</foo>';
 			selected = testNode.querySelectorAll('*');
 			this.starSelectsClosedQSA = (selected && selected.length && selected[0].nodeName.charAt(0) == '/');
-		} catch(e){};
+		} catch(e){}
 
 		// IE returns elements with the name instead of just id for getElementsById for some documents
 		try {
 			id = 'slick_id_gets_name';
 			testNode.innerHTML = '<a name="'+id+'"></a><b id="'+id+'"></b>';
 			this.idGetsName = document.getElementById(id) === testNode.firstChild;
-		} catch(e){};
+		} catch(e){}
 
 		// Safari 3.2 querySelectorAll doesnt work with mixedcase on quirksmode
 		try {
 			testNode.innerHTML = '<a class="MiXedCaSe"></a>';
 			this.brokenMixedCaseQSA = !testNode.querySelectorAll('.MiXedCaSe').length;
-		} catch(e){};
+		} catch(e){}
 
 		try {
 			testNode.innerHTML = '<a class="f"></a><a class="b"></a>';
 			testNode.getElementsByClassName('b').length;
 			testNode.firstChild.className = 'b';
 			cachedGetElementsByClassName = (testNode.getElementsByClassName('b').length != 2);
-		} catch(e){};
+		} catch(e){}
 
 		// Opera 9.6 getElementsByClassName doesnt detects the class if its not the first one
 		try {
 			testNode.innerHTML = '<a class="a"></a><a class="f b a"></a>';
 			brokenSecondClassNameGEBCN = (testNode.getElementsByClassName('a').length != 2);
-		} catch(e){};
+		} catch(e){}
 
 		this.brokenGEBCN = cachedGetElementsByClassName || brokenSecondClassNameGEBCN;
 		
@@ -1817,13 +1817,13 @@ local.setDocument = function(document){
 		try {
 			testNode.innerHTML = '<select><option selected="selected">a</option></select>';
 			this.brokenCheckedQSA = (testNode.querySelectorAll(':checked').length == 0);
-		} catch(e){};
+		} catch(e){}
 		
 		// IE returns incorrect results for attr[*^$]="" selectors on querySelectorAll
 		try {
 			testNode.innerHTML = '<a class=""></a>';
 			this.brokenEmptyAttributeQSA = (testNode.querySelectorAll('[class*=""]').length != 0);
-		} catch(e){};
+		} catch(e){}
 		
 	}
 
@@ -3926,28 +3926,28 @@ var styleString = Element.getComputedStyle;
 
 function styleNumber(element, style){
 	return styleString(element, style).toInt() || 0;
-};
+}
 
 function borderBox(element){
 	return styleString(element, '-moz-box-sizing') == 'border-box';
-};
+}
 
 function topBorder(element){
 	return styleNumber(element, 'border-top-width');
-};
+}
 
 function leftBorder(element){
 	return styleNumber(element, 'border-left-width');
-};
+}
 
 function isBody(element){
 	return (/^(?:body|html)$/i).test(element.tagName);
-};
+}
 
 function getCompatElement(element){
 	var doc = element.getDocument();
 	return (!doc.compatMode || doc.compatMode == 'CSS1Compat') ? doc.html : doc.body;
-};
+}
 
 })();
 

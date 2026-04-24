@@ -8,7 +8,7 @@ const InputBox = ({ onClick, value = '\u00A0', active = false }) => {
     let className = 'archers__score__input';
     if (active) {
         className += ' archers__score__input--active';
-    };
+    }
     return (
         <div onClick={ onClick } className={ className }>{ value }</div>
     );

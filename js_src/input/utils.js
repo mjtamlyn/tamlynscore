@@ -21,7 +21,7 @@ function currentEnd(score) {
         return 1;
     }
     return Math.floor((score.arrows.length - 1) / score.round.endLength) + 1;
-};
+}
 
 function getEnd(score, endNumber, endLength) {
     return score.arrows.slice((endNumber - 1) * (endLength || score.round.endLength), endNumber * (endLength || score.round.endLength));

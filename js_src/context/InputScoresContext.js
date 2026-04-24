@@ -1,4 +1,4 @@
-import React, { createContext, useEffect } from 'react';
+import React, { createContext } from 'react';
 import { useImmerReducer } from 'use-immer';
 
 import { getEnd } from '../input/utils';
@@ -22,7 +22,7 @@ function compareArrows(a, b) {
         return -1;
     }
     return 0;
-};
+}
 
 function isDescending(end) {
     const sorted = end.toSorted(compareArrows);
@@ -60,7 +60,7 @@ const inputScoresReducer = (scores, action) => {
                 }
             } else {
                 actionQueue.doAction({ type: 'SETARROW', params: {score: score.id, arrowOfRound: arrowNumber + 1, arrowValue: action.number }});
-            };
+            }
             return;
         }
         default: {

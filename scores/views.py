@@ -538,65 +538,78 @@ class RankingsExport(ResultModeMixin, CompetitionMixin, View):
             request=self.request,
         )
         self.annotate_round_data(by_round_results, archer_details)
+        archer_details = {k: v for k, v in archer_details.items() if v.get('Pos')}
         h2h_rounds = OlympicSessionRound.objects.filter(session__competition=self.competition)
         self.annotate_h2h_data(h2h_rounds, archer_details)
-        response = HttpResponse(content_type='text/csv')
-        response['Content-Disposition'] = 'attachment; filename="%s-rankings-export.csv"' % self.competition.slug
-        writer = csv.writer(response)
-        writer.writerow(headings)
-        writer.writerows(sorted(archer_details.values(), key=lambda a: (str(a[6]), a[5], a[4], a[7] or 10000)))
+        response = HttpResponse(content_type='text/txt')
+        # response['Content-Disposition'] = 'attachment; filename="%s-rankings-export.csv"' % self.competition.slug
+        writer = csv.DictWriter(response, fieldnames=headings)
+        writer.writeheader()
+        # Sort by round, division, class then placing
+        writer.writerows(sorted(archer_details.values(), key=lambda a: (a['Div'], a['Class'], a['Pos'])))
         return response
 
     def get_entries(self):
         return CompetitionEntry.objects.filter(
             competition=self.competition,
             sessionentry__targetallocation__isnull=False,
-        ).select_related('archer', 'club', 'bowstyle')
+        ).select_related('archer', 'club', 'bowstyle', 'competition')
 
     def get_scores(self):
         return Score.objects.filter(
-            target__session_entry__competition_entry__competition=self.competition
+            target__session_entry__competition_entry__competition=self.competition,
+            retired=False,
+        ).exclude(
+            score=0,
+            is_actual_zero=False,
         ).select_related(
-            'target__session_entry',
+            'target__session_entry__competition_entry__competition',
+            'target__session_entry__competition_entry__bowstyle',
+            'target__session_entry__competition_entry__archer',
+            'target__session_entry__session_round__shot_round',
+        ).prefetch_related(
+            'arrow_set',
         )
 
     def get_headings(self):
-        headings = ['AGB Number', 'First Name', 'Last Name', 'Club', 'Bowstyle', 'Division']
+        headings = [
+            'AGB',
+            'FN',
+            'LN',
+            'Div',
+            'Class',
+            'Pos',
+            'Score',
+            '10s',
+            'Xs',
+        ]
+        has_h2h = OlympicSessionRound.objects.filter(session__competition=self.competition).exists()
+        if has_h2h:
+            headings += ['H2H Pos']
+        headings += [
+            'Category',
+            'Canonical Category',
+        ]
         max_number_of_rounds = self.competition.competitionentry_set.annotate(session_count=Count('sessionentry')).aggregate(count=Max('session_count'))['count'] or 0
         for i in range(max_number_of_rounds):
             headings += [
                 'Round %s' % (i + 1),
-                'Placing',
-                'Score',
-                '10s',
-                'Xs'
+                'Arrow values',
             ]
-        has_h2h = OlympicSessionRound.objects.filter(session__competition=self.competition).exists()
-        if has_h2h:
-            headings += ['H2H Placing']
         return headings
-
-    def get_division(self, entry):
-        division = ''
-        if entry.archer.gender == 'G':
-            division += 'M'
-        else:
-            division += 'W'
-        if self.competition.has_agb_age_groups and self.competition.split_categories_on_agb_age:
-            division = entry.agb_age + division
-        return division
 
     def archer_details(self, entries, scores):
         data = {}
         for entry in entries:
-            data[entry.pk] = [
-                entry.archer.agb_number,
-                ' '.join(entry.archer.name.split(' ')[:-1]),
-                entry.archer.name.split(' ')[-1],
-                entry.team_name(),
-                entry.bowstyle.name[0],
-                self.get_division(entry),
-            ]
+            data[entry.pk] = {
+                'AGB': entry.archer.agb_number,
+                'FN': ' '.join(entry.archer.name.split(' ')[:-1]),
+                'LN': entry.archer.name.split(' ')[-1],
+                'Class': entry.clss,
+                'Div': entry.get_division(simple=True),
+                'Category': entry.category,
+                'Canonical Category': entry.canonical_category,
+            }
         return data
 
     def annotate_round_data(self, results, archers):
@@ -604,20 +617,22 @@ class RankingsExport(ResultModeMixin, CompetitionMixin, View):
             for category, results in categories.items():
                 for result in results:
                     entry = result.target.session_entry.competition_entry
-                    archers[entry.pk] += [
-                        shot_round,
-                        result.placing if not result.retired else None,
-                        result.score,
-                        result.golds,
-                        result.xs,
-                    ]
+                    archers[entry.pk].update({
+                        # shot_round,
+                        # shot_round.round.codename,
+                        'Pos': result.placing if not result.retired else None,
+                        'Score': result.score,
+                        'Xs': result.xs,
+                        '10s': result.golds,
+                        'Arrow values': result.source.arrows_string,
+                    })
         return archers
 
     def annotate_h2h_data(self, h2hs, archers):
         for h2h_round in h2hs:
             results = h2h_round.get_results().results
             for seeding in results:
-                archers[seeding.entry_id] += [seeding.rank]
+                archers[seeding.entry_id]['H2H Pos'] = [seeding.rank]
         return archers
 
 
