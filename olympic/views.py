@@ -516,6 +516,9 @@ class OlympicTreeMixin(object):
     def get_round_table(self, olympic_round):
 
         self.total_levels = olympic_round.match_set.aggregate(Max('level'))['level__max']
+        if self.total_levels is None:
+            self.cols = 0
+            return [[]]
         seedings = olympic_round.seeding_set.select_related('entry__archer')
         seedings_dict = {s.seed: s for s in seedings}
 

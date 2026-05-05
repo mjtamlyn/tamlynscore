@@ -898,7 +898,7 @@ class H2HSeedings(ByRound, Team, BaseResultMode):
         rounds = self.get_rounds(competition)
         results = OrderedDict()
         for round in rounds:
-            section = self.get_section_for_round(round, competition)
+            section = self.get_section_for_round(round, round.ranking_rounds.first().scoring_type, competition)
             section.seedings_confirmed = round.seeding_set.exists()
             section_scores = self.filter_scores(competition, scores, round)
             section_results = self.get_round_results(competition, round, section_scores, section.seedings_confirmed, leaderboard)
