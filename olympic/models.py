@@ -10,7 +10,8 @@ from core.models import (
 from entries.models import CompetitionEntry, Session, SessionRound
 
 MATCH_TYPES = (
-    ('T', 'Sets'),
+    ('T', 'Sets (old placing rules)'),
+    ('U', 'Sets'),
     ('C', 'Score'),
 )
 
@@ -411,3 +412,20 @@ class Result(models.Model):
         if self.win_by_forfeit:
             return 'BYE'
         return self.total
+
+
+class MatchArrow(models.Model):
+    result = models.ForeignKey(Result, on_delete=models.CASCADE)
+    arrow_value = models.PositiveIntegerField()
+    arrow_of_round = models.PositiveIntegerField()
+    is_x = models.BooleanField(default=False)
+
+    class Meta:
+        unique_together = [('arrow_of_round', 'result')]
+
+    def __str__(self):
+        if self.is_x:
+            return 'X'
+        if self.arrow_value == 0:
+            return 'M'
+        return str(self.arrow_value)
