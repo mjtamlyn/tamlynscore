@@ -392,6 +392,92 @@ class Match(models.Model):
             return (self.for_placing - 1) / 2 + next_number
         return (self.for_placing + self.n_archers_next_round - 1) / 2 + next_number
 
+    def update_totals(self):
+        results = self.result_set.all()
+        if not len(results) == 2:
+            return
+        result_1, result_2 = results
+        result_1.total = result_2.total = 0
+        result_1.win = result_2.win = False
+
+        if result_1.dns:
+            result_2.win = True
+            result_2.win_by_forfeit = True
+            result_1.save()
+            result_2.save()
+            return
+        elif result_2.dns:
+            result_1.win = True
+            result_1.win_by_forfeit = True
+            result_1.save()
+            result_2.save()
+            return
+
+        arrows_1 = result_1.matcharrow_set.order_by('arrow_of_round')
+        arrows_2 = result_2.matcharrow_set.order_by('arrow_of_round')
+        if self.session_round.shot_round.match_type == 'C':
+            result_1.total = sum(arrows_1[:15], key=lambda a: a.arrow_value)
+            result_2.total = sum(arrows_2[:15], key=lambda a: a.arrow_value)
+            if result_1.total > result_2.total and len(arrows_1) >= 15 and len(arrows_2) >= 15:
+                result_1.win = True
+                result_2.win = False
+            if result_1.total < result_2.total and len(arrows_1) >= 15 and len(arrows_2) >= 15:
+                result_2.win = True
+                result_1.win = False
+            else:
+                so_1 = next(filter(lambda a: a.arrow_of_round == 16, arrows_1), None)
+                so_2 = next(filter(lambda a: a.arrow_of_round == 16, arrows_2), None)
+                if so_1 and so_2:
+                    if so_1.arrow_value > so_2.arrow_value or (so_1.arrow_value == so_2.arrow_value and so_1.closest and not so_2.closest):
+                        result_1.win = True
+                        result_2.win = False
+                    elif so_1.arrow_value < so_2.arrow_value or (so_1.arrow_value == so_2.arrow_value and not so_1.closest and so_2.closest):
+                        result_2.win = True
+                        result_1.win = False
+        elif self.session_round.shot_round.match_type == 'U':
+            for i in range(5):
+                pts_1, pts_2 = self.set_result(arrows_1, arrows_2, i)
+                result_1.total += pts_1
+                result_2.total += pts_2
+            if result_1.total >= 6:
+                result_1.win = True
+                result_2.win = False
+            elif result_2.total >= 6:
+                result_2.win = True
+                result_1.win = False
+            else:
+                so_1 = next(filter(lambda a: a.arrow_of_round == 16, arrows_1), None)
+                so_2 = next(filter(lambda a: a.arrow_of_round == 16, arrows_2), None)
+                if so_1 and so_2:
+                    if so_1.arrow_value > so_2.arrow_value or (so_1.arrow_value == so_2.arrow_value and so_1.closest and not so_2.closest):
+                        result_1.total = 6
+                        result_1.win = True
+                        result_2.win = False
+                    elif so_1.arrow_value < so_2.arrow_value or (so_1.arrow_value == so_2.arrow_value and not so_1.closest and so_2.closest):
+                        result_2.total = 6
+                        result_2.win = True
+                        result_1.win = False
+
+        result_1.save()
+        result_2.save()
+
+    def set_result(self, arrows_1, arrows_2, set_number):
+        def filter_fn(a):
+            return a.arrow_of_round in range(3 * set_number + 1, 3 * set_number + 4)
+
+        if not list(filter(filter_fn, arrows_1)):
+            return 0, 0
+        if not list(filter(filter_fn, arrows_2)):
+            return 0, 0
+
+        score_1 = sum(map(lambda a: a.arrow_value, filter(filter_fn, arrows_1)))
+        score_2 = sum(map(lambda a: a.arrow_value, filter(filter_fn, arrows_2)))
+        if score_1 > score_2:
+            return 2, 0
+        elif score_1 < score_2:
+            return 0, 2
+        return 1, 1
+
 
 class Result(models.Model):
     match = models.ForeignKey(Match, on_delete=models.CASCADE)
@@ -419,6 +505,7 @@ class MatchArrow(models.Model):
     arrow_value = models.PositiveIntegerField()
     arrow_of_round = models.PositiveIntegerField()
     is_x = models.BooleanField(default=False)
+    closest = models.BooleanField(default=False)
 
     class Meta:
         unique_together = [('arrow_of_round', 'result')]
