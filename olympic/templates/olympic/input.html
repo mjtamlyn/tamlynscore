@@ -1,18 +1,58 @@
 {% extends 'entries/competition_detail.html' %}
 
 {% block competition_content %}
-<h4>Input scores for {{ seed.label }} ({{ seed.session_round.category.name }} {{ seed.seed }})</h4>
+<div class="module input-arrows">
+<h2>Input scores for {{ seed.label }} ({{ seed.session_round.category.name }} {{ seed.seed }})</h2>
 
 <form method="post" action="{{ request.get_full_path }}" novalidate>
 {% csrf_token %}
 {% for form in forms %}
     {% if form.form %}
-        <h5>{{ form.label }}</h5>
-        <ul>
-            {{ form.form.as_ul }}
-        </ul>
+        <h3>{{ form.label }} Final</h3>
+        <table class="target h2h table">
+            <thead>
+                <tr>
+                    <th colspan="3">Match arrows</th>
+                </tr>
+            </thead>
+            <tr>
+                <td>{{ form.form.arrow_1 }}</td>
+                <td>{{ form.form.arrow_2 }}</td>
+                <td>{{ form.form.arrow_3 }}</td>
+            </tr>
+            <tr>
+                <td>{{ form.form.arrow_4 }}</td>
+                <td>{{ form.form.arrow_5 }}</td>
+                <td>{{ form.form.arrow_6 }}</td>
+            </tr>
+            <tr>
+                <td>{{ form.form.arrow_7 }}</td>
+                <td>{{ form.form.arrow_8 }}</td>
+                <td>{{ form.form.arrow_9 }}</td>
+            </tr>
+            <tr>
+                <td>{{ form.form.arrow_10 }}</td>
+                <td>{{ form.form.arrow_11 }}</td>
+                <td>{{ form.form.arrow_12 }}</td>
+            </tr>
+            <tr>
+                <td>{{ form.form.arrow_13 }}</td>
+                <td>{{ form.form.arrow_14 }}</td>
+                <td>{{ form.form.arrow_15 }}</td>
+            </tr>
+            <tr>
+                <th>Shoot off:</th>
+                <td>{{ form.form.shoot_off }}</td>
+                <td>Closest? {{ form.form.closest }}</td>
+            </tr>
+            <tr>
+                <th>No match:</th>
+                <td>Did not start? {{ form.form.dns }}</td>
+                <td>Win by default? {{ form.form.win_by_forfeit }}</td>
+        </table>
     {% endif %}
 {% endfor %}
 <input type="submit" class="btn">
 </form>
+</div>
 {% endblock %}
