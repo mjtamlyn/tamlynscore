@@ -433,7 +433,7 @@ class ByRound(BaseResultMode):
             ).exclude(olympicsessionround__exclude_ranking_rounds=True).order_by('session__start').select_related('shot_round')
         rounds = []
         for round in session_rounds:
-            if round.shot_round not in rounds:
+            if (round.shot_round, round.scoring_type) not in rounds:
                 rounds.append((round.shot_round, round.scoring_type))
         return rounds
 
