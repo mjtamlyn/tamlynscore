@@ -534,7 +534,7 @@ class DoubleRound(BaseResultMode):
         rounds = []
         valid_session_rounds = []
         for round in session_rounds:
-            if round.shot_round not in rounds:
+            if (round.shot_round, round.scoring_type) not in rounds:
                 rounds.append((round.shot_round, round.scoring_type))
             valid_session_rounds.append(round)
         return rounds, valid_session_rounds
@@ -571,6 +571,7 @@ class DoubleRound(BaseResultMode):
                 golds=sum(s.golds for s in sub_scores),
                 xs=sum(s.xs for s in sub_scores),
                 tiebreak=None,
+                scoring_type=sub_scores[0].scoring_type,
             ) for entry, sub_scores in scores.items()]
             if not self.leaderboard:
                 new_scores = filter(lambda s: s.score > 0, new_scores)
