@@ -37,9 +37,14 @@ class ResultModeMixin(object):
         )
         return scores
 
-    def get_mode(self, mode_name=None, load=False):
+    def get_mode(self, mode_name=None, load=False, primary=False):
         if mode_name is None:
             mode_name = self.kwargs['mode']
+        if primary:
+            primary_mode = self.competition.result_modes.filter(primary=True).first()
+            if primary_mode:
+                mode_name = primary_mode.mode
+                load = False
         mode = get_mode(mode_name, include_distance_breakdown=self.include_distance_breakdown, hide_golds=self.get_hide_golds())
         if not mode:
             raise Http404('No such mode')

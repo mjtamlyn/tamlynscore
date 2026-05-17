@@ -185,15 +185,16 @@ class CompetitionDetail(CompetitionMixin, ResultModeMixin, DetailView):
             ).exists()
         else:
             try:
-                by_round = self.get_mode('by-round')
+                primary_results = self.get_mode(primary=True, mode_name='by-round')
             except Http404:
-                by_round = None
-            if by_round:
-                context['by_round'] = by_round.get_results(self.competition, self.get_scores(), leaderboard=True, request=self.request)
-                for section in context['by_round']:
-                    for category in context['by_round'][section]:
-                        for score in context['by_round'][section][category]:
-                            score.details = by_round.score_details(score, section)
+                primary_results = None
+            if primary_results:
+                context['mode'] = primary_results
+                context['results'] = primary_results.get_results(self.competition, self.get_scores(), leaderboard=True, request=self.request)
+                for section in context['results']:
+                    for category in context['results'][section]:
+                        for score in context['results'][section][category]:
+                            score.details = primary_results.score_details(score, section)
         return context
 
 
