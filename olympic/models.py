@@ -174,27 +174,44 @@ class OlympicSessionRound(models.Model):
         self.match_set.filter(level=level).delete()
 
     def pretty_rank(self, rank, extra_rank_info=None):
-        if rank <= 8:
-            if extra_rank_info:
-                index = rank - 5
-                last_result = list(extra_rank_info[index][1])[0]
-                if last_result.match.session_round.shot_round.match_type == 'T':
-                    while index > 0 and last_result.total == list(extra_rank_info[index - 1][1])[0].total:
-                        if last_result.arrow_total == list(extra_rank_info[index - 1][1])[0].arrow_total:
+        if self.shot_round.match_type in ['T', 'C']:
+            if rank <= 8:
+                if extra_rank_info:
+                    extra_rank_info = extra_rank_info[4:8]  # compat with new flow
+                    index = rank - 5
+                    last_result = list(extra_rank_info[index][1])[0]
+                    if last_result.match.session_round.shot_round.match_type == 'T':
+                        while index > 0 and last_result.total == list(extra_rank_info[index - 1][1])[0].total:
+                            if last_result.arrow_total == list(extra_rank_info[index - 1][1])[0].arrow_total:
+                                index -= 1
+                        rank = index + 5
+                    if last_result.match.session_round.shot_round.match_type == 'C':
+                        while index > 0 and last_result.total == list(extra_rank_info[index - 1][1])[0].total:
                             index -= 1
-                        else:
-                            # TODO: This doesn't work but it would be nice if it did
-                            last_result.total = '%s (%s)' % (last_result.total, last_result.arrow_total)
-                    rank = index + 5
-                if last_result.match.session_round.shot_round.match_type == 'C':
-                    while index > 0 and last_result.total == list(extra_rank_info[index - 1][1])[0].total:
-                        index -= 1
-                    rank = index + 5
+                        rank = index + 5
+                return rank
+            real_rank = 8
+            while real_rank < rank:
+                real_rank = real_rank * 2
+            return int(real_rank / 2) + 1
+        elif self.shot_round.match_type in ['U']:
+            if rank <= 4:
+                return rank
+            # Work out which section we are in
+            lv = 2
+            while 2 ** (lv + 1) < rank:
+                lv += 1
+            offset = 2 ** lv
+            results_to_rank = extra_rank_info[offset:offset * 2]
+
+            # Look for people ranked above us with the same avg arrow value
+            index = rank - offset - 1
+            last_result = list(results_to_rank[index][1])[0]
+            while index > 0 and last_result.average_arrow_value == list(extra_rank_info[index - 1][1])[0].average_arrow_value:
+                index -= 1
+
+            rank = index + offset + 1
             return rank
-        real_rank = 8
-        while real_rank < rank:
-            real_rank = real_rank * 2
-        return int(real_rank / 2) + 1
 
     def get_results(self):
 
@@ -203,7 +220,7 @@ class OlympicSessionRound(models.Model):
                 self.results = results
                 self.total_levels = total_levels
 
-        seedings = self.seeding_set.all().select_related().prefetch_related('result_set')
+        seedings = self.seeding_set.all().select_related().prefetch_related('result_set', 'result_set__matcharrow_set')
         total_levels = self.match_set.aggregate(models.Max('level'))['level__max']
 
         seedings_with_results = []
@@ -215,9 +232,8 @@ class OlympicSessionRound(models.Model):
             seedings_with_results,
             key=lambda s: (
                 s[1][0].match.level,
-                s[1][0].match.match if s[1][0].match.level == 1 else None,
-                -s[1][0].total,
-                -s[1][0].arrow_total,
+                s[1][0].match.match if s[1][0].match.level == 1 else None,  # This is a Bronze hack
+                -s[1][0].total if self.shot_round.match_type in ['T', 'C'] else -s[1][0].average_arrow_value,
                 -s[1][0].win,
                 s[0].seed,
             )
@@ -227,8 +243,8 @@ class OlympicSessionRound(models.Model):
         for rank, (seeding, results) in enumerate(seedings_with_results):
             rank = rank + 1
             extra_rank_info = None
-            if rank in [6, 7, 8]:
-                extra_rank_info = seedings_with_results[4:8]
+            if rank >= 5:
+                extra_rank_info = seedings_with_results
             rank = self.pretty_rank(rank, extra_rank_info)
             seeding.results = results
             seeding.rank = rank
@@ -497,7 +513,18 @@ class Result(models.Model):
             return 'DNS'
         if self.win_by_forfeit:
             return 'BYE'
+        if self.match.level >= 3 and not self.win and self.match.session_round.shot_round.match_type == 'U':
+            return '%s (%1.2f)' % (self.total, self.average_arrow_value)
         return self.total
+
+    @property
+    def average_arrow_value(self):
+        arrows = list(filter(lambda a: a.arrow_of_round <= 15, self.matcharrow_set.all()))
+        total_score = sum(map(lambda a: a.arrow_value, arrows))
+        n_arrows = len(arrows)
+        if not n_arrows:
+            return 0
+        return float(total_score) / n_arrows
 
 
 class MatchArrow(models.Model):
