@@ -416,8 +416,8 @@ class Match(models.Model):
         arrows_1 = result_1.matcharrow_set.order_by('arrow_of_round')
         arrows_2 = result_2.matcharrow_set.order_by('arrow_of_round')
         if self.session_round.shot_round.match_type == 'C':
-            result_1.total = sum(arrows_1[:15], key=lambda a: a.arrow_value)
-            result_2.total = sum(arrows_2[:15], key=lambda a: a.arrow_value)
+            result_1.total = sum(map(lambda a: a.arrow_value, arrows_1[:15]))
+            result_2.total = sum(map(lambda a: a.arrow_value, arrows_2[:15]))
             if result_1.total > result_2.total and len(arrows_1) >= 15 and len(arrows_2) >= 15:
                 result_1.win = True
                 result_2.win = False
