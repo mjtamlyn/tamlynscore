@@ -132,6 +132,20 @@ class BaseResultMode(object):
             results.append(score)
         return results
 
+    def get_subround_headers(self, round):
+        headers = []
+        subrounds = round.subrounds.all()
+        if len(subrounds) > 1:
+            for subround in round.subrounds.all():
+                headers += ['%s%s' % (subround.distance, subround.unit)]
+        elif round.can_split:
+            subround = subrounds[0]
+            headers += [
+                '%s%s-1' % (subround.distance, subround.unit),
+                '%s%s-2' % (subround.distance, subround.unit),
+            ]
+        return headers
+
     def get_section_for_round(self, round, scoring_type, competition, is_team=False):
         headers = ['Pl.'] + self.get_main_headers(competition)
         if competition.has_juniors or not competition.split_categories_on_agb_age and not is_team:
@@ -139,16 +153,7 @@ class BaseResultMode(object):
         if competition.has_novices and not is_team:
             headers += ['']
         if self.include_distance_breakdown and hasattr(round, 'subrounds'):
-            subrounds = round.subrounds.all()
-            if len(subrounds) > 1:
-                for subround in round.subrounds.all():
-                    headers += ['%s%s' % (subround.distance, subround.unit)]
-            elif round.can_split:
-                subround = subrounds[0]
-                headers += [
-                    '%s%s-1' % (subround.distance, subround.unit),
-                    '%s%s-2' % (subround.distance, subround.unit),
-                ]
+            headers += self.get_subround_headers(round)
         headers.append('Score')
         if scoring_type == 'X':
             headers += ['10s', 'Xs']
@@ -220,6 +225,14 @@ class BaseResultMode(object):
             elif shot_round.can_split:
                 if score.disqualified or score.target.session_entry.session_round.session.scoring_system == SCORING_TOTALS or not hasattr(score, 'source'):
                     scores += ['', '']
+                elif isinstance(score.source, list):
+                    # Double or combined rounds
+                    for s in score.source:
+                        arrows = s.arrow_set.order_by('arrow_of_round').values_list('arrow_value', flat=True)
+                        scores += [
+                            sum(arrows[:(shot_round.arrows / 2)], 0),
+                            sum(arrows[(shot_round.arrows / 2):]),
+                        ]
                 else:
                     score = score.source
                     arrows = score.arrow_set.order_by('arrow_of_round').values_list('arrow_value', flat=True)
@@ -509,6 +522,22 @@ class DoubleRound(BaseResultMode):
     slug = 'double-round'
     name = 'Double round'
 
+    def get_subround_headers(self, round):
+        headers = []
+        subrounds = round.subrounds.all()
+        if len(subrounds) > 1:
+            for subround in round.subrounds.all():
+                headers += ['%s%s' % (subround.distance, subround.unit)] * 2
+        elif round.can_split:
+            subround = subrounds[0]
+            headers += [
+                '%s%s-1' % (subround.distance, subround.unit),
+                '%s%s-2' % (subround.distance, subround.unit),
+                '%s%s-3' % (subround.distance, subround.unit),
+                '%s%s-4' % (subround.distance, subround.unit),
+            ]
+        return headers
+
     def get_results(self, competition, scores, leaderboard=False, request=None):
         """Get the results for each category, by round.
 
@@ -572,9 +601,10 @@ class DoubleRound(BaseResultMode):
                 xs=sum(s.xs for s in sub_scores),
                 tiebreak=None,
                 scoring_type=sub_scores[0].scoring_type,
+                source=sub_scores,
             ) for entry, sub_scores in scores.items()]
             if not self.leaderboard:
-                new_scores = filter(lambda s: s.score > 0, new_scores)
+                new_scores = list(filter(lambda s: s.score > 0, new_scores))
             results[category] = self.sort_results(new_scores)
         for category in categories_to_remove:
             results.pop(category)
