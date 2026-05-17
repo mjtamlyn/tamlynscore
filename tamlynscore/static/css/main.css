@@ -3464,6 +3464,16 @@ table.table .score-sheet-link:after {
   content: "";
 }
 
+/* line 58, ../../sass/_tables.sass */
+table.h2h {
+  max-width: 400px;
+}
+/* line 61, ../../sass/_tables.sass */
+table.h2h td {
+  width: 33%;
+  text-align: center;
+}
+
 /* line 1, ../../sass/_forms.sass */
 input,
 select {

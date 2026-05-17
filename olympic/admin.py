@@ -1,7 +1,8 @@
 from django.contrib import admin
 
 from olympic.models import (
-    Category, Match, OlympicRound, OlympicSessionRound, Result, Seeding,
+    Category, Match, MatchArrow, OlympicRound, OlympicSessionRound, Result,
+    Seeding,
 )
 
 
@@ -32,3 +33,4 @@ admin.site.register(OlympicSessionRound, OlympicSessionRoundAdmin)
 admin.site.register(Seeding)
 admin.site.register(Match, MatchAdmin)
 admin.site.register(Result, ResultAdmin)
+admin.site.register(MatchArrow)

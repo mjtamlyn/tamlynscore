@@ -237,7 +237,7 @@ class OlympicScoreSheet(ScoreSheetsPdf):
         super().update_style()
         arrows = self.session_round.shot_round.arrows_per_end
         ends = self.session_round.shot_round.ends
-        total_cols = 3 if self.session_round.shot_round.match_type == 'T' else 2
+        total_cols = 3 if self.session_round.shot_round.match_type in ['T', 'U'] else 2
         self.col_widths = arrows * [self.box_size] + total_cols * [self.wide_box] + [self.box_size * 3.2, self.wide_box]
         self.row_heights = (3 + ends) * [self.box_size]
 
@@ -319,14 +319,14 @@ class OlympicScoreSheet(ScoreSheetsPdf):
                     location_label = '{} {}'.format(boss, timing)
 
                 arrows = self.session_round.shot_round.arrows_per_end
-                total_cols = 3 if self.session_round.shot_round.match_type == 'T' else 2
+                total_cols = 3 if self.session_round.shot_round.match_type in ['T', 'U'] else 2
                 ends = self.session_round.shot_round.ends
                 table_data = [
                     [self.Para(match_title, 'h3')] + [None] * arrows + [self.Para(location_label, 'h3')],
                     ['Arrows' if has_match else self.Para('BYE', 'h3')] + [None] * (arrows - 1) + [
                         'S',
-                        'Pts' if self.session_round.shot_round.match_type == 'T' else 'RT',
-                    ] + (['RT'] if self.session_round.shot_round.match_type == 'T' else []) + [
+                        'Pts' if self.session_round.shot_round.match_type in ['T', 'U'] else 'RT',
+                    ] + (['RT'] if self.session_round.shot_round.match_type in ['T', 'U'] else []) + [
                         'Opponent seed',
                         None
                     ],
@@ -367,11 +367,11 @@ class OlympicScoreSheet(ScoreSheetsPdf):
     def get_scores_table_style(self, shot_round):
         arrows = shot_round.arrows_per_end
         ends = shot_round.ends
-        total_cols = 3 if self.session_round.shot_round.match_type == 'T' else 2
+        total_cols = 3 if self.session_round.shot_round.match_type in ['T', 'U'] else 2
         shoot_off_arrows = 1
         if self.session_round.shot_round.team_type == 'X':
             shoot_off_arrows = 2
-        if self.session_round.shot_round.team_type == 'T':
+        if self.session_round.shot_round.team_type in ['T', 'U']:
             shoot_off_arrows = 3
         rules = [
             # alignment

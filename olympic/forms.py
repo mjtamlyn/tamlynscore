@@ -4,9 +4,68 @@ from .models import Result
 
 
 class ResultForm(forms.ModelForm):
+    shoot_off = forms.CharField(required=False)
+    closest = forms.BooleanField(required=False)
+
+    def __init__(self, *args, **kwargs):
+        super().__init__(*args, **kwargs)
+        if self.instance.pk:
+            arrows = self.instance.matcharrow_set.order_by('arrow_of_round')
+            for arrow in arrows:
+                if arrow.arrow_of_round <= 15:
+                    self.initial['arrow_%s' % arrow.arrow_of_round] = str(arrow)
+                elif arrow.arrow_of_round == 16:
+                    self.initial['shoot_off'] = str(arrow)
+                    self.initial['closest'] = arrow.closest
+        for i in range(1, 16):
+            self.fields['arrow_%s' % i] = forms.CharField(required=False)
+
     class Meta:
         model = Result
-        exclude = ('match', 'seed')
+        fields = ('dns', 'win_by_forfeit')
+
+    def arrow_value_check(self, arrow_value):
+        data = {}
+        if arrow_value == 'X':
+            data['arrow_value'] = 10
+            data['is_x'] = True
+        elif arrow_value == 'M':
+            data['arrow_value'] = 0
+            data['is_x'] = False
+        elif arrow_value:
+            data['arrow_value'] = arrow_value
+            data['is_x'] = False
+        return data
+
+    def clean(self):
+        self.cleaned_data['shoot_off'] = self.arrow_value_check(self.cleaned_data.get('shoot_off'))
+        for i in range(1, 16):
+            self.cleaned_data['arrow_%s' % i] = self.arrow_value_check(self.cleaned_data.get('arrow_%s' % i))
+
+    def save(self):
+        if self.cleaned_data['arrow_1'] or self.cleaned_data['dns'] or self.cleaned_data['win_by_forfeit']:
+            self.instance.total = 0
+            super().save()
+            for i in range(1, 16):
+                data = self.cleaned_data['arrow_%s' % i]
+                if data:
+                    self.instance.matcharrow_set.update_or_create(
+                        defaults=data,
+                        arrow_of_round=i,
+                    )
+                else:
+                    self.instance.matcharrow_set.filter(arrow_of_round=i).delete()
+                if self.cleaned_data['shoot_off']:
+                    self.instance.matcharrow_set.update_or_create(
+                        defaults={
+                            'closest': self.cleaned_data['closest'],
+                            **self.cleaned_data['shoot_off'],
+                        },
+                        arrow_of_round=16,
+                    )
+            self.instance.match.update_totals()
+        elif self.instance.pk:
+            self.instance.delete()
 
 
 class SetupForm(forms.Form):
