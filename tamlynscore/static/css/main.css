@@ -4094,7 +4094,7 @@ header.banner .banner-nav li ul {
   display: none;
   position: absolute;
   top: 100%;
-  left: -1px;
+  left: 0;
   min-width: 100%;
   background-color: #333;
   box-sizing: content-box;
@@ -4120,6 +4120,8 @@ header.banner .banner-nav li ul li a {
 /* line 112, ../../sass/components/_banner_header.sass */
 header.banner .banner-nav li:hover ul {
   display: block;
+  overflow: hidden;
+  z-index: 1;
 }
 
 /* line 1, ../../sass/components/_link_list.sass */
