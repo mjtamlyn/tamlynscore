@@ -79,6 +79,7 @@ class BaseResultMode(object):
     name = ''
     include_distance_breakdown = False
     ignore_subrounds = False
+    hide_golds = False
     subrounds = {}
 
     def __init__(self, **kwargs):
@@ -548,13 +549,13 @@ class DoubleRound(BaseResultMode):
         - need to add a quacking score object which is the double
         """
         self.leaderboard = leaderboard
-        rounds, valid_session_rounds = self.get_rounds(competition)
+        rounds, valid_session_rounds = self.get_rounds(competition, include_session_rounds=True)
         return OrderedDict((
             self.get_section_for_round(round, scoring_type, competition),
             self.get_round_results(competition, round, valid_session_rounds, scores)
         ) for (round, scoring_type) in rounds)
 
-    def get_rounds(self, competition):
+    def get_rounds(self, competition, include_session_rounds=False):
         from entries.models import SessionRound
 
         session_rounds = SessionRound.objects.filter(session__competition=competition).order_by('session__start').exclude(
@@ -566,7 +567,9 @@ class DoubleRound(BaseResultMode):
             if (round.shot_round, round.scoring_type) not in rounds:
                 rounds.append((round.shot_round, round.scoring_type))
             valid_session_rounds.append(round)
-        return rounds, valid_session_rounds
+        if include_session_rounds:
+            return rounds, valid_session_rounds
+        return rounds
 
     def get_round_results(self, competition, round, valid_session_rounds, scores):
         results = OrderedDict()

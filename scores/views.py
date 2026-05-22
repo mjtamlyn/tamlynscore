@@ -9,7 +9,6 @@ from itertools import groupby
 from django.conf import settings
 from django.contrib.auth import login
 from django.core.cache import cache
-from django.db.models import Count, Max
 from django.http import (
     Http404, HttpResponse, HttpResponseNotAllowed, HttpResponseRedirect,
     JsonResponse,
@@ -40,7 +39,6 @@ from olympic.models import OlympicSessionRound
 from .forms import get_arrow_formset, get_dozen_formset
 from .mixins import ResultModeMixin
 from .models import Arrow, Dozen, Score
-from .result_modes import ByRound
 
 
 class InputScores(TargetListBase):
@@ -526,20 +524,25 @@ class Results(Leaderboard):
 
 
 class RankingsExport(ResultModeMixin, CompetitionMixin, View):
+    include_distance_breakdown = True
+
     def get(self, request, *args, **kwargs):
         entries = self.get_entries()
         scores = self.get_scores()
-        headings = self.get_headings()
         archer_details = self.archer_details(entries, scores)
-        by_round_results = ByRound().get_results(
+        h2h_rounds = OlympicSessionRound.objects.filter(session__competition=self.competition)
+
+        mode = self.get_mode(primary=True, mode_name='seedings' if h2h_rounds else 'by-round')
+
+        headings = self.get_headings(mode, has_h2h=len(h2h_rounds))
+        results = mode.get_results(
             self.competition,
             scores,
             leaderboard=False,
             request=self.request,
         )
-        self.annotate_round_data(by_round_results, archer_details)
+        self.annotate_round_data(mode, results, archer_details)
         archer_details = {k: v for k, v in archer_details.items() if v.get('Pos')}
-        h2h_rounds = OlympicSessionRound.objects.filter(session__competition=self.competition)
         self.annotate_h2h_data(h2h_rounds, archer_details)
         response = HttpResponse(content_type='text/txt')
         # response['Content-Disposition'] = 'attachment; filename="%s-rankings-export.csv"' % self.competition.slug
@@ -571,7 +574,7 @@ class RankingsExport(ResultModeMixin, CompetitionMixin, View):
             'arrow_set',
         )
 
-    def get_headings(self):
+    def get_headings(self, mode, has_h2h=False):
         headings = [
             'AGB',
             'FN',
@@ -583,18 +586,20 @@ class RankingsExport(ResultModeMixin, CompetitionMixin, View):
             '10s',
             'Xs',
         ]
-        has_h2h = OlympicSessionRound.objects.filter(session__competition=self.competition).exists()
         if has_h2h:
             headings += ['H2H Pos']
         headings += [
             'Category',
             'Canonical Category',
+            'Round',
         ]
-        max_number_of_rounds = self.competition.competitionentry_set.annotate(session_count=Count('sessionentry')).aggregate(count=Max('session_count'))['count'] or 0
-        for i in range(max_number_of_rounds):
+        # Assume homogeneous rounds
+        rounds = mode.get_rounds(self.competition)
+        n_subrounds = len(mode.get_subround_headers(rounds[0][0]))
+        for i in range(1, n_subrounds + 1):
             headings += [
-                'Round %s' % (i + 1),
-                'Arrow values',
+                'Distance %s' % i,
+                'Arrow values %s' % i,
             ]
         return headings
 
@@ -612,20 +617,57 @@ class RankingsExport(ResultModeMixin, CompetitionMixin, View):
             }
         return data
 
-    def annotate_round_data(self, results, archers):
+    def annotate_round_data(self, mode, results, archers):
         for shot_round, categories in results.items():
             for category, results in categories.items():
                 for result in results:
                     entry = result.target.session_entry.competition_entry
                     archers[entry.pk].update({
-                        # shot_round,
-                        # shot_round.round.codename,
+                        'Round': shot_round.round.codename,
                         'Pos': result.placing if not result.retired else None,
                         'Score': result.score,
                         'Xs': result.xs,
                         '10s': result.golds,
-                        'Arrow values': result.source.arrows_string,
                     })
+
+                    # TODO: use the mode more correctly to get all the headings
+                    # right for Xs/10s/Golds/etc as well as the subrounds
+                    n_subrounds = len(mode.get_subround_headers(shot_round.round))
+                    details = mode.score_details(result, shot_round)
+
+                    # TODO: refactor round splitting into subrounds / split
+                    # rounds to be done once for result modes or arrow string
+                    # exports
+                    arrows_strings = []
+                    if isinstance(result.source, list):
+                        # Assume double 720 for now
+                        arrows_strings = [
+                            result.source[0].arrows_string(0, int(shot_round.round.arrows / 2)),
+                            result.source[0].arrows_string(int(shot_round.round.arrows / 2), shot_round.round.arrows),
+                            result.source[1].arrows_string(0, int(shot_round.round.arrows / 2)),
+                            result.source[1].arrows_string(int(shot_round.round.arrows / 2), shot_round.round.arrows),
+                        ]
+                    elif shot_round.round.can_split:
+                        arrows_strings = [
+                            result.source.arrows_string(0, int(shot_round.round.arrows / 2)),
+                            result.source.arrows_string(int(shot_round.round.arrows / 2), shot_round.round.arrows),
+                        ]
+                    elif n_subrounds > 1:
+                        subrounds = mode.get_subrounds(result.source)
+                        counter = 1
+                        for subround in subrounds:
+                            arrows_strings.append(
+                                result.source.arrows_string(counter, counter + subround.arrows)
+                            )
+                            counter += subround.arrows
+                    else:
+                        arrows_strings = result.source.arrows_string()
+
+                    for i in range(n_subrounds):
+                        print(details)
+                        print(arrows_strings)
+                        archers[entry.pk]['Distance %s' % (i + 1)] = details[i]
+                        archers[entry.pk]['Arrow values %s' % (i + 1)] = arrows_strings[i]
         return archers
 
     def annotate_h2h_data(self, h2hs, archers):
