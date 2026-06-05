@@ -545,7 +545,7 @@ class RankingsExport(ResultModeMixin, CompetitionMixin, View):
         archer_details = {k: v for k, v in archer_details.items() if v.get('Pos')}
         self.annotate_h2h_data(h2h_rounds, archer_details)
         response = HttpResponse(content_type='text/txt')
-        # response['Content-Disposition'] = 'attachment; filename="%s-rankings-export.csv"' % self.competition.slug
+        response['Content-Disposition'] = 'attachment; filename="%s-rankings-export.csv"' % self.competition.slug
         writer = csv.DictWriter(response, fieldnames=headings)
         writer.writeheader()
         # Sort by round, division, class then placing
