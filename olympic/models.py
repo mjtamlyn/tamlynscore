@@ -233,8 +233,8 @@ class OlympicSessionRound(models.Model):
             key=lambda s: (
                 s[1][0].match.level,
                 s[1][0].match.match if s[1][0].match.level == 1 else None,  # This is a Bronze hack
-                -s[1][0].total if self.shot_round.match_type in ['T', 'C'] else -s[1][0].average_arrow_value,
                 -s[1][0].win,
+                -s[1][0].total if self.shot_round.match_type in ['T', 'C'] else -s[1][0].average_arrow_value,
                 s[0].seed,
             )
         )
