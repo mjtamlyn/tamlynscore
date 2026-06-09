@@ -508,13 +508,15 @@ class Result(models.Model):
     def __str__(self):
         return u'Result of match {0}'.format(self.match)
 
-    def display(self):
+    def display(self, include_avg_arrow=True):
         if self.dns:
             return 'DNS'
         if self.win_by_forfeit:
             return 'BYE'
         if self.match.level >= 3 and not self.win and self.match.session_round.shot_round.match_type == 'U':
-            return '%s (%1.2f)' % (self.total, self.average_arrow_value)
+            if include_avg_arrow:
+                return '%s (%1.2f)' % (self.total, self.average_arrow_value)
+            return self.total
         return self.total
 
     @property

@@ -605,11 +605,11 @@ class OlympicTreeMixin(object):
                     if results[0]:
                         table_data[blocks[m][0]][i] = results[0].seed.seed
                         table_data[blocks[m][0]][i + 1] = results[0].seed.label()
-                        table_data[blocks[m][0]][i + 2] = results[0].display()
+                        table_data[blocks[m][0]][i + 2] = results[0].display(include_avg_arrow=False)
                     if results[1]:
                         table_data[blocks[m][1] - 1][i] = results[1].seed.seed
                         table_data[blocks[m][1] - 1][i + 1] = results[1].seed.label()
-                        table_data[blocks[m][1] - 1][i + 2] = results[1].display()
+                        table_data[blocks[m][1] - 1][i + 2] = results[1].display(include_avg_arrow=False)
                 elif previous_matches:
                     qualified_seeds = []
                     for previous in filter(None, previous_matches):
