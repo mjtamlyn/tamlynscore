@@ -959,6 +959,8 @@ class H2HSeedings(ByRound, Team, BaseResultMode):
                         disqualified=score.disqualified,
                         retired=score.retired,
                         source=score,
+                        round=score.target.session_entry.session_round.shot_round,
+                        scoring_type=score.target.session_entry.session_round.shot_round.scoring_type,
                         placing=seeding.seed,
                     )
                     results.append(score)

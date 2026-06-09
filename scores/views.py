@@ -533,6 +533,7 @@ class RankingsExport(ResultModeMixin, CompetitionMixin, View):
         h2h_rounds = OlympicSessionRound.objects.filter(session__competition=self.competition)
 
         mode = self.get_mode(primary=True, mode_name='seedings' if h2h_rounds else 'by-round')
+        mode.include_distance_breakdown = True  # force this for Seedings
 
         headings = self.get_headings(mode, has_h2h=len(h2h_rounds))
         results = mode.get_results(
@@ -549,7 +550,7 @@ class RankingsExport(ResultModeMixin, CompetitionMixin, View):
         writer = csv.DictWriter(response, fieldnames=headings)
         writer.writeheader()
         # Sort by round, division, class then placing
-        writer.writerows(sorted(archer_details.values(), key=lambda a: (a['Div'], a['Class'], a['Pos'])))
+        writer.writerows(sorted(archer_details.values(), key=lambda a: (a['Round'], a['Div'], a['Class'], a['Pos'])))
         return response
 
     def get_entries(self):
@@ -595,7 +596,7 @@ class RankingsExport(ResultModeMixin, CompetitionMixin, View):
         ]
         # Assume homogeneous rounds
         rounds = mode.get_rounds(self.competition)
-        n_subrounds = len(mode.get_subround_headers(rounds[0][0]))
+        n_subrounds = len(mode.get_subround_headers(rounds[0].ranking_rounds.all()[0].shot_round if has_h2h else rounds[0]))
         for i in range(1, n_subrounds + 1):
             headings += [
                 'Distance %s' % i,
@@ -621,6 +622,8 @@ class RankingsExport(ResultModeMixin, CompetitionMixin, View):
         for shot_round, categories in results.items():
             for category, results in categories.items():
                 for result in results:
+                    if hasattr(shot_round.round, 'ranking_rounds'):
+                        shot_round = result
                     entry = result.target.session_entry.competition_entry
                     archers[entry.pk].update({
                         'Round': shot_round.round.codename,
@@ -664,8 +667,6 @@ class RankingsExport(ResultModeMixin, CompetitionMixin, View):
                         arrows_strings = result.source.arrows_string()
 
                     for i in range(n_subrounds):
-                        print(details)
-                        print(arrows_strings)
                         archers[entry.pk]['Distance %s' % (i + 1)] = details[i]
                         archers[entry.pk]['Arrow values %s' % (i + 1)] = arrows_strings[i]
         return archers
@@ -674,7 +675,7 @@ class RankingsExport(ResultModeMixin, CompetitionMixin, View):
         for h2h_round in h2hs:
             results = h2h_round.get_results().results
             for seeding in results:
-                archers[seeding.entry_id]['H2H Pos'] = [seeding.rank]
+                archers[seeding.entry_id]['H2H Pos'] = seeding.rank
         return archers
 
 
