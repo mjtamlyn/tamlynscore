@@ -596,7 +596,7 @@ class RankingsExport(ResultModeMixin, CompetitionMixin, View):
         ]
         # Assume homogeneous rounds
         rounds = mode.get_rounds(self.competition)
-        n_subrounds = len(mode.get_subround_headers(rounds[0].ranking_rounds.all()[0].shot_round if has_h2h else rounds[0]))
+        n_subrounds = len(mode.get_subround_headers(rounds[0].ranking_rounds.all()[0].shot_round if has_h2h else rounds[0][0]))
         for i in range(1, n_subrounds + 1):
             headings += [
                 'Distance %s' % i,
@@ -611,8 +611,8 @@ class RankingsExport(ResultModeMixin, CompetitionMixin, View):
                 'AGB': entry.archer.agb_number,
                 'FN': ' '.join(entry.archer.name.split(' ')[:-1]),
                 'LN': entry.archer.name.split(' ')[-1],
-                'Class': entry.clss,
-                'Div': entry.get_division(simple=True),
+                'Class': entry.get_clss(simple=True),
+                'Div': entry.division,
                 'Category': entry.category,
                 'Canonical Category': entry.canonical_category,
             }

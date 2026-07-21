@@ -401,14 +401,14 @@ class CompetitionEntry(models.Model):
         return self.archer.get_gender_display()
 
     @property
-    def clss(self):
+    def division(self):
         return self.bowstyle.name[0]
 
     @property
-    def division(self):
-        return self.get_division()
+    def clss(self):
+        return self.get_clss()
 
-    def get_division(self, simple=False):
+    def get_clss(self, simple=False):
         division = ''
         if self.archer.gender == 'G':
             division += 'M'
@@ -422,11 +422,11 @@ class CompetitionEntry(models.Model):
 
     @property
     def canonical_category(self):
-        return '%s%s' % (self.clss, self.division)
+        return '%s%s' % (self.division, self.clss)
 
     @property
     def category(self):
-        return '%s%s' % (self.clss, self.get_division(simple=True))
+        return '%s%s' % (self.division, self.get_clss(simple=True))
 
 
 class EntryUser(models.Model):
