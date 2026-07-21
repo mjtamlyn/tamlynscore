@@ -104,6 +104,21 @@ class Score(models.Model):
     def guest(self):
         return self.target.session_entry.competition_entry.guest
 
+    def arrows_string(self, arrow_start=None, arrow_end=None):
+        arrows = sorted(self.arrow_set.all(), key=lambda a: a.arrow_of_round)
+
+        if arrow_start is not None and arrow_end is not None:
+            arrows = arrows[arrow_start:arrow_end]
+
+        string = ''
+        for a in arrows:
+            if a.is_x:
+                string += 'L'
+            else:
+                letters = 'ABCDEFGHIJK'
+                string += letters[a.arrow_value]
+        return string
+
 
 class Arrow(models.Model):
     score = models.ForeignKey(Score, on_delete=models.CASCADE)

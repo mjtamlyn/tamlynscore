@@ -400,6 +400,34 @@ class CompetitionEntry(models.Model):
             return names[self.archer.gender]
         return self.archer.get_gender_display()
 
+    @property
+    def division(self):
+        return self.bowstyle.name[0]
+
+    @property
+    def clss(self):
+        return self.get_clss()
+
+    def get_clss(self, simple=False):
+        division = ''
+        if self.archer.gender == 'G':
+            division += 'M'
+        else:
+            division += 'W'
+        if simple:
+            return division
+        if self.competition.has_agb_age_groups:
+            division = self.agb_age.strip('+') + division
+        return division
+
+    @property
+    def canonical_category(self):
+        return '%s%s' % (self.division, self.clss)
+
+    @property
+    def category(self):
+        return '%s%s' % (self.division, self.get_clss(simple=True))
+
 
 class EntryUser(models.Model):
     uuid = models.UUIDField(default=uuid.uuid4)

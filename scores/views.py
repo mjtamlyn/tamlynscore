@@ -9,7 +9,6 @@ from itertools import groupby
 from django.conf import settings
 from django.contrib.auth import login
 from django.core.cache import cache
-from django.db.models import Count, Max
 from django.http import (
     Http404, HttpResponse, HttpResponseNotAllowed, HttpResponseRedirect,
     JsonResponse,
@@ -40,7 +39,6 @@ from olympic.models import OlympicSessionRound
 from .forms import get_arrow_formset, get_dozen_formset
 from .mixins import ResultModeMixin
 from .models import Arrow, Dozen, Score
-from .result_modes import ByRound
 
 
 class InputScores(TargetListBase):
@@ -526,98 +524,158 @@ class Results(Leaderboard):
 
 
 class RankingsExport(ResultModeMixin, CompetitionMixin, View):
+    include_distance_breakdown = True
+
     def get(self, request, *args, **kwargs):
         entries = self.get_entries()
         scores = self.get_scores()
-        headings = self.get_headings()
         archer_details = self.archer_details(entries, scores)
-        by_round_results = ByRound().get_results(
+        h2h_rounds = OlympicSessionRound.objects.filter(session__competition=self.competition)
+
+        mode = self.get_mode(primary=True, mode_name='seedings' if h2h_rounds else 'by-round')
+        mode.include_distance_breakdown = True  # force this for Seedings
+
+        headings = self.get_headings(mode, has_h2h=len(h2h_rounds))
+        results = mode.get_results(
             self.competition,
             scores,
             leaderboard=False,
             request=self.request,
         )
-        self.annotate_round_data(by_round_results, archer_details)
-        h2h_rounds = OlympicSessionRound.objects.filter(session__competition=self.competition)
+        self.annotate_round_data(mode, results, archer_details)
+        archer_details = {k: v for k, v in archer_details.items() if v.get('Pos')}
         self.annotate_h2h_data(h2h_rounds, archer_details)
-        response = HttpResponse(content_type='text/csv')
+        response = HttpResponse(content_type='text/txt')
         response['Content-Disposition'] = 'attachment; filename="%s-rankings-export.csv"' % self.competition.slug
-        writer = csv.writer(response)
-        writer.writerow(headings)
-        writer.writerows(sorted(archer_details.values(), key=lambda a: (str(a[6]), a[5], a[4], a[7] or 10000)))
+        writer = csv.DictWriter(response, fieldnames=headings)
+        writer.writeheader()
+        # Sort by round, division, class then placing
+        writer.writerows(sorted(archer_details.values(), key=lambda a: (a['Round'], a['Div'], a['Class'], a['Pos'])))
         return response
 
     def get_entries(self):
         return CompetitionEntry.objects.filter(
             competition=self.competition,
             sessionentry__targetallocation__isnull=False,
-        ).select_related('archer', 'club', 'bowstyle')
+        ).select_related('archer', 'club', 'bowstyle', 'competition')
 
     def get_scores(self):
         return Score.objects.filter(
-            target__session_entry__competition_entry__competition=self.competition
+            target__session_entry__competition_entry__competition=self.competition,
+            retired=False,
+        ).exclude(
+            score=0,
+            is_actual_zero=False,
         ).select_related(
-            'target__session_entry',
+            'target__session_entry__competition_entry__competition',
+            'target__session_entry__competition_entry__bowstyle',
+            'target__session_entry__competition_entry__archer',
+            'target__session_entry__session_round__shot_round',
+        ).prefetch_related(
+            'arrow_set',
         )
 
-    def get_headings(self):
-        headings = ['AGB Number', 'First Name', 'Last Name', 'Club', 'Bowstyle', 'Division']
-        max_number_of_rounds = self.competition.competitionentry_set.annotate(session_count=Count('sessionentry')).aggregate(count=Max('session_count'))['count'] or 0
-        for i in range(max_number_of_rounds):
-            headings += [
-                'Round %s' % (i + 1),
-                'Placing',
-                'Score',
-                '10s',
-                'Xs'
-            ]
-        has_h2h = OlympicSessionRound.objects.filter(session__competition=self.competition).exists()
+    def get_headings(self, mode, has_h2h=False):
+        headings = [
+            'AGB',
+            'FN',
+            'LN',
+            'Div',
+            'Class',
+            'Pos',
+            'Score',
+            '10s',
+            'Xs',
+        ]
         if has_h2h:
-            headings += ['H2H Placing']
+            headings += ['H2H Pos']
+        headings += [
+            'Category',
+            'Canonical Category',
+            'Round',
+        ]
+        # Assume homogeneous rounds
+        rounds = mode.get_rounds(self.competition)
+        n_subrounds = len(mode.get_subround_headers(rounds[0].ranking_rounds.all()[0].shot_round if has_h2h else rounds[0][0]))
+        for i in range(1, n_subrounds + 1):
+            headings += [
+                'Distance %s' % i,
+                'Arrow values %s' % i,
+            ]
         return headings
-
-    def get_division(self, entry):
-        division = ''
-        if entry.archer.gender == 'G':
-            division += 'M'
-        else:
-            division += 'W'
-        if self.competition.has_agb_age_groups and self.competition.split_categories_on_agb_age:
-            division = entry.agb_age + division
-        return division
 
     def archer_details(self, entries, scores):
         data = {}
         for entry in entries:
-            data[entry.pk] = [
-                entry.archer.agb_number,
-                ' '.join(entry.archer.name.split(' ')[:-1]),
-                entry.archer.name.split(' ')[-1],
-                entry.team_name(),
-                entry.bowstyle.name[0],
-                self.get_division(entry),
-            ]
+            data[entry.pk] = {
+                'AGB': entry.archer.agb_number,
+                'FN': ' '.join(entry.archer.name.split(' ')[:-1]),
+                'LN': entry.archer.name.split(' ')[-1],
+                'Class': entry.get_clss(simple=True),
+                'Div': entry.division,
+                'Category': entry.category,
+                'Canonical Category': entry.canonical_category,
+            }
         return data
 
-    def annotate_round_data(self, results, archers):
+    def annotate_round_data(self, mode, results, archers):
         for shot_round, categories in results.items():
             for category, results in categories.items():
                 for result in results:
+                    if hasattr(shot_round.round, 'ranking_rounds'):
+                        shot_round = result
                     entry = result.target.session_entry.competition_entry
-                    archers[entry.pk] += [
-                        shot_round,
-                        result.placing if not result.retired else None,
-                        result.score,
-                        result.golds,
-                        result.xs,
-                    ]
+                    archers[entry.pk].update({
+                        'Round': shot_round.round.codename,
+                        'Pos': result.placing if not result.retired else None,
+                        'Score': result.score,
+                        'Xs': result.xs,
+                        '10s': result.golds,
+                    })
+
+                    # TODO: use the mode more correctly to get all the headings
+                    # right for Xs/10s/Golds/etc as well as the subrounds
+                    n_subrounds = len(mode.get_subround_headers(shot_round.round))
+                    details = mode.score_details(result, shot_round)
+
+                    # TODO: refactor round splitting into subrounds / split
+                    # rounds to be done once for result modes or arrow string
+                    # exports
+                    arrows_strings = []
+                    if isinstance(result.source, list):
+                        # Assume double 720 for now
+                        arrows_strings = [
+                            result.source[0].arrows_string(0, int(shot_round.round.arrows / 2)),
+                            result.source[0].arrows_string(int(shot_round.round.arrows / 2), shot_round.round.arrows),
+                            result.source[1].arrows_string(0, int(shot_round.round.arrows / 2)),
+                            result.source[1].arrows_string(int(shot_round.round.arrows / 2), shot_round.round.arrows),
+                        ]
+                    elif shot_round.round.can_split:
+                        arrows_strings = [
+                            result.source.arrows_string(0, int(shot_round.round.arrows / 2)),
+                            result.source.arrows_string(int(shot_round.round.arrows / 2), shot_round.round.arrows),
+                        ]
+                    elif n_subrounds > 1:
+                        subrounds = mode.get_subrounds(result.source)
+                        counter = 1
+                        for subround in subrounds:
+                            arrows_strings.append(
+                                result.source.arrows_string(counter, counter + subround.arrows)
+                            )
+                            counter += subround.arrows
+                    else:
+                        arrows_strings = result.source.arrows_string()
+
+                    for i in range(n_subrounds):
+                        archers[entry.pk]['Distance %s' % (i + 1)] = details[i]
+                        archers[entry.pk]['Arrow values %s' % (i + 1)] = arrows_strings[i]
         return archers
 
     def annotate_h2h_data(self, h2hs, archers):
         for h2h_round in h2hs:
             results = h2h_round.get_results().results
             for seeding in results:
-                archers[seeding.entry_id] += [seeding.rank]
+                archers[seeding.entry_id]['H2H Pos'] = seeding.rank
         return archers
 
 
