@@ -192,17 +192,21 @@ class OlympicInput(OlympicMixin, TemplateView):
                 'match': match,
                 'label': self.labels[match.level] if match else None,
             })
-        bronze = Match.objects.get(session_round=self.seed.session_round, level=1, match=2)
         try:
-            instance = Result.objects.get(match=bronze, seed=self.seed)
-        except Result.DoesNotExist:
-            instance = Result(match=bronze, seed=self.seed)
-        form = ResultForm(instance=instance, data=self.request.POST if self.request.method == 'POST' else None, prefix='bronze')
-        forms.append({
-            'form': form,
-            'match': bronze,
-            'label': self.labels[0],
-        })
+            bronze = Match.objects.get(session_round=self.seed.session_round, level=1, match=2)
+        except Match.DoesNotExist:
+            pass
+        else:
+            try:
+                instance = Result.objects.get(match=bronze, seed=self.seed)
+            except Result.DoesNotExist:
+                instance = Result(match=bronze, seed=self.seed)
+            form = ResultForm(instance=instance, data=self.request.POST if self.request.method == 'POST' else None, prefix='bronze')
+            forms.append({
+                'form': form,
+                'match': bronze,
+                'label': self.labels[0],
+            })
         return forms
 
     def get_context_data(self, **kwargs):
