@@ -207,7 +207,7 @@ class OlympicSessionRound(models.Model):
             # Look for people ranked above us with the same avg arrow value
             index = rank - offset - 1
             last_result = list(results_to_rank[index][1])[0]
-            while index > 0 and last_result.average_arrow_value == list(extra_rank_info[index - 1][1])[0].average_arrow_value:
+            while index > 0 and last_result.average_arrow_value == list(extra_rank_info[offset + index - 1][1])[0].average_arrow_value:
                 index -= 1
 
             rank = index + offset + 1
