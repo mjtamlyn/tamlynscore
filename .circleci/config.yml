@@ -4,7 +4,7 @@ references:
 
     container_config: &container_config
         docker:
-            - image: cimg/python:3.12.0-node
+            - image: cimg/python:3.15.0-node
               environment:
                   PIPENV_VENV_IN_PROJECT: "true"
                   PIPENV_IGNORE_VIRTUALENVS: "true"
@@ -158,7 +158,7 @@ jobs:
 
     python_test:
         docker:
-            - image: cimg/python:3.12.0-node
+            - image: cimg/python:3.15.0-node
             - image: cimg/postgres:16.1
               environment:
                   POSTGRES_USER: postgres
