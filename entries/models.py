@@ -441,6 +441,10 @@ class EntryUser(models.Model):
     def __str__(self):
         return 'Archer login - %s' % self.competition_entry
 
+    def get_session_auth_hash(self):
+        return str(self.uuid)
+    get_session_auth_fallback_hash = get_session_auth_hash
+
 
 class SessionEntry(models.Model):
     competition_entry = models.ForeignKey(CompetitionEntry, on_delete=models.CASCADE)
