@@ -397,7 +397,7 @@ class CompetitionEntry(models.Model):
         return name
 
     def get_gender_display(self):
-        names = {'G': 'Men', 'L': 'Women', 'O': 'Open'}
+        names = {'G': 'Men', 'L': 'Women', 'O': 'Open', 'F': 'Female'}
         if self.competition.ifaa_rules:
             names = {'G': 'Male', 'L': 'Female'}
         return names[self.gender]
