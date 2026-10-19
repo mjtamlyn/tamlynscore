@@ -22,6 +22,9 @@
             {% endif %}
         </div>
         <div class="form-row">
+            {{ form.gender.as_field_group }}
+        </div>
+        <div class="form-row">
             {{ form.bowstyle.as_field_group }}
             {{ form.update_bowstyle.as_field_group }}
         </div>

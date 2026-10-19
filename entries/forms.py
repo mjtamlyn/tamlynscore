@@ -330,6 +330,18 @@ class EntryCreateForm(forms.Form):
             self.fields.pop('update_club')
             if 'club' in self.initial:
                 self.initial['custom_team_name'] = self.initial['club']
+        if self.competition.use_open_gender:
+            initial = 'L' if archer.gender == 'L' else 'O'
+            self.fields['gender'] = forms.ChoiceField(choices=[
+                ('O', 'Open'),
+                ('L', 'Women'),
+            ], initial=initial)
+        else:
+            initial = 'L' if archer.gender == 'L' else 'G'
+            self.fields['gender'] = forms.ChoiceField(choices=[
+                ('G', 'Men'),
+                ('L', 'Women'),
+            ], initial=initial)
 
         if self.competition.ifaa_rules:
             self.fields['agb_number'].label = 'ID number'
@@ -407,6 +419,7 @@ class EntryCreateForm(forms.Form):
 
     def set_entry_data(self, entry):
         default = self.get_current_obj()
+        entry.gender = self.cleaned_data['gender']
         if self.competition.use_county_teams:
             entry.county = self.cleaned_data['county'] or (default.club.county if default.club else None)
         elif self.competition.use_custom_teams:
