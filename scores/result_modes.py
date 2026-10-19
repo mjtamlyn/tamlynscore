@@ -1,4 +1,5 @@
 import itertools
+import json
 from collections import OrderedDict
 
 from django.core.exceptions import ImproperlyConfigured
@@ -305,6 +306,45 @@ class BaseResultMode(object):
                     score.golds,
                 ]
         return scores
+
+    def serialize(self, results=None):
+        if results is None:
+            results = self.get_results()
+        json_results = []
+        for section, categories in results.items():
+            json_section = {
+                'section': {
+                    'label': section.label,
+                    'round': section.round.pk,
+                    'headers': section.headers,
+                },
+                'categories': [],
+            }
+            for category, scores in categories.items():
+                json_category = {
+                    'category': str(category),
+                    'scores': [],
+                }
+                for score in scores:
+                    if score.is_team:
+                        json_score = {
+                            'summary': [
+                                score.placing,
+                                score.club,
+                            ] + self.score_details(score, section),
+                            'team': [[
+                                member.target.pk,
+                            ] + self.score_details(member, section) for member in score.team],
+                        }
+                    else:
+                        json_score = [
+                            score.placing,
+                            score.target.pk,
+                        ] + self.score_details(score, section)
+                    json_category['scores'].append(json_score)
+                json_section['categories'].append(json_category)
+            json_results.append(json_section)
+        return json.dumps(json_results)
 
     def get_categories_for_entry(self, competition, entry):
         kwargs = {
