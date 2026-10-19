@@ -46,7 +46,8 @@ class CompetitionForm(forms.Form):
     leaderboard_only_modes = forms.MultipleChoiceField(choices=get_result_modes, widget=forms.CheckboxSelectMultiple, required=False)
 
     # Fields about individual results
-    has_guests = forms.BooleanField(required=False, label='Allow guest entries')
+    has_guests = forms.BooleanField(required=False, label='Allow guest entries', help_text='Guest entries appear in results but are not placed')
+    use_open_gender = forms.BooleanField(required=False, label='Use open gender', help_text='Use Open/Women rather than Men/Women')
     has_novices = forms.BooleanField(required=False, label='Use a novice category')
     has_juniors = forms.BooleanField(required=False, label='Use a general junior category')
     has_agb_age_groups = forms.BooleanField(required=False, label='Use Archery GB age groups')
@@ -70,10 +71,12 @@ class CompetitionForm(forms.Form):
     junior_team_size = forms.IntegerField(required=False)
 
     CONFIG_FIELDS = [
+        'use_open_gender',
         'has_guests',
         'has_novices',
         'has_juniors',
         'has_agb_age_groups',
+        'split_categories_on_agb_age',
         'exclude_later_shoots',
         'team_size',
         'allow_incomplete_teams',
@@ -327,6 +330,18 @@ class EntryCreateForm(forms.Form):
             self.fields.pop('update_club')
             if 'club' in self.initial:
                 self.initial['custom_team_name'] = self.initial['club']
+        if self.competition.use_open_gender:
+            initial = 'L' if archer.gender == 'L' else 'O'
+            self.fields['gender'] = forms.ChoiceField(choices=[
+                ('O', 'Open'),
+                ('L', 'Women'),
+            ], initial=initial)
+        else:
+            initial = 'L' if archer.gender == 'L' else 'G'
+            self.fields['gender'] = forms.ChoiceField(choices=[
+                ('G', 'Men'),
+                ('L', 'Women'),
+            ], initial=initial)
 
         if self.competition.ifaa_rules:
             self.fields['agb_number'].label = 'ID number'
@@ -404,6 +419,7 @@ class EntryCreateForm(forms.Form):
 
     def set_entry_data(self, entry):
         default = self.get_current_obj()
+        entry.gender = self.cleaned_data['gender']
         if self.competition.use_county_teams:
             entry.county = self.cleaned_data['county'] or (default.club.county if default.club else None)
         elif self.competition.use_custom_teams:
