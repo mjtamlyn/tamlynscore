@@ -71,6 +71,8 @@ class TestCompetitionForm(TestCase):
 
             'result_modes': [result_mode.mode],
 
+            'use_open_gender': True,
+            'split_categories_on_agb_age': True,
             'has_guests': False,
             'has_novices': False,
             'has_juniors': False,
