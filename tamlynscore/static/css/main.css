@@ -4264,24 +4264,24 @@ ul.link-list li a:hover {
   background-color: #A62;
 }
 /* line 59, ../../sass/components/_archer_block.sass */
-.pill--women, .pill.women {
+.pill--female, .pill--women, .pill.female, .pill.women {
   background-color: #F57;
 }
-/* line 63, ../../sass/components/_archer_block.sass */
+/* line 65, ../../sass/components/_archer_block.sass */
 .pill--recurve, .pill.recurve {
   background-color: #A21;
 }
-/* line 66, ../../sass/components/_archer_block.sass */
+/* line 68, ../../sass/components/_archer_block.sass */
 .pill--compound, .pill.compound {
   background-color: #6C4;
   color: #000F1F;
 }
-/* line 70, ../../sass/components/_archer_block.sass */
+/* line 72, ../../sass/components/_archer_block.sass */
 .pill--barebow, .pill.barebow {
   background-color: #6FB3FF;
   color: #000F1F;
 }
-/* line 74, ../../sass/components/_archer_block.sass */
+/* line 76, ../../sass/components/_archer_block.sass */
 .pill--longbow, .pill.longbow {
   background-color: #000F1F;
 }

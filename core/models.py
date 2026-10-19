@@ -28,6 +28,7 @@ GENDER_CHOICES = (
     ('O', 'Open'),
     ('G', 'Men'),
     ('L', 'Women'),
+    ('F', 'Female'),
 )
 
 

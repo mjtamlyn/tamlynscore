@@ -47,7 +47,7 @@ class CompetitionForm(forms.Form):
 
     # Fields about individual results
     has_guests = forms.BooleanField(required=False, label='Allow guest entries', help_text='Guest entries appear in results but are not placed')
-    use_open_gender = forms.BooleanField(required=False, label='Use open gender', help_text='Use Open/Women rather than Men/Women')
+    use_open_gender = forms.BooleanField(required=False, label='Use open gender', help_text='Use Open/Female rather than Men/Women')
     has_novices = forms.BooleanField(required=False, label='Use a novice category')
     has_juniors = forms.BooleanField(required=False, label='Use a general junior category')
     has_agb_age_groups = forms.BooleanField(required=False, label='Use Archery GB age groups')
@@ -331,10 +331,10 @@ class EntryCreateForm(forms.Form):
             if 'club' in self.initial:
                 self.initial['custom_team_name'] = self.initial['club']
         if self.competition.use_open_gender:
-            initial = 'L' if archer.gender == 'L' else 'O'
+            initial = 'F' if archer.gender == 'L' else 'O'
             self.fields['gender'] = forms.ChoiceField(choices=[
                 ('O', 'Open'),
-                ('L', 'Women'),
+                ('F', 'Female'),
             ], initial=initial)
         else:
             initial = 'L' if archer.gender == 'L' else 'G'
