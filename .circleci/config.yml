@@ -153,7 +153,7 @@ jobs:
                 name: Run isort
                 command: |
                     source .venv/bin/activate
-                    isort -c -df .
+                    isort . --check --diff
             - *report_failure
 
     python_test:
