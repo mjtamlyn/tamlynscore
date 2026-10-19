@@ -4260,28 +4260,28 @@ ul.link-list li a:hover {
   border-radius: 0.5em;
 }
 /* line 54, ../../sass/components/_archer_block.sass */
-.pill--men, .pill.men {
+.pill--open, .pill--men, .pill.open, .pill.men {
   background-color: #A62;
 }
-/* line 57, ../../sass/components/_archer_block.sass */
+/* line 59, ../../sass/components/_archer_block.sass */
 .pill--women, .pill.women {
   background-color: #F57;
 }
-/* line 61, ../../sass/components/_archer_block.sass */
+/* line 63, ../../sass/components/_archer_block.sass */
 .pill--recurve, .pill.recurve {
   background-color: #A21;
 }
-/* line 64, ../../sass/components/_archer_block.sass */
+/* line 66, ../../sass/components/_archer_block.sass */
 .pill--compound, .pill.compound {
   background-color: #6C4;
   color: #000F1F;
 }
-/* line 68, ../../sass/components/_archer_block.sass */
+/* line 70, ../../sass/components/_archer_block.sass */
 .pill--barebow, .pill.barebow {
   background-color: #6FB3FF;
   color: #000F1F;
 }
-/* line 72, ../../sass/components/_archer_block.sass */
+/* line 74, ../../sass/components/_archer_block.sass */
 .pill--longbow, .pill.longbow {
   background-color: #000F1F;
 }

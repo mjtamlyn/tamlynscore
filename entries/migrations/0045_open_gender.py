@@ -6,12 +6,12 @@ from django.db import migrations, models
 class Migration(migrations.Migration):
 
     dependencies = [
-        ('olympic', '0018_ifaa'),
+        ('entries', '0044_resultsmode_primary'),
     ]
 
     operations = [
-        migrations.AlterField(
-            model_name='category',
+        migrations.AddField(
+            model_name='competitionentry',
             name='gender',
             field=models.CharField(blank=True, choices=[('O', 'Open'), ('G', 'Men'), ('L', 'Women')], max_length=1, null=True),
         ),

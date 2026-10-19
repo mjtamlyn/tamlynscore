@@ -14,7 +14,7 @@ def populate_entry_gender(apps, schema_editor):
 class Migration(migrations.Migration):
 
     dependencies = [
-        ('entries', '0043_open_gender'),
+        ('entries', '0045_open_gender'),
     ]
 
     operations = [
