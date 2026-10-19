@@ -94,7 +94,7 @@ class TestEntryAdd(CompetitionViewCase, LoggedInViewCase, TestCase):
         self.assertIsInstance(response.context['form'], EntryCreateForm)
 
     def test_submit_entry(self):
-        response = self.post_response({'gender': 'L'})
+        response = self.post_response({'gender': 'F'})
         self.assertEqual(response.status_code, 302)
         self.assertEqual(CompetitionEntry.objects.count(), 1)
         entry = CompetitionEntry.objects.get()
@@ -118,7 +118,7 @@ class TestEntryAdd(CompetitionViewCase, LoggedInViewCase, TestCase):
         self.setup_multisession()
         data = {
             'sessions': [self.session_round.pk],
-            'gender': 'L',
+            'gender': 'F',
         }
         response = self.post_response(data=data)
         self.assertEqual(response.status_code, 302)
@@ -133,7 +133,7 @@ class TestEntryAdd(CompetitionViewCase, LoggedInViewCase, TestCase):
         self.setup_multisession()
         data = {
             'sessions': [self.session_round.pk, self.session_round_2.pk],
-            'gender': 'L',
+            'gender': 'F',
         }
         response = self.post_response(data=data)
         self.assertEqual(response.status_code, 302)
@@ -150,13 +150,13 @@ class TestEntryAdd(CompetitionViewCase, LoggedInViewCase, TestCase):
 
     def test_no_sessions_fail(self):
         self.setup_multisession()
-        response = self.post_response({'gender': 'L'})
+        response = self.post_response({'gender': 'F'})
         self.assertEqual(response.status_code, 200)
         self.assertEqual(CompetitionEntry.objects.count(), 0)
 
     def test_different_club(self):
         other_club = factories.ClubFactory.create()
-        data = {'club': other_club.pk, 'gender': 'L'}
+        data = {'club': other_club.pk, 'gender': 'F'}
         response = self.post_response(data)
         self.assertEqual(response.status_code, 302)
         self.assertEqual(CompetitionEntry.objects.count(), 1)
@@ -168,7 +168,7 @@ class TestEntryAdd(CompetitionViewCase, LoggedInViewCase, TestCase):
         data = {
             'club': other_club.pk,
             'update_club': True,
-            'gender': 'L',
+            'gender': 'F',
         }
         response = self.post_response(data)
         self.assertEqual(response.status_code, 302)
@@ -180,7 +180,7 @@ class TestEntryAdd(CompetitionViewCase, LoggedInViewCase, TestCase):
 
     def test_different_bowstyle(self):
         other_bowstyle = factories.BowstyleFactory.create()
-        data = {'bowstyle': other_bowstyle.pk, 'gender': 'L'}
+        data = {'bowstyle': other_bowstyle.pk, 'gender': 'F'}
         response = self.post_response(data)
         self.assertEqual(response.status_code, 302)
         self.assertEqual(CompetitionEntry.objects.count(), 1)
@@ -192,7 +192,7 @@ class TestEntryAdd(CompetitionViewCase, LoggedInViewCase, TestCase):
         data = {
             'bowstyle': other_bowstyle.pk,
             'update_bowstyle': True,
-            'gender': 'L',
+            'gender': 'F',
         }
         response = self.post_response(data)
         self.assertEqual(response.status_code, 302)
@@ -207,7 +207,7 @@ class TestEntryAdd(CompetitionViewCase, LoggedInViewCase, TestCase):
         self.assertFalse(self.competition.has_novices)
         response = self.get_response()
         self.assertNotIn('novice', response.context['form'].fields)
-        response = self.post_response({'gender': 'L'})
+        response = self.post_response({'gender': 'F'})
         self.assertEqual(response.status_code, 302)
         self.assertEqual(CompetitionEntry.objects.count(), 1)
         entry = CompetitionEntry.objects.get()
@@ -218,7 +218,7 @@ class TestEntryAdd(CompetitionViewCase, LoggedInViewCase, TestCase):
         self.archer.save()
         self.competition.has_novices = True
         self.competition.save()
-        response = self.post_response({'gender': 'L'})
+        response = self.post_response({'gender': 'F'})
         self.assertEqual(response.status_code, 302)
         self.assertEqual(CompetitionEntry.objects.count(), 1)
         entry = CompetitionEntry.objects.get()
@@ -228,7 +228,7 @@ class TestEntryAdd(CompetitionViewCase, LoggedInViewCase, TestCase):
         self.assertEqual(self.archer.novice, 'E')
         self.competition.has_novices = True
         self.competition.save()
-        data = {'novice': 'N', 'gender': 'L'}
+        data = {'novice': 'N', 'gender': 'F'}
         response = self.post_response(data)
         self.assertEqual(response.status_code, 302)
         self.assertEqual(CompetitionEntry.objects.count(), 1)
@@ -242,7 +242,7 @@ class TestEntryAdd(CompetitionViewCase, LoggedInViewCase, TestCase):
         data = {
             'novice': 'N',
             'update_novice': True,
-            'gender': 'L',
+            'gender': 'F',
         }
         response = self.post_response(data)
         self.assertEqual(response.status_code, 302)
@@ -257,7 +257,7 @@ class TestEntryAdd(CompetitionViewCase, LoggedInViewCase, TestCase):
         self.assertFalse(self.competition.has_juniors)
         response = self.get_response()
         self.assertNotIn('age', response.context['form'].fields)
-        response = self.post_response({'gender': 'L'})
+        response = self.post_response({'gender': 'F'})
         self.assertEqual(response.status_code, 302)
         self.assertEqual(CompetitionEntry.objects.count(), 1)
         entry = CompetitionEntry.objects.get()
@@ -268,7 +268,7 @@ class TestEntryAdd(CompetitionViewCase, LoggedInViewCase, TestCase):
         self.archer.save()
         self.competition.has_juniors = True
         self.competition.save()
-        response = self.post_response({'gender': 'L'})
+        response = self.post_response({'gender': 'F'})
         self.assertEqual(response.status_code, 302)
         self.assertEqual(CompetitionEntry.objects.count(), 1)
         entry = CompetitionEntry.objects.get()
@@ -278,7 +278,7 @@ class TestEntryAdd(CompetitionViewCase, LoggedInViewCase, TestCase):
         self.assertEqual(self.archer.age, 'S')
         self.competition.has_juniors = True
         self.competition.save()
-        data = {'age': 'J', 'gender': 'L'}
+        data = {'age': 'J', 'gender': 'F'}
         response = self.post_response(data)
         self.assertEqual(response.status_code, 302)
         self.assertEqual(CompetitionEntry.objects.count(), 1)
@@ -291,7 +291,7 @@ class TestEntryAdd(CompetitionViewCase, LoggedInViewCase, TestCase):
         self.competition.save()
         data = {
             'age': 'J',
-            'gender': 'L',
+            'gender': 'F',
             'update_age': True,
         }
         response = self.post_response(data)
