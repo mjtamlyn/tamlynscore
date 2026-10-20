@@ -215,7 +215,7 @@ class MatchLoader:
                         match.archer_1 = other_seeding.entry.archer
                     else:
                         match.archer_2 = other_seeding.entry.archer
-        else:
+        elif not getattr(match, 'pre_filled', None):
             self.setup_empty_match(match)
 
     def setup_empty_match(self, match):
@@ -241,6 +241,8 @@ class MatchLoader:
         if not next_match:
             return
         next_match.pre_filled = True
+        next_match.is_bye = False
+        next_match.score_1 = next_match.score_2 = None
 
         seeds = [next_match.effective_match, next_match.n_archers_this_round + 1 - next_match.effective_match]
         effective_seed = Match.objects.effective_seed(seed, next_match.level)
@@ -250,9 +252,15 @@ class MatchLoader:
         if effective_seed == seeds[0]:
             next_match.archer_1 = archer
             next_match.seed_1 = seed
+            if not getattr(next_match, 'archer_2', None):
+                next_match.archer_2 = 'TBC'
+                next_match.seed_2 = '?'
         else:
             next_match.archer_2 = archer
             next_match.seed_2 = seed
+            if not getattr(next_match, 'archer_1', None):
+                next_match.archer_1 = 'TBC'
+                next_match.seed_2 = '?'
 
     def handle_pre_filled(self, match):
         match.results = []
