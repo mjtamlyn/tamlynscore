@@ -100,9 +100,11 @@ class MatchLoader:
         match.seed_1 = match.results[0].seed.seed
         match.archer_1 = match.results[0].seed.entry.archer
         match.score_1 = match.results[0].total
+        match.win_1 = match.results[0].win
         match.seed_2 = match.results[1].seed.seed
         match.archer_2 = match.results[1].seed.entry.archer
         match.score_2 = match.results[1].total
+        match.win_2 = match.results[1].win
         match.is_bye = False
 
         # Fill in next match if we have a result
@@ -139,16 +141,20 @@ class MatchLoader:
         if seed_1:
             match.seed_1 = seeds[0]
             match.archer_1 = seed_1.entry.archer
+            match.win_1 = True
         else:
             match.seed_1 = None
             match.archer_1 = 'BYE'
+            match.win_1 = False
         seed_2 = self.seeding_lookup.get((match.session_round_id, seeds[1]), None)
         if seed_2:
             match.seed_2 = seed_2.seed
             match.archer_2 = seed_2.entry.archer
+            match.win_2 = True
         else:
             match.seed_2 = None
             match.archer_2 = 'BYE'
+            match.win_2 = False
         match.is_bye = False
         if (seed_2 and not seed_1) or (seed_1 and not seed_2):
             match.is_bye = True
@@ -317,3 +323,50 @@ class MatchLoader:
                     current = target
                     check = (target['category_short'], target['round'])
         return layout
+
+    def matches_by_level(self):
+        by_level = []
+        for session_round, max_level in self.max_levels.items():
+            matches = []
+            levels = list(reversed(range(1, max_level + 1)))
+            for level in levels:
+                level_matches = []
+                layout = session_round._get_match_layout(level)
+                for i in layout:
+                    match = self.match_lookup.get((session_round, level, i))
+                    if match is None:
+                        # Populate a bye for a match that wasn't scheduled
+                        match = Match(
+                            session_round=session_round,
+                            match=i,
+                            level=level,
+                        )
+                        seed = self.seeding_lookup[(session_round.pk, i)]
+                        if match.match % 2:
+                            match.seed_1 = seed.seed
+                            match.archer_1 = seed.entry.archer
+                            match.win_1 = True
+                            match.is_bye = True
+                            match.seed_2 = None
+                            match.archer_2 = 'BYE'
+                        else:
+                            match.seed_2 = seed.seed
+                            match.archer_2 = seed.entry.archer
+                            match.win_2 = True
+                            match.is_bye = True
+                            match.seed_1 = None
+                            match.archer_1 = 'BYE'
+
+                    # Don't put empty bronze medal matches in
+                    if level == 1 and match.match == 2 and match.is_bye:
+                        continue
+
+                    level_matches.append(match)
+
+                matches.append({
+                    'level': level,
+                    'name': level_matches[0].round_name,
+                    'matches': level_matches,
+                })
+            by_level.append((session_round, matches))
+        return by_level

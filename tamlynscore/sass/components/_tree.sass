@@ -1,0 +1,135 @@
+.tree
+  display: flex
+  justify-content: left
+
+  &__wrapper
+    margin: 0 auto
+    width: fit-content
+    max-width: 100%
+    overflow-x: scroll
+
+  $column-space: 15px
+
+  &__level
+    width: 250px
+    flex-shrink: 0
+
+  &__round-label
+    font-weight: bold
+    padding: 5px $column-space
+    text-align: center
+    font-size: 18px
+    margin: 0
+
+  &__matches
+    display: flex
+    flex-direction: column
+    justify-content: center
+    height: calc(100% - 32px)  // height of the header
+    padding: 5px $column-space
+    position: relative
+
+  &__match-wrapper
+    flex-grow: 1
+    display: flex
+    flex-direction: column
+    justify-content: center
+    margin: 5px 0
+    position: relative
+
+  // Bronze Medal match at the bottom
+  &__level:last-child:not(:only-child) &__match-wrapper:last-child
+    position: absolute
+    bottom: 0
+    width: 220px  // width of level - padding - auto width gets lost by the absolute
+
+  // ...except when there are only semi finals and a final
+  &--n-rounds-2 &__level:last-child:not(:only-child) &__match-wrapper:last-child
+    position: relative
+
+  // Bronze has no incoming bracket
+  &__level:last-child &__match-wrapper:last-child &__bracket-incoming,
+    display: none
+
+  // Finals have no outgoing bracket
+  &__level:last-child &__bracket-up,
+  &__level:last-child &__bracket-down
+    display: none
+
+  // First round has no incoming bracket
+  &__level:first-child &__bracket-incoming
+    display: none
+
+  &__bracket-incoming
+    border-top: 1px solid $borders
+    position: absolute
+    top: 50%
+    left: -$column-space
+    width: $column-space
+    height: 1px
+
+  &__bracket-down
+    position: absolute
+    right: -$column-space
+    top: 50%
+    height: calc(50% + 6px)
+    width: $column-space
+    border-top: 1px solid $borders
+    border-right: 1px solid $borders
+
+  &__bracket-up
+    position: absolute
+    right: -$column-space
+    top: -6px
+    height: calc(50% + 6px)
+    width: $column-space
+    border-bottom: 1px solid $borders
+    border-right: 1px solid $borders
+
+  &__match-card
+    border-radius: 5px
+    display: flex
+    flex-direction: column
+    border: 1px solid $borders
+    overflow: hidden
+    font-size: 14px
+
+  &__archer
+    display: flex
+    padding: 0 8px
+    height: 30px
+    line-height: 30px
+    background-color: #f3f3f3
+
+    &:first-child
+      border-bottom: 1px solid $borders
+
+    &--winner
+      font-weight: bold
+      background-color: #bbb
+
+    &--bye
+      color: #777
+      text-align: center
+
+    &__el
+      flex-grow: 1
+      text-wrap: nowrap
+      overflow: hidden
+      text-overflow: ellipsis
+
+      &--seed
+        width: 16px
+        text-align: center
+
+      &:first-child
+        flex-grow: 0
+        margin-right: 5px
+      &:last-child
+        flex-grow: 0
+        margin-left: 5px
+
+      &:only-child
+        flex-grow: 1
+        margin: 0
+

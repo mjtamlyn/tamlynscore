@@ -19,4 +19,49 @@
         {% endfor %}
     </table>
 {% endfor %}
+
+{% for round, matches in by_level %}
+    <h3>{{ round.category.name }} - {{ round.shot_round.short_name }}</h3>
+    <div class="tree__wrapper">
+        <div class="tree tree--n-rounds-{{ matches|length }}">
+            {% for level in matches %}
+            <div class="tree__level">
+                <h4 class="tree__round-label">{{ level.name }}</h4>
+                <div class="tree__matches">
+                {% for match in level.matches %}
+                    <div class="tree__match-wrapper">
+                        <div class="tree__match-card">
+                            <div class="tree__archer {% if match.win_1 %}tree__archer--winner{% elif match.archer_1 == 'BYE' %}tree__archer--bye{% endif %}">
+                                {% if match.seed_1 %}
+                                    <span class="tree__archer__el tree__archer__el--seed">{{ match.seed_1 }}</span>
+                                {% endif %}
+                                <span class="tree__archer__el">{% if match.archer_1 == 'BYE' %} - BYE - {% else %}{{ match.archer_1 }}{% endif %}</span>
+                                {% if match.score_1 is not None %}
+                                    <span class="tree__archer__el">{{ match.score_1 }}</span>
+                                {% endif %}
+                            </div>
+                            <div class="tree__archer {% if match.win_2 %}tree__archer--winner{% elif match.archer_2 == 'BYE' %}tree__archer--bye{% endif %}">
+                                {% if match.seed_2 %}
+                                    <span class="tree__archer__el tree__archer__el--seed">{{ match.seed_2 }}</span>
+                                {% endif %}
+                                <span class="tree__archer__el">{% if match.archer_2 == 'BYE' %} - BYE - {% else %}{{ match.archer_2 }}{% endif %}</span>
+                                {% if match.score_2 is not None %}
+                                    <span class="tree__archer__el">{{ match.score_2 }}</span>
+                                {% endif %}
+                            </div>
+                        </div>
+                        <div class="tree__bracket-incoming"></div>
+                        {% if match.match|divisibleby:2 %}
+                        <div class="tree__bracket-up"></div>
+                        {% else %}
+                        <div class="tree__bracket-down"></div>
+                        {% endif %}
+                    </div>
+                {% endfor %}
+                </div>
+            </div>
+            {% endfor %}
+        </div>
+    </div>
+{% endfor %}
 {% endblock %}
