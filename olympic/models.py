@@ -1,5 +1,3 @@
-import math
-
 from django.contrib.postgres.fields import ArrayField
 from django.db import models
 from django.utils.functional import cached_property
@@ -403,7 +401,9 @@ class Match(models.Model):
         return effective_match
 
     def get_next_match_number(self, win=True):
-        next_number = math.ceil(self.effective_match / 2)
+        next_number = self.effective_match
+        if self.effective_match > self.n_matches_this_round / 2:
+            next_number = self.n_matches_this_round + 1 - next_number
         if win:
             return (self.for_placing - 1) / 2 + next_number
         return (self.for_placing + self.n_archers_next_round - 1) / 2 + next_number
