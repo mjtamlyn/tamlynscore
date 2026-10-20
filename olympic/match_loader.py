@@ -235,7 +235,7 @@ class MatchLoader:
         for_placing = match.for_placing
         n_archers = match.n_archers_this_round
         seeds = [for_placing + effective_match - 1, for_placing + n_archers - effective_match]
-        if not effective_match % 2 and match.level != 1:
+        if (not effective_match % 2 and match.level != 1) or (match.level == 1 and not match.match % 2):
             seeds.reverse()
 
         match.seed_1, match.seed_2 = seeds
