@@ -4587,7 +4587,7 @@ ul.link-list li a:hover {
 .tree__bracket-incoming {
   border-top: 1px solid #CCCCCC;
   position: absolute;
-  top: 50%;
+  top: calc(50% - 1px);
   left: -15px;
   width: 15px;
   height: 1px;
@@ -4596,7 +4596,7 @@ ul.link-list li a:hover {
 .tree__bracket-down {
   position: absolute;
   right: -15px;
-  top: 50%;
+  top: calc(50% - 1px);
   height: calc(50% + 6px);
   width: 15px;
   border-top: 1px solid #CCCCCC;
