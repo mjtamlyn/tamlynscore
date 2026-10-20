@@ -447,15 +447,6 @@ class Leaderboard(ResultModeMixin, CompetitionMixin, PDFResultsRenderer, CSVResu
         context = self.get_context_data(object_list=self.object_list)
         return self.render_to_response(context)
 
-    def post(self, request, *args, **kwargs):
-        self.format = self.get_format()
-        self.mode, obj = self.get_mode(load=True)
-        self.object_list = self.get_queryset()
-        context = self.get_context_data(competition=self.competition, object_list=self.object_list)
-        obj.json = self.mode.serialize(context['results'])
-        obj.save()
-        return HttpResponseRedirect(request.get_full_path())
-
     def get_format(self):
         format = self.kwargs['format']
         if format not in ['html', 'pdf', 'pdf-summary', 'big-screen', 'csv', 'json']:
