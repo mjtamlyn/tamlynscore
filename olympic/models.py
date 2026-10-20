@@ -300,8 +300,8 @@ class MatchManager(models.Manager):
     def effective_seed(self, seed, level):
         return self.match_number_for_seed(seed, level + 1)
 
-    def match_for_seed(self, seed, level):
-        match_number = self.match_number_for_seed(seed.seed, level)
+    def match_for_seed(self, seed, level, offset=0):
+        match_number = self.match_number_for_seed(seed.seed, level) + offset
         match = self.get(level=level, session_round=seed.session_round, match=match_number)
         return match
 

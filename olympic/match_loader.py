@@ -54,9 +54,16 @@ class MatchLoader:
 
         for seed in seedings:
             level = self.max_levels[seed.session_round]
+
+            match_number_offset = 0
+            # Are we in a main bracket or an additional one?
+            # For now, this only understands when the lower bracket is "from the start" rather than "dropped into" from results
+            if seed.seed > 2 ** level:
+                match_number_offset = 2 ** (level - 1)
+
             seeds_matches = []
             while level:
-                match_number = Match.objects.match_number_for_seed(seed.seed, level)
+                match_number = Match.objects.match_number_for_seed(seed.seed, level) + match_number_offset
                 match = self.match_lookup.get((seed.session_round, level, match_number))
                 if match:
                     seeds_matches.append(match)
@@ -99,7 +106,8 @@ class MatchLoader:
                 self.add_incomplete_results(match)
 
     def setup_completed_match(self, match):
-        match.results = sorted(match.result_set.all(), key=lambda r: Match.objects.effective_seed(r.seed.seed, match.level))
+        match.results = sorted(match.result_set.all(), key=lambda r: Match.objects.effective_seed(r.seed.seed - match.for_placing + 1, match.level))
+
         if not match.match % 2:
             match.results.reverse()
         match.seed_1 = match.results[0].seed.seed

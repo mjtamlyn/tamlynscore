@@ -172,11 +172,19 @@ class OlympicInput(OlympicMixin, TemplateView):
     def get_forms(self):
         self.seed = get_object_or_404(Seeding.objects.select_related(), pk=self.kwargs['seed_pk'])
         self.results = self.seed.result_set.all()
+
         highest_level = Match.objects.filter(session_round=self.seed.session_round).order_by('-level')[0].level
+
+        match_number_offset = 0
+        # Are we in a main bracket or an additional one?
+        # For now, this only understands when the lower bracket is "from the start" rather than "dropped into" from results
+        if self.seed.seed > 2 ** highest_level:
+            match_number_offset = 2 ** (highest_level - 1)
+
         forms = []
         for i in range(1, highest_level + 1):
             try:
-                match = Match.objects.match_for_seed(self.seed, i)
+                match = Match.objects.match_for_seed(self.seed, i, offset=match_number_offset)
             except Match.DoesNotExist:
                 match = None
             if match:
@@ -193,7 +201,7 @@ class OlympicInput(OlympicMixin, TemplateView):
                 'label': self.labels[match.level] if match else None,
             })
         try:
-            bronze = Match.objects.get(session_round=self.seed.session_round, level=1, match=2)
+            bronze = Match.objects.get(session_round=self.seed.session_round, level=1, match=2 + match_number_offset)
         except Match.DoesNotExist:
             pass
         else:
