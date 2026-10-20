@@ -119,6 +119,7 @@ class MatchLoader:
         match.score_2 = match.results[1].total
         match.win_2 = match.results[1].win
         match.is_bye = False
+        match.is_done = True
 
         # Fill in next match if we have a result
         if match.results[0].win or match.results[1].win:
@@ -246,8 +247,9 @@ class MatchLoader:
             return
         next_match_number = match.get_next_match_number(win=win)
         next_match = self.match_lookup.get((match.session_round, match.level - 1, next_match_number), None)
-        if not next_match:
+        if not next_match or getattr(next_match, 'is_done', False):
             return
+
         next_match.pre_filled = True
         next_match.is_bye = False
         next_match.score_1 = next_match.score_2 = None
