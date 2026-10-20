@@ -172,11 +172,19 @@ class OlympicInput(OlympicMixin, TemplateView):
     def get_forms(self):
         self.seed = get_object_or_404(Seeding.objects.select_related(), pk=self.kwargs['seed_pk'])
         self.results = self.seed.result_set.all()
+
         highest_level = Match.objects.filter(session_round=self.seed.session_round).order_by('-level')[0].level
+
+        match_number_offset = 0
+        # Are we in a main bracket or an additional one?
+        # For now, this only understands when the lower bracket is "from the start" rather than "dropped into" from results
+        if self.seed.seed > 2 ** highest_level:
+            match_number_offset = 2 ** (highest_level - 1)
+
         forms = []
         for i in range(1, highest_level + 1):
             try:
-                match = Match.objects.match_for_seed(self.seed, i)
+                match = Match.objects.match_for_seed(self.seed, i, offset=match_number_offset)
             except Match.DoesNotExist:
                 match = None
             if match:
@@ -193,7 +201,7 @@ class OlympicInput(OlympicMixin, TemplateView):
                 'label': self.labels[match.level] if match else None,
             })
         try:
-            bronze = Match.objects.get(session_round=self.seed.session_round, level=1, match=2)
+            bronze = Match.objects.get(session_round=self.seed.session_round, level=1, match=2 + match_number_offset)
         except Match.DoesNotExist:
             pass
         else:
@@ -517,6 +525,18 @@ class OlympicResults(CompetitionMixin, HeadedPdfView):
     ))
 
 
+class OlympicTree(CompetitionMixin, TemplateView):
+    template_name = 'olympic/tree.html'
+    admin_required = False
+
+    def get_context_data(self, **kwargs):
+        context = super().get_context_data(**kwargs)
+        matches = MatchLoader(self.competition)
+        matches.load_all()
+        context['by_level'] = matches.matches_by_level()
+        return context
+
+
 class OlympicTreeMixin(object):
     @property
     def match_cols(self):
@@ -700,63 +720,6 @@ class OlympicTreeMixin(object):
             previous_matches = matches
 
         return table_data
-
-
-class OlympicTree(OlympicTreeMixin, CompetitionMixin, TemplateView):
-    template_name = 'olympic/tree.html'
-    admin_required = False
-
-    def add_borders(self, table, round):
-        tree = []
-
-        right_borders = []
-        top_borders = []
-        vert_line = None
-        for i in self.match_cols:
-            offset = int(2 ** (i / 3 - 1)) if i else 0
-
-            for j in range((2 ** (len(table[0]) // 3)) + 1):
-                if (not i == 0 and not j % 2 ** (i / 3)) or (i == 0 and not j % 2):
-                    top_borders.append(((i, i + 2), j + offset))
-                    if vert_line is not None:
-                        right_borders.append((i + 2, (vert_line + offset, j + offset - 1)))
-                        vert_line = None
-                    else:
-                        vert_line = j
-
-        main_rows = 2 ** (len(table[0]) // 3)
-        for i, row in enumerate(table):
-            tree_row = []
-            for j, cell in enumerate(row):
-                borders = []
-                for x, y in top_borders:
-                    if j >= x[0] and j <= x[1] and i == y and i <= main_rows:
-                        borders.append('border-top')
-                if j >= len(row) - 3 and i == len(table) - 2:
-                    borders.append('border-top')
-                if j >= len(row) - 3 and i == len(table) - 1:
-                    borders.append('border-bottom')
-                # if not (j + 1) % 3:
-                    # TODO
-                    # if i in right_borders:
-                    #     borders.append('border-right')
-                tree_row.append((cell, ' '.join(borders)))
-            tree.append(tree_row)
-        return tree
-
-    def get_context_data(self, **kwargs):
-        context = super().get_context_data(**kwargs)
-        olympic_rounds = OlympicSessionRound.objects.filter(session__competition=self.competition).order_by('id')
-        rounds = []
-        for round in olympic_rounds:
-            table = self.get_round_table(round)
-            tree = self.add_borders(table, round)
-            rounds.append({
-                'round': round,
-                'tree': tree
-            })
-        context['rounds'] = rounds
-        return context
 
 
 class OlympicTreePdf(OlympicTreeMixin, OlympicResults):

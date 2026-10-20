@@ -6,6 +6,7 @@ from olympic.models import (
 )
 
 
+@admin.register(Match)
 class MatchAdmin(admin.ModelAdmin):
     raw_id_fields = ('session_round',)
 
@@ -13,6 +14,7 @@ class MatchAdmin(admin.ModelAdmin):
         return super(MatchAdmin, self).get_queryset(request).select_related()
 
 
+@admin.register(OlympicSessionRound)
 class OlympicSessionRoundAdmin(admin.ModelAdmin):
     raw_id_fields = ('session', 'ranking_rounds',)
 
@@ -20,6 +22,7 @@ class OlympicSessionRoundAdmin(admin.ModelAdmin):
         return super(OlympicSessionRoundAdmin, self).get_queryset(request).select_related()
 
 
+@admin.register(Result)
 class ResultAdmin(admin.ModelAdmin):
     list_display = ('match', 'seed', 'total', 'win')
     list_filter = ('match__session_round', 'match__level')
@@ -27,10 +30,11 @@ class ResultAdmin(admin.ModelAdmin):
     raw_id_fields = ('seed', 'match')
 
 
+@admin.register(MatchArrow)
+class MatchArrowAdmin(admin.ModelAdmin):
+    raw_id_fields = ('result',)
+
+
 admin.site.register(OlympicRound)
 admin.site.register(Category)
-admin.site.register(OlympicSessionRound, OlympicSessionRoundAdmin)
 admin.site.register(Seeding)
-admin.site.register(Match, MatchAdmin)
-admin.site.register(Result, ResultAdmin)
-admin.site.register(MatchArrow)

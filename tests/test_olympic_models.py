@@ -188,8 +188,19 @@ class TestMatch(TestCase):
             (2, 2, True, 1),  # 2nd Semi win
             (2, 1, False, 2),  # 1st Semi loss
             (2, 2, False, 2),  # 2nd Semi loss
-            (3, 6, True, 5),  # 9th place quarter final 2 win
-            (3, 6, False, 7),  # 9th place quarter final 2 loss
+
+            # Test all the 1/4 finals and with an offset
+            (3, 5, True, 5),  # 9th place quarter final 1 win
+            (3, 5, False, 7),  # 9th place quarter final 1 loss
+            # Matches are numbered by higher seed, not bracket position, so "QF2" is "Match 8"
+            (3, 8, True, 5),  # 9th place quarter final 2 win
+            (3, 8, False, 7),  # 9th place quarter final 2 loss
+
+            (3, 7, True, 6),  # 9th place quarter final 1 win
+            (3, 7, False, 8),  # 9th place quarter final 1 loss
+            (3, 6, True, 6),  # 9th place quarter final 2 win
+            (3, 6, False, 8),  # 9th place quarter final 2 loss
+
             (2, 7, False, 8),  # 13th place semi final loss
         )
         for level, match, win, next_match in examples:

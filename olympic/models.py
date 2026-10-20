@@ -1,5 +1,3 @@
-import math
-
 from django.contrib.postgres.fields import ArrayField
 from django.db import models
 from django.utils.functional import cached_property
@@ -302,8 +300,8 @@ class MatchManager(models.Manager):
     def effective_seed(self, seed, level):
         return self.match_number_for_seed(seed, level + 1)
 
-    def match_for_seed(self, seed, level):
-        match_number = self.match_number_for_seed(seed.seed, level)
+    def match_for_seed(self, seed, level, offset=0):
+        match_number = self.match_number_for_seed(seed.seed, level) + offset
         match = self.get(level=level, session_round=seed.session_round, match=match_number)
         return match
 
@@ -403,7 +401,9 @@ class Match(models.Model):
         return effective_match
 
     def get_next_match_number(self, win=True):
-        next_number = math.ceil(self.effective_match / 2)
+        next_number = self.effective_match
+        if self.effective_match > self.n_matches_this_round / 2:
+            next_number = self.n_matches_this_round + 1 - next_number
         if win:
             return (self.for_placing - 1) / 2 + next_number
         return (self.for_placing + self.n_archers_next_round - 1) / 2 + next_number

@@ -4518,28 +4518,173 @@ ul.link-list li a:hover {
     transform: scale(1);
   }
 }
-/* line 18, ../../sass/main.sass */
+/* line 1, ../../sass/components/_tree.sass */
+.tree {
+  display: flex;
+  justify-content: left;
+}
+/* line 5, ../../sass/components/_tree.sass */
+.tree__wrapper {
+  margin: 0 auto;
+  width: fit-content;
+  max-width: 100%;
+  overflow-x: scroll;
+}
+/* line 13, ../../sass/components/_tree.sass */
+.tree__level {
+  width: 250px;
+  flex-shrink: 0;
+}
+/* line 17, ../../sass/components/_tree.sass */
+.tree__round-label {
+  font-weight: bold;
+  padding: 5px 15px;
+  text-align: center;
+  font-size: 18px;
+  margin: 0;
+}
+/* line 24, ../../sass/components/_tree.sass */
+.tree__matches {
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  height: calc(100% - 32px);
+  padding: 5px 15px;
+  position: relative;
+}
+/* line 32, ../../sass/components/_tree.sass */
+.tree__match-wrapper {
+  flex-grow: 1;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  margin: 5px 0;
+  position: relative;
+}
+/* line 41, ../../sass/components/_tree.sass */
+.tree__level:last-child:not(:only-child) .tree__match-wrapper:last-child {
+  position: absolute;
+  bottom: 0;
+  width: 220px;
+}
+/* line 47, ../../sass/components/_tree.sass */
+.tree--n-rounds-2 .tree__level:last-child:not(:only-child) .tree__match-wrapper:last-child {
+  position: relative;
+}
+/* line 51, ../../sass/components/_tree.sass */
+.tree__level:last-child .tree__match-wrapper:last-child .tree__bracket-incoming {
+  display: none;
+}
+/* line 55, ../../sass/components/_tree.sass */
+.tree__level:last-child .tree__bracket-up, .tree__level:last-child .tree__bracket-down {
+  display: none;
+}
+/* line 60, ../../sass/components/_tree.sass */
+.tree__level:first-child .tree__bracket-incoming {
+  display: none;
+}
+/* line 63, ../../sass/components/_tree.sass */
+.tree__bracket-incoming {
+  border-top: 1px solid #CCCCCC;
+  position: absolute;
+  top: calc(50% - 1px);
+  left: -15px;
+  width: 15px;
+  height: 1px;
+}
+/* line 71, ../../sass/components/_tree.sass */
+.tree__bracket-down {
+  position: absolute;
+  right: -15px;
+  top: calc(50% - 1px);
+  height: calc(50% + 6px);
+  width: 15px;
+  border-top: 1px solid #CCCCCC;
+  border-right: 1px solid #CCCCCC;
+}
+/* line 80, ../../sass/components/_tree.sass */
+.tree__bracket-up {
+  position: absolute;
+  right: -15px;
+  top: -6px;
+  height: calc(50% + 6px);
+  width: 15px;
+  border-bottom: 1px solid #CCCCCC;
+  border-right: 1px solid #CCCCCC;
+}
+/* line 89, ../../sass/components/_tree.sass */
+.tree__match-card {
+  border-radius: 5px;
+  display: flex;
+  flex-direction: column;
+  border: 1px solid #CCCCCC;
+  overflow: hidden;
+  font-size: 14px;
+}
+/* line 97, ../../sass/components/_tree.sass */
+.tree__archer {
+  display: flex;
+  padding: 0 8px;
+  height: 30px;
+  line-height: 30px;
+  background-color: #f3f3f3;
+}
+/* line 104, ../../sass/components/_tree.sass */
+.tree__archer:first-child {
+  border-bottom: 1px solid #CCCCCC;
+}
+/* line 107, ../../sass/components/_tree.sass */
+.tree__archer--winner {
+  font-weight: bold;
+  background-color: #bbb;
+}
+/* line 111, ../../sass/components/_tree.sass */
+.tree__archer--bye {
+  color: #777;
+  text-align: center;
+}
+/* line 115, ../../sass/components/_tree.sass */
+.tree__archer__el {
+  flex-grow: 1;
+  text-wrap: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+/* line 121, ../../sass/components/_tree.sass */
+.tree__archer__el--seed {
+  width: 16px;
+  text-align: center;
+  margin-right: 5px;
+  flex-grow: 0;
+}
+/* line 127, ../../sass/components/_tree.sass */
+.tree__archer__el--score {
+  flex-grow: 0;
+  margin-left: 5px;
+}
+
+/* line 19, ../../sass/main.sass */
 body {
   color: #000F1F;
   background-image: linear-gradient(#f7f7f7 50px, transparent 150px);
 }
 
-/* line 23, ../../sass/main.sass */
+/* line 24, ../../sass/main.sass */
 .clear:before, .clear:after {
   display: table;
   content: " ";
 }
-/* line 26, ../../sass/main.sass */
+/* line 27, ../../sass/main.sass */
 .clear:after {
   clear: both;
 }
 
-/* line 30, ../../sass/main.sass */
+/* line 31, ../../sass/main.sass */
 .hidden {
   display: none;
 }
 
-/* line 33, ../../sass/main.sass */
+/* line 34, ../../sass/main.sass */
 .text-right {
   text-align: right;
 }
@@ -6030,32 +6175,6 @@ table.field-plan td.empty, table.field-plan th.empty {
 /* line 14, ../../sass/_olympic.sass */
 table.table .missed-cut {
   background-color: #e3e3e3;
-}
-
-/* line 17, ../../sass/_olympic.sass */
-table.tree {
-  margin: 0 auto;
-  border-collapse: collapse;
-}
-/* line 20, ../../sass/_olympic.sass */
-table.tree td {
-  padding: 5px 8px;
-}
-/* line 22, ../../sass/_olympic.sass */
-table.tree td:nth-child(3n) {
-  padding-right: 30px;
-}
-/* line 24, ../../sass/_olympic.sass */
-table.tree td.border-top {
-  border-top: 1px solid #bbb;
-}
-/* line 26, ../../sass/_olympic.sass */
-table.tree td.border-bottom {
-  border-bottom: 1px solid #bbb;
-}
-/* line 28, ../../sass/_olympic.sass */
-table.tree td.border-right {
-  border-right: 1px solid #bbb;
 }
 
 /* line 2, ../../sass/_target_input.sass */
