@@ -525,6 +525,18 @@ class OlympicResults(CompetitionMixin, HeadedPdfView):
     ))
 
 
+class OlympicTree(CompetitionMixin, TemplateView):
+    template_name = 'olympic/tree.html'
+    admin_required = False
+
+    def get_context_data(self, **kwargs):
+        context = super().get_context_data(**kwargs)
+        matches = MatchLoader(self.competition)
+        matches.load_all()
+        context['by_level'] = matches.matches_by_level()
+        return context
+
+
 class OlympicTreeMixin(object):
     @property
     def match_cols(self):
@@ -708,18 +720,6 @@ class OlympicTreeMixin(object):
             previous_matches = matches
 
         return table_data
-
-
-class OlympicTree(OlympicTreeMixin, CompetitionMixin, TemplateView):
-    template_name = 'olympic/tree.html'
-    admin_required = False
-
-    def get_context_data(self, **kwargs):
-        context = super().get_context_data(**kwargs)
-        matches = MatchLoader(self.competition)
-        matches.load_all()
-        context['by_level'] = matches.matches_by_level()
-        return context
 
 
 class OlympicTreePdf(OlympicTreeMixin, OlympicResults):
