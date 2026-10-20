@@ -37,7 +37,7 @@
                                 {% endif %}
                                 <span class="tree__archer__el">{% if match.archer_1 == 'BYE' %} - BYE - {% else %}{{ match.archer_1 }}{% endif %}</span>
                                 {% if match.score_1 is not None %}
-                                    <span class="tree__archer__el">{{ match.score_1 }}</span>
+                                    <span class="tree__archer__el tree__archer__el--score">{{ match.score_1 }}</span>
                                 {% endif %}
                             </div>
                             <div class="tree__archer {% if match.win_2 %}tree__archer--winner{% elif match.archer_2 == 'BYE' %}tree__archer--bye{% endif %}">
@@ -46,7 +46,7 @@
                                 {% endif %}
                                 <span class="tree__archer__el">{% if match.archer_2 == 'BYE' %} - BYE - {% else %}{{ match.archer_2 }}{% endif %}</span>
                                 {% if match.score_2 is not None %}
-                                    <span class="tree__archer__el">{{ match.score_2 }}</span>
+                                    <span class="tree__archer__el tree__archer__el--score">{{ match.score_2 }}</span>
                                 {% endif %}
                             </div>
                         </div>

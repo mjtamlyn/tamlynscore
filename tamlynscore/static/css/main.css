@@ -4654,21 +4654,13 @@ ul.link-list li a:hover {
 .tree__archer__el--seed {
   width: 16px;
   text-align: center;
-}
-/* line 125, ../../sass/components/_tree.sass */
-.tree__archer__el:first-child {
-  flex-grow: 0;
   margin-right: 5px;
+  flex-grow: 0;
 }
-/* line 128, ../../sass/components/_tree.sass */
-.tree__archer__el:last-child {
+/* line 127, ../../sass/components/_tree.sass */
+.tree__archer__el--score {
   flex-grow: 0;
   margin-left: 5px;
-}
-/* line 132, ../../sass/components/_tree.sass */
-.tree__archer__el:only-child {
-  flex-grow: 1;
-  margin: 0;
 }
 
 /* line 19, ../../sass/main.sass */
