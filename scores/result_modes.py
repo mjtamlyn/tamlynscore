@@ -314,8 +314,10 @@ class BaseResultMode(object):
         for section, categories in results.items():
             json_section = {
                 'section': {
-                    'label': section.label,
-                    'round': section.round.pk,
+                    'round': {
+                        'label': section.label,
+                        'codename': section.round.codename,
+                    },
                     'headers': section.headers,
                 },
                 'categories': [],
@@ -333,16 +335,21 @@ class BaseResultMode(object):
                                 score.club,
                             ] + self.score_details(score, section),
                             'team': [[
-                                member.target.pk,
+                                member.target.session_entry.competition_entry.archer.name,
                             ] + self.score_details(member, section) for member in score.team],
                         }
                     else:
                         json_score = [
                             score.placing,
-                            score.target.pk,
+                            score.target.session_entry.competition_entry.archer.name,
+                            score.target.session_entry.competition_entry.team_name(short_form=True),
                         ] + self.score_details(score, section)
                     json_category['scores'].append(json_score)
+                if not json_category['scores']:
+                    continue
                 json_section['categories'].append(json_category)
+            if not json_section['categories']:
+                continue
             json_results.append(json_section)
         return json.dumps(json_results)
 
