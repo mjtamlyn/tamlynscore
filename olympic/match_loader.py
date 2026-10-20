@@ -401,8 +401,7 @@ class MatchLoader:
     def matches_by_level(self):
         by_level = []
         for session_round, max_level in self.max_levels.items():
-            matches = self._build_bracket(session_round, max_level)
-            by_level.append((session_round, matches))
-            matches = self._build_bracket(session_round, max_level, 5)
-            by_level.append((session_round, matches))
+            for for_placing in self.placing_brackets[session_round]:
+                matches = self._build_bracket(session_round, max_level, for_placing)
+                by_level.append((session_round, matches))
         return by_level
