@@ -44,7 +44,7 @@ SIMPLE_AGE_CHOICES = (
 )
 
 AGB_AGE_CHOICES = (
-    ('', 'Senior'),
+    ('', 'Adult'),
     ('50+', '50+'),
     ('65+', '65+'),
     ('U21', 'U21'),

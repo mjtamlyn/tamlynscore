@@ -150,33 +150,8 @@ class CompetitionDetail(CompetitionMixin, ResultModeMixin, DetailView):
                 context['rounds'][entry.session_round.shot_round_id]['entries'].append(entry)
 
             for info in context['rounds'].values():
-                if self.competition.has_agb_age_groups:
-                    if self.competition.has_novices:
-                        counter = collections.Counter('%s %s %s%s' % (
-                            e.competition_entry.bowstyle,
-                            e.competition_entry.get_agb_age_display(),
-                            e.competition_entry.get_gender_display(),
-                            (' %s' % e.competition_entry.get_novice_display()) if e.competition_entry.novice == 'N' else '',
-                        ) for e in info['entries'])
-                    else:
-                        counter = collections.Counter('%s %s %s' % (
-                            e.competition_entry.bowstyle,
-                            e.competition_entry.get_agb_age_display(),
-                            e.competition_entry.get_gender_display(),
-                        ) for e in info['entries'])
-                else:
-                    if self.competition.has_novices:
-                        counter = collections.Counter('%s %s%s' % (
-                            e.competition_entry.bowstyle,
-                            e.competition_entry.get_gender_display(),
-                            (' %s' % e.competition_entry.get_novice_display()) if e.competition_entry.novice == 'N' else '',
-                        ) for e in info['entries'])
-                    else:
-                        counter = collections.Counter('%s %s' % (
-                            e.competition_entry.bowstyle,
-                            e.competition_entry.get_gender_display(),
-                        ) for e in info['entries'])
-                info['data'] = counter.most_common(10)
+                counter = collections.Counter(e.competition_entry.get_full_category_name() for e in info['entries'])
+                info['data'] = counter.most_common(20)
             context['rounds'] = sorted(context['rounds'].values(), key=lambda r: -r['round'].longest_distance)
             context['entry_count'] = self.competition.competitionentry_set.count()
 

@@ -430,6 +430,16 @@ class CompetitionEntry(models.Model):
     def category(self):
         return '%s%s' % (self.division, self.get_clss(simple=True))
 
+    def get_full_category_name(self):
+        sections = []
+        if self.competition.has_novices and self.novice == 'N':
+            sections.append('Novice')
+        sections.append(str(self.bowstyle))
+        sections.append(self.get_gender_display())
+        if self.competition.has_agb_age_groups and self.agb_age:
+            sections.append(self.get_agb_age_display())
+        return ' '.join(sections)
+
 
 class EntryUser(models.Model):
     uuid = models.UUIDField(default=uuid.uuid4)
