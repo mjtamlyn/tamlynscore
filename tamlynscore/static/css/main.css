@@ -3479,15 +3479,15 @@ input,
 select {
   padding: 4px 7px;
   border-radius: 3px;
-  outline-color: #6FB3FF;
-  border: 1px solid #6FB3FF;
+  outline-color: #5DA9E9;
+  border: 1px solid #5DA9E9;
   font-size: 16px;
 }
 
 /* line 9, ../../sass/_forms.sass */
 input:disabled {
-  outline-color: #93b5db;
-  border-color: #93b5db;
+  outline-color: #8ba5bb;
+  border-color: #8ba5bb;
   background-color: #F0F0F0;
 }
 
@@ -3646,7 +3646,7 @@ body {
 /* line 10, ../../sass/_typography.sass */
 h1, h2, h3, h4, h5, h6 {
   font-family: "MuseoSlab", serif;
-  color: #111D2A;
+  color: #000F1F;
   margin: 8px 0 10px;
   text-align: center;
 }
@@ -3658,7 +3658,7 @@ a {
 }
 /* line 20, ../../sass/_typography.sass */
 a.link {
-  color: #004ca2;
+  color: #154376;
 }
 
 /* line 23, ../../sass/_typography.sass */
@@ -3694,7 +3694,7 @@ li {
   font-family: "Helvetica Neue", "Trebuchet MS", Helvetica, sans-serif;
   font-weight: normal;
   border-radius: 5px;
-  background-color: #004ca2;
+  background-color: #154376;
   color: white;
   font-size: 16px;
   padding: 5px 10px;
@@ -3706,7 +3706,7 @@ li {
 }
 /* line 15, ../../sass/_buttons.sass */
 .btn:hover {
-  background-color: #0064d5;
+  background-color: #1d5ca1;
 }
 /* line 18, ../../sass/_buttons.sass */
 .btn:before {
@@ -3714,7 +3714,7 @@ li {
 }
 /* line 21, ../../sass/_buttons.sass */
 .btn.btn-subtle {
-  background-color: #FBC87A;
+  background-color: #EEC643;
 }
 /* line 24, ../../sass/_buttons.sass */
 .btn.btn-small {
@@ -3737,8 +3737,8 @@ li {
 }
 /* line 38, ../../sass/_buttons.sass */
 .btn.btn-toggle .btn-segment.selected {
-  background: #6FB3FF;
-  box-shadow: 0 0 3px #004ca2 inset;
+  background: #5DA9E9;
+  box-shadow: 0 0 3px #154376 inset;
   border-radius: 5px;
 }
 /* line 43, ../../sass/_buttons.sass */
@@ -3747,11 +3747,11 @@ li {
 }
 /* line 46, ../../sass/_buttons.sass */
 .btn.delete {
-  background-color: #A21;
+  background-color: #CA0902;
 }
 /* line 49, ../../sass/_buttons.sass */
 .btn.delete:hover {
-  background-color: #d82b16;
+  background-color: #fd0b03;
 }
 /* line 52, ../../sass/_buttons.sass */
 .btn.score-sheet {
@@ -3763,7 +3763,7 @@ li {
 }
 /* line 58, ../../sass/_buttons.sass */
 .btn.depressed {
-  background-color: #0064d5;
+  background-color: #1d5ca1;
   box-shadow: 0 0 5px #002147 inset;
 }
 
@@ -4195,7 +4195,7 @@ ul.link-list li a:hover {
 .archer-block {
   font-size: 13px;
   margin-bottom: 15px;
-  border: 1px solid #6FB3FF;
+  border: 1px solid #5DA9E9;
   overflow: hidden;
   border-radius: 5px;
 }
@@ -4203,7 +4203,7 @@ ul.link-list li a:hover {
 .archer-block .name {
   line-height: 28px;
   font-size: 14px;
-  background-color: #6FB3FF;
+  background-color: #5DA9E9;
   padding: 0 10px;
   overflow: auto;
 }
@@ -4261,24 +4261,24 @@ ul.link-list li a:hover {
 }
 /* line 54, ../../sass/components/_archer_block.sass */
 .pill--open, .pill--men, .pill.open, .pill.men {
-  background-color: #A62;
+  background-color: #B28706;
 }
 /* line 59, ../../sass/components/_archer_block.sass */
 .pill--female, .pill--women, .pill.female, .pill.women {
-  background-color: #F57;
+  background-color: #CC6699;
 }
 /* line 65, ../../sass/components/_archer_block.sass */
 .pill--recurve, .pill.recurve {
-  background-color: #A21;
+  background-color: #CA0902;
 }
 /* line 68, ../../sass/components/_archer_block.sass */
 .pill--compound, .pill.compound {
-  background-color: #6C4;
+  background-color: #EEC643;
   color: #000F1F;
 }
 /* line 72, ../../sass/components/_archer_block.sass */
 .pill--barebow, .pill.barebow {
-  background-color: #6FB3FF;
+  background-color: #5DA9E9;
   color: #000F1F;
 }
 /* line 76, ../../sass/components/_archer_block.sass */
@@ -4350,12 +4350,12 @@ ul.link-list li a:hover {
   padding: 5px 8px;
   border-radius: 4px;
   font-weight: bold;
-  background-color: #6FB3FF;
+  background-color: #5DA9E9;
   margin-bottom: 5px;
 }
 /* line 9, ../../sass/components/_messages.sass */
 .messages__message--error {
-  background-color: #D58100;
+  background-color: #B28706;
 }
 
 /* line 11, ../../sass/components/_loading.sass */
@@ -4698,8 +4698,8 @@ ul.link-list li a:hover {
   min-width: 30%;
   height: 40px;
   line-height: 38px;
-  background-color: #DDDAFA;
-  border: 1px solid #6FB3FF;
+  background-color: #c0e0f7;
+  border: 1px solid #5DA9E9;
   border-radius: 5px;
   overflow: hidden;
   text-align: center;
@@ -4732,369 +4732,62 @@ body {
   text-align: right;
 }
 
-/* line 3, ../../sass/_competition.sass */
-#entry-list .new-entry {
-  float: left;
-}
-/* line 8, ../../sass/_competition.sass */
-#entry-list .new-entry .new-entry-form {
-  padding: 5px;
-}
-/* line 11, ../../sass/_competition.sass */
-#entry-list .new-entry .new-entry-form input {
-  border: 2px solid #DDDAFA;
-  border-radius: 4px;
-  font-family: Verdana;
-  font-size: 18px;
-  margin: 0;
-  outline: none;
-  padding: 5px;
-  width: 300px;
-}
-/* line 21, ../../sass/_competition.sass */
-#entry-list .new-entry .new-entry-form input:focus {
-  border-color: #6FB3FF;
-}
-/* line 23, ../../sass/_competition.sass */
-#entry-list .new-entry .new-entry-form input::webkit-input-placeholder {
-  font-style: italic;
-}
-/* line 29, ../../sass/_competition.sass */
-#entry-list .new-entry .new-entry-form .options-wrapper .options {
-  margin: 0 0px;
-  width: 300px;
-}
-/* line 33, ../../sass/_competition.sass */
-#entry-list .new-entry .new-entry-form .options-wrapper .options .option {
-  background-color: white;
-  border-left: 2px solid #DDDAFA;
-  border-right: 2px solid #DDDAFA;
-  border-bottom: 1px solid #DDDAFA;
-  font-family: Verdana;
-  padding: 3px 5px;
-}
-/* line 42, ../../sass/_competition.sass */
-#entry-list .new-entry .new-entry-form .options-wrapper .options .option:last-child {
-  border-bottom-width: 2px;
-}
-/* line 44, ../../sass/_competition.sass */
-#entry-list .new-entry .new-entry-form .options-wrapper .options .option.selected {
-  background-color: #353345;
-  color: white;
-}
-/* line 48, ../../sass/_competition.sass */
-#entry-list .new-entry .new-entry-form #archer-widget {
-  margin: 0 auto 10px;
-  width: 300px;
-}
-/* line 52, ../../sass/_competition.sass */
-#entry-list .new-entry .new-entry-form .archer-details {
-  visibility: hidden;
-  opacity: 0;
-  width: 450px;
-  -webkit-transition: all 0.2s ease-in-out;
-}
-/* line 57, ../../sass/_competition.sass */
-#entry-list .new-entry .new-entry-form .archer-details.shown {
-  visibility: visible;
-  opacity: 1;
-}
-/* line 61, ../../sass/_competition.sass */
-#entry-list .new-entry .new-entry-form .archer-details p {
-  margin: 0;
-  text-align: center;
-}
-/* line 65, ../../sass/_competition.sass */
-#entry-list .new-entry .new-entry-form .archer-details .button {
-  border: 2px solid #6FB3FF;
-  border-radius: 10px;
-  background-image: -webkit-linear-gradient(#b4adf4, #DDDAFA, #b4adf4);
-  cursor: pointer;
-  padding: 5px;
-  text-align: center;
-  -webkit-user-select: none;
-}
-/* line 73, ../../sass/_competition.sass */
-#entry-list .new-entry .new-entry-form .archer-details .button.selected {
-  background-image: -webkit-linear-gradient(#111D2A, #353345, #111D2A);
-  border-color: #111D2A;
-  color: white;
-}
-/* line 78, ../../sass/_competition.sass */
-#entry-list .new-entry .new-entry-form .archer-details #club-widget {
-  margin: 0 auto;
-  width: 300px;
-}
-/* line 82, ../../sass/_competition.sass */
-#entry-list .new-entry .new-entry-form .archer-details .save {
-  background-image: -webkit-linear-gradient(#111D2A, #353345, #111D2A);
-  border-color: #111D2A;
-  color: white;
-  float: right;
-}
-/* line 88, ../../sass/_competition.sass */
-#entry-list .new-entry .new-entry-form .archer-details .show-more-details {
-  float: left;
-  cursor: pointer;
-}
-/* line 91, ../../sass/_competition.sass */
-#entry-list .new-entry .new-entry-form .archer-details .show-more-details .pointer {
-  display: inline-block;
-  font-size: 20px;
-  line-height: 12px;
-  -webkit-transition: -webkit-transform 0.2s ease-in-out;
-}
-/* line 97, ../../sass/_competition.sass */
-#entry-list .new-entry .new-entry-form .archer-details .show-more-details.selected .pointer {
-  -webkit-transform: rotate(90deg);
-}
-/* line 101, ../../sass/_competition.sass */
-#entry-list .new-entry .new-entry-form .archer-details .more-details {
-  display: none;
-  padding: 10px 0;
-  text-align: center;
-}
-/* line 105, ../../sass/_competition.sass */
-#entry-list .new-entry .new-entry-form .archer-details .more-details.shown {
-  display: block;
-}
-/* line 109, ../../sass/_competition.sass */
-#entry-list .stats {
-  float: right;
-}
-/* line 112, ../../sass/_competition.sass */
-#entry-list .stats ul {
-  margin: 0 10px 10px 10px;
-}
-/* line 117, ../../sass/_competition.sass */
-#entry-list .entries-table table {
-  border-collapse: collapse;
-  width: 100%;
-}
-/* line 121, ../../sass/_competition.sass */
-#entry-list .entries-table table td:last-child.delete {
-  cursor: pointer;
-}
-/* line 124, ../../sass/_competition.sass */
-#entry-list .entries-table table tr:hover td:last-child.delete {
-  background-color: #070052;
-  color: white;
-}
-/* line 128, ../../sass/_competition.sass */
-#entry-list .entries-table table td {
-  padding: 3px;
-}
-/* line 131, ../../sass/_competition.sass */
-#entry-list .entries-table table .top td {
-  border-top: 1px solid #111D2A;
-}
-/* line 134, ../../sass/_competition.sass */
-#entry-list .entries-table table .bottom td {
-  font-size: 14px;
-}
-/* line 137, ../../sass/_competition.sass */
-#entry-list .entries-table table .tall {
-  border-left: 1px solid #111D2A;
-  text-align: center;
-}
-
-/* line 145, ../../sass/_competition.sass */
-.target-list-nav .session-select {
-  width: 100%;
-}
-/* line 147, ../../sass/_competition.sass */
-.target-list-nav .round-select {
-  display: none;
-  width: 100%;
-}
-/* line 149, ../../sass/_competition.sass */
-.target-list-nav .round-select.selected {
-  display: block;
-}
-/* line 152, ../../sass/_competition.sass */
-.target-list-nav .link {
-  background-color: #DDDAFA;
-  float: left;
-  font-weight: bold;
-  text-align: center;
-}
-/* line 157, ../../sass/_competition.sass */
-.target-list-nav .selected {
-  background-color: #6FB3FF;
-}
-
-/* line 161, ../../sass/_competition.sass */
-.target-list .target-list-gen {
-  display: none;
-  width: 100%;
-}
-/* line 163, ../../sass/_competition.sass */
-.target-list .target-list-gen.selected {
-  display: block;
-}
-/* line 167, ../../sass/_competition.sass */
-.target-list .target-list-gen .archer {
-  background-color: #DDDAFA;
-  padding: 2px;
-  border-bottom: 1px solid #111D2A;
-  -webkit-user-select: none;
-}
-/* line 172, ../../sass/_competition.sass */
-.target-list .target-list-gen .archer:not(.blank) {
-  cursor: pointer;
-  -webkit-user-drag: element;
-}
-/* line 175, ../../sass/_competition.sass */
-.target-list .target-list-gen .archer:-webkit-drag {
-  border: 1px solid #111D2A;
-  opacity: 0.5;
-}
-/* line 178, ../../sass/_competition.sass */
-.target-list .target-list-gen .archer:-webkit-drag p:not(.name) {
-  display: none;
-}
-/* line 180, ../../sass/_competition.sass */
-.target-list .target-list-gen .archer.blank {
-  background-color: #f7f7f7;
-}
-/* line 183, ../../sass/_competition.sass */
-.target-list .target-list-gen .board-wrapper {
-  float: left;
-  width: 70%;
-}
-/* line 187, ../../sass/_competition.sass */
-.target-list .target-list-gen .board-wrapper .board {
-  margin: 8px 0 8px 8px;
-}
-/* line 190, ../../sass/_competition.sass */
-.target-list .target-list-gen .board-wrapper .board .target {
-  width: 100%;
-}
-/* line 193, ../../sass/_competition.sass */
-.target-list .target-list-gen .board-wrapper .board .target div {
-  float: left;
-}
-/* line 195, ../../sass/_competition.sass */
-.target-list .target-list-gen .board-wrapper .board .target div.number {
-  text-align: center;
-  width: 8%;
-}
-/* line 198, ../../sass/_competition.sass */
-.target-list .target-list-gen .board-wrapper .board .target div.number p {
-  border: 1px solid #111D2A;
-  margin: 0;
-  padding: 2px 0;
-}
-/* line 202, ../../sass/_competition.sass */
-.target-list .target-list-gen .board-wrapper .board .target div.detail {
-  width: 92%;
-}
-/* line 205, ../../sass/_competition.sass */
-.target-list .target-list-gen .board-wrapper .board .target div.detail.drag-over .archer {
-  background-color: #6FB3FF;
-}
-/* line 207, ../../sass/_competition.sass */
-.target-list .target-list-gen .board-wrapper .board .target div.detail .archer {
-  border: 1px solid #111D2A;
-  padding: 2px 0 2px 0;
-  width: 100%;
-}
-/* line 211, ../../sass/_competition.sass */
-.target-list .target-list-gen .board-wrapper .board .target div.detail .archer p {
-  margin: 0;
-  padding-left: 5px;
-  float: left;
-}
-/* line 215, ../../sass/_competition.sass */
-.target-list .target-list-gen .board-wrapper .board .target div.detail .archer p.club {
-  float: right;
-  padding-right: 5px;
-}
-/* line 219, ../../sass/_competition.sass */
-.target-list .target-list-gen .entries-wrapper {
-  float: right;
-  width: 30%;
-}
-/* line 223, ../../sass/_competition.sass */
-.target-list .target-list-gen .entries-wrapper .entries {
-  border: 1px solid #111D2A;
-  border-bottom: none;
-  margin: 8px;
-}
-/* line 228, ../../sass/_competition.sass */
-.target-list .target-list-gen .entries-wrapper .entries h5 {
-  margin: 0;
-}
-/* line 232, ../../sass/_competition.sass */
-.target-list .target-list-gen .entries-wrapper .entries .archer p {
-  margin: 0;
-  float: right;
-}
-/* line 235, ../../sass/_competition.sass */
-.target-list .target-list-gen .entries-wrapper .entries .archer p.name {
-  float: left;
-}
-/* line 237, ../../sass/_competition.sass */
-.target-list .target-list-gen .entries-wrapper .entries .archer p.club {
-  display: none;
-}
-
-/* line 241, ../../sass/_competition.sass */
+/* line 4, ../../sass/_competition.sass */
 .registration .registration-board {
   display: block;
 }
-/* line 244, ../../sass/_competition.sass */
+/* line 7, ../../sass/_competition.sass */
 .registration .registration-board .actions {
   margin: 10px 0;
 }
-/* line 247, ../../sass/_competition.sass */
+/* line 10, ../../sass/_competition.sass */
 .registration .registration-board tr.present {
   background-color: #f7f7f7;
 }
-/* line 250, ../../sass/_competition.sass */
+/* line 13, ../../sass/_competition.sass */
 .registration .registration-board tr.present a.present {
   display: none;
 }
-/* line 253, ../../sass/_competition.sass */
+/* line 16, ../../sass/_competition.sass */
 .registration .registration-board tr:not(.present) a.not-present {
   display: none;
 }
-/* line 256, ../../sass/_competition.sass */
+/* line 19, ../../sass/_competition.sass */
 .registration .registration-board .archer-details {
   opacity: 0.5;
   font-style: italic;
 }
-/* line 260, ../../sass/_competition.sass */
+/* line 23, ../../sass/_competition.sass */
 .registration .registration-board tr.kit-inspected {
   background-color: #f7f7f7;
 }
-/* line 263, ../../sass/_competition.sass */
+/* line 26, ../../sass/_competition.sass */
 .registration .registration-board tr.kit-inspected td {
   padding: 3px;
 }
-/* line 265, ../../sass/_competition.sass */
+/* line 28, ../../sass/_competition.sass */
 .registration .registration-board tr.kit-inspected .archer-name {
   font-style: italic;
 }
-/* line 267, ../../sass/_competition.sass */
+/* line 30, ../../sass/_competition.sass */
 .registration .registration-board tr.kit-inspected .archer-category {
   display: none;
 }
 
-/* line 271, ../../sass/_competition.sass */
+/* line 34, ../../sass/_competition.sass */
 .input-scores .input-board {
   display: block;
   padding-bottom: 10px;
   border-bottom: 2px solid #CCCCCC;
 }
-/* line 276, ../../sass/_competition.sass */
+/* line 39, ../../sass/_competition.sass */
 .input-scores .input-board .bosses {
   overflow: auto;
 }
-/* line 280, ../../sass/_competition.sass */
+/* line 43, ../../sass/_competition.sass */
 .input-scores .input-board .boss {
-  background-color: #DDDAFA;
-  border: 1px solid #6FB3FF;
+  background-color: #c0e0f7;
+  border: 1px solid #5DA9E9;
   float: left;
   height: 30px;
   margin: 5px;
@@ -5103,22 +4796,22 @@ body {
   text-align: center;
   width: 30px;
 }
-/* line 290, ../../sass/_competition.sass */
+/* line 53, ../../sass/_competition.sass */
 .input-scores .input-board .boss.done {
-  background-color: #353345;
-  border-color: #111D2A;
+  background-color: #03315f;
+  border-color: #000F1F;
   color: white;
 }
-/* line 294, ../../sass/_competition.sass */
+/* line 57, ../../sass/_competition.sass */
 .input-scores .input-board .boss-link:focus {
   outline: none;
 }
-/* line 296, ../../sass/_competition.sass */
+/* line 59, ../../sass/_competition.sass */
 .input-scores .input-board .boss-link:focus .boss {
-  border-color: #6FB3FF;
-  box-shadow: 0 0 5px #6FB3FF;
+  border-color: #5DA9E9;
+  box-shadow: 0 0 5px #5DA9E9;
 }
-/* line 300, ../../sass/_competition.sass */
+/* line 63, ../../sass/_competition.sass */
 .input-scores .input-tracker {
   display: grid;
   text-align: center;
@@ -5126,44 +4819,44 @@ body {
   padding: 1px;
   grid-gap: 1px;
 }
-/* line 308, ../../sass/_competition.sass */
+/* line 71, ../../sass/_competition.sass */
 .input-scores .input-tracker__header, .input-scores .input-tracker__item {
   padding: 3px 5px;
 }
-/* line 312, ../../sass/_competition.sass */
+/* line 75, ../../sass/_competition.sass */
 .input-scores .input-tracker__header {
   background-color: white;
   font-weight: bold;
 }
-/* line 316, ../../sass/_competition.sass */
+/* line 79, ../../sass/_competition.sass */
 .input-scores .input-tracker__item {
-  background-color: #6FB3FF;
+  background-color: #5DA9E9;
 }
-/* line 318, ../../sass/_competition.sass */
+/* line 81, ../../sass/_competition.sass */
 .input-scores .input-tracker__item--done {
-  background-color: #353345;
+  background-color: #03315f;
 }
-/* line 321, ../../sass/_competition.sass */
+/* line 84, ../../sass/_competition.sass */
 .input-scores .input-tracker__link {
   color: white;
 }
 
-/* line 325, ../../sass/_competition.sass */
+/* line 88, ../../sass/_competition.sass */
 .input-arrows table {
   margin: 0 auto;
 }
-/* line 327, ../../sass/_competition.sass */
+/* line 90, ../../sass/_competition.sass */
 .input-arrows table tbody {
   font-size: 16px;
 }
-/* line 330, ../../sass/_competition.sass */
+/* line 93, ../../sass/_competition.sass */
 .input-arrows table tr.disabled,
 .input-arrows table tr.disabled input {
   color: #ccc;
 }
-/* line 334, ../../sass/_competition.sass */
+/* line 97, ../../sass/_competition.sass */
 .input-arrows table input {
-  border: 1px solid #6FB3FF;
+  border: 1px solid #5DA9E9;
   border-radius: 3px;
   outline: none;
   text-align: center;
@@ -5171,966 +4864,159 @@ body {
   font-size: 16px;
   padding: 5px;
 }
-/* line 342, ../../sass/_competition.sass */
+/* line 105, ../../sass/_competition.sass */
 .input-arrows table input:focus {
-  box-shadow: 0 0 5px #FFC600;
+  box-shadow: 0 0 5px #EEC643;
 }
-/* line 345, ../../sass/_competition.sass */
+/* line 108, ../../sass/_competition.sass */
 .input-arrows .save {
   text-align: center;
 }
 
-/* line 349, ../../sass/_competition.sass */
+/* line 112, ../../sass/_competition.sass */
 .input-dozens input[type="number"] {
   width: 75px;
 }
 
-/* line 353, ../../sass/_competition.sass */
+/* line 116, ../../sass/_competition.sass */
 .leaderboard .board {
   display: none;
 }
-/* line 355, ../../sass/_competition.sass */
+/* line 118, ../../sass/_competition.sass */
 .leaderboard .board.selected {
   display: block;
 }
-/* line 358, ../../sass/_competition.sass */
+/* line 121, ../../sass/_competition.sass */
 .leaderboard .board table {
   width: 100%;
 }
 
-/* line 362, ../../sass/_competition.sass */
+/* line 125, ../../sass/_competition.sass */
 .olympic .board {
   display: none;
 }
-/* line 364, ../../sass/_competition.sass */
+/* line 127, ../../sass/_competition.sass */
 .olympic .board.selected {
   display: block;
 }
-/* line 367, ../../sass/_competition.sass */
+/* line 130, ../../sass/_competition.sass */
 .olympic .board table {
   width: 100%;
 }
-/* line 370, ../../sass/_competition.sass */
+/* line 133, ../../sass/_competition.sass */
 .olympic .board .remove-all {
   color: red;
   float: right;
   font-size: 12px;
   margin: 5px;
 }
-/* line 376, ../../sass/_competition.sass */
-.olympic .btn.complete {
-  background-image: -webkit-linear-gradient(#03001f, #070052, #03001f);
-  color: white;
-}
 
-/* line 381, ../../sass/_competition.sass */
+/* line 140, ../../sass/_competition.sass */
 .select-widget .select {
   display: none;
 }
-/* line 383, ../../sass/_competition.sass */
+/* line 142, ../../sass/_competition.sass */
 .select-widget .options-wrapper {
   position: relative;
 }
-/* line 385, ../../sass/_competition.sass */
+/* line 144, ../../sass/_competition.sass */
 .select-widget .options-wrapper .options {
   position: absolute;
   display: none;
 }
 
-/* line 389, ../../sass/_competition.sass */
+/* line 148, ../../sass/_competition.sass */
 .buttons-widget {
   padding: 5px;
   text-align: center;
 }
-/* line 392, ../../sass/_competition.sass */
+/* line 151, ../../sass/_competition.sass */
 .buttons-widget .select {
   display: none;
 }
-/* line 394, ../../sass/_competition.sass */
+/* line 153, ../../sass/_competition.sass */
 .buttons-widget .button {
   display: inline-block;
   margin: 0 2px;
 }
 
-/* line 399, ../../sass/_competition.sass */
+/* line 158, ../../sass/_competition.sass */
 .leaderboard-big-screen .container {
   width: 1800px;
 }
-/* line 401, ../../sass/_competition.sass */
+/* line 160, ../../sass/_competition.sass */
 .leaderboard-big-screen .container .col2 {
   padding: 0 25px;
 }
-/* line 403, ../../sass/_competition.sass */
+/* line 162, ../../sass/_competition.sass */
 .leaderboard-big-screen .container h1 {
   font-size: 50px;
 }
-/* line 405, ../../sass/_competition.sass */
+/* line 164, ../../sass/_competition.sass */
 .leaderboard-big-screen .container h2 {
   margin-top: 0;
   font-size: 36px;
   overflow: hidden;
 }
-/* line 409, ../../sass/_competition.sass */
+/* line 168, ../../sass/_competition.sass */
 .leaderboard-big-screen .container h3 {
   margin-top: 0;
   font-size: 36px;
 }
-/* line 412, ../../sass/_competition.sass */
+/* line 171, ../../sass/_competition.sass */
 .leaderboard-big-screen .container h4 {
   font-size: 30px;
 }
-/* line 414, ../../sass/_competition.sass */
+/* line 173, ../../sass/_competition.sass */
 .leaderboard-big-screen .container table {
   border-top: 1px solid #CCCCCC;
 }
-/* line 416, ../../sass/_competition.sass */
+/* line 175, ../../sass/_competition.sass */
 .leaderboard-big-screen .container td {
   font-size: 20px;
 }
 
-/* line 424, ../../sass/_competition.sass */
-.leaderboard-butc .wrapper {
-  width: 1020px;
-  height: 756px;
-}
-/* line 428, ../../sass/_competition.sass */
-.leaderboard-butc .wrapper nav {
-  display: none;
-}
-/* line 431, ../../sass/_competition.sass */
-.leaderboard-butc .wrapper #update {
-  font-size: 10px;
-  margin: 10px;
-  float: right;
-}
-/* line 436, ../../sass/_competition.sass */
-.leaderboard-butc .wrapper #leaderboard {
-  position: relative;
-  height: 672px;
-}
-/* line 440, ../../sass/_competition.sass */
-.leaderboard-butc .wrapper #leaderboard .club {
-  margin: 5px;
-  padding: 15px;
-  border-radius: 10px;
-  background-color: #111D2A;
-  position: absolute;
-  top: 0;
-  left: 0;
-}
-/* line 449, ../../sass/_competition.sass */
-.leaderboard-butc .wrapper #leaderboard .club, .leaderboard-butc .wrapper #leaderboard .club [data-club], .leaderboard-butc .wrapper #leaderboard .club .title, .leaderboard-butc .wrapper #leaderboard .club .position, .leaderboard-butc .wrapper #leaderboard .club .score, .leaderboard-butc .wrapper #leaderboard .club ul {
-  -webkit-transition: all 2s ease-in-out;
-}
-/* line 452, ../../sass/_competition.sass */
-.leaderboard-butc .wrapper #leaderboard .club [data-club] {
-  position: relative;
-  width: 327.2px;
-  height: 128px;
-}
-/* line 457, ../../sass/_competition.sass */
-.leaderboard-butc .wrapper #leaderboard .club .title {
-  color: #f7f7f7;
-  font-size: 33.6px;
-  font-weight: bold;
-  display: block;
-}
-/* line 463, ../../sass/_competition.sass */
-.leaderboard-butc .wrapper #leaderboard .club .position, .leaderboard-butc .wrapper #leaderboard .club .score {
-  font-size: 84px;
-  position: absolute;
-  bottom: 14px;
-}
-/* line 468, ../../sass/_competition.sass */
-.leaderboard-butc .wrapper #leaderboard .club .position {
-  color: #FFC600;
-  left: 0;
-}
-/* line 472, ../../sass/_competition.sass */
-.leaderboard-butc .wrapper #leaderboard .club .score {
-  color: #D58100;
-  right: 0;
-}
-/* line 476, ../../sass/_competition.sass */
-.leaderboard-butc .wrapper #leaderboard .club ul {
-  width: 327.2px;
-  text-align: center;
-  color: #DDDAFA;
-  font-size: 16.8px;
-  position: absolute;
-  bottom: -5.6px;
-  height: 20.8px;
-  overflow: hidden;
-}
-/* line 485, ../../sass/_competition.sass */
-.leaderboard-butc .wrapper #leaderboard .club ul li {
-  display: inline;
-}
-/* line 489, ../../sass/_competition.sass */
-.leaderboard-butc .wrapper #leaderboard .club.position-1 {
-  -webkit-transform: translate(0, 0px);
-}
-/* line 489, ../../sass/_competition.sass */
-.leaderboard-butc .wrapper #leaderboard .club.position-2 {
-  -webkit-transform: translate(0, 168px);
-}
-/* line 489, ../../sass/_competition.sass */
-.leaderboard-butc .wrapper #leaderboard .club.position-3 {
-  -webkit-transform: translate(0, 336px);
-}
-/* line 489, ../../sass/_competition.sass */
-.leaderboard-butc .wrapper #leaderboard .club.position-4 {
-  -webkit-transform: translate(0, 504px);
-}
-/* line 493, ../../sass/_competition.sass */
-.leaderboard-butc .wrapper #leaderboard .club.position-5 {
-  -webkit-transform: translate(367.2px, 0px);
-  padding: 10px;
-}
-/* line 497, ../../sass/_competition.sass */
-.leaderboard-butc .wrapper #leaderboard .club.position-5 [data-club] {
-  width: 174px;
-  height: 54px;
-}
-/* line 501, ../../sass/_competition.sass */
-.leaderboard-butc .wrapper #leaderboard .club.position-5 .title {
-  font-size: 16.8px;
-}
-/* line 504, ../../sass/_competition.sass */
-.leaderboard-butc .wrapper #leaderboard .club.position-5 .position, .leaderboard-butc .wrapper #leaderboard .club.position-5 .score {
-  font-size: 42px;
-  bottom: -5px;
-}
-/* line 508, ../../sass/_competition.sass */
-.leaderboard-butc .wrapper #leaderboard .club.position-5 ul {
-  -webkit-transform: scale(0);
-}
-/* line 493, ../../sass/_competition.sass */
-.leaderboard-butc .wrapper #leaderboard .club.position-6 {
-  -webkit-transform: translate(367.2px, 84px);
-  padding: 10px;
-}
-/* line 497, ../../sass/_competition.sass */
-.leaderboard-butc .wrapper #leaderboard .club.position-6 [data-club] {
-  width: 174px;
-  height: 54px;
-}
-/* line 501, ../../sass/_competition.sass */
-.leaderboard-butc .wrapper #leaderboard .club.position-6 .title {
-  font-size: 16.8px;
-}
-/* line 504, ../../sass/_competition.sass */
-.leaderboard-butc .wrapper #leaderboard .club.position-6 .position, .leaderboard-butc .wrapper #leaderboard .club.position-6 .score {
-  font-size: 42px;
-  bottom: -5px;
-}
-/* line 508, ../../sass/_competition.sass */
-.leaderboard-butc .wrapper #leaderboard .club.position-6 ul {
-  -webkit-transform: scale(0);
-}
-/* line 493, ../../sass/_competition.sass */
-.leaderboard-butc .wrapper #leaderboard .club.position-7 {
-  -webkit-transform: translate(367.2px, 168px);
-  padding: 10px;
-}
-/* line 497, ../../sass/_competition.sass */
-.leaderboard-butc .wrapper #leaderboard .club.position-7 [data-club] {
-  width: 174px;
-  height: 54px;
-}
-/* line 501, ../../sass/_competition.sass */
-.leaderboard-butc .wrapper #leaderboard .club.position-7 .title {
-  font-size: 16.8px;
-}
-/* line 504, ../../sass/_competition.sass */
-.leaderboard-butc .wrapper #leaderboard .club.position-7 .position, .leaderboard-butc .wrapper #leaderboard .club.position-7 .score {
-  font-size: 42px;
-  bottom: -5px;
-}
-/* line 508, ../../sass/_competition.sass */
-.leaderboard-butc .wrapper #leaderboard .club.position-7 ul {
-  -webkit-transform: scale(0);
-}
-/* line 493, ../../sass/_competition.sass */
-.leaderboard-butc .wrapper #leaderboard .club.position-8 {
-  -webkit-transform: translate(367.2px, 252px);
-  padding: 10px;
-}
-/* line 497, ../../sass/_competition.sass */
-.leaderboard-butc .wrapper #leaderboard .club.position-8 [data-club] {
-  width: 174px;
-  height: 54px;
-}
-/* line 501, ../../sass/_competition.sass */
-.leaderboard-butc .wrapper #leaderboard .club.position-8 .title {
-  font-size: 16.8px;
-}
-/* line 504, ../../sass/_competition.sass */
-.leaderboard-butc .wrapper #leaderboard .club.position-8 .position, .leaderboard-butc .wrapper #leaderboard .club.position-8 .score {
-  font-size: 42px;
-  bottom: -5px;
-}
-/* line 508, ../../sass/_competition.sass */
-.leaderboard-butc .wrapper #leaderboard .club.position-8 ul {
-  -webkit-transform: scale(0);
-}
-/* line 493, ../../sass/_competition.sass */
-.leaderboard-butc .wrapper #leaderboard .club.position-9 {
-  -webkit-transform: translate(367.2px, 336px);
-  padding: 10px;
-}
-/* line 497, ../../sass/_competition.sass */
-.leaderboard-butc .wrapper #leaderboard .club.position-9 [data-club] {
-  width: 174px;
-  height: 54px;
-}
-/* line 501, ../../sass/_competition.sass */
-.leaderboard-butc .wrapper #leaderboard .club.position-9 .title {
-  font-size: 16.8px;
-}
-/* line 504, ../../sass/_competition.sass */
-.leaderboard-butc .wrapper #leaderboard .club.position-9 .position, .leaderboard-butc .wrapper #leaderboard .club.position-9 .score {
-  font-size: 42px;
-  bottom: -5px;
-}
-/* line 508, ../../sass/_competition.sass */
-.leaderboard-butc .wrapper #leaderboard .club.position-9 ul {
-  -webkit-transform: scale(0);
-}
-/* line 493, ../../sass/_competition.sass */
-.leaderboard-butc .wrapper #leaderboard .club.position-10 {
-  -webkit-transform: translate(367.2px, 420px);
-  padding: 10px;
-}
-/* line 497, ../../sass/_competition.sass */
-.leaderboard-butc .wrapper #leaderboard .club.position-10 [data-club] {
-  width: 174px;
-  height: 54px;
-}
-/* line 501, ../../sass/_competition.sass */
-.leaderboard-butc .wrapper #leaderboard .club.position-10 .title {
-  font-size: 16.8px;
-}
-/* line 504, ../../sass/_competition.sass */
-.leaderboard-butc .wrapper #leaderboard .club.position-10 .position, .leaderboard-butc .wrapper #leaderboard .club.position-10 .score {
-  font-size: 42px;
-  bottom: -5px;
-}
-/* line 508, ../../sass/_competition.sass */
-.leaderboard-butc .wrapper #leaderboard .club.position-10 ul {
-  -webkit-transform: scale(0);
-}
-/* line 493, ../../sass/_competition.sass */
-.leaderboard-butc .wrapper #leaderboard .club.position-11 {
-  -webkit-transform: translate(367.2px, 504px);
-  padding: 10px;
-}
-/* line 497, ../../sass/_competition.sass */
-.leaderboard-butc .wrapper #leaderboard .club.position-11 [data-club] {
-  width: 174px;
-  height: 54px;
-}
-/* line 501, ../../sass/_competition.sass */
-.leaderboard-butc .wrapper #leaderboard .club.position-11 .title {
-  font-size: 16.8px;
-}
-/* line 504, ../../sass/_competition.sass */
-.leaderboard-butc .wrapper #leaderboard .club.position-11 .position, .leaderboard-butc .wrapper #leaderboard .club.position-11 .score {
-  font-size: 42px;
-  bottom: -5px;
-}
-/* line 508, ../../sass/_competition.sass */
-.leaderboard-butc .wrapper #leaderboard .club.position-11 ul {
-  -webkit-transform: scale(0);
-}
-/* line 493, ../../sass/_competition.sass */
-.leaderboard-butc .wrapper #leaderboard .club.position-12 {
-  -webkit-transform: translate(367.2px, 588px);
-  padding: 10px;
-}
-/* line 497, ../../sass/_competition.sass */
-.leaderboard-butc .wrapper #leaderboard .club.position-12 [data-club] {
-  width: 174px;
-  height: 54px;
-}
-/* line 501, ../../sass/_competition.sass */
-.leaderboard-butc .wrapper #leaderboard .club.position-12 .title {
-  font-size: 16.8px;
-}
-/* line 504, ../../sass/_competition.sass */
-.leaderboard-butc .wrapper #leaderboard .club.position-12 .position, .leaderboard-butc .wrapper #leaderboard .club.position-12 .score {
-  font-size: 42px;
-  bottom: -5px;
-}
-/* line 508, ../../sass/_competition.sass */
-.leaderboard-butc .wrapper #leaderboard .club.position-12 ul {
-  -webkit-transform: scale(0);
-}
-/* line 493, ../../sass/_competition.sass */
-.leaderboard-butc .wrapper #leaderboard .club.position-13 {
-  -webkit-transform: translate(367.2px, 672px);
-  padding: 10px;
-}
-/* line 497, ../../sass/_competition.sass */
-.leaderboard-butc .wrapper #leaderboard .club.position-13 [data-club] {
-  width: 174px;
-  height: 54px;
-}
-/* line 501, ../../sass/_competition.sass */
-.leaderboard-butc .wrapper #leaderboard .club.position-13 .title {
-  font-size: 16.8px;
-}
-/* line 504, ../../sass/_competition.sass */
-.leaderboard-butc .wrapper #leaderboard .club.position-13 .position, .leaderboard-butc .wrapper #leaderboard .club.position-13 .score {
-  font-size: 42px;
-  bottom: -5px;
-}
-/* line 508, ../../sass/_competition.sass */
-.leaderboard-butc .wrapper #leaderboard .club.position-13 ul {
-  -webkit-transform: scale(0);
-}
-/* line 493, ../../sass/_competition.sass */
-.leaderboard-butc .wrapper #leaderboard .club.position-14 {
-  -webkit-transform: translate(367.2px, 756px);
-  padding: 10px;
-}
-/* line 497, ../../sass/_competition.sass */
-.leaderboard-butc .wrapper #leaderboard .club.position-14 [data-club] {
-  width: 174px;
-  height: 54px;
-}
-/* line 501, ../../sass/_competition.sass */
-.leaderboard-butc .wrapper #leaderboard .club.position-14 .title {
-  font-size: 16.8px;
-}
-/* line 504, ../../sass/_competition.sass */
-.leaderboard-butc .wrapper #leaderboard .club.position-14 .position, .leaderboard-butc .wrapper #leaderboard .club.position-14 .score {
-  font-size: 42px;
-  bottom: -5px;
-}
-/* line 508, ../../sass/_competition.sass */
-.leaderboard-butc .wrapper #leaderboard .club.position-14 ul {
-  -webkit-transform: scale(0);
-}
-/* line 493, ../../sass/_competition.sass */
-.leaderboard-butc .wrapper #leaderboard .club.position-15 {
-  -webkit-transform: translate(367.2px, 840px);
-  padding: 10px;
-}
-/* line 497, ../../sass/_competition.sass */
-.leaderboard-butc .wrapper #leaderboard .club.position-15 [data-club] {
-  width: 174px;
-  height: 54px;
-}
-/* line 501, ../../sass/_competition.sass */
-.leaderboard-butc .wrapper #leaderboard .club.position-15 .title {
-  font-size: 16.8px;
-}
-/* line 504, ../../sass/_competition.sass */
-.leaderboard-butc .wrapper #leaderboard .club.position-15 .position, .leaderboard-butc .wrapper #leaderboard .club.position-15 .score {
-  font-size: 42px;
-  bottom: -5px;
-}
-/* line 508, ../../sass/_competition.sass */
-.leaderboard-butc .wrapper #leaderboard .club.position-15 ul {
-  -webkit-transform: scale(0);
-}
-/* line 493, ../../sass/_competition.sass */
-.leaderboard-butc .wrapper #leaderboard .club.position-16 {
-  -webkit-transform: translate(367.2px, 924px);
-  padding: 10px;
-}
-/* line 497, ../../sass/_competition.sass */
-.leaderboard-butc .wrapper #leaderboard .club.position-16 [data-club] {
-  width: 174px;
-  height: 54px;
-}
-/* line 501, ../../sass/_competition.sass */
-.leaderboard-butc .wrapper #leaderboard .club.position-16 .title {
-  font-size: 16.8px;
-}
-/* line 504, ../../sass/_competition.sass */
-.leaderboard-butc .wrapper #leaderboard .club.position-16 .position, .leaderboard-butc .wrapper #leaderboard .club.position-16 .score {
-  font-size: 42px;
-  bottom: -5px;
-}
-/* line 508, ../../sass/_competition.sass */
-.leaderboard-butc .wrapper #leaderboard .club.position-16 ul {
-  -webkit-transform: scale(0);
-}
-/* line 493, ../../sass/_competition.sass */
-.leaderboard-butc .wrapper #leaderboard .club.position-17 {
-  -webkit-transform: translate(367.2px, 1008px);
-  padding: 10px;
-}
-/* line 497, ../../sass/_competition.sass */
-.leaderboard-butc .wrapper #leaderboard .club.position-17 [data-club] {
-  width: 174px;
-  height: 54px;
-}
-/* line 501, ../../sass/_competition.sass */
-.leaderboard-butc .wrapper #leaderboard .club.position-17 .title {
-  font-size: 16.8px;
-}
-/* line 504, ../../sass/_competition.sass */
-.leaderboard-butc .wrapper #leaderboard .club.position-17 .position, .leaderboard-butc .wrapper #leaderboard .club.position-17 .score {
-  font-size: 42px;
-  bottom: -5px;
-}
-/* line 508, ../../sass/_competition.sass */
-.leaderboard-butc .wrapper #leaderboard .club.position-17 ul {
-  -webkit-transform: scale(0);
-}
-/* line 493, ../../sass/_competition.sass */
-.leaderboard-butc .wrapper #leaderboard .club.position-18 {
-  -webkit-transform: translate(367.2px, 1092px);
-  padding: 10px;
-}
-/* line 497, ../../sass/_competition.sass */
-.leaderboard-butc .wrapper #leaderboard .club.position-18 [data-club] {
-  width: 174px;
-  height: 54px;
-}
-/* line 501, ../../sass/_competition.sass */
-.leaderboard-butc .wrapper #leaderboard .club.position-18 .title {
-  font-size: 16.8px;
-}
-/* line 504, ../../sass/_competition.sass */
-.leaderboard-butc .wrapper #leaderboard .club.position-18 .position, .leaderboard-butc .wrapper #leaderboard .club.position-18 .score {
-  font-size: 42px;
-  bottom: -5px;
-}
-/* line 508, ../../sass/_competition.sass */
-.leaderboard-butc .wrapper #leaderboard .club.position-18 ul {
-  -webkit-transform: scale(0);
-}
-/* line 493, ../../sass/_competition.sass */
-.leaderboard-butc .wrapper #leaderboard .club.position-19 {
-  -webkit-transform: translate(367.2px, 1176px);
-  padding: 10px;
-}
-/* line 497, ../../sass/_competition.sass */
-.leaderboard-butc .wrapper #leaderboard .club.position-19 [data-club] {
-  width: 174px;
-  height: 54px;
-}
-/* line 501, ../../sass/_competition.sass */
-.leaderboard-butc .wrapper #leaderboard .club.position-19 .title {
-  font-size: 16.8px;
-}
-/* line 504, ../../sass/_competition.sass */
-.leaderboard-butc .wrapper #leaderboard .club.position-19 .position, .leaderboard-butc .wrapper #leaderboard .club.position-19 .score {
-  font-size: 42px;
-  bottom: -5px;
-}
-/* line 508, ../../sass/_competition.sass */
-.leaderboard-butc .wrapper #leaderboard .club.position-19 ul {
-  -webkit-transform: scale(0);
-}
-/* line 493, ../../sass/_competition.sass */
-.leaderboard-butc .wrapper #leaderboard .club.position-20 {
-  -webkit-transform: translate(367.2px, 1260px);
-  padding: 10px;
-}
-/* line 497, ../../sass/_competition.sass */
-.leaderboard-butc .wrapper #leaderboard .club.position-20 [data-club] {
-  width: 174px;
-  height: 54px;
-}
-/* line 501, ../../sass/_competition.sass */
-.leaderboard-butc .wrapper #leaderboard .club.position-20 .title {
-  font-size: 16.8px;
-}
-/* line 504, ../../sass/_competition.sass */
-.leaderboard-butc .wrapper #leaderboard .club.position-20 .position, .leaderboard-butc .wrapper #leaderboard .club.position-20 .score {
-  font-size: 42px;
-  bottom: -5px;
-}
-/* line 508, ../../sass/_competition.sass */
-.leaderboard-butc .wrapper #leaderboard .club.position-20 ul {
-  -webkit-transform: scale(0);
-}
-/* line 512, ../../sass/_competition.sass */
-.leaderboard-butc .wrapper #leaderboard .club.position-13 {
-  -webkit-transform: translate(571.2px, 0px);
-}
-/* line 512, ../../sass/_competition.sass */
-.leaderboard-butc .wrapper #leaderboard .club.position-14 {
-  -webkit-transform: translate(571.2px, 84px);
-}
-/* line 512, ../../sass/_competition.sass */
-.leaderboard-butc .wrapper #leaderboard .club.position-15 {
-  -webkit-transform: translate(571.2px, 168px);
-}
-/* line 512, ../../sass/_competition.sass */
-.leaderboard-butc .wrapper #leaderboard .club.position-16 {
-  -webkit-transform: translate(571.2px, 252px);
-}
-/* line 512, ../../sass/_competition.sass */
-.leaderboard-butc .wrapper #leaderboard .club.position-17 {
-  -webkit-transform: translate(571.2px, 336px);
-}
-/* line 512, ../../sass/_competition.sass */
-.leaderboard-butc .wrapper #leaderboard .club.position-18 {
-  -webkit-transform: translate(571.2px, 420px);
-}
-/* line 512, ../../sass/_competition.sass */
-.leaderboard-butc .wrapper #leaderboard .club.position-19 {
-  -webkit-transform: translate(571.2px, 504px);
-}
-/* line 512, ../../sass/_competition.sass */
-.leaderboard-butc .wrapper #leaderboard .club.position-20 {
-  -webkit-transform: translate(571.2px, 588px);
-}
-/* line 516, ../../sass/_competition.sass */
-.leaderboard-butc .wrapper #leaderboard .club.position-21 {
-  -webkit-transform: translate(775.2px, 0px);
-  padding: 10px;
-}
-/* line 520, ../../sass/_competition.sass */
-.leaderboard-butc .wrapper #leaderboard .club.position-21 [data-club] {
-  width: 214.8px;
-  height: 26px;
-}
-/* line 524, ../../sass/_competition.sass */
-.leaderboard-butc .wrapper #leaderboard .club.position-21 .title {
-  font-size: 16.8px;
-  padding-top: 3px;
-  margin-left: 40px;
-}
-/* line 529, ../../sass/_competition.sass */
-.leaderboard-butc .wrapper #leaderboard .club.position-21 .position, .leaderboard-butc .wrapper #leaderboard .club.position-21 .score {
-  font-size: 28px;
-  bottom: 0;
-}
-/* line 533, ../../sass/_competition.sass */
-.leaderboard-butc .wrapper #leaderboard .club.position-21 ul {
-  -webkit-transform: scale(0);
-}
-/* line 516, ../../sass/_competition.sass */
-.leaderboard-butc .wrapper #leaderboard .club.position-22 {
-  -webkit-transform: translate(775.2px, 56px);
-  padding: 10px;
-}
-/* line 520, ../../sass/_competition.sass */
-.leaderboard-butc .wrapper #leaderboard .club.position-22 [data-club] {
-  width: 214.8px;
-  height: 26px;
-}
-/* line 524, ../../sass/_competition.sass */
-.leaderboard-butc .wrapper #leaderboard .club.position-22 .title {
-  font-size: 16.8px;
-  padding-top: 3px;
-  margin-left: 40px;
-}
-/* line 529, ../../sass/_competition.sass */
-.leaderboard-butc .wrapper #leaderboard .club.position-22 .position, .leaderboard-butc .wrapper #leaderboard .club.position-22 .score {
-  font-size: 28px;
-  bottom: 0;
-}
-/* line 533, ../../sass/_competition.sass */
-.leaderboard-butc .wrapper #leaderboard .club.position-22 ul {
-  -webkit-transform: scale(0);
-}
-/* line 516, ../../sass/_competition.sass */
-.leaderboard-butc .wrapper #leaderboard .club.position-23 {
-  -webkit-transform: translate(775.2px, 112px);
-  padding: 10px;
-}
-/* line 520, ../../sass/_competition.sass */
-.leaderboard-butc .wrapper #leaderboard .club.position-23 [data-club] {
-  width: 214.8px;
-  height: 26px;
-}
-/* line 524, ../../sass/_competition.sass */
-.leaderboard-butc .wrapper #leaderboard .club.position-23 .title {
-  font-size: 16.8px;
-  padding-top: 3px;
-  margin-left: 40px;
-}
-/* line 529, ../../sass/_competition.sass */
-.leaderboard-butc .wrapper #leaderboard .club.position-23 .position, .leaderboard-butc .wrapper #leaderboard .club.position-23 .score {
-  font-size: 28px;
-  bottom: 0;
-}
-/* line 533, ../../sass/_competition.sass */
-.leaderboard-butc .wrapper #leaderboard .club.position-23 ul {
-  -webkit-transform: scale(0);
-}
-/* line 516, ../../sass/_competition.sass */
-.leaderboard-butc .wrapper #leaderboard .club.position-24 {
-  -webkit-transform: translate(775.2px, 168px);
-  padding: 10px;
-}
-/* line 520, ../../sass/_competition.sass */
-.leaderboard-butc .wrapper #leaderboard .club.position-24 [data-club] {
-  width: 214.8px;
-  height: 26px;
-}
-/* line 524, ../../sass/_competition.sass */
-.leaderboard-butc .wrapper #leaderboard .club.position-24 .title {
-  font-size: 16.8px;
-  padding-top: 3px;
-  margin-left: 40px;
-}
-/* line 529, ../../sass/_competition.sass */
-.leaderboard-butc .wrapper #leaderboard .club.position-24 .position, .leaderboard-butc .wrapper #leaderboard .club.position-24 .score {
-  font-size: 28px;
-  bottom: 0;
-}
-/* line 533, ../../sass/_competition.sass */
-.leaderboard-butc .wrapper #leaderboard .club.position-24 ul {
-  -webkit-transform: scale(0);
-}
-/* line 516, ../../sass/_competition.sass */
-.leaderboard-butc .wrapper #leaderboard .club.position-25 {
-  -webkit-transform: translate(775.2px, 224px);
-  padding: 10px;
-}
-/* line 520, ../../sass/_competition.sass */
-.leaderboard-butc .wrapper #leaderboard .club.position-25 [data-club] {
-  width: 214.8px;
-  height: 26px;
-}
-/* line 524, ../../sass/_competition.sass */
-.leaderboard-butc .wrapper #leaderboard .club.position-25 .title {
-  font-size: 16.8px;
-  padding-top: 3px;
-  margin-left: 40px;
-}
-/* line 529, ../../sass/_competition.sass */
-.leaderboard-butc .wrapper #leaderboard .club.position-25 .position, .leaderboard-butc .wrapper #leaderboard .club.position-25 .score {
-  font-size: 28px;
-  bottom: 0;
-}
-/* line 533, ../../sass/_competition.sass */
-.leaderboard-butc .wrapper #leaderboard .club.position-25 ul {
-  -webkit-transform: scale(0);
-}
-/* line 516, ../../sass/_competition.sass */
-.leaderboard-butc .wrapper #leaderboard .club.position-26 {
-  -webkit-transform: translate(775.2px, 280px);
-  padding: 10px;
-}
-/* line 520, ../../sass/_competition.sass */
-.leaderboard-butc .wrapper #leaderboard .club.position-26 [data-club] {
-  width: 214.8px;
-  height: 26px;
-}
-/* line 524, ../../sass/_competition.sass */
-.leaderboard-butc .wrapper #leaderboard .club.position-26 .title {
-  font-size: 16.8px;
-  padding-top: 3px;
-  margin-left: 40px;
-}
-/* line 529, ../../sass/_competition.sass */
-.leaderboard-butc .wrapper #leaderboard .club.position-26 .position, .leaderboard-butc .wrapper #leaderboard .club.position-26 .score {
-  font-size: 28px;
-  bottom: 0;
-}
-/* line 533, ../../sass/_competition.sass */
-.leaderboard-butc .wrapper #leaderboard .club.position-26 ul {
-  -webkit-transform: scale(0);
-}
-/* line 516, ../../sass/_competition.sass */
-.leaderboard-butc .wrapper #leaderboard .club.position-27 {
-  -webkit-transform: translate(775.2px, 336px);
-  padding: 10px;
-}
-/* line 520, ../../sass/_competition.sass */
-.leaderboard-butc .wrapper #leaderboard .club.position-27 [data-club] {
-  width: 214.8px;
-  height: 26px;
-}
-/* line 524, ../../sass/_competition.sass */
-.leaderboard-butc .wrapper #leaderboard .club.position-27 .title {
-  font-size: 16.8px;
-  padding-top: 3px;
-  margin-left: 40px;
-}
-/* line 529, ../../sass/_competition.sass */
-.leaderboard-butc .wrapper #leaderboard .club.position-27 .position, .leaderboard-butc .wrapper #leaderboard .club.position-27 .score {
-  font-size: 28px;
-  bottom: 0;
-}
-/* line 533, ../../sass/_competition.sass */
-.leaderboard-butc .wrapper #leaderboard .club.position-27 ul {
-  -webkit-transform: scale(0);
-}
-/* line 516, ../../sass/_competition.sass */
-.leaderboard-butc .wrapper #leaderboard .club.position-28 {
-  -webkit-transform: translate(775.2px, 392px);
-  padding: 10px;
-}
-/* line 520, ../../sass/_competition.sass */
-.leaderboard-butc .wrapper #leaderboard .club.position-28 [data-club] {
-  width: 214.8px;
-  height: 26px;
-}
-/* line 524, ../../sass/_competition.sass */
-.leaderboard-butc .wrapper #leaderboard .club.position-28 .title {
-  font-size: 16.8px;
-  padding-top: 3px;
-  margin-left: 40px;
-}
-/* line 529, ../../sass/_competition.sass */
-.leaderboard-butc .wrapper #leaderboard .club.position-28 .position, .leaderboard-butc .wrapper #leaderboard .club.position-28 .score {
-  font-size: 28px;
-  bottom: 0;
-}
-/* line 533, ../../sass/_competition.sass */
-.leaderboard-butc .wrapper #leaderboard .club.position-28 ul {
-  -webkit-transform: scale(0);
-}
-/* line 516, ../../sass/_competition.sass */
-.leaderboard-butc .wrapper #leaderboard .club.position-29 {
-  -webkit-transform: translate(775.2px, 448px);
-  padding: 10px;
-}
-/* line 520, ../../sass/_competition.sass */
-.leaderboard-butc .wrapper #leaderboard .club.position-29 [data-club] {
-  width: 214.8px;
-  height: 26px;
-}
-/* line 524, ../../sass/_competition.sass */
-.leaderboard-butc .wrapper #leaderboard .club.position-29 .title {
-  font-size: 16.8px;
-  padding-top: 3px;
-  margin-left: 40px;
-}
-/* line 529, ../../sass/_competition.sass */
-.leaderboard-butc .wrapper #leaderboard .club.position-29 .position, .leaderboard-butc .wrapper #leaderboard .club.position-29 .score {
-  font-size: 28px;
-  bottom: 0;
-}
-/* line 533, ../../sass/_competition.sass */
-.leaderboard-butc .wrapper #leaderboard .club.position-29 ul {
-  -webkit-transform: scale(0);
-}
-/* line 516, ../../sass/_competition.sass */
-.leaderboard-butc .wrapper #leaderboard .club.position-30 {
-  -webkit-transform: translate(775.2px, 504px);
-  padding: 10px;
-}
-/* line 520, ../../sass/_competition.sass */
-.leaderboard-butc .wrapper #leaderboard .club.position-30 [data-club] {
-  width: 214.8px;
-  height: 26px;
-}
-/* line 524, ../../sass/_competition.sass */
-.leaderboard-butc .wrapper #leaderboard .club.position-30 .title {
-  font-size: 16.8px;
-  padding-top: 3px;
-  margin-left: 40px;
-}
-/* line 529, ../../sass/_competition.sass */
-.leaderboard-butc .wrapper #leaderboard .club.position-30 .position, .leaderboard-butc .wrapper #leaderboard .club.position-30 .score {
-  font-size: 28px;
-  bottom: 0;
-}
-/* line 533, ../../sass/_competition.sass */
-.leaderboard-butc .wrapper #leaderboard .club.position-30 ul {
-  -webkit-transform: scale(0);
-}
-/* line 516, ../../sass/_competition.sass */
-.leaderboard-butc .wrapper #leaderboard .club.position-31 {
-  -webkit-transform: translate(775.2px, 560px);
-  padding: 10px;
-}
-/* line 520, ../../sass/_competition.sass */
-.leaderboard-butc .wrapper #leaderboard .club.position-31 [data-club] {
-  width: 214.8px;
-  height: 26px;
-}
-/* line 524, ../../sass/_competition.sass */
-.leaderboard-butc .wrapper #leaderboard .club.position-31 .title {
-  font-size: 16.8px;
-  padding-top: 3px;
-  margin-left: 40px;
-}
-/* line 529, ../../sass/_competition.sass */
-.leaderboard-butc .wrapper #leaderboard .club.position-31 .position, .leaderboard-butc .wrapper #leaderboard .club.position-31 .score {
-  font-size: 28px;
-  bottom: 0;
-}
-/* line 533, ../../sass/_competition.sass */
-.leaderboard-butc .wrapper #leaderboard .club.position-31 ul {
-  -webkit-transform: scale(0);
-}
-/* line 516, ../../sass/_competition.sass */
-.leaderboard-butc .wrapper #leaderboard .club.position-32 {
-  -webkit-transform: translate(775.2px, 616px);
-  padding: 10px;
-}
-/* line 520, ../../sass/_competition.sass */
-.leaderboard-butc .wrapper #leaderboard .club.position-32 [data-club] {
-  width: 214.8px;
-  height: 26px;
-}
-/* line 524, ../../sass/_competition.sass */
-.leaderboard-butc .wrapper #leaderboard .club.position-32 .title {
-  font-size: 16.8px;
-  padding-top: 3px;
-  margin-left: 40px;
-}
-/* line 529, ../../sass/_competition.sass */
-.leaderboard-butc .wrapper #leaderboard .club.position-32 .position, .leaderboard-butc .wrapper #leaderboard .club.position-32 .score {
-  font-size: 28px;
-  bottom: 0;
-}
-/* line 533, ../../sass/_competition.sass */
-.leaderboard-butc .wrapper #leaderboard .club.position-32 ul {
-  -webkit-transform: scale(0);
-}
-
 /* line 2, ../../sass/_target_list.sass */
-.target-list span.unallocated {
-  margin-left: 10px;
-  color: #D58100;
-  font-weight: bold;
-  cursor: help;
-}
-/* line 8, ../../sass/_target_list.sass */
 .target-list .detail {
   font-weight: bold;
   margin-right: 5px;
 }
-/* line 12, ../../sass/_target_list.sass */
+/* line 6, ../../sass/_target_list.sass */
 .target-list .boss {
   margin: 10px 0;
-  border-bottom: 1px solid #6FB3FF;
+  border-bottom: 1px solid #5DA9E9;
 }
-/* line 16, ../../sass/_target_list.sass */
+/* line 10, ../../sass/_target_list.sass */
 .target-list .boss .archer-block {
   margin-bottom: 0;
   border-radius: 0;
   border-bottom: 0;
 }
-/* line 21, ../../sass/_target_list.sass */
+/* line 15, ../../sass/_target_list.sass */
 .target-list__btn {
   display: block;
   width: 100%;
   margin: 10px 0;
 }
-/* line 26, ../../sass/_target_list.sass */
+/* line 20, ../../sass/_target_list.sass */
 .target-list .archer-block {
   position: relative;
   overflow: unset;
 }
-/* line 30, ../../sass/_target_list.sass */
+/* line 24, ../../sass/_target_list.sass */
 .target-list .archer-block .name {
   height: 28px;
 }
-/* line 33, ../../sass/_target_list.sass */
+/* line 27, ../../sass/_target_list.sass */
 .target-list .archer-block .bottom {
   min-height: 53px;
   overflow: auto;
 }
-/* line 37, ../../sass/_target_list.sass */
+/* line 31, ../../sass/_target_list.sass */
 .target-list .select {
   cursor: pointer;
 }
-/* line 40, ../../sass/_target_list.sass */
+/* line 34, ../../sass/_target_list.sass */
 .target-list .archer-selector {
   position: absolute;
   top: 28px;
@@ -6143,7 +5029,7 @@ body {
   overflow-y: scroll;
   z-index: 1;
 }
-/* line 52, ../../sass/_target_list.sass */
+/* line 46, ../../sass/_target_list.sass */
 .target-list .archer-selector__input {
   width: 100%;
   border: none;
@@ -6151,28 +5037,28 @@ body {
   border-bottom: 2px solid #CCCCCC;
   outline: none;
 }
-/* line 59, ../../sass/_target_list.sass */
+/* line 53, ../../sass/_target_list.sass */
 .target-list .archer-selector__row {
   padding: 5px 8px;
   border-bottom: 1px solid #CCCCCC;
   background-color: white;
   cursor: pointer;
 }
-/* line 65, ../../sass/_target_list.sass */
+/* line 59, ../../sass/_target_list.sass */
 .target-list .archer-selector__row:hover {
   background-color: #002147;
   color: white;
 }
-/* line 69, ../../sass/_target_list.sass */
+/* line 63, ../../sass/_target_list.sass */
 .target-list .archer-selector__row[aria-selected] {
-  background-color: #6FB3FF;
+  background-color: #5DA9E9;
 }
-/* line 71, ../../sass/_target_list.sass */
+/* line 65, ../../sass/_target_list.sass */
 .target-list .archer-selector__row[aria-selected]:hover {
   background-color: #002147;
   color: white;
 }
-/* line 75, ../../sass/_target_list.sass */
+/* line 69, ../../sass/_target_list.sass */
 .target-list .archer-selector__row:last-child {
   border-bottom: none;
 }
@@ -6253,7 +5139,7 @@ table.table .missed-cut {
   position: fixed;
   top: 0;
   left: 0;
-  background-color: #353345;
+  background-color: #03315f;
   padding-bottom: 20px;
 }
 /* line 34, ../../sass/_target_input.sass */
@@ -6276,7 +5162,7 @@ table.table .missed-cut {
   margin: 15px;
   text-align: center;
   padding: 15px 10px;
-  background-color: #6FB3FF;
+  background-color: #5DA9E9;
   border-radius: 4px;
   line-height: 1.4;
   overflow-y: scroll;
@@ -6326,7 +5212,7 @@ table.table .missed-cut {
 /* line 92, ../../sass/_target_input.sass */
 #target-input .archers__row {
   padding: 3px 10px;
-  background-color: #6FB3FF;
+  background-color: #5DA9E9;
   display: grid;
   grid-template-columns: 30px 1fr auto;
   grid-gap: 3px;
@@ -6415,8 +5301,8 @@ table.table .missed-cut {
 }
 /* line 169, ../../sass/_target_input.sass */
 #target-input .archers__row--current .archers__score__input--active {
-  box-shadow: 0 0 2px #D58100 inset;
-  border-color: #D58100;
+  box-shadow: 0 0 2px #EEC643 inset;
+  border-color: #EEC643;
   background-color: #eeeeee;
 }
 /* line 174, ../../sass/_target_input.sass */
@@ -6424,7 +5310,7 @@ table.table .missed-cut {
   display: grid;
   grid-template-columns: repeat(4, 1fr);
   grid-template-rows: repeat(3, 1fr);
-  background-color: #353345;
+  background-color: #03315f;
   grid-gap: 5px;
   padding: 5px;
   flex-grow: 1;
