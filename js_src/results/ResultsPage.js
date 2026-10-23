@@ -28,15 +28,17 @@ const ResultsPage = ({ resultsApi }) => {
         return <a key={ format.id } href={ format.url } className="btn">{ format.label }</a>;
     });
 
-    return <>
-        <h2>{ title }</h2>
-        <SectionSelector mode={ data.mode } sections={ data.results } />
-        <h3>Downloadable results</h3>
-        <div className="btn-list">
-            { links }
-        </div>
-        <ResultList scores={ data.results[0].categories[0].scores } label={ data.results[0].categories[0].category.name } headers={ data.results[0].section.headers } />
-    </>;
+    return (
+        <ErrorBoundary FallbackComponent={ ErrorState }>
+            <h2>{ title }</h2>
+            <SectionSelector mode={ data.mode } sections={ data.results } />
+            <h3>Downloadable results</h3>
+            <div className="btn-list">
+                { links }
+            </div>
+            <ResultList scores={ data.results[0].categories[0].scores } label={ data.results[0].categories[0].category.name } headers={ data.results[0].section.headers } />
+        </ErrorBoundary>
+    );
 };
 
 export default ResultsPage;

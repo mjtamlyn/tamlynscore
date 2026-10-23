@@ -30,12 +30,13 @@ export default defineConfig([
         extends: compat.extends("eslint:recommended", "plugin:react/recommended"),
 
         plugins: { react },
-        settings: { react: { "version": "detect", } },
+        settings: { react: { "version": "18", } },
         languageOptions: {
             globals: {
                 ...globals.browser,
                 Atomics: "readonly",
                 SharedArrayBuffer: "readonly",
+                Iterator: true,
             },
 
             ecmaVersion: 2018,
