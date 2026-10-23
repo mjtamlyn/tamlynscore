@@ -10,6 +10,10 @@ class ArcherForm(forms.ModelForm):
         self.fields['bowstyle'].queryset = Bowstyle.objects.filter(ifaa_only=False)
         self.fields['agb_age'].label = 'Age group'
         self.fields['agb_number'].label = 'Archery GB Number'
+        self.fields['gender'].choices = [
+            ('G', 'Men/Open'),
+            ('L', 'Women/Female'),
+        ]
 
         if competition:
             if competition.ifaa_rules:
@@ -18,6 +22,10 @@ class ArcherForm(forms.ModelForm):
                 self.fields.pop('novice')
                 self.fields.pop('club')
                 self.fields.pop('agb_number')
+            if not competition.has_novices:
+                self.fields.pop('novice')
+            if not competition.has_agb_age_groups:
+                self.fields.pop('agb_age')
 
         if self.initial:
             for name in self.initial:
