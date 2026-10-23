@@ -217,6 +217,23 @@ class BaseResultMode(object):
             self.subrounds[shot_round] = shot_round.subrounds.all()
         return self.subrounds[shot_round]
 
+    def score_athlete_details(self, score):
+        entry = score.target.session_entry.competition_entry
+        names = [
+            entry.archer.name,
+            entry.team_name(short_form=True),
+        ]
+        if entry.competition.has_novices:
+            if entry.novice == 'N':
+                names.append('Novice')
+            else:
+                names.append('')
+        if entry.competition.has_agb_age_groups and not entry.competition.split_categories_on_agb_age:
+            if entry.agb_age:
+                names.append(entry.get_agb_age_display())
+            names.append('')
+        return names
+
     def score_details(self, score, section):
         from entries.models import (
             SCORING_ARCHER, SCORING_DOZENS, SCORING_FULL, SCORING_TOTALS,
@@ -365,11 +382,7 @@ class BaseResultMode(object):
                             ] + self.score_details(member, section) for member in score.team],
                         }
                     else:
-                        json_score = [
-                            score.placing,
-                            score.target.session_entry.competition_entry.archer.name,
-                            score.target.session_entry.competition_entry.team_name(short_form=True),
-                        ] + self.score_details(score, section)
+                        json_score = [score.placing] + self.score_athlete_details(score) + self.score_details(score, section)
                     json_category['scores'].append(json_score)
                 if not json_category['scores']:
                     continue

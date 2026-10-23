@@ -7,6 +7,7 @@ import ErrorState from '../utils/ErrorState';
 import Spinner from '../utils/Spinner';
 
 import SectionSelector from './SectionSelector';
+import ResultList from './ResultList';
 
 
 const ResultsPage = ({ resultsApi }) => {
@@ -24,7 +25,7 @@ const ResultsPage = ({ resultsApi }) => {
     const title = data.resultsStatus.leaderboard ? 'Leaderboard' : 'Results';
 
     const links = data.formats.filter(format => format.id !== 'html').map(format => {
-        return <a href={ format.url } className="btn">{ format.label }</a>;
+        return <a key={ format.id } href={ format.url } className="btn">{ format.label }</a>;
     });
 
     return <>
@@ -34,6 +35,7 @@ const ResultsPage = ({ resultsApi }) => {
         <div className="btn-list">
             { links }
         </div>
+        <ResultList scores={ data.results[0].categories[0].scores } label={ data.results[0].categories[0].category.name } headers={ data.results[0].section.headers } />
     </>;
 };
 
