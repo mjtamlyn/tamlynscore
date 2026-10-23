@@ -421,8 +421,60 @@ class CSVResultsRenderer(object):
 
 class JSONResultsRenderer(object):
     def render_to_json(self, context):
-        results = self.mode.serialize(context['results'])
-        return HttpResponse(results, content_type='application/json')
+        results = {
+            'mode': {
+                'id': self.mode.slug,
+                'name': str(self.mode),
+            },
+            'resultsStatus': {
+                'leaderboard': self.leaderboard,
+            },
+            'formats': [
+                {
+                    'id': 'pdf',
+                    'label': 'PDF',
+                    'url': self.request.build_absolute_uri(reverse(context['url_name'], kwargs={
+                        'slug': self.competition.slug,
+                        'mode': self.mode.slug,
+                        'format': 'pdf',
+                    })),
+                }, {
+                    'id': 'pdf-summary',
+                    'label': 'PDF (top 8s)',
+                    'url': self.request.build_absolute_uri(reverse(context['url_name'], kwargs={
+                        'slug': self.competition.slug,
+                        'mode': self.mode.slug,
+                        'format': 'pdf-summary',
+                    })),
+                }, {
+                    'id': 'csv',
+                    'label': 'CSV',
+                    'url': self.request.build_absolute_uri(reverse(context['url_name'], kwargs={
+                        'slug': self.competition.slug,
+                        'mode': self.mode.slug,
+                        'format': 'csv',
+                    })),
+                }, {
+                    'id': 'json',
+                    'label': 'JSON',
+                    'url': self.request.build_absolute_uri(reverse(context['url_name'], kwargs={
+                        'slug': self.competition.slug,
+                        'mode': self.mode.slug,
+                        'format': 'json',
+                    })),
+                }, {
+                    'id': 'html',
+                    'label': 'HTML',
+                    'url': self.request.build_absolute_uri(reverse(context['url_name'], kwargs={
+                        'slug': self.competition.slug,
+                        'mode': self.mode.slug,
+                        'format': 'html',
+                    })),
+                },
+            ],
+            'results': self.mode.serialize(context['results']),
+        }
+        return JsonResponse(results)
 
 
 class Leaderboard(ResultModeMixin, CompetitionMixin, PDFResultsRenderer, CSVResultsRenderer, JSONResultsRenderer, ListView):
