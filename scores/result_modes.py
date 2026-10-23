@@ -231,7 +231,8 @@ class BaseResultMode(object):
         if entry.competition.has_agb_age_groups and not entry.competition.split_categories_on_agb_age:
             if entry.agb_age:
                 names.append(entry.get_agb_age_display())
-            names.append('')
+            else:
+                names.append('')
         return names
 
     def score_details(self, score, section):

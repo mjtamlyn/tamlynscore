@@ -6,7 +6,7 @@ import useQuery from '../utils/useQuery';
 import ErrorState from '../utils/ErrorState';
 import Spinner from '../utils/Spinner';
 
-import SectionSelector from './SectionSelector';
+import ResultsNav from './ResultsNav';
 import ResultList from './ResultList';
 
 
@@ -20,23 +20,28 @@ const ResultsPage = ({ resultsApi }) => {
             </div>
         );
     }
-    console.log(data);
 
     const title = data.resultsStatus.leaderboard ? 'Leaderboard' : 'Results';
 
     const links = data.formats.filter(format => format.id !== 'html').map(format => {
-        return <a key={ format.id } href={ format.url } className="btn">{ format.label }</a>;
+        return <a className="results-nav__category" key={ format.id } href={ format.url }>{ format.label }</a>;
     });
 
     return (
         <ErrorBoundary FallbackComponent={ ErrorState }>
-            <h2>{ title }</h2>
-            <SectionSelector mode={ data.mode } sections={ data.results } />
-            <h3>Downloadable results</h3>
-            <div className="btn-list">
-                { links }
+            <div className="results-page">
+                <nav className="results-page__nav">
+                    <h3>{ title }</h3>
+                    <ResultsNav mode={ data.mode } sections={ data.results } />
+                    <div className="results-nav">
+                        <div className="results-nav__label">Downloadable results</div>
+                        { links }
+                    </div>
+                </nav>
+                <article className="results-page__main">
+                    <ResultList scores={ data.results[0].categories[0].scores } label={ data.results[0].categories[0].category.name } headers={ data.results[0].section.headers } />
+                </article>
             </div>
-            <ResultList scores={ data.results[0].categories[0].scores } label={ data.results[0].categories[0].category.name } headers={ data.results[0].section.headers } />
         </ErrorBoundary>
     );
 };
