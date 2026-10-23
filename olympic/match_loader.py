@@ -111,11 +111,11 @@ class MatchLoader:
         if not match.match % 2:
             match.results.reverse()
         match.seed_1 = match.results[0].seed.seed
-        match.archer_1 = match.results[0].seed.entry.archer
+        match.archer_1 = match.results[0].seed.label
         match.score_1 = match.results[0].total
         match.win_1 = match.results[0].win
         match.seed_2 = match.results[1].seed.seed
-        match.archer_2 = match.results[1].seed.entry.archer
+        match.archer_2 = match.results[1].seed.label
         match.score_2 = match.results[1].total
         match.win_2 = match.results[1].win
         match.is_bye = False
@@ -124,9 +124,9 @@ class MatchLoader:
         # Fill in next match if we have a result
         if match.results[0].win or match.results[1].win:
             winner = match.results[0].seed if match.results[0].win else match.results[1].seed
-            self.setup_next_match(match, winner.entry.archer, winner.seed)
+            self.setup_next_match(match, winner.label, winner.seed)
             loser = match.results[0].seed if not match.results[0].win else match.results[1].seed
-            self.setup_next_match(match, loser.entry.archer, loser.seed, win=False)
+            self.setup_next_match(match, loser.label, loser.seed, win=False)
 
     def add_incomplete_results(self, match):
         # This should only happen when we have only one half of a match
@@ -155,7 +155,7 @@ class MatchLoader:
         seed_2 = self.seeding_lookup.get((match.session_round_id, seeds[1]), None)
         if seed_1:
             match.seed_1 = seeds[0]
-            match.archer_1 = seed_1.entry.archer
+            match.archer_1 = seed_1.label
         elif seed_2:
             match.seed_1 = None
             match.archer_1 = 'BYE'
@@ -166,7 +166,7 @@ class MatchLoader:
             match.archer_1 = 'TBC'
         if seed_2:
             match.seed_2 = seed_2.seed
-            match.archer_2 = seed_2.entry.archer
+            match.archer_2 = seed_2.label
         elif seed_1:
             match.seed_2 = None
             match.archer_2 = 'BYE'
@@ -205,11 +205,11 @@ class MatchLoader:
             match.score_1 = match.score_2 = None
             match.is_bye = False
             if seeds[0] == seed.seed:
-                match.archer_1 = seed.entry.archer
+                match.archer_1 = seed.label
                 match.archer_2 = 'TBC'
             else:
                 match.archer_1 = 'TBC'
-                match.archer_2 = seed.entry.archer
+                match.archer_2 = seed.label
             if getattr(match, 'pre_filled', False):
                 self.handle_pre_filled(match)
             else:
@@ -221,9 +221,9 @@ class MatchLoader:
                 matches = self.match_lookup_by_seed[other_seeding]
                 if match == matches[0]:
                     if seeds[0] == other_seed:
-                        match.archer_1 = other_seeding.entry.archer
+                        match.archer_1 = other_seeding.label
                     else:
-                        match.archer_2 = other_seeding.entry.archer
+                        match.archer_2 = other_seeding.label
         elif not getattr(match, 'pre_filled', None):
             self.setup_empty_match(match)
 
@@ -372,14 +372,14 @@ class MatchLoader:
                         seed = self.seeding_lookup[(session_round.pk, i)]
                         if match.match % 2:
                             match.seed_1 = seed.seed
-                            match.archer_1 = seed.entry.archer
+                            match.archer_1 = seed.label
                             match.win_1 = True
                             match.is_bye = True
                             match.seed_2 = None
                             match.archer_2 = 'BYE'
                         else:
                             match.seed_2 = seed.seed
-                            match.archer_2 = seed.entry.archer
+                            match.archer_2 = seed.label
                             match.win_2 = True
                             match.is_bye = True
                             match.seed_1 = None
