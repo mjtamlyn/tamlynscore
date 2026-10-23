@@ -1,18 +1,3 @@
-<div class="section-selector">
-    {% for section, categories in results.items %}
-    <div class="section-selector__section">
-        <h4 class="section-selector__label">{{ section }}</h4>
-        <div class="section-selector__categories">
-        {% for category in categories %}
-            <div class="section-selector__category">
-                {{ category }}
-            </div>
-        {% endfor %}
-        </div>
-    </div>
-    {% endfor %}
-</div>
-
 <div class="row row--flex">
     {% for section, categories in results.items %}
     {% for category, scores in categories.items %}

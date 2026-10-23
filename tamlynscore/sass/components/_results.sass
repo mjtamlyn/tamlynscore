@@ -1,0 +1,71 @@
+.results-page
+  display: flex
+
+  &__nav
+    min-width: 250px
+    border-right: 1px solid $borders
+    margin-right: 15px
+
+  &__main
+    flex-grow: 1
+
+.results-nav
+
+  &__label
+    background-color: $lightblue
+    padding: 10px 8px
+    font-weight: bold
+    white-space: nowrap
+    overflow: hidden
+    text-overflow: ellipsis
+
+  &__category
+    display: block
+    cursor: pointer
+    padding: 10px 24px 10px 8px
+    font-size: 16px
+    position: relative
+    white-space: nowrap
+    overflow: hidden
+    text-overflow: ellipsis
+    border-bottom: 1px solid $borders
+
+    &--active
+      background-color: $bg-dark
+
+    &:after
+      @include fa-icon()
+      content: $fa-var-chevron-right
+      font-size: 14px
+      color: $borders
+      position: absolute
+      top: calc(50% - 7px)
+      right: 8px
+
+    &:hover
+      background-color: $bg
+
+.results-list
+  &__grid
+    display: grid
+    font-size: 14px
+    text-align: center
+
+  &__heading,
+  &__part
+    padding: 5px
+    border-bottom: 1px solid $borders
+    white-space: nowrap
+    overflow: hidden
+    text-overflow: ellipsis
+
+    &--left
+      text-align: left
+
+  &__heading
+    font-weight: bold
+
+  &__score-sheet:after
+    @include fa-icon()
+    content: $fa-var-table
+

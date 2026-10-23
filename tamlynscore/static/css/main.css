@@ -3855,16 +3855,6 @@ button.action-button {
   margin-left: 3px;
 }
 
-/* line 100, ../../sass/_buttons.sass */
-.btn-list {
-  display: flex;
-  justify-content: center;
-}
-/* line 104, ../../sass/_buttons.sass */
-.btn-list .btn {
-  margin: 0 5px;
-}
-
 /* line 1, ../../sass/components/_error_state.sass */
 .error-state {
   background-color: red;
@@ -4673,47 +4663,97 @@ ul.link-list li a:hover {
   margin-left: 5px;
 }
 
-/* line 1, ../../sass/components/_section_selector.sass */
-.section-selector {
-  margin: 0 auto;
-  max-width: 800px;
-}
-/* line 5, ../../sass/components/_section_selector.sass */
-.section-selector__section {
-  margin: 15px;
-  border: 1px solid #5DA9E9;
-  border-radius: 5px;
-  overflow: hidden;
-}
-/* line 11, ../../sass/components/_section_selector.sass */
-.section-selector__label {
-  height: 40px;
-  line-height: 30px;
-  background-color: #5DA9E9;
-  padding: 5px 15px;
-  text-align: center;
-  margin: 0;
-}
-/* line 19, ../../sass/components/_section_selector.sass */
-.section-selector__categories {
+/* line 1, ../../sass/components/_results.sass */
+.results-page {
   display: flex;
-  justify-content: center;
-  flex-wrap: wrap;
-  padding: 10px 0;
 }
-/* line 25, ../../sass/components/_section_selector.sass */
-.section-selector__category {
-  margin: 5px;
-  padding: 0 8px;
-  min-width: 30%;
-  height: 40px;
-  line-height: 38px;
-  background-color: #c0e0f7;
-  border: 1px solid #5DA9E9;
-  border-radius: 5px;
+/* line 4, ../../sass/components/_results.sass */
+.results-page__nav {
+  min-width: 250px;
+  border-right: 1px solid #CCCCCC;
+  margin-right: 15px;
+}
+/* line 9, ../../sass/components/_results.sass */
+.results-page__main {
+  flex-grow: 1;
+}
+
+/* line 14, ../../sass/components/_results.sass */
+.results-nav__label {
+  background-color: #5DA9E9;
+  padding: 10px 8px;
+  font-weight: bold;
+  white-space: nowrap;
   overflow: hidden;
-  text-align: center;
+  text-overflow: ellipsis;
+}
+/* line 22, ../../sass/components/_results.sass */
+.results-nav__category {
+  display: block;
+  cursor: pointer;
+  padding: 10px 24px 10px 8px;
   font-size: 16px;
+  position: relative;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  border-bottom: 1px solid #CCCCCC;
+}
+/* line 33, ../../sass/components/_results.sass */
+.results-nav__category--active {
+  background-color: #eeeeee;
+}
+/* line 36, ../../sass/components/_results.sass */
+.results-nav__category:after {
+  display: inline-block;
+  font: normal normal normal 14px/1 FontAwesome;
+  font-size: inherit;
+  text-rendering: auto;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+  content: "";
+  font-size: 14px;
+  color: #CCCCCC;
+  position: absolute;
+  top: calc(50% - 7px);
+  right: 8px;
+}
+/* line 45, ../../sass/components/_results.sass */
+.results-nav__category:hover {
+  background-color: #f7f7f7;
+}
+
+/* line 49, ../../sass/components/_results.sass */
+.results-list__grid {
+  display: grid;
+  font-size: 14px;
+  text-align: center;
+}
+/* line 54, ../../sass/components/_results.sass */
+.results-list__heading, .results-list__part {
+  padding: 5px;
+  border-bottom: 1px solid #CCCCCC;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+/* line 62, ../../sass/components/_results.sass */
+.results-list__heading--left, .results-list__part--left {
+  text-align: left;
+}
+/* line 65, ../../sass/components/_results.sass */
+.results-list__heading {
+  font-weight: bold;
+}
+/* line 68, ../../sass/components/_results.sass */
+.results-list__score-sheet:after {
+  display: inline-block;
+  font: normal normal normal 14px/1 FontAwesome;
+  font-size: inherit;
+  text-rendering: auto;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+  content: "";
 }
 
 /* line 20, ../../sass/main.sass */
