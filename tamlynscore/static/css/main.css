@@ -3855,6 +3855,16 @@ button.action-button {
   margin-left: 3px;
 }
 
+/* line 100, ../../sass/_buttons.sass */
+.btn-list {
+  display: flex;
+  justify-content: center;
+}
+/* line 104, ../../sass/_buttons.sass */
+.btn-list .btn {
+  margin: 0 5px;
+}
+
 /* line 1, ../../sass/components/_error_state.sass */
 .error-state {
   background-color: red;
@@ -4671,16 +4681,16 @@ ul.link-list li a:hover {
 /* line 5, ../../sass/components/_section_selector.sass */
 .section-selector__section {
   margin: 15px;
-  border: 1px solid #bbb;
+  border: 1px solid #5DA9E9;
   border-radius: 5px;
   overflow: hidden;
 }
 /* line 11, ../../sass/components/_section_selector.sass */
 .section-selector__label {
-  height: 30px;
+  height: 40px;
   line-height: 30px;
-  background-color: #bbb;
-  padding: 0 15px;
+  background-color: #5DA9E9;
+  padding: 5px 15px;
   text-align: center;
   margin: 0;
 }

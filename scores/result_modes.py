@@ -377,7 +377,7 @@ class BaseResultMode(object):
             if not json_section['categories']:
                 continue
             json_results.append(json_section)
-        return json.dumps(json_results)
+        return json_results
 
     def get_categories_for_entry(self, competition, entry):
         kwargs = {
