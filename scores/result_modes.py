@@ -1,9 +1,9 @@
 import itertools
-import json
 from collections import OrderedDict
 
 from django.core.exceptions import ImproperlyConfigured
 from django.db import connection, models
+from django.template.defaultfilters import slugify
 
 
 class ScoreMock(object):
@@ -53,6 +53,19 @@ class ResultCategory(object):
         ])
         return ' '.join(parts)
 
+    @property
+    def slug(self):
+        parts = []
+        if self.novice:
+            parts.append(self.novice[0])
+        if self.bowstyle:
+            parts.append(str(self.bowstyle)[0])
+        if self.junior:
+            parts.append(self.junior)
+        if self.gender:
+            parts.append(self.gender[0])
+        return ''.join(parts)
+
     def __eq__(self, other):
         return (
             self.bowstyle,
@@ -73,6 +86,16 @@ class ResultCategory(object):
             self.junior,
             self.novice,
         ))
+
+
+class TeamResultCategory(object):
+    """TODO: Get rid of this at some point and merge with the above."""
+    def __init__(self, name):
+        self.name = name
+        self.slug = slugify(name)
+
+    def __str__(self):
+        return '%s Team' % self.name
 
 
 class BaseResultMode(object):
@@ -314,15 +337,20 @@ class BaseResultMode(object):
         for section, categories in results.items():
             json_section = {
                 'section': {
-                    'label': section.label,
-                    'round': section.round.pk,
+                    'round': {
+                        'label': section.label,
+                        'codename': section.round.codename,
+                    },
                     'headers': section.headers,
                 },
                 'categories': [],
             }
             for category, scores in categories.items():
                 json_category = {
-                    'category': str(category),
+                    'category': {
+                        'name': str(category),
+                        'slug': category.slug,
+                    },
                     'scores': [],
                 }
                 for score in scores:
@@ -333,18 +361,23 @@ class BaseResultMode(object):
                                 score.club,
                             ] + self.score_details(score, section),
                             'team': [[
-                                member.target.pk,
+                                member.target.session_entry.competition_entry.archer.name,
                             ] + self.score_details(member, section) for member in score.team],
                         }
                     else:
                         json_score = [
                             score.placing,
-                            score.target.pk,
+                            score.target.session_entry.competition_entry.archer.name,
+                            score.target.session_entry.competition_entry.team_name(short_form=True),
                         ] + self.score_details(score, section)
                     json_category['scores'].append(json_score)
+                if not json_category['scores']:
+                    continue
                 json_section['categories'].append(json_category)
+            if not json_section['categories']:
+                continue
             json_results.append(json_section)
-        return json.dumps(json_results)
+        return json_results
 
     def get_categories_for_entry(self, competition, entry):
         kwargs = {
@@ -747,7 +780,7 @@ class Team(BaseResultMode):
         for type in self.get_team_types(competition):
             type_results = self.get_team_scores(competition, clubs, type)
             if type_results:
-                results[type] = type_results
+                results[TeamResultCategory(type)] = type_results
         return {self.get_section_for_round(session_round.shot_round, session_round.scoring_type, competition, is_team=True): results}
 
     def split_by_club(self, scores, competition, leaderboard, valid_rounds=None):
@@ -791,7 +824,7 @@ class Team(BaseResultMode):
         return clubs, session_round
 
     def get_team_types(self, competition):
-        # TODO: support team types properly
+        # TODO: support team types properly - using ResultsCategory!
         if competition.use_county_teams:
             return [
                 'Recurve',
@@ -937,7 +970,7 @@ class Team(BaseResultMode):
         return ['County' if competition.use_county_teams else 'Club']
 
     def label_for_round(self, round):
-        return 'Team'
+        return 'All rounds'
 
     def combine_rounds(self, club_scores):
         combined_scores = []
@@ -976,11 +1009,18 @@ class H2HSeedings(ByRound, Team, BaseResultMode):
             section.seedings_confirmed = round.seeding_set.exists()
             section_scores = self.filter_scores(competition, scores, round)
             section_results = self.get_round_results(competition, round, section_scores, section.seedings_confirmed, leaderboard)
+            # TODO: We have duplicate sections for the same shot round at the moment - combine by distance
             results[section] = section_results
         return results
 
     def get_round_results(self, competition, round, scores, seedings_confirmed, leaderboard):
         if not round.shot_round.team_type:
+            results_category = ResultCategory(
+                bowstyle=round.category.bowstyles.all()[0] if round.category.bowstyles.all() else None,  # TODO: Fix this
+                gender=round.category.get_gender_display(),
+                novice=round.category.get_novice_display(),
+                junior=round.category.ages[0] if round.category.ages else None,  # TODO: Fix this
+            )
             if seedings_confirmed:
                 results = []
                 score_lookup = {score.target.session_entry.competition_entry: score for score in scores}
@@ -1004,8 +1044,8 @@ class H2HSeedings(ByRound, Team, BaseResultMode):
                         placing=seeding.seed,
                     )
                     results.append(score)
-                return {round.category: results}
-            results = ByRound.get_round_results(self, competition, [round.shot_round for round in round.ranking_rounds.all()], scores, category=round.category)
+                return {results_category: results}
+            results = ByRound.get_round_results(self, competition, [round.shot_round for round in round.ranking_rounds.all()], scores, category=results_category)
             if round.cut:
                 for category, provisional_seedings in results.items():
                     for seed in provisional_seedings:
@@ -1030,7 +1070,7 @@ class H2HSeedings(ByRound, Team, BaseResultMode):
         return {round.category: team_scores}
 
     def label_for_round(self, round):
-        return str(round.shot_round)
+        return round.shot_round.short_name()
 
     def get_main_headers(self, competition):
         if competition.use_county_teams:
