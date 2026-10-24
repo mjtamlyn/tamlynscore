@@ -15,3 +15,7 @@ class Judge(models.Model):
 
     def __str__(self):
         return 'Judges - %s' % self.competition
+
+    def get_session_auth_hash(self):
+        return str(self.uuid)
+    get_session_auth_fallback_hash = get_session_auth_hash
