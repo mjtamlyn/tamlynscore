@@ -132,11 +132,11 @@ class MatchLoader:
         # This should only happen when we have only one half of a match
         result = match.result_set.all()[0]
         effective_seed = Match.objects.effective_seed(result.seed.seed, match.level)
-        if match.seed_1 == effective_seed:
+        if getattr(match, 'seed_1', None) == effective_seed:
             match.seed_1 = result.seed.seed
             match.score_1 = result.total
             match.results = [result, None]
-        if match.seed_2 == effective_seed:
+        if getattr(match, 'seed_2', None) == effective_seed:
             match.seed_2 = result.seed.seed
             match.score_2 = result.total
             match.results = [None, result]
