@@ -27,6 +27,25 @@ const ResultsPage = ({ resultsApi }) => {
         return <a className="results-nav__category" key={ format.id } href={ format.url }>{ format.label }</a>;
     });
 
+    console.log(data);
+
+    const results = [];
+    data.results.forEach(({ section, categories }) => {
+        const sectionId = section.round.codename;
+        categories.forEach(({ category, scores }) => {
+            const resultsetId = `${sectionId}-${category.slug}`;
+            results.push(
+                <ResultList
+                    key={ resultsetId }
+                    id={ resultsetId }
+                    scores={ scores }
+                    label={ category.name }
+                    headers={ section.headers }
+                />
+            );
+        });
+    });
+
     return (
         <ErrorBoundary FallbackComponent={ ErrorState }>
             <div className="results-page">
@@ -39,7 +58,7 @@ const ResultsPage = ({ resultsApi }) => {
                     </div>
                 </nav>
                 <article className="results-page__main">
-                    <ResultList scores={ data.results[0].categories[0].scores } label={ data.results[0].categories[0].category.name } headers={ data.results[0].section.headers } />
+                    { results }
                 </article>
             </div>
         </ErrorBoundary>
