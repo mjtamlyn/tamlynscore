@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { useState } from 'react';
 
 import { ErrorBoundary } from 'react-error-boundary';
 
@@ -12,6 +12,7 @@ import ResultList from './ResultList';
 
 const ResultsPage = ({ resultsApi }) => {
     const [data, loading] = useQuery(resultsApi);
+    const [selectedCategory, setSelectedCategory] = useState(null);
 
     if (loading) {
         return (
@@ -27,13 +28,14 @@ const ResultsPage = ({ resultsApi }) => {
         return <a className="results-nav__category" key={ format.id } href={ format.url }>{ format.label }</a>;
     });
 
-    console.log(data);
-
     const results = [];
     data.results.forEach(({ section, categories }) => {
         const sectionId = section.round.codename;
         categories.forEach(({ category, scores }) => {
             const resultsetId = `${sectionId}-${category.slug}`;
+            if (selectedCategory && selectedCategory !== resultsetId) {
+                return;
+            }
             results.push(
                 <ResultList
                     key={ resultsetId }
@@ -51,7 +53,7 @@ const ResultsPage = ({ resultsApi }) => {
             <div className="results-page">
                 <nav className="results-page__nav">
                     <h3>{ title }</h3>
-                    <ResultsNav mode={ data.mode } sections={ data.results } />
+                    <ResultsNav mode={ data.mode } sections={ data.results } selectedCategory={ selectedCategory } setSelectedCategory={ setSelectedCategory } />
                     <div className="results-nav">
                         <div className="results-nav__label">Downloadable results</div>
                         { links }

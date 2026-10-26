@@ -1,35 +1,32 @@
 import React from 'react';
 
 
-const CategoryLink = ({ name, selected = false }) => {
+const CategoryLink = ({ name, resultsetId, selectedCategory, setSelectedCategory }) => {
     var className = "results-nav__category";
-    if (selected) {
+    if (selectedCategory === resultsetId) {
         className += " results-nav__category--active";
     }
     return (
-        <a className={ className }>
+        <a className={ className } onClick={ () => setSelectedCategory(resultsetId) }>
             { name }
         </a>
     );
 };
 
-const Section = ({ mode, section, categories }) => {
-    const links = categories.map(category => <CategoryLink key={ category.category.slug } { ...category.category } />);
+const ResultsNav = ({ sections, mode, selectedCategory, setSelectedCategory }) => {
+    const blocks = [];
 
-    return (
-        <>
-            <div className="results-nav__label">{ section.round.label } - { mode.name }</div>
-            { links }
-        </>
-    );
-};
-
-const ResultsNav = ({ sections, mode }) => {
-    const blocks = sections.map(section => <Section mode={ mode } { ...section } key={ section.section.round.label } />);
+    sections.forEach(({ section, categories }) => {
+        blocks.push(<div key={ section.round.codename } className="results-nav__label">{ section.round.label } - { mode.name }</div>);
+        categories.forEach(({ category }) => {
+            const resultsetId = `${section.round.codename}-${category.slug}`;
+            blocks.push(<CategoryLink key={ resultsetId } resultsetId={ resultsetId } selectedCategory={ selectedCategory } setSelectedCategory={ setSelectedCategory } { ...category } />);
+        });
+    });
 
     return (
         <div className="results-nav">
-            <CategoryLink name="Show all" selected />
+            <CategoryLink name="Show all" selectedCategory={ selectedCategory } resultsetId={ null } setSelectedCategory={ setSelectedCategory } />
             { blocks }
         </div>
     );
