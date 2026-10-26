@@ -374,7 +374,7 @@ class BaseResultMode(object):
                 for score in scores:
                     if score.is_team:
                         json_score = {
-                            'summary': [
+                            'details': [
                                 score.placing,
                                 score.club,
                             ] + self.score_details(score, section),
@@ -383,7 +383,9 @@ class BaseResultMode(object):
                             ] + self.score_details(member, section) for member in score.team],
                         }
                     else:
-                        json_score = [score.placing] + self.score_athlete_details(score) + self.score_details(score, section)
+                        json_score = {
+                            'details': [score.placing] + self.score_athlete_details(score) + self.score_details(score, section),
+                        }
                     json_category['scores'].append(json_score)
                 if not json_category['scores']:
                     continue

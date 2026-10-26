@@ -4742,10 +4742,18 @@ ul.link-list li a:hover {
   text-align: left;
 }
 /* line 65, ../../sass/components/_results.sass */
-.results-list__heading {
+.results-list__heading--team-name, .results-list__part--team-name {
   font-weight: bold;
 }
 /* line 68, ../../sass/components/_results.sass */
+.results-list__heading--team-row, .results-list__part--team-row {
+  border-bottom: 0;
+}
+/* line 71, ../../sass/components/_results.sass */
+.results-list__heading {
+  font-weight: bold;
+}
+/* line 74, ../../sass/components/_results.sass */
 .results-list__score-sheet:after {
   display: inline-block;
   font: normal normal normal 14px/1 FontAwesome;

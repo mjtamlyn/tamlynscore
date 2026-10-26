@@ -22,6 +22,8 @@ const ResultsPage = ({ resultsApi }) => {
         );
     }
 
+    console.log(data);
+
     const title = data.resultsStatus.leaderboard ? 'Leaderboard' : 'Results';
 
     const links = data.formats.filter(format => format.id !== 'html').map(format => {
