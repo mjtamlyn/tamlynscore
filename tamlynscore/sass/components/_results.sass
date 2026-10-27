@@ -15,9 +15,27 @@
     height: 100vh
     overflow-y: scroll
 
+    &--full-width
+      height: auto
+      position: relative
+      width: 100%
+      border-right: 0
+      margin-right: 0
+
+  &__nav-toggle:after
+    @include fa-icon()
+    content: $fa-var-bars
+    position: absolute
+    top: 11px
+    left: 8px
+    cursor: pointer
+
   &__main
     flex-grow: 1
     margin-left: 315px
+
+    &--full-width
+      margin: 0
 
 .results-nav
 
@@ -56,6 +74,8 @@
       background-color: $bg
 
 .results-list
+  overflow: auto
+
   &__grid
     display: grid
     font-size: 14px

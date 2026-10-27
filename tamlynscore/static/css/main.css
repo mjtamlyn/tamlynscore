@@ -4684,12 +4684,38 @@ ul.link-list li a:hover {
   overflow-y: scroll;
 }
 /* line 18, ../../sass/components/_results.sass */
+.results-page__nav--full-width {
+  height: auto;
+  position: relative;
+  width: 100%;
+  border-right: 0;
+  margin-right: 0;
+}
+/* line 25, ../../sass/components/_results.sass */
+.results-page__nav-toggle:after {
+  display: inline-block;
+  font: normal normal normal 14px/1 FontAwesome;
+  font-size: inherit;
+  text-rendering: auto;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+  content: "";
+  position: absolute;
+  top: 11px;
+  left: 8px;
+  cursor: pointer;
+}
+/* line 33, ../../sass/components/_results.sass */
 .results-page__main {
   flex-grow: 1;
   margin-left: 315px;
 }
+/* line 37, ../../sass/components/_results.sass */
+.results-page__main--full-width {
+  margin: 0;
+}
 
-/* line 24, ../../sass/components/_results.sass */
+/* line 42, ../../sass/components/_results.sass */
 .results-nav__label {
   background-color: #5DA9E9;
   padding: 10px 8px;
@@ -4698,7 +4724,7 @@ ul.link-list li a:hover {
   overflow: hidden;
   text-overflow: ellipsis;
 }
-/* line 32, ../../sass/components/_results.sass */
+/* line 50, ../../sass/components/_results.sass */
 .results-nav__category {
   display: block;
   cursor: pointer;
@@ -4710,11 +4736,11 @@ ul.link-list li a:hover {
   text-overflow: ellipsis;
   border-bottom: 1px solid #CCCCCC;
 }
-/* line 43, ../../sass/components/_results.sass */
+/* line 61, ../../sass/components/_results.sass */
 .results-nav__category--active {
   background-color: #eeeeee;
 }
-/* line 46, ../../sass/components/_results.sass */
+/* line 64, ../../sass/components/_results.sass */
 .results-nav__category:after {
   display: inline-block;
   font: normal normal normal 14px/1 FontAwesome;
@@ -4729,18 +4755,22 @@ ul.link-list li a:hover {
   top: calc(50% - 7px);
   right: 8px;
 }
-/* line 55, ../../sass/components/_results.sass */
+/* line 73, ../../sass/components/_results.sass */
 .results-nav__category:hover {
   background-color: #f7f7f7;
 }
 
-/* line 59, ../../sass/components/_results.sass */
+/* line 76, ../../sass/components/_results.sass */
+.results-list {
+  overflow: auto;
+}
+/* line 79, ../../sass/components/_results.sass */
 .results-list__grid {
   display: grid;
   font-size: 14px;
   text-align: center;
 }
-/* line 64, ../../sass/components/_results.sass */
+/* line 84, ../../sass/components/_results.sass */
 .results-list__heading, .results-list__part {
   padding: 5px;
   border-bottom: 1px solid #CCCCCC;
@@ -4748,23 +4778,23 @@ ul.link-list li a:hover {
   overflow: hidden;
   text-overflow: ellipsis;
 }
-/* line 72, ../../sass/components/_results.sass */
+/* line 92, ../../sass/components/_results.sass */
 .results-list__heading--left, .results-list__part--left {
   text-align: left;
 }
-/* line 75, ../../sass/components/_results.sass */
+/* line 95, ../../sass/components/_results.sass */
 .results-list__heading--team-name, .results-list__part--team-name {
   font-weight: bold;
 }
-/* line 78, ../../sass/components/_results.sass */
+/* line 98, ../../sass/components/_results.sass */
 .results-list__heading--team-row, .results-list__part--team-row {
   border-bottom: 0;
 }
-/* line 81, ../../sass/components/_results.sass */
+/* line 101, ../../sass/components/_results.sass */
 .results-list__heading {
   font-weight: bold;
 }
-/* line 84, ../../sass/components/_results.sass */
+/* line 104, ../../sass/components/_results.sass */
 .results-list__score-sheet:after {
   display: inline-block;
   font: normal normal normal 14px/1 FontAwesome;
@@ -4774,7 +4804,7 @@ ul.link-list li a:hover {
   -moz-osx-font-smoothing: grayscale;
   content: "";
 }
-/* line 88, ../../sass/components/_results.sass */
+/* line 108, ../../sass/components/_results.sass */
 .results-list__score-sheet-row {
   grid-column: 1/-1;
   margin: 5px 0;
