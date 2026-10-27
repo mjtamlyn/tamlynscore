@@ -297,7 +297,7 @@ class OlympicScoreSheet(ScoreSheetsPdf):
                     final_timing = matches[0].timing
                     final_target = matches[0].target_for_seed(effective_seed)
                     try:
-                        bronze_match = Match.objects.get(level=1, session_round=seeding.session_round, match=2)
+                        bronze_match = Match.objects.get(level=1, session_round=seeding.session_round, match=matches[0].match + 1)
                     except Match.DoesNotExist:
                         bronze_target = bronze_timing = None
                     else:
