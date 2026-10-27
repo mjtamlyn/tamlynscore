@@ -99,6 +99,10 @@ class OlympicSessionRound(models.Model):
     def scoring_type(self):
         return self.ranking_rounds.all()[0].scoring_type
 
+    @property
+    def codename(self):
+        return 'h2h_%s_%s' % (self.shot_round.distance, self.shot_round.match_type.lower())
+
     def set_seedings(self, scores):
         for i, score in enumerate(scores):
             if score.is_team:

@@ -9,9 +9,9 @@ const byEntered = 'byEntered';
 const byDozen = 'byDozen';
 
 
-const ScoreSheet = ({ score, showDetails }) => {
+const ScoreSheet = ({ score, showDetails, initialDisplayMode = byEntered }) => {
     const competition = useContext(CompetitionContext);
-    const [displayMode, setDisplayMode] = useState(byEntered);
+    const [displayMode, setDisplayMode] = useState(initialDisplayMode);
 
     const totalArrows = score.round.endCount * score.round.endLength;
     const endCount = (displayMode === byEntered) ? score.round.endCount : (totalArrows / 12);
@@ -33,6 +33,8 @@ const ScoreSheet = ({ score, showDetails }) => {
                 <div className={ 'btn-segment ' + (displayMode === byDozen ? 'selected' : '') }>12s</div>
             </a>
         );
+    } else if (displayMode === byDozen) {
+        setDisplayMode(byEntered);
     }
 
     const ends = [...Array(endCount).keys()];
@@ -228,3 +230,4 @@ const ScoreSheet = ({ score, showDetails }) => {
 };
 
 export default ScoreSheet;
+export { byDozen, byEntered };

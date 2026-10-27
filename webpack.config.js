@@ -10,7 +10,8 @@ const config = {
     entry: {
         'score_sheet': './js_src/scoreSheet.js',
         'target_input': './js_src/targetInput.js',
-        'target_list': './js_src/targetList.js'
+        'target_list': './js_src/targetList.js',
+        'results': './js_src/results.js'
     },
     mode: devMode ? 'development' : 'production',
     output: {

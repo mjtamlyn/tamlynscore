@@ -19,9 +19,6 @@
             {% for session, details in target_list.items %}
             <li><p>
             <span>{{ session.start|date:"l, jS F - f a" }}</span>
-            {% if details.entries|length %}
-            <span class="unallocated" title="Unallocated entries">{{ details.entries|length }}</span>
-            {% endif %}
             <a class="btn btn-small" href="#session-{{ session.pk }}">Skip</a>
             <small title="Unregistered entries">{{ details.unregistered }} unregistered</small>
             </p></li>
