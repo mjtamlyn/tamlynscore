@@ -38,12 +38,16 @@ const ResultsPage = ({ resultsApi }) => {
             if (selectedCategory && selectedCategory !== resultsetId) {
                 return;
             }
+            var label = category.name;
+            if (!selectedCategory && data.results.length > 1) {
+                label = `${section.round.label} - ${category.name}`;
+            }
             results.push(
                 <ResultList
                     key={ resultsetId }
                     id={ resultsetId }
                     scores={ scores }
-                    label={ category.name }
+                    label={ label }
                     headers={ section.headers }
                 />
             );
