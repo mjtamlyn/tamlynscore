@@ -96,7 +96,7 @@ const ResultList = ({ label, headers, scores }) => {
     });
 
     // TODO: Make header types richer so we can build this
-    const templateColumns = `min-content 2fr ${scores[0].team ? '' : '1fr '}repeat(${headers.length - 2}, min-content)`;
+    const templateColumns = `min-content minmax(min-content, 2fr) ${scores[0].team ? '' : 'minmax(min-content, 1fr) '}repeat(${headers.length - 2}, min-content)`;
     return (
         <div className="results-list">
             <h3>{ label }</h3>
