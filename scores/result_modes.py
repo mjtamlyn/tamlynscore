@@ -67,7 +67,7 @@ class ResultCategory(object):
         if self.novice:
             parts.append(self.novice[0])
         if self.bowstyle:
-            parts.append(str(self.bowstyle)[0])
+            parts.append(str(self.bowstyle))
         if self.junior:
             parts.append(self.junior)
         if self.gender:
@@ -257,7 +257,9 @@ class BaseResultMode(object):
         if self.include_distance_breakdown:
             shot_round = score.target.session_entry.session_round.shot_round
             subrounds = self.get_subrounds(score)
-            if len(subrounds) > 1 and not score.target.session_entry.session_round.session.scoring_system == SCORING_TOTALS:
+            if getattr(score, 'pre_done_subrounds', False):
+                scores += score.subrounds
+            elif len(subrounds) > 1 and not score.target.session_entry.session_round.session.scoring_system == SCORING_TOTALS:
                 if score.disqualified or score.target.session_entry.session_round.session.scoring_system == SCORING_TOTALS:
                     scores += [''] * len(subrounds)
                 elif not hasattr(score, 'source'):
@@ -720,6 +722,7 @@ class DoubleRound(BaseResultMode):
 class CombinedRounds(BaseResultMode):
     slug = 'combined-rounds'
     name = 'Combined rounds'
+    include_distance_breakdown = True
 
     def get_results(self, competition, scores, leaderboard=False, request=None):
         """Get the results for each category, by combined all scores.
@@ -737,7 +740,8 @@ class CombinedRounds(BaseResultMode):
         session_round = SessionRound.objects.filter(session__competition=competition).order_by('session__start').exclude(
             olympicsessionround__exclude_ranking_rounds=True,
         ).first()
-        headers = ['Pl.'] + self.get_main_headers(competition)
+        # TODO: this only works for 3 rounds at the moment
+        headers = ['Pl.'] + self.get_main_headers(competition) + ['R1', 'R2', 'R3', 'Total']
         section = ResultSection(
             'Combined scores',
             round=session_round.shot_round,
@@ -772,10 +776,12 @@ class CombinedRounds(BaseResultMode):
                 target=sub_scores[0].target,
                 score=sum(s.score for s in sub_scores),
                 subrounds=[s.score for s in sub_scores],
+                pre_done_subrounds=True,
                 hits=sum(s.hits for s in sub_scores),
                 golds=sum(s.golds for s in sub_scores),
                 xs=sum(s.xs for s in sub_scores),
                 tiebreak=sum(s.tiebreak for s in sub_scores),
+                scoring_type=sub_scores[0].scoring_type,
             ) for entry, sub_scores in scores.items()]
             if not self.leaderboard:
                 new_scores = filter(lambda s: s.score > 0, new_scores)
@@ -1165,6 +1171,8 @@ class Weekend(BaseResultMode):
         for category in h2h_categories:
             h2h_results = category.get_results()
             results = []
+            fita = None
+            # TODO: this is very broken and probably has been for a long time
             for round in all_fita_results:
                 if category.category.gender == 'G' and round.round.name == 'WA 1440 (Men)':
                     fita = round

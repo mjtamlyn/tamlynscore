@@ -7,7 +7,7 @@ const ResultsHeaders = ({ headers, team }) => {
     const labels = headers.map((header) => {
         var className = "results-list__heading"
         // TODO: Make this less hacky!
-        if (header === "Archer" || header === "Club") {
+        if (header === "Archer" || header === "Club" || header === "Country") {
             className += " results-list__heading--left";
         }
         return (
@@ -28,7 +28,7 @@ const Result = ({ details, team, scoresheetUrl, scoresheetApi, headers }) =>{
     const items = Iterator.zip([details, headers]).toArray();
     const bits = items.map(([detail, id]) => {
         var className = baseClassName;
-        if (id === "Archer" || id === "Club") {
+        if (id === "Archer" || id === "Club" || id === "Country") {
             className += ` ${baseClassName}--left`;
             if (team) {
                 className += ` ${baseClassName}--team-name`;
