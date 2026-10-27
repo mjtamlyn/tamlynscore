@@ -32,9 +32,8 @@ const ResultsPage = ({ resultsApi }) => {
 
     const results = [];
     data.results.forEach(({ section, categories }) => {
-        const sectionId = section.round.codename;
         categories.forEach(({ category, scores }) => {
-            const resultsetId = `${sectionId}-${category.slug}`;
+            const resultsetId = `${section.id}-${category.slug}`;
             if (selectedCategory && selectedCategory !== resultsetId) {
                 return;
             }

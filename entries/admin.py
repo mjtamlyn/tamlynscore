@@ -30,6 +30,7 @@ class SessionRoundAdmin(admin.ModelAdmin):
 
 class ResultModeAdmin(admin.ModelAdmin):
     list_display = ('competition', 'mode')
+    list_filter = ('mode',)
 
 
 class SessionEntryAdmin(admin.ModelAdmin):

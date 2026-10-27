@@ -28,14 +28,21 @@ class ScoreMock(object):
 
 class ResultSection(object):
 
-    def __init__(self, label, round=None, scoring_type=None, headers=None):
+    def __init__(self, label, round=None, scoring_type=None, headers=None, id_suffix=None):
         self.label = label
         self.round = round
         self.scoring_type = scoring_type
         self.headers = headers
+        self.id_suffix = id_suffix
 
     def __str__(self):
         return self.label
+
+    @property
+    def id(self):
+        if self.id_suffix:
+            return '%s-%s' % (self.round.codename, self.id_suffix)
+        return self.round.codename
 
 
 class ResultCategory(object):
@@ -172,7 +179,7 @@ class BaseResultMode(object):
             ]
         return headers
 
-    def get_section_for_round(self, round, scoring_type, competition, is_team=False):
+    def get_section_for_round(self, round, scoring_type, competition, label=None, is_team=False):
         headers = ['Pl.'] + self.get_main_headers(competition)
         if competition.has_juniors or not competition.split_categories_on_agb_age and not is_team:
             headers += ['Age']
@@ -194,10 +201,11 @@ class BaseResultMode(object):
         else:
             headers += ['Hits', 'Golds']
         return ResultSection(
-            label=self.label_for_round(round),
+            label=label or self.label_for_round(round),
             round=round,
             scoring_type=scoring_type,
             headers=headers,
+            id_suffix=slugify(label) if label else '',
         )
 
     def get_main_headers(self, competition):
@@ -234,6 +242,11 @@ class BaseResultMode(object):
                 names.append(entry.get_agb_age_display())
             else:
                 names.append('')
+        if entry.competition.has_juniors:
+            if entry.age == 'J':
+                names.append('Jnr')
+            else:
+                names.append('Snr')
         return names
 
     def score_details(self, score, section):
@@ -356,6 +369,7 @@ class BaseResultMode(object):
         for section, categories in results.items():
             json_section = {
                 'section': {
+                    'id': section.id,
                     'round': {
                         'label': section.label,
                         'codename': section.round.codename,
@@ -440,27 +454,13 @@ class BySession(BaseResultMode):
         """
         self.leaderboard = leaderboard
         sessions = self.get_sessions(competition)
-        headers = ['Pl.'] + self.get_main_headers(competition)
         round = scores[0].target.session_entry.session_round
-        headers.append('Score')
-        if round.scoring_type == 'X':
-            headers += ['10s', 'Xs']
-        elif round.scoring_type == 'Y':
-            headers += ['Xs', '10s']
-        elif round.scoring_type == 'E':
-            headers += ['11s', '10s']
-        elif round.scoring_type == 'I':
-            headers += ['10s']
-        elif round.scoring_type == 'S':
-            pass
-        else:
-            headers += ['Hits', 'Golds']
         return OrderedDict((
-            ResultSection(
-                session.start.strftime('%Y/%m/%d %I:%M %p'),
+            self.get_section_for_round(
+                label=session.start.strftime('%Y/%m/%d %I:%M %p'),
                 round=round.shot_round,
                 scoring_type=round.scoring_type,
-                headers=headers,
+                competition=competition,
             ),
             self.get_session_results(competition, session, scores),
         ) for session in sessions)
@@ -738,7 +738,13 @@ class CombinedRounds(BaseResultMode):
             olympicsessionround__exclude_ranking_rounds=True,
         ).first()
         headers = ['Pl.'] + self.get_main_headers(competition)
-        section = ResultSection('Combined scores', session_round.shot_round, session_round.scoring_type, headers)
+        section = ResultSection(
+            'Combined scores',
+            round=session_round.shot_round,
+            scoring_type=session_round.scoring_type,
+            headers=headers,
+            id_suffix='combined',
+        )
         return {
             section: self.get_round_results(competition, scores)
         }
@@ -1236,7 +1242,7 @@ class Weekend(BaseResultMode):
             full_results[category.category.name] = results
 
         headers = ['Pl.'] + self.get_main_headers(competition) + ['720', 'H2H', '1440', 'Total']
-        section = ResultSection('Weekend results', None, None, headers)
+        section = ResultSection('Weekend results', headers=headers)
         return {section: full_results}
 
 

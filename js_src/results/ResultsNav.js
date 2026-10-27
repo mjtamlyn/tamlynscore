@@ -17,9 +17,9 @@ const ResultsNav = ({ sections, mode, selectedCategory, setSelectedCategory }) =
     const blocks = [];
 
     sections.forEach(({ section, categories }) => {
-        blocks.push(<div key={ section.round.codename } className="results-nav__label">{ section.round.label } - { mode.name }</div>);
+        blocks.push(<div key={ section.id } className="results-nav__label">{ section.round.label } - { mode.name }</div>);
         categories.forEach(({ category }) => {
-            const resultsetId = `${section.round.codename}-${category.slug}`;
+            const resultsetId = `${section.id}-${category.slug}`;
             blocks.push(<CategoryLink key={ resultsetId } resultsetId={ resultsetId } selectedCategory={ selectedCategory } setSelectedCategory={ setSelectedCategory } { ...category } />);
         });
     });
