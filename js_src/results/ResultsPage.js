@@ -57,17 +57,19 @@ const ResultsPage = ({ resultsApi }) => {
     return (
         <ErrorBoundary FallbackComponent={ ErrorState }>
             <div className="results-page">
-                <nav className="results-page__nav">
-                    <h3>{ title }</h3>
-                    <ResultsNav mode={ data.mode } sections={ data.results } selectedCategory={ selectedCategory } setSelectedCategory={ setSelectedCategory } />
-                    <div className="results-nav">
-                        <div className="results-nav__label">Downloadable results</div>
-                        { links }
-                    </div>
-                </nav>
-                <article className="results-page__main">
-                    { results }
-                </article>
+                <div className="results-page__scroll">
+                    <nav className="results-page__nav">
+                        <h3>{ title }</h3>
+                        <ResultsNav mode={ data.mode } sections={ data.results } selectedCategory={ selectedCategory } setSelectedCategory={ setSelectedCategory } />
+                        <div className="results-nav">
+                            <div className="results-nav__label">Downloadable results</div>
+                            { links }
+                        </div>
+                    </nav>
+                    <article className="results-page__main">
+                        { results }
+                    </article>
+                </div>
             </div>
         </ErrorBoundary>
     );

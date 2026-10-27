@@ -4665,20 +4665,31 @@ ul.link-list li a:hover {
 
 /* line 1, ../../sass/components/_results.sass */
 .results-page {
-  display: flex;
+  position: relative;
 }
 /* line 4, ../../sass/components/_results.sass */
-.results-page__nav {
-  min-width: 250px;
-  border-right: 1px solid #CCCCCC;
-  margin-right: 15px;
+.results-page__scroll {
+  display: flex;
+  height: 100vh;
+  overflow-y: scroll;
 }
 /* line 9, ../../sass/components/_results.sass */
+.results-page__nav {
+  width: 300px;
+  border-right: 1px solid #CCCCCC;
+  margin-right: 15px;
+  position: absolute;
+  top: 0;
+  height: 100vh;
+  overflow-y: scroll;
+}
+/* line 18, ../../sass/components/_results.sass */
 .results-page__main {
   flex-grow: 1;
+  margin-left: 315px;
 }
 
-/* line 14, ../../sass/components/_results.sass */
+/* line 24, ../../sass/components/_results.sass */
 .results-nav__label {
   background-color: #5DA9E9;
   padding: 10px 8px;
@@ -4687,7 +4698,7 @@ ul.link-list li a:hover {
   overflow: hidden;
   text-overflow: ellipsis;
 }
-/* line 22, ../../sass/components/_results.sass */
+/* line 32, ../../sass/components/_results.sass */
 .results-nav__category {
   display: block;
   cursor: pointer;
@@ -4699,11 +4710,11 @@ ul.link-list li a:hover {
   text-overflow: ellipsis;
   border-bottom: 1px solid #CCCCCC;
 }
-/* line 33, ../../sass/components/_results.sass */
+/* line 43, ../../sass/components/_results.sass */
 .results-nav__category--active {
   background-color: #eeeeee;
 }
-/* line 36, ../../sass/components/_results.sass */
+/* line 46, ../../sass/components/_results.sass */
 .results-nav__category:after {
   display: inline-block;
   font: normal normal normal 14px/1 FontAwesome;
@@ -4718,18 +4729,18 @@ ul.link-list li a:hover {
   top: calc(50% - 7px);
   right: 8px;
 }
-/* line 45, ../../sass/components/_results.sass */
+/* line 55, ../../sass/components/_results.sass */
 .results-nav__category:hover {
   background-color: #f7f7f7;
 }
 
-/* line 49, ../../sass/components/_results.sass */
+/* line 59, ../../sass/components/_results.sass */
 .results-list__grid {
   display: grid;
   font-size: 14px;
   text-align: center;
 }
-/* line 54, ../../sass/components/_results.sass */
+/* line 64, ../../sass/components/_results.sass */
 .results-list__heading, .results-list__part {
   padding: 5px;
   border-bottom: 1px solid #CCCCCC;
@@ -4737,23 +4748,23 @@ ul.link-list li a:hover {
   overflow: hidden;
   text-overflow: ellipsis;
 }
-/* line 62, ../../sass/components/_results.sass */
+/* line 72, ../../sass/components/_results.sass */
 .results-list__heading--left, .results-list__part--left {
   text-align: left;
 }
-/* line 65, ../../sass/components/_results.sass */
+/* line 75, ../../sass/components/_results.sass */
 .results-list__heading--team-name, .results-list__part--team-name {
   font-weight: bold;
 }
-/* line 68, ../../sass/components/_results.sass */
+/* line 78, ../../sass/components/_results.sass */
 .results-list__heading--team-row, .results-list__part--team-row {
   border-bottom: 0;
 }
-/* line 71, ../../sass/components/_results.sass */
+/* line 81, ../../sass/components/_results.sass */
 .results-list__heading {
   font-weight: bold;
 }
-/* line 74, ../../sass/components/_results.sass */
+/* line 84, ../../sass/components/_results.sass */
 .results-list__score-sheet:after {
   display: inline-block;
   font: normal normal normal 14px/1 FontAwesome;

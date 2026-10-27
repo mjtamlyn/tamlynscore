@@ -1,13 +1,23 @@
 .results-page
-  display: flex
+  position: relative
+
+  &__scroll
+    display: flex
+    height: 100vh
+    overflow-y: scroll
 
   &__nav
-    min-width: 250px
+    width: 300px
     border-right: 1px solid $borders
     margin-right: 15px
+    position: absolute
+    top: 0
+    height: 100vh
+    overflow-y: scroll
 
   &__main
     flex-grow: 1
+    margin-left: 315px
 
 .results-nav
 
