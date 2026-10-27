@@ -1035,7 +1035,11 @@ class H2HSeedings(ByRound, Team, BaseResultMode):
     def get_rounds(self, competition):
         from olympic.models import OlympicSessionRound
 
-        session_rounds = OlympicSessionRound.objects.filter(session__competition=competition).select_related('category').prefetch_related('ranking_rounds', 'category__bowstyles').order_by('id')
+        session_rounds = OlympicSessionRound.objects.filter(session__competition=competition).select_related('category').prefetch_related('ranking_rounds', 'category__bowstyles').order_by(
+            '-shot_round__distance',
+            '-shot_round_id',
+            'id',
+        )
         self.categories = [session_round.category for session_round in session_rounds]
         return session_rounds
 
@@ -1043,13 +1047,20 @@ class H2HSeedings(ByRound, Team, BaseResultMode):
         self.leaderboard = leaderboard
         rounds = self.get_rounds(competition)
         results = OrderedDict()
+
+        current_shot_round = None
+        section = None
         for round in rounds:
-            section = self.get_section_for_round(round, round.ranking_rounds.first().scoring_type, competition)
+            if round.shot_round != current_shot_round:
+                section = self.get_section_for_round(round, round.ranking_rounds.first().scoring_type, competition)
+                current_shot_round = round.shot_round
             section.seedings_confirmed = round.seeding_set.exists()
             section_scores = self.filter_scores(competition, scores, round)
             section_results = self.get_round_results(competition, round, section_scores, section.seedings_confirmed, leaderboard)
-            # TODO: We have duplicate sections for the same shot round at the moment - combine by distance
-            results[section] = section_results
+            if section not in results:
+                results[section] = section_results
+            else:
+                results[section].update(section_results)
         return results
 
     def get_round_results(self, competition, round, scores, seedings_confirmed, leaderboard):
