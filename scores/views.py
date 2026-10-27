@@ -472,7 +472,7 @@ class JSONResultsRenderer(object):
                     })),
                 },
             ],
-            'results': self.mode.serialize(context['results']),
+            'results': self.mode.serialize(context['results'], self.request),
         }
         return JsonResponse(results)
 

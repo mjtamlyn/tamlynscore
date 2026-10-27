@@ -4,6 +4,7 @@ from collections import OrderedDict
 from django.core.exceptions import ImproperlyConfigured
 from django.db import connection, models
 from django.template.defaultfilters import slugify
+from django.urls import reverse
 
 
 class ScoreMock(object):
@@ -348,7 +349,7 @@ class BaseResultMode(object):
                 ]
         return scores
 
-    def serialize(self, results=None):
+    def serialize(self, results=None, request=None):
         if results is None:
             results = self.get_results()
         json_results = []
@@ -383,8 +384,18 @@ class BaseResultMode(object):
                             ] + self.score_details(member, section) for member in score.team],
                         }
                     else:
+                        scoresheet_url = None
+                        scoresheet_api = None
+                        if hasattr(score, 'pk'):
+                            scoresheet_url = reverse('score_sheet', kwargs={'score_id': score.pk, 'slug': score.target.session_entry.competition_entry.competition.slug})
+                            scoresheet_api = reverse('score_sheet_api', kwargs={'score_id': score.pk, 'slug': score.target.session_entry.competition_entry.competition.slug})
+                            if request is not None:
+                                scoresheet_url = request.build_absolute_uri(scoresheet_url)
+                                scoresheet_api = request.build_absolute_uri(scoresheet_api)
                         json_score = {
                             'details': [score.placing] + self.score_athlete_details(score) + self.score_details(score, section),
+                            'scoresheetUrl': scoresheet_url,
+                            'scoresheetApi': scoresheet_api,
                         }
                     json_category['scores'].append(json_score)
                 if not json_category['scores']:

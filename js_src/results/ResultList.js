@@ -1,4 +1,6 @@
-import React from 'react';
+import React, { useState } from 'react';
+
+import ScoreSheetPage from '../input/ScoreSheetPage';
 
 
 const ResultsHeaders = ({ headers, team }) => {
@@ -18,7 +20,9 @@ const ResultsHeaders = ({ headers, team }) => {
     </>;
 };
 
-const Result = ({ details, team, headers }) =>{
+const Result = ({ details, team, scoresheetUrl, scoresheetApi, headers }) =>{
+    const [showScoresheet, setShowScoresheet] = useState(false);
+
     const baseClassName = "results-list__part";
 
     const items = Iterator.zip([details, headers]).toArray();
@@ -54,18 +58,41 @@ const Result = ({ details, team, headers }) =>{
         });
     }
 
+    const toggleScoresheet = (e) => {
+        e.preventDefault();
+        setShowScoresheet(!showScoresheet);
+    }
+    var scoresheet = null;
+    if (showScoresheet && scoresheetApi) {
+        scoresheet = (
+            <div className="results-list__score-sheet-row">
+                <ScoreSheetPage scoreApi={ scoresheetApi } showHeaders={ false } />
+            </div>
+        );
+    }
+
     return <>
         { bits }
         { !team && <div className="results-list__part">
-                <a className="results-list__score-sheet" />
+            { scoresheetUrl && <a href={ scoresheetUrl } onClick={ toggleScoresheet } className="results-list__score-sheet" /> }
         </div> }
+        { scoresheet }
     </>;
 };
 
 
 const ResultList = ({ label, headers, scores }) => {
     const results = scores.map((score, index) => {
-        return <Result details={ score.details } team={ score.team } headers={ headers } key={ index } />
+        return (
+            <Result
+                details={ score.details }
+                scoresheetUrl={ score.scoresheetUrl }
+                scoresheetApi={ score.scoresheetApi }
+                team={ score.team }
+                headers={ headers }
+                key={ index }
+            />
+        );
     });
 
     // TODO: Make header types richer so we can build this
