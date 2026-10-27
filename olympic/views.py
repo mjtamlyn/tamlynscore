@@ -175,11 +175,7 @@ class OlympicInput(OlympicMixin, TemplateView):
 
         highest_level = Match.objects.filter(session_round=self.seed.session_round).order_by('-level')[0].level
 
-        match_number_offset = 0
-        # Are we in a main bracket or an additional one?
-        # For now, this only understands when the lower bracket is "from the start" rather than "dropped into" from results
-        if self.seed.seed > 2 ** highest_level:
-            match_number_offset = 2 ** (highest_level - 1)
+        match_number_offset = self.seed.match_number_offset(highest_level)
 
         forms = []
         for i in range(1, highest_level + 1):
@@ -243,16 +239,6 @@ class OlympicScoreSheet(ScoreSheetsPdf):
     wide_box = box_size * 1.3
     title_position = 30
 
-    match_names = [
-        'Final / Bronze',
-        'Semi Final',
-        'Quarter Final',
-        '1/8 Round',
-        '1/16 Round',
-        '1/32 Round',
-        '1/64 Round',
-    ]
-
     def set_options(self, slug=None, round_id=None):
         if round_id:
             self.session_round = get_object_or_404(OlympicSessionRound, pk=round_id)
@@ -295,6 +281,7 @@ class OlympicScoreSheet(ScoreSheetsPdf):
                     ('SPAN', (0, 0), (-1, 0)),
                 ]))
 
+            # TODO: move this to MatchLoader
             matches = Match.objects.matches_for_seed(seeding, highest_seed=highest_seed)
 
             score_sheet_elements = []
@@ -304,53 +291,56 @@ class OlympicScoreSheet(ScoreSheetsPdf):
                     # This is a final, potentially with no bronze match
                     # available for the top seed(s) if there are less than 3
                     # people
+                    effective_seed = Match.objects.effective_seed(seeding.seed, 1)
+
                     has_match = True
-                    final_target, final_timing = matches[0]
+                    final_timing = matches[0].timing
+                    final_target = matches[0].target_for_seed(effective_seed)
                     try:
                         bronze_match = Match.objects.get(level=1, session_round=seeding.session_round, match=2)
                     except Match.DoesNotExist:
                         bronze_target = bronze_timing = None
                     else:
-                        bronze_target, bronze_timing = bronze_match.target, bronze_match.timing
-                        effective_seed = Match.objects.effective_seed(seeding.seed, 1)
-                        if bronze_match.target_2 and effective_seed == 2:
-                            bronze_target = bronze_match.target_2
+                        bronze_target, bronze_timing = bronze_match.target_for_seed(effective_seed), bronze_match.timing
 
                     if highest_seed <= 3:
-                        match_title = 'Final'
-                        location_label = 'T.{} Pass {}'.format(final_target, 'ABCDEFGHIJK'[final_timing - 1])
+                        location_label = 'T.{} - Pass {}'.format(final_target, 'ABCDEFGHIJK'[final_timing - 1])
                     elif bronze_timing != final_timing:
-                        match_title = self.match_names[0]
-                        location_label = 'T.{} Pass {} / T.{} Pass {}'.format(
+                        location_label = 'T.{} - Pass {} / T.{} - Pass {}'.format(
                             final_target,
                             'ABCDEFGHIJK'[final_timing - 1],
                             bronze_target,
                             'ABCDEFGHIJK'[bronze_timing - 1],
                         )
                     else:
-                        match_title = self.match_names[0]
-                        location_label = 'T.{} / T.{} Pass {}'.format(
+                        location_label = 'T.{} / T.{} - Pass {}'.format(
                             final_target,
                             bronze_target,
                             'ABCDEFGHIJK'[final_timing - 1],
                         )
                 else:
-                    match, timing = matches[i]
+                    match = matches[i]
                     has_match = bool(match)
-                    match_title = self.match_names[i]
                     if match:
-                        boss = 'T.{}'.format(match)
+                        boss = 'T.{}'.format(match.target_for_seed(effective_seed))
+                        timing = 'Pass %s' % 'ABCDEFGHIJK'[match.timing - 1]
                     else:
                         boss = None
-                    if timing is not None:
-                        timing = 'Pass %s' % 'ABCDEFGHIJK'[timing - 1]
-                    location_label = '{} {}'.format(boss, timing)
+                        timing = None
+                    location_label = '{} - {}'.format(boss, timing)
 
                 arrows = self.session_round.shot_round.arrows_per_end
                 total_cols = 3 if self.session_round.shot_round.match_type in ['T', 'U'] else 2
                 ends = self.session_round.shot_round.ends
+                if matches[i]:
+                    round_label = '%s - %s ' % (
+                        matches[i].round_name if i > 0 else '%s / Bronze' % matches[i].round_name,
+                        location_label,
+                    )
+                else:
+                    round_label = Match.objects.round_name(i + 1)
                 table_data = [
-                    [self.Para(match_title, 'h3')] + [None] * arrows + [self.Para(location_label, 'h3')],
+                    [self.Para(round_label, 'h3')],
                     ['Arrows' if has_match else self.Para('BYE', 'h3')] + [None] * (arrows - 1) + [
                         'S',
                         'Pts' if self.session_round.shot_round.match_type in ['T', 'U'] else 'RT',
@@ -426,8 +416,7 @@ class OlympicScoreSheet(ScoreSheetsPdf):
             ('INNERGRID', (arrows + total_cols, 1), (arrows + total_cols + 1, -2), 2, colors.black),
 
             # spans
-            ('SPAN', (0, 0), (arrows, 0)),
-            ('SPAN', (arrows + 1, 0), (-1, 0)),
+            ('SPAN', (0, 0), (-1, 0)),
             ('SPAN', (0, 1), (arrows - 1, 1)),
             ('SPAN', (0, -1), (arrows - (shoot_off_arrows + 1), -1)),
             ('SPAN', (arrows + 2, -1), (arrows + total_cols, -1)),

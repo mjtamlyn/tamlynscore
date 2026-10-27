@@ -270,6 +270,14 @@ class Seeding(models.Model):
             return self.entry.team_name()
         return str(self.entry.archer)
 
+    def match_number_offset(self, highest_level):
+        match_number_offset = 0
+        # Are we in a main bracket or an additional one?
+        # For now, this only understands when the lower bracket is "from the start" rather than "dropped into" from results
+        if self.seed > 2 ** highest_level:
+            match_number_offset = 2 ** (highest_level - 1)
+        return match_number_offset
+
 
 class MatchManager(models.Manager):
 
@@ -309,16 +317,6 @@ class MatchManager(models.Manager):
         match = self.get(level=level, session_round=seed.session_round, match=match_number)
         return match
 
-    def target_for_seed(self, seed, level):
-        try:
-            match = self.match_for_seed(seed, level)
-        except self.model.DoesNotExist:
-            return None
-        effective_seed = self.effective_seed(seed.seed, level)
-        if match.target_2 and effective_seed > self.n_matches_for_level(level):
-            return (match.target_2, match.timing)
-        return (match.target, match.timing)
-
     def matches_for_seed(self, seed, highest_seed=None):
         highest_level = self.filter(session_round=seed.session_round).order_by('-level')[:1]
         if not highest_level.exists():
@@ -327,10 +325,23 @@ class MatchManager(models.Manager):
         matches = []
         for level in range(1, highest_level + 1):
             if highest_seed and self.n_archers_for_level(level) + 1 - seed.seed > highest_seed:
-                matches.append((None, None))
+                # TODO: We may be able to load a match here and display the target they could shoot on
+                matches.append(None)
             else:
-                matches.append(self.target_for_seed(seed, level))
+                matches.append(self.match_for_seed(seed, level, offset=seed.match_number_offset(highest_level)))
         return matches
+
+    def round_name(self, level, for_placing=1):
+        """Name for the round, respecting "for_placing".
+
+        Can't be on Match because we need it for BYE matches that don't exist.
+        """
+        levels = ['Final', 'Semis', 'Quarters', '1/8', '1/16', '1/32', '1/64', '1/128', '1/256']
+        if for_placing == 1:
+            return levels[level - 1]
+        if for_placing == 3:
+            return 'Bronze'
+        return '%sth %s' % (for_placing, levels[level - 1])
 
 
 class Match(models.Model):
@@ -360,13 +371,12 @@ class Match(models.Model):
     @property
     def round_name(self):
         """Name for the round, respecting "for_placing"."""
-        levels = ['Final', 'Semis', 'Quarters', '1/8', '1/16', '1/32', '1/64', '1/128', '1/256']
-        for_placing = self.for_placing
-        if for_placing == 1:
-            return levels[self.level - 1]
-        if for_placing == 3:
-            return 'Bronze'
-        return '%sth %s' % (for_placing, levels[self.level - 1])
+        return Match.objects.round_name(self.level, self.for_placing)
+
+    def target_for_seed(self, effective_seed):
+        if self.target_2 and effective_seed > self.n_matches_this_round:
+            return self.target_2
+        return self.target
 
     @property
     def n_archers_this_round(self):
