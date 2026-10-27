@@ -615,7 +615,7 @@ class ByRoundProgressional(ByRound, BaseResultMode):
         rounds = self.get_rounds(competition)
         return OrderedDict((
             self.get_section_for_round(round, scoring_type, competition),
-            self.get_round_results(competition, round, scores)
+            self.get_round_results(competition, [round], scores)
         ) for (round, scoring_type) in rounds)
 
 
