@@ -56,7 +56,7 @@
     white-space: nowrap
     overflow: hidden
     text-overflow: ellipsis
-    border-bottom: 1px solid $borders
+    border-top: 1px solid $borders
 
     &--active
       background-color: $bg-dark
@@ -72,6 +72,13 @@
 
     &:hover
       background-color: $bg
+
+    &:first-child
+      border-top: 0
+  
+  // Don't put a border on the first one after a category label
+  &__label + &__category
+    border-top: 0
 
 .results-list
   overflow: auto

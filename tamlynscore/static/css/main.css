@@ -4734,7 +4734,7 @@ ul.link-list li a:hover {
   white-space: nowrap;
   overflow: hidden;
   text-overflow: ellipsis;
-  border-bottom: 1px solid #CCCCCC;
+  border-top: 1px solid #CCCCCC;
 }
 /* line 61, ../../sass/components/_results.sass */
 .results-nav__category--active {
@@ -4759,18 +4759,26 @@ ul.link-list li a:hover {
 .results-nav__category:hover {
   background-color: #f7f7f7;
 }
-
 /* line 76, ../../sass/components/_results.sass */
+.results-nav__category:first-child {
+  border-top: 0;
+}
+/* line 80, ../../sass/components/_results.sass */
+.results-nav__label + .results-nav__category {
+  border-top: 0;
+}
+
+/* line 83, ../../sass/components/_results.sass */
 .results-list {
   overflow: auto;
 }
-/* line 79, ../../sass/components/_results.sass */
+/* line 86, ../../sass/components/_results.sass */
 .results-list__grid {
   display: grid;
   font-size: 14px;
   text-align: center;
 }
-/* line 84, ../../sass/components/_results.sass */
+/* line 91, ../../sass/components/_results.sass */
 .results-list__heading, .results-list__part {
   padding: 5px;
   border-bottom: 1px solid #CCCCCC;
@@ -4778,23 +4786,23 @@ ul.link-list li a:hover {
   overflow: hidden;
   text-overflow: ellipsis;
 }
-/* line 92, ../../sass/components/_results.sass */
+/* line 99, ../../sass/components/_results.sass */
 .results-list__heading--left, .results-list__part--left {
   text-align: left;
 }
-/* line 95, ../../sass/components/_results.sass */
+/* line 102, ../../sass/components/_results.sass */
 .results-list__heading--team-name, .results-list__part--team-name {
   font-weight: bold;
 }
-/* line 98, ../../sass/components/_results.sass */
+/* line 105, ../../sass/components/_results.sass */
 .results-list__heading--team-row, .results-list__part--team-row {
   border-bottom: 0;
 }
-/* line 101, ../../sass/components/_results.sass */
+/* line 108, ../../sass/components/_results.sass */
 .results-list__heading {
   font-weight: bold;
 }
-/* line 104, ../../sass/components/_results.sass */
+/* line 111, ../../sass/components/_results.sass */
 .results-list__score-sheet:after {
   display: inline-block;
   font: normal normal normal 14px/1 FontAwesome;
@@ -4804,7 +4812,7 @@ ul.link-list li a:hover {
   -moz-osx-font-smoothing: grayscale;
   content: "";
 }
-/* line 108, ../../sass/components/_results.sass */
+/* line 115, ../../sass/components/_results.sass */
 .results-list__score-sheet-row {
   grid-column: 1/-1;
   margin: 5px 0;
