@@ -456,6 +456,8 @@ class BySession(BaseResultMode):
         """
         self.leaderboard = leaderboard
         sessions = self.get_sessions(competition)
+        if not scores:
+            return {}
         round = scores[0].target.session_entry.session_round
         return OrderedDict((
             self.get_section_for_round(

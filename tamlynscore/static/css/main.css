@@ -3666,25 +3666,29 @@ p {
   margin: 5px 0;
   padding: 0;
 }
-
 /* line 27, ../../sass/_typography.sass */
+p.p--centered {
+  text-align: center;
+}
+
+/* line 30, ../../sass/_typography.sass */
 ul {
   list-style-type: none;
   margin: 0;
   padding: 0;
 }
 
-/* line 32, ../../sass/_typography.sass */
+/* line 35, ../../sass/_typography.sass */
 ul.bullets {
   list-style-type: disc;
   padding-inline-start: 30px;
 }
-/* line 35, ../../sass/_typography.sass */
+/* line 38, ../../sass/_typography.sass */
 ul.bullets li {
   display: list-item;
 }
 
-/* line 38, ../../sass/_typography.sass */
+/* line 41, ../../sass/_typography.sass */
 li {
   display: block;
 }

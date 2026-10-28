@@ -54,6 +54,15 @@ const ResultsPage = ({ resultsApi }) => {
         });
     });
 
+    if (!results.length) {
+        results.push(
+            <div className="results-list">
+                <h3>{ data.mode.name }</h3>
+                <p className="p--centered">No scores available</p>
+            </div>
+        );
+    }
+
     var content = null;
     if (isNarrow) {
         if (navOpen) {
