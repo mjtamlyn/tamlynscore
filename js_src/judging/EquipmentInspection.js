@@ -11,11 +11,18 @@ const EquipmentInspection = ({ targetList }) => {
         const lettersUsed = letters.slice(0, session.archersPerBoss);
 
         session.targetList.forEach(boss => {
-            lettersUsed.forEach(letter => {
+            lettersUsed.forEach((letter, i) => {
                 const archer = boss.archers[letter];
+                let bossEnd = false;
+                if ((i + 1) === session.archersPerBoss) {
+                    bossEnd = true;
+                }
                 if (archer) {
                     rows.push(
-                        <tr className={ "archer" + (archer.kitInspected ? " kit-inspected" : "") } key={ `${boss.number}${letter}` }>
+                        <tr
+                                className={ "archer" + (archer.kitInspected ? " kit-inspected" : "") + (bossEnd ? " boss-end" : "") }
+                                key={ `${boss.number}${letter}` }
+                        >
                             <td>{ boss.number }{ letter }</td>
                             <td>
                                 <div className="archer-name">
@@ -58,7 +65,7 @@ const EquipmentInspection = ({ targetList }) => {
             });
         });
         return (
-            <div className="registration-board">
+            <div className="registration-board" key={ session.id }>
                 <h3>{ session.sessionTime }</h3>
                 <table className="table">
                     <thead>

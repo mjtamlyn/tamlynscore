@@ -2,7 +2,7 @@ import React from 'react';
 
 import { ErrorBoundary } from 'react-error-boundary';
 
-import { useQuery } from '@tanstack/react-query'
+import { useQuery } from '@tanstack/react-query';
 
 import { CompetitionContext } from '../context/CompetitionContext';
 import ErrorState from '../utils/ErrorState';
