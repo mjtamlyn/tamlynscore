@@ -1,9 +1,46 @@
 import React from 'react';
 
+import { useMutation, useQueryClient } from '@tanstack/react-query';
+
 import ArcherPills from '../utils/ArcherPills';
 
 
-const EquipmentInspection = ({ targetList }) => {
+const EquipmentInspection = ({ targetList, judgingApi }) => {
+    const queryClient = useQueryClient();
+    const mutation = useMutation({
+        mutationFn: ({ id, kitInspected }) => {
+            const data = new FormData();
+            data.append('pk', id);
+            data.append('kitInspected', kitInspected);
+            return fetch(judgingApi, {
+                method: "POST",
+                body: data,
+            });
+        },
+        onMutate: async ({ id, kitInspected }, context) => {
+            await context.client.cancelQueries({ queryKey: ['targetList'] })
+            const previous = context.client.getQueryData(['targetList'])
+            context.client.setQueryData(['targetList'], (old) => {
+                old.targetList.forEach(session => {
+                    session.targetList.forEach(boss => {
+                        Object.entries(boss.archers).forEach(([letter, archer]) => {
+                            if (archer?.id === id) {
+                                archer.kitInspected = kitInspected;
+                            }
+                        });
+                    });
+                });
+                return old;
+            });
+            return { previous };
+        },
+        onError: (err, variables, onMutateResult, context) => {
+            context.client.setQueryData(['targetList'], onMutateResult.previous);
+        },
+        onSettled: () => {
+            queryClient.invalidateQueries({ queryKey: ['targetList'] });
+        },
+    });
 
     const sessions = targetList.map(session => {
         const rows = [];
@@ -39,8 +76,8 @@ const EquipmentInspection = ({ targetList }) => {
                                 { archer.kitInspected ? "✅" : "❌" }
                                 &nbsp;
                                 { archer.kitInspected
-                                    ? <a className="btn btn-small btn-subtle">Undo</a>
-                                    : <a className="btn btn-small">Done!</a>
+                                    ? <a className="btn btn-small btn-subtle" onClick={ () => mutation.mutate({ id: archer.id, kitInspected: false }) }>Undo</a>
+                                    : <a className="btn btn-small" onClick={ () => mutation.mutate({ id: archer.id, kitInspected: true }) }>Done!</a>
                                 }
                             </td>
                         </tr>

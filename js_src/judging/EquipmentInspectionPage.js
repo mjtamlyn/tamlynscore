@@ -13,7 +13,7 @@ import EquipmentInspection from './EquipmentInspection';
 
 const EquipmentInspectionPage = ({ judgingApi, targetListApi }) => {
     const { isPending, isError, data, error } = useQuery({ 
-        queryKey: ['targetList', targetListApi],
+        queryKey: ['targetList'],
         queryFn: async () => {
             const response = await fetch(targetListApi);
             if (!response.ok) {
@@ -35,7 +35,7 @@ const EquipmentInspectionPage = ({ judgingApi, targetListApi }) => {
     return (
         <ErrorBoundary FallbackComponent={ ErrorState }>
             <CompetitionContext.Provider value={ data.competition }>
-                <EquipmentInspection targetList={ data.targetList } />
+                <EquipmentInspection targetList={ data.targetList } judgingApi={ judgingApi } />
             </CompetitionContext.Provider>
         </ErrorBoundary>
     );
