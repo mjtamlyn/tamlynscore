@@ -5,16 +5,17 @@ import { useMutation, useQueryClient } from '@tanstack/react-query';
 import ArcherPills from '../utils/ArcherPills';
 
 
-const EquipmentInspection = ({ targetList, judgingApi }) => {
+const EquipmentInspection = ({ targetList, targetListApi }) => {
     const queryClient = useQueryClient();
     const mutation = useMutation({
-        mutationFn: ({ id, kitInspected }) => {
-            const data = new FormData();
-            data.append('pk', id);
-            data.append('kitInspected', kitInspected);
-            return fetch(judgingApi, {
-                method: "POST",
-                body: data,
+        mutationFn: (data) => {
+            return fetch(targetListApi, {
+                method: 'POST',
+                credentials: 'same-origin',
+                body: JSON.stringify({ actions: [{
+                    'action': 'KITINSPECTION',
+                    ...data,
+                }]}),
             });
         },
         onMutate: async ({ id, kitInspected }, context) => {

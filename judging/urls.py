@@ -6,7 +6,6 @@ from . import views
 urlpatterns = [
     path('<slug>/judges/', views.JudgeIndex.as_view(), name='judge_index'),
     path('<slug>/judges/inspection/', csrf_exempt(views.JudgeInspection.as_view()), name='judge_inspection'),
-    path('<slug>/judges/inspection/api/', csrf_exempt(views.JudgeInspectionApi.as_view()), name='judge_inspection_api'),
     path('<slug>/judges/matches/', views.JudgeMatches.as_view(), name='judge_matches'),
     path('login/<id>/', views.JudgeAuthenticate.as_view(), name='judge_authenticate'),
 ]

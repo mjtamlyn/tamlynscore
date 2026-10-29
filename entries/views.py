@@ -36,6 +36,7 @@ from reportlab.rl_config import defaultPageSize
 
 from api import serializers
 from core.models import Archer
+from judging.models import Judge
 from scores.mixins import ResultModeMixin
 
 from .forms import (
@@ -598,10 +599,19 @@ class TargetListApi(CsrfExemptMixin, TargetListBase, View):
                 boss__gte=data['number'],
             ).update(boss=F('boss') - 1)
             return {'updated': updated}
+        elif data['action'] == 'KITINSPECTION':
+            updated = SessionEntry.objects.filter(pk=data['id']).update(kit_inspected=data['kitInspected'])
+            return {'updated': updated}
         raise self.UnknownAction(data)
 
     def post(self, request, slug):
-        if not self.is_admin:
+        try:
+            judge_user = self.competition.judge
+        except Judge.DoesNotExist:
+            judge_user = None
+
+        if not (self.request.user == judge_user or self.is_admin):
+            # TODO: May need permissions by action here?
             return HttpResponseNotAllowed()
         data = json.loads(request.body)
         actions = data['actions']

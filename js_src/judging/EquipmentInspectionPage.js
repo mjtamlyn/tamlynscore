@@ -11,7 +11,7 @@ import Spinner from '../utils/Spinner';
 import EquipmentInspection from './EquipmentInspection';
 
 
-const EquipmentInspectionPage = ({ judgingApi, targetListApi }) => {
+const EquipmentInspectionPage = ({ targetListApi }) => {
     const { isPending, isError, data, error } = useQuery({ 
         queryKey: ['targetList'],
         queryFn: async () => {
@@ -39,7 +39,7 @@ const EquipmentInspectionPage = ({ judgingApi, targetListApi }) => {
     return (
         <ErrorBoundary FallbackComponent={ ErrorState }>
             <CompetitionContext.Provider value={ data.competition }>
-                <EquipmentInspection targetList={ data.targetList } judgingApi={ judgingApi } />
+                <EquipmentInspection targetList={ data.targetList } targetListApi={ targetListApi } />
             </CompetitionContext.Provider>
         </ErrorBoundary>
     );
