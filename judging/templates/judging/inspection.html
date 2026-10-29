@@ -5,7 +5,11 @@
 {% block bodyclass %}registration{% endblock %}
 
 {% block judge_content %}
-<div id="app" data-judging-api="{% url 'judge_inspection_api' slug=competition.slug %}"></div>
+<div
+    id="app"
+    data-judging-api="{% url 'judge_inspection_api' slug=competition.slug %}"
+    data-target-list-api="{% url 'target_list_api' slug=competition.slug %}"
+></div>
 
 
 {% for session, details in target_list.items %}

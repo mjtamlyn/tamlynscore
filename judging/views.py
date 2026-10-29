@@ -1,5 +1,5 @@
 from django.contrib.auth import login
-from django.http import Http404
+from django.http import Http404, JsonResponse
 from django.urls import reverse
 from django.views.generic import RedirectView, TemplateView
 
@@ -43,7 +43,9 @@ class JudgeIndex(JudgeMixin, TemplateView):
 class JudgeInspectionApi(Registration):
     def render_to_response(self, context, **kwargs):
         target_list = context['target_list']
-        return JsonResponse('ok')
+        return JsonResponse({
+            'targetList': 'ok',
+        });
 
 
 class JudgeInspection(JudgeMixin, Registration):

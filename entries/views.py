@@ -505,6 +505,7 @@ class TargetListBase(CompetitionMixin, ListView):
             },
             'stayOnLine': entry.competition_entry.stay_on_line,
             'round': entry.session_round.shot_round.name,
+            'kitInspected': entry.kit_inspected,
         }
         if self.competition.has_novices and entry.competition_entry.novice == 'N':
             data['categories']['novice'] = entry.competition_entry.get_novice_display()
