@@ -7,4 +7,6 @@ urlpatterns = [
     path('<slug:league_slug>/', views.LeagueDetail.as_view(), name='league-detail'),
     path('<slug:league_slug>/<slug:season_slug>/', views.SeasonDetail.as_view(), name='season-detail'),
     path('<slug:league_slug>/<slug:season_slug>/<slug:leg_index>/<slug:mode>/<slug:format>/', views.Results.as_view(), name='leg-results'),
+
+    path('organiser/<slug:league_slug>/create/', views.LegCreateView.as_view(), name='leg-create'),
 ]

@@ -1,32 +1,75 @@
-from django.http import Http404
+from django.http import Http404, HttpResponseRedirect
 from django.shortcuts import get_object_or_404
-from django.views.generic import DetailView, ListView, TemplateView
+from django.urls import reverse
+from django.views.generic import CreateView, DetailView, ListView, TemplateView
+
+from braces.views import MessageMixin
 
 from scores.models import Score
 from scores.result_modes import get_mode
 
+from .forms import LegCreateForm
 from .models import League, Leg, ResultsMode, Season
 
+
+class LeagueMixin(MessageMixin):
+    organiser_required = True
+
+    def setup(self, request, *args, **kwargs):
+        super().setup(request, *args, **kwargs)
+        self.league = get_object_or_404(League, slug=kwargs['league_slug'])
+        self.is_organiser = self.request.user.is_superuser or self.request.user in self.league.organisers.all()
+
+    def check_permission(self):
+        return self.is_organiser or not self.organiser_required
+
+    def dispatch(self, request, *args, **kwargs):
+        if not self.check_permission():
+            self.messages.error('You must be logged in as a league organiser to do that.')
+            return HttpResponseRedirect(reverse('league-detail', kwargs={'leage_slug': self.kwargs['league_slug']}))
+        return super().dispatch(request, *args, **kwargs)
+
+    def get_meta_description(self):
+        return '{}, hosted on TamlynScore.'.format(self.league)
+
+    def get_context_data(self, **kwargs):
+        context = super().get_context_data(**kwargs)
+        context.update({
+            'league': self.league,
+            'is_organiser': self.is_organiser,
+            'title': str(self.league),
+            'meta_description': self.get_meta_description(),
+        })
+        return context
+
+
+#######################
+# PUBLIC LEAGUE PAGES #
+#######################
 
 class LeagueList(ListView):
     model = League
 
 
-class LeagueDetail(DetailView):
+class LeagueDetail(LeagueMixin, DetailView):
     model = League
-    slug_url_kwarg = 'league_slug'
+    organiser_required = False
+
+    def get_object(self):
+        return self.league
 
 
-class SeasonDetail(DetailView):
+class SeasonDetail(LeagueMixin, DetailView):
     slug_url_kwarg = 'season_slug'
+    organiser_required = False
 
     def get_queryset(self):
-        return Season.objects.filter(league__slug=self.kwargs['league_slug'])
+        return Season.objects.filter(league=self.league)
 
     def get_context_data(self, **kwargs):
         context = super(SeasonDetail, self).get_context_data(**kwargs)
         context['legs'] = self.object.leg_set.order_by('index')
-        context['editions'] = self.object.league.season_set.order_by('-start_date').exclude(pk=self.object.pk)
+        context['editions'] = self.league.season_set.order_by('-start_date').exclude(pk=self.object.pk)
         context['non_leg_competitions'] = self.object.non_leg_competitions.order_by('date')
         return context
 
@@ -126,3 +169,17 @@ class Results(TemplateView):
                         for archer in score.team:
                             archer.details = self.mode.score_details(archer, section)
         return super().render_to_response(context, **response_kwargs)
+
+
+##########################
+# LEAGUE ORGANISER TOOLS #
+##########################
+
+class LegCreateView(LeagueMixin, CreateView):
+    model = Leg
+    form_class = LegCreateForm
+
+    def get_context_data(self, **kwargs):
+        # TODO: SeasonQuerySet.filter_current()
+        season = self.league.season_set.order_by('-start_date').first()
+        return super().get_context_data(season=season, **kwargs)

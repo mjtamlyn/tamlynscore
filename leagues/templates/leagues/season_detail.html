@@ -29,7 +29,7 @@
         {% endfor %}
         </ul>
         {% if non_leg_competitions %}
-        <h4>Other events part of this season</h4>
+        <h3>Other events part of this season</h3>
         <ul class="link-list">
             {% for competition in non_leg_competitions %}
             <li>
@@ -49,6 +49,10 @@
             <li><a href="{{ edition.get_absolute_url }}">{{ edition }}</a></li>
             {% endfor %}
         </ul>
+
+        {% if is_organiser %}
+        {% include 'leagues/_organiser_zone.html' %}
+        {% endif %}
     </div>
 </div>
 {% endblock %}
