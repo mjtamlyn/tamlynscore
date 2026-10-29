@@ -25,7 +25,6 @@ from django.views.generic import (
 
 from braces.views import CsrfExemptMixin, MessageMixin, SuperuserRequiredMixin
 from qr_code.qrcode.maker import _options_from_args, make_qr
-from render_block import render_block_to_string
 from reportlab.lib import colors
 from reportlab.lib.styles import getSampleStyleSheet
 from reportlab.lib.units import inch
