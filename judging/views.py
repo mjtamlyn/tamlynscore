@@ -1,12 +1,10 @@
 from django.contrib.auth import login
-from django.http import Http404
 from django.urls import reverse
 from django.views.generic import RedirectView, TemplateView
 
 from braces.views import MessageMixin
 
-from entries.models import SessionEntry
-from entries.views import CompetitionMixin, Registration
+from entries.views import CompetitionMixin
 from olympic.match_loader import MatchLoader
 
 from .models import Judge
@@ -40,15 +38,8 @@ class JudgeIndex(JudgeMixin, TemplateView):
     template_name = 'judging/index.html'
 
 
-class JudgeInspection(JudgeMixin, Registration):
+class JudgeInspection(JudgeMixin, TemplateView):
     template_name = 'judging/inspection.html'
-
-    def post(self, request, slug):
-        inspected = request.POST['kit_inspected'] == 'true'
-        updated = SessionEntry.objects.filter(pk=request.POST['pk']).update(kit_inspected=inspected)
-        if not updated:
-            raise Http404
-        return self.get(request, slug)
 
 
 class JudgeMatches(JudgeMixin, TemplateView):

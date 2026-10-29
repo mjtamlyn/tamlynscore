@@ -25,7 +25,6 @@ from django.views.generic import (
 
 from braces.views import CsrfExemptMixin, MessageMixin, SuperuserRequiredMixin
 from qr_code.qrcode.maker import _options_from_args, make_qr
-from render_block import render_block_to_string
 from reportlab.lib import colors
 from reportlab.lib.styles import getSampleStyleSheet
 from reportlab.lib.units import inch
@@ -37,6 +36,7 @@ from reportlab.rl_config import defaultPageSize
 
 from api import serializers
 from core.models import Archer
+from judging.models import Judge
 from scores.mixins import ResultModeMixin
 
 from .forms import (
@@ -498,6 +498,7 @@ class TargetListBase(CompetitionMixin, ListView):
         data = {
             'id': entry.pk,
             'name': entry.competition_entry.archer.name,
+            'agbNumber': entry.competition_entry.archer.agb_number,
             'club': entry.competition_entry.team_name(),
             'categories': {
                 'gender': entry.competition_entry.get_gender_display(),
@@ -505,6 +506,8 @@ class TargetListBase(CompetitionMixin, ListView):
             },
             'stayOnLine': entry.competition_entry.stay_on_line,
             'round': entry.session_round.shot_round.name,
+            'present': entry.present,
+            'kitInspected': entry.kit_inspected,
         }
         if self.competition.has_novices and entry.competition_entry.novice == 'N':
             data['categories']['novice'] = entry.competition_entry.get_novice_display()
@@ -596,10 +599,19 @@ class TargetListApi(CsrfExemptMixin, TargetListBase, View):
                 boss__gte=data['number'],
             ).update(boss=F('boss') - 1)
             return {'updated': updated}
+        elif data['action'] == 'KITINSPECTION':
+            updated = SessionEntry.objects.filter(pk=data['id']).update(kit_inspected=data['kitInspected'])
+            return {'updated': updated}
         raise self.UnknownAction(data)
 
     def post(self, request, slug):
-        if not self.is_admin:
+        try:
+            judge_user = self.competition.judge
+        except Judge.DoesNotExist:
+            judge_user = None
+
+        if not (self.request.user == judge_user or self.is_admin):
+            # TODO: May need permissions by action here?
             return HttpResponseNotAllowed()
         data = json.loads(request.body)
         actions = data['actions']
@@ -640,16 +652,6 @@ class Registration(TargetListBase):
                     }))
             target_list[session]['unregistered'] = unregistered
         return target_list
-
-    def render_to_response(self, context, **response_kwargs):
-        if self.request.POST.get('pjax'):
-            response = render_block_to_string(
-                self.get_template_names(),
-                'judge_content',
-                context,
-            )
-            return HttpResponse(response)
-        return super().render_to_response(context, **response_kwargs)
 
     def post(self, request, slug):
         present = request.POST['present'] == 'true'
