@@ -3520,103 +3520,105 @@ div.form-group button {
 div.form-group h2 {
   text-align: left;
   line-height: 1.47;
+  margin-left: 8px;
+  margin-right: 8px;
   border-bottom: 2px solid rgba(0, 0, 0, 0.1);
 }
-/* line 41, ../../sass/_forms.sass */
+/* line 42, ../../sass/_forms.sass */
 div.form-group div.form-flex-subgroup {
   flex: 0.5;
   margin: 0px 8px;
 }
-/* line 46, ../../sass/_forms.sass */
+/* line 47, ../../sass/_forms.sass */
 div.form-group div.form-subgroup {
   margin-bottom: 16px;
 }
-/* line 49, ../../sass/_forms.sass */
+/* line 50, ../../sass/_forms.sass */
 div.form-group div.form-subgroup h3 {
   text-align: left;
   line-height: 1.47;
   border-bottom: 1px solid rgba(0, 0, 0, 0.1);
 }
-/* line 55, ../../sass/_forms.sass */
+/* line 56, ../../sass/_forms.sass */
 div.form-group div.form-subgroup > div.form-item {
   margin-bottom: 8px;
 }
-/* line 58, ../../sass/_forms.sass */
+/* line 59, ../../sass/_forms.sass */
 div.form-group div.form-subgroup > div.form-item:last-of-type {
   margin-bottom: 0px;
 }
-/* line 61, ../../sass/_forms.sass */
+/* line 62, ../../sass/_forms.sass */
 div.form-group div.form-row {
   display: flex;
   margin-bottom: 8px;
 }
-/* line 66, ../../sass/_forms.sass */
+/* line 67, ../../sass/_forms.sass */
 div.form-group div.form-row.contains-subgroup {
   display: flex;
 }
-/* line 69, ../../sass/_forms.sass */
+/* line 70, ../../sass/_forms.sass */
 div.form-group div.form-row.align-bottom {
   align-items: flex-end;
 }
-/* line 72, ../../sass/_forms.sass */
+/* line 73, ../../sass/_forms.sass */
 div.form-group div.form-row.align-center {
   align-items: flex-center;
 }
-/* line 75, ../../sass/_forms.sass */
+/* line 76, ../../sass/_forms.sass */
 div.form-group div.form-row div.form-item {
   flex: 1;
   margin: 0px 8px;
 }
-/* line 80, ../../sass/_forms.sass */
+/* line 81, ../../sass/_forms.sass */
 div.form-group div.form-row div.form-item label {
   opacity: 0.9;
   font-size: 16px;
   display: block;
 }
-/* line 85, ../../sass/_forms.sass */
+/* line 86, ../../sass/_forms.sass */
 div.form-group div.form-row div.form-item input, div.form-group div.form-row div.form-item select {
   display: block;
   width: 100%;
   margin-top: 4px;
 }
-/* line 90, ../../sass/_forms.sass */
+/* line 91, ../../sass/_forms.sass */
 div.form-group div.form-row div.form-item input[type=checkbox] {
   display: inline;
   width: auto;
 }
-/* line 94, ../../sass/_forms.sass */
+/* line 95, ../../sass/_forms.sass */
 div.form-group div.form-row div.form-item input.btn {
   width: auto;
   margin: 0 auto;
 }
-/* line 98, ../../sass/_forms.sass */
+/* line 99, ../../sass/_forms.sass */
 div.form-group div.form-row div.form-item select {
   -webkit-appearance: none;
   -moz-appearance: none;
   appearance: none;
   background-color: white;
 }
-/* line 105, ../../sass/_forms.sass */
+/* line 106, ../../sass/_forms.sass */
 div.form-group div.form-row div.form-item select:not([multiple]) {
   background-repeat: no-repeat;
   background-position: 100% center;
   background-image: url(data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHZlcnNpb249IjEuMSIgeD0iMTJweCIgeT0iMHB4IiB3aWR0aD0iMjRweCIgaGVpZ2h0PSIzcHgiIHZpZXdCb3g9IjAgMCA2IDMiIGVuYWJsZS1iYWNrZ3JvdW5kPSJuZXcgMCAwIDYgMyIgeG1sOnNwYWNlPSJwcmVzZXJ2ZSI+PHBvbHlnb24gcG9pbnRzPSI1Ljk5MiwwIDIuOTkyLDMgLTAuMDA4LDAgIi8+PC9zdmc+);
 }
-/* line 112, ../../sass/_forms.sass */
+/* line 113, ../../sass/_forms.sass */
 div.form-group div.form-row div.form-flex-subgroup div.form-item {
   margin: 0px;
 }
-/* line 115, ../../sass/_forms.sass */
+/* line 116, ../../sass/_forms.sass */
 div.form-group div.form-row div.form-flex-subgroup > div.form-item {
   margin-bottom: 8px;
 }
-/* line 118, ../../sass/_forms.sass */
+/* line 119, ../../sass/_forms.sass */
 div.form-group div.form-row div.form-flex-subgroup > div.form-item:last-of-type {
   margin-bottom: 0px;
 }
 
 @media only screen and (max-width: 640px) {
-  /* line 123, ../../sass/_forms.sass */
+  /* line 124, ../../sass/_forms.sass */
   div.form-group div.form-row.contains-subgroup {
     display: block;
   }
