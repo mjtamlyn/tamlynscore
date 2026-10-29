@@ -32,19 +32,14 @@ export default defineConfig([
         plugins: { react },
         settings: { react: { "version": "18", } },
         languageOptions: {
-            globals: {
-                ...globals.browser,
-                Atomics: "readonly",
-                SharedArrayBuffer: "readonly",
-                Iterator: true,
-            },
-
-            ecmaVersion: 2018,
+            globals: globals.browser,
+            ecmaVersion: 2025,
             sourceType: "module",
         },
 
         rules: {
             "react/prop-types": 0,
+            "no-unused-vars": ["error", {"argsIgnorePattern": "^_"}],
         },
     },
 ]);

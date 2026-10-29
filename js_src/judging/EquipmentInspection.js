@@ -23,7 +23,7 @@ const EquipmentInspection = ({ targetList, judgingApi }) => {
             context.client.setQueryData(['targetList'], (old) => {
                 old.targetList.forEach(session => {
                     session.targetList.forEach(boss => {
-                        Object.entries(boss.archers).forEach(([letter, archer]) => {
+                        Object.entries(boss.archers).forEach(([_, archer]) => {
                             if (archer?.id === id) {
                                 archer.kitInspected = kitInspected;
                             }
