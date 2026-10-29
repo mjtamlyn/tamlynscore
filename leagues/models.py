@@ -40,6 +40,14 @@ class Season(models.Model):
         return reverse('season-detail', kwargs={'league_slug': self.league.slug, 'season_slug': self.slug})
 
 
+class ConfigTemplate(ResultsFormatFields, models.Model):
+    league = models.ForeignKey('League', on_delete=models.CASCADE)
+    name = models.CharField(max_length=255)
+
+    def __str__(self):
+        return self.name
+
+
 class Leg(ResultsFormatFields, models.Model):
     season = models.ForeignKey('Season', on_delete=models.CASCADE)
     competitions = models.ManyToManyField('entries.Competition')
