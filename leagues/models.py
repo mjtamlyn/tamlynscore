@@ -8,6 +8,9 @@ from scores.result_modes import get_result_modes
 class League(models.Model):
     name = models.CharField(max_length=255)
     slug = models.SlugField()
+    organisers = models.ManyToManyField('core.User', blank=True, related_name='league_set')
+    managed_accounts = models.ManyToManyField('core.User', blank=True, related_name='belonging_to_leagues')
+    tournaments = models.ManyToManyField('entries.Tournament', blank=True)
 
     def __str__(self):
         return self.name
