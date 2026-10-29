@@ -32,7 +32,10 @@ export default defineConfig([
         plugins: { react },
         settings: { react: { "version": "18", } },
         languageOptions: {
-            globals: globals.browser,
+            globals: {
+                Iterator: true,
+                ...globals.browser
+            },
             ecmaVersion: 2025,
             sourceType: "module",
         },
