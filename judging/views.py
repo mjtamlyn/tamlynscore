@@ -40,6 +40,12 @@ class JudgeIndex(JudgeMixin, TemplateView):
     template_name = 'judging/index.html'
 
 
+class JudgeInspectionApi(Registration):
+    def render_to_response(self, context, **kwargs):
+        target_list = context['target_list']
+        return JsonResponse('ok')
+
+
 class JudgeInspection(JudgeMixin, Registration):
     template_name = 'judging/inspection.html'
 

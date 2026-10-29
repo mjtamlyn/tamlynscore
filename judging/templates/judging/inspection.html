@@ -1,8 +1,13 @@
 {% extends 'judging/index.html' %}
 
+{% load render_bundle from webpack_loader %}
+
 {% block bodyclass %}registration{% endblock %}
 
 {% block judge_content %}
+<div id="app" data-judging-api="{% url 'judge_inspection_api' slug=competition.slug %}"></div>
+
+
 {% for session, details in target_list.items %}
 <div class="registration-board pjax-target" id="session-{{ session.id }}">
     <h3>{{ session.start|date:"l, jS F - f a" }}</h3>
@@ -71,6 +76,8 @@
 {% endblock %}
 
 {% block scripts %}
+{% render_bundle 'judging' 'js' %}
+
 <script>
     function init() {
         document.querySelectorAll('.pjax-form').forEach(function(el) {
