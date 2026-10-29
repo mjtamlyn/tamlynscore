@@ -498,6 +498,7 @@ class TargetListBase(CompetitionMixin, ListView):
         data = {
             'id': entry.pk,
             'name': entry.competition_entry.archer.name,
+            'agbNumber': entry.competition_entry.archer.agb_number,
             'club': entry.competition_entry.team_name(),
             'categories': {
                 'gender': entry.competition_entry.get_gender_display(),
@@ -505,6 +506,7 @@ class TargetListBase(CompetitionMixin, ListView):
             },
             'stayOnLine': entry.competition_entry.stay_on_line,
             'round': entry.session_round.shot_round.name,
+            'present': entry.present,
             'kitInspected': entry.kit_inspected,
         }
         if self.competition.has_novices and entry.competition_entry.novice == 'N':

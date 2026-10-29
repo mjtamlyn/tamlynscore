@@ -4,8 +4,12 @@ import { ErrorBoundary } from 'react-error-boundary';
 
 import { useQuery } from '@tanstack/react-query'
 
+import { CompetitionContext } from '../context/CompetitionContext';
 import ErrorState from '../utils/ErrorState';
 import Spinner from '../utils/Spinner';
+
+import EquipmentInspection from './EquipmentInspection';
+
 
 const EquipmentInspectionPage = ({ judgingApi, targetListApi }) => {
     const { isPending, isError, data, error } = useQuery({ 
@@ -17,6 +21,7 @@ const EquipmentInspectionPage = ({ judgingApi, targetListApi }) => {
             }
             return response.json();
         },
+        refetchInterval: 3 * 1000,  // 3 seconds
     });
 
     if (isPending) {
@@ -29,8 +34,9 @@ const EquipmentInspectionPage = ({ judgingApi, targetListApi }) => {
 
     return (
         <ErrorBoundary FallbackComponent={ ErrorState }>
-            <h3>Inspection React!</h3>
-            <p>{ JSON.stringify(data) }</p>
+            <CompetitionContext.Provider value={ data.competition }>
+                <EquipmentInspection targetList={ data.targetList } />
+            </CompetitionContext.Provider>
         </ErrorBoundary>
     );
 };
