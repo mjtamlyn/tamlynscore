@@ -16,8 +16,8 @@ const EquipmentInspectionPage = ({ judgingApi, targetListApi }) => {
         queryKey: ['targetList'],
         queryFn: async () => {
             const response = await fetch(targetListApi);
-            if (!response.ok) {
-                throw new Error('Judge API failed', response);
+            if (!response.ok || response.status !== 200) {
+                throw new Error('TargetList API failed');
             }
             return response.json();
         },
@@ -30,6 +30,10 @@ const EquipmentInspectionPage = ({ judgingApi, targetListApi }) => {
                 <Spinner />
             </div>
         );
+    }
+
+    if (isError) {
+        return <ErrorState error={ error } />;
     }
 
     return (
