@@ -68,7 +68,7 @@ class SeasonDetail(LeagueMixin, DetailView):
 
     def get_context_data(self, **kwargs):
         context = super(SeasonDetail, self).get_context_data(**kwargs)
-        context['legs'] = self.object.leg_set.order_by('index')
+        context['legs'] = self.object.leg_set.order_by('name')
         context['editions'] = self.league.season_set.order_by('-start_date').exclude(pk=self.object.pk)
         context['non_leg_competitions'] = self.object.non_leg_competitions.order_by('date')
         return context
@@ -94,7 +94,7 @@ class Results(TemplateView):
     def get_leg(self):
         return get_object_or_404(
             Leg,
-            index=self.kwargs['leg_index'],
+            slug=self.kwargs['leg_slug'],
             season__slug=self.kwargs['season_slug'],
             season__league__slug=self.kwargs['league_slug'],
         )
@@ -179,7 +179,17 @@ class LegCreateView(LeagueMixin, CreateView):
     model = Leg
     form_class = LegCreateForm
 
-    def get_context_data(self, **kwargs):
+    def get_form_kwargs(self):
+        kwargs = super().get_form_kwargs()
+        kwargs['league'] = self.league
         # TODO: SeasonQuerySet.filter_current()
-        season = self.league.season_set.order_by('-start_date').first()
-        return super().get_context_data(season=season, **kwargs)
+        self.season = kwargs['season'] = self.league.season_set.order_by('-start_date').first()
+        return kwargs
+
+    def get_context_data(self, **kwargs):
+        context = super().get_context_data()
+        context['season'] = self.season
+        return context
+
+    def get_success_url(self):
+        return self.season.get_absolute_url()

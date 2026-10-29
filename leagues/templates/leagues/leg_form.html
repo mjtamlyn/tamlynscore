@@ -2,15 +2,29 @@
 
 {% block content %}
 <header>
-    <h1>Create a new Leg in {{ season }}</h1>
+    <h1>{{ leage }}</h1>
 </header>
 
 <div class="row">
     <div class="col3">
-        <form action="." method="POST">
+        <form class="page-form" action="." method="POST">
+            <h2>Create a new leg</h2>
             {% csrf_token %}
+            <div class="form-group">
+                <div class="form-row">
+                    <div class="form-item">
+                        <p class="help-text">Legs will be created in the most recent season, which is {{ season }}.</p>
+                    </div>
+                </div>
+            </div>
             {{ form }}
-            <input type="submit" class="btn" value="Create" />
+            <div class="form-group">
+                <div class="form-row">
+                    <div class="form-item">
+                        <input type="submit" class="btn" value="Create leg" />
+                    </div>
+                </div>
+            </div>
         </form>
     </div>
 

@@ -8,7 +8,7 @@
 <div class="row row--flex">
     <div class="col4">
         {% for leg in legs %}
-            <h3>Leg {{ leg.index }}</h3>
+            <h3>{{ leg }}</h3>
             <h4>Individual events</h4>
             <ul class="link-list">
                 {% for competition in leg.competitions.all %}

@@ -54,10 +54,14 @@ class ConfigTemplate(ResultsFormatFields, models.Model):
 class Leg(ResultsFormatFields, models.Model):
     season = models.ForeignKey('Season', on_delete=models.CASCADE)
     competitions = models.ManyToManyField('entries.Competition')
-    index = models.PositiveIntegerField()
+    name = models.CharField(max_length=255)
+    slug = models.SlugField()
 
     def __str__(self):
-        return '%s Leg %s' % (self.season, self.index)
+        return self.name
+
+    class Meta:
+        unique_together = [('season', 'slug')]
 
 
 class ResultsMode(models.Model):
@@ -74,7 +78,7 @@ class ResultsMode(models.Model):
         return reverse('leg-results', kwargs={
             'mode': self.mode,
             'format': 'html',
-            'leg_index': self.leg.index,
+            'leg_slug': self.leg.slug,
             'season_slug': self.leg.season.slug,
             'league_slug': self.leg.season.league.slug,
         })

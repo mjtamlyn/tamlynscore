@@ -1,11 +1,16 @@
 from django.contrib import admin
 
-from .models import League, Leg, ResultsMode, Season
+from .models import ConfigTemplate, League, Leg, ResultsMode, Season
 
 
 @admin.register(League)
 class LeagueAdmin(admin.ModelAdmin):
     filter_horizontal = ('organisers', 'managed_accounts', 'tournaments')
+
+
+@admin.register(ConfigTemplate)
+class ConfigTemplateAdmin(admin.ModelAdmin):
+    list_filter = ('league',)
 
 
 @admin.register(Season)
