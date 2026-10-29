@@ -644,16 +644,6 @@ class Registration(TargetListBase):
             target_list[session]['unregistered'] = unregistered
         return target_list
 
-    def render_to_response(self, context, **response_kwargs):
-        if self.request.POST.get('pjax'):
-            response = render_block_to_string(
-                self.get_template_names(),
-                'judge_content',
-                context,
-            )
-            return HttpResponse(response)
-        return super().render_to_response(context, **response_kwargs)
-
     def post(self, request, slug):
         present = request.POST['present'] == 'true'
         updated = SessionEntry.objects.filter(pk=request.POST['pk']).update(present=present)
