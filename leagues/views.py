@@ -1,7 +1,9 @@
 from django.http import Http404, HttpResponseRedirect
 from django.shortcuts import get_object_or_404
 from django.urls import reverse
-from django.views.generic import CreateView, DetailView, ListView, TemplateView, UpdateView
+from django.views.generic import (
+    CreateView, DeleteView, DetailView, ListView, TemplateView, UpdateView,
+)
 
 from braces.views import MessageMixin
 
@@ -43,6 +45,26 @@ class LeagueMixin(MessageMixin):
         return context
 
 
+class LegMixin(LeagueMixin):
+
+    def setup(self, request, *args, **kwargs):
+        super().setup(request, *args, **kwargs)
+        self.leg = get_object_or_404(
+            Leg,
+            slug=self.kwargs['leg_slug'],
+            season__slug=self.kwargs['season_slug'],
+            season__league=self.league,
+        )
+
+    def get_context_data(self, **kwargs):
+        context = super().get_context_data(**kwargs)
+        context.update({
+            'leg': self.leg,
+            'title': str(self.leg),
+        })
+        return context
+
+
 #######################
 # PUBLIC LEAGUE PAGES #
 #######################
@@ -74,11 +96,11 @@ class SeasonDetail(LeagueMixin, DetailView):
         return context
 
 
-class Results(TemplateView):
+class Results(LegMixin, TemplateView):
     template_name = 'leagues/leg_results.html'
+    organiser_required = False
 
     def get(self, request, *args, **kwargs):
-        self.leg = self.get_leg()
         self.format = self.get_format()
         self.mode = self.get_mode()
         self.object_list = self.get_scores()
@@ -90,14 +112,6 @@ class Results(TemplateView):
         if format not in ['html', 'pdf', 'pdf-summary', 'big-screen', 'csv', 'json']:
             raise Http404('No such format')
         return format
-
-    def get_leg(self):
-        return get_object_or_404(
-            Leg,
-            slug=self.kwargs['leg_slug'],
-            season__slug=self.kwargs['season_slug'],
-            season__league__slug=self.kwargs['league_slug'],
-        )
 
     def get_scores(self):
         scores = Score.objects.filter(
@@ -195,18 +209,22 @@ class LegCreateView(LeagueMixin, CreateView):
         return self.season.get_absolute_url()
 
 
-class LegUpdateView(LeagueMixin, UpdateView):
+class LegUpdateView(LegMixin, UpdateView):
     model = Leg
     form_class = LegUpdateForm
 
     def get_object(self):
-        # TODO: Move this to LeagueMixin? Also used in Results pages
-        return get_object_or_404(
-            Leg,
-            slug=self.kwargs['leg_slug'],
-            season__slug=self.kwargs['season_slug'],
-            season__league__slug=self.kwargs['league_slug'],
-        )
+        return self.leg
 
     def get_success_url(self):
-        return self.object.season.get_absolute_url()
+        return self.leg.season.get_absolute_url()
+
+
+class LegDeleteView(LegMixin, DeleteView):
+    model = Leg
+
+    def get_object(self):
+        return self.leg
+
+    def get_success_url(self):
+        return self.leg.season.get_absolute_url()

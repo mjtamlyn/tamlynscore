@@ -1,0 +1,34 @@
+{% extends 'base.html' %}
+
+{% block content %}
+<header>
+    <h1>{{ league }}</h1>
+</header>
+
+<div class="row">
+    <div class="col3">
+        <form class="page-form" action="." method="POST">
+            <h2>Are you sure you want to delete {{ object }}?</h2>
+            {% csrf_token %}
+            <div class="form-group">
+                <div class="form-row">
+                    <div class="form-item">
+                        <p class="help-text">This will remove the Leg and any associated results formats. It will not remove any attached events.</p>
+                    </div>
+                </div>
+            </div>
+            <div class="form-group">
+                <div class="form-row">
+                    <div class="form-item">
+                        <input type="submit" class="btn delete" value="Confirm deletion" />
+                    </div>
+                </div>
+            </div>
+        </form>
+    </div>
+
+    <div class="col3">
+        {% include 'leagues/_organiser_zone.html' %}
+    </div>
+</div>
+{% endblock %}

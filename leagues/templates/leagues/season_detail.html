@@ -12,7 +12,7 @@
                 {{ leg }}
                 {% if is_organiser %}
                 <a class="action-button edit" href="{% url 'leg-update' league_slug=league.slug season_slug=season.slug leg_slug=leg.slug %}"></a>
-                <a class="action-button delete"></a>
+                <a class="action-button delete" href="{% url 'leg-delete' league_slug=league.slug season_slug=season.slug leg_slug=leg.slug %}"></a>
                 {% endif %}
             </h2>
             <h3>Individual events</h3>
