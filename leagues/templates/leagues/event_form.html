@@ -1,0 +1,38 @@
+{% extends 'base.html' %}
+
+{% block content %}
+<header>
+    <h1>{{ league }}</h1>
+</header>
+
+<div class="row">
+    <div class="col3">
+        <form class="page-form" action="." method="POST">
+            <h2>Create new event</h2>
+            {% csrf_token %}
+            <div class="form-group">
+                <div class="form-row">
+                    <div class="form-item">
+                        <p class="help-text">
+                            Events will be created in the most recent season,
+                            optionally attached to an existing Leg.
+                        </p>
+                    </div>
+                </div>
+            </div>
+            {{ form }}
+            <div class="form-group">
+                <div class="form-row">
+                    <div class="form-item">
+                        <input type="submit" class="btn" value="Create event" />
+                    </div>
+                </div>
+            </div>
+        </form>
+    </div>
+
+    <div class="col3">
+        {% include 'leagues/_organiser_zone.html' %}
+    </div>
+</div>
+{% endblock %}

@@ -8,8 +8,14 @@
 <div class="row row--flex">
     <div class="col4">
         {% for leg in legs %}
-            <h3>Leg {{ leg.index }}</h3>
-            <h4>Individual events</h4>
+            <h2>
+                {{ leg }}
+                {% if is_organiser %}
+                <a class="action-button edit" href="{% url 'leg-update' league_slug=league.slug season_slug=season.slug leg_slug=leg.slug %}"></a>
+                <a class="action-button delete" href="{% url 'leg-delete' league_slug=league.slug season_slug=season.slug leg_slug=leg.slug %}"></a>
+                {% endif %}
+            </h2>
+            <h3>Individual events</h3>
             <ul class="link-list">
                 {% for competition in leg.competitions.all %}
                 <li>
@@ -20,7 +26,7 @@
                 </li>
                 {% endfor %}
             </ul>
-            <h4>Combined results</h4>
+            <h3>Combined results</h3>
             <ul class="link-list">
                 {% for mode in leg.result_modes.all %}
                 <li><a href="{{ mode.get_absolute_url }}">{{ mode }}</a></li>
@@ -29,7 +35,7 @@
         {% endfor %}
         </ul>
         {% if non_leg_competitions %}
-        <h4>Other events part of this season</h4>
+        <h2>Other events during this season</h2>
         <ul class="link-list">
             {% for competition in non_leg_competitions %}
             <li>
@@ -41,14 +47,22 @@
             {% endfor %}
         </ul>
         {% endif %}
+        {% if not non_leg_competitions and not legs %}
+            <h2>Nothing here yet</h2>
+            <p class="p--centered">Move along...</p>
+        {% endif %}
     </div>
     <div class="col2">
-        <h3>Other years</h3>
+        <h2>Other years</h2>
         <ul class="link-list">
             {% for edition in editions %}
             <li><a href="{{ edition.get_absolute_url }}">{{ edition }}</a></li>
             {% endfor %}
         </ul>
+
+        {% if is_organiser %}
+        {% include 'leagues/_organiser_zone.html' %}
+        {% endif %}
     </div>
 </div>
 {% endblock %}

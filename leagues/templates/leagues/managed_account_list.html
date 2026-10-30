@@ -1,0 +1,29 @@
+{% extends 'base.html' %}
+
+{% block content %}
+<header>
+    <h1>{{ league }}</h1>
+</header>
+
+<div class="row">
+    <div class="col3">
+        <h2>Managed accounts</h2>
+        <p>The following logins are managed by this league. As a league organiser, you can give them administraive access to events</p>
+        <p>
+            <small><em>
+            Future planned features here include: password resets, adding new accounts, maybe attaching logins to Clubs and Events so club admins can directly manage their users and enter them to events??
+            </em></small>
+        </p>
+        <ul>
+        {% for user in object_list %}
+            <li>{{ user }} <small>{{ user.email }}</small></li>
+        {% endfor %}
+        </ul>
+    </div>
+
+    <div class="col3">
+        {% include 'leagues/_organiser_zone.html' %}
+    </div>
+</div>
+{% endblock %}
+

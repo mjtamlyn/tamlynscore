@@ -1,0 +1,39 @@
+{% extends 'base.html' %}
+
+{% block content %}
+<header>
+    <h1>{{ league }}</h1>
+</header>
+
+<div class="row">
+    <div class="col3">
+        <form class="page-form" action="." method="POST">
+            <h2>{% if form.instance.pk %}Edit {{ form.instance }}{% else %}Create a new leg{% endif %}</h2>
+            {% csrf_token %}
+            <div class="form-group">
+                <div class="form-row">
+                    <div class="form-item">
+                        {% if form.instance.pk %}
+                        <p class="help-text">If you need to change the configuration setup for a leg that is already in progress, please email.</p>
+                        {% else %}
+                        <p class="help-text">Legs will be created in the most recent season, which is {{ season }}.</p>
+                        {% endif %}
+                    </div>
+                </div>
+            </div>
+            {{ form }}
+            <div class="form-group">
+                <div class="form-row">
+                    <div class="form-item">
+                        <input type="submit" class="btn" value="{% if form.instance.pk %}Save{% else %}Create leg{% endif %}" />
+                    </div>
+                </div>
+            </div>
+        </form>
+    </div>
+
+    <div class="col3">
+        {% include 'leagues/_organiser_zone.html' %}
+    </div>
+</div>
+{% endblock %}

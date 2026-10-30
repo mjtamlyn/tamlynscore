@@ -6,13 +6,20 @@
 </header>
 
 <div class="row">
-    <div class="col6">
+    <div class="{% if is_organiser %}col3{% else %}col6{% endif %}">
+        <h2>Seasons</h2>
         <ul class="link-list">
             {% for season in league.season_set.all %}
             <li><a href="{{ season.get_absolute_url }}">{{ season }}</a></li>
             {% endfor %}
         </ul>
     </div>
+
+    {% if is_organiser %}
+    <div class="col3">
+        {% include 'leagues/_organiser_zone.html' %}
+    </div>
+    {% endif %}
 </div>
 {% endblock %}
 

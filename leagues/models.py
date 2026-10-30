@@ -8,6 +8,9 @@ from scores.result_modes import get_result_modes
 class League(models.Model):
     name = models.CharField(max_length=255)
     slug = models.SlugField()
+    organisers = models.ManyToManyField('core.User', blank=True, related_name='league_set')
+    managed_accounts = models.ManyToManyField('core.User', blank=True, related_name='belonging_to_leagues')
+    tournaments = models.ManyToManyField('entries.Tournament', blank=True)
 
     def __str__(self):
         return self.name
@@ -40,13 +43,25 @@ class Season(models.Model):
         return reverse('season-detail', kwargs={'league_slug': self.league.slug, 'season_slug': self.slug})
 
 
+class ConfigTemplate(ResultsFormatFields, models.Model):
+    league = models.ForeignKey('League', on_delete=models.CASCADE)
+    name = models.CharField(max_length=255)
+
+    def __str__(self):
+        return self.name
+
+
 class Leg(ResultsFormatFields, models.Model):
     season = models.ForeignKey('Season', on_delete=models.CASCADE)
     competitions = models.ManyToManyField('entries.Competition')
-    index = models.PositiveIntegerField()
+    name = models.CharField(max_length=255)
+    slug = models.SlugField()
 
     def __str__(self):
-        return '%s Leg %s' % (self.season, self.index)
+        return self.name
+
+    class Meta:
+        unique_together = [('season', 'slug')]
 
 
 class ResultsMode(models.Model):
@@ -63,7 +78,7 @@ class ResultsMode(models.Model):
         return reverse('leg-results', kwargs={
             'mode': self.mode,
             'format': 'html',
-            'leg_index': self.leg.index,
+            'leg_slug': self.leg.slug,
             'season_slug': self.leg.season.slug,
             'league_slug': self.leg.season.league.slug,
         })
