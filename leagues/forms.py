@@ -4,7 +4,7 @@ from django import forms
 from django.db import transaction
 
 from core.models import User
-from entries.models import Competition, Tournament, SCORING_ARCHER
+from entries.models import SCORING_ARCHER, Competition, Tournament
 from scores.result_modes import ByRound, Team
 
 from .models import ConfigTemplate, Leg
