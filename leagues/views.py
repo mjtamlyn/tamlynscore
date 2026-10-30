@@ -189,6 +189,13 @@ class Results(LegMixin, TemplateView):
 # LEAGUE ORGANISER TOOLS #
 ##########################
 
+class ManagedAccountList(LeagueMixin, ListView):
+    template_name = 'leagues/managed_account_list.html'
+
+    def get_queryset(self):
+        return self.league.managed_accounts.order_by('name')
+
+
 class LegCreateView(LeagueMixin, CreateView):
     model = Leg
     form_class = LegCreateForm
