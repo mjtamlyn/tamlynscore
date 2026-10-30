@@ -21,24 +21,24 @@ class CompetitionForm(forms.Form):
     # Fields about the shoot itself
     full_name = forms.CharField(max_length=300)
     short_name = forms.CharField(max_length=20)
-    date = forms.DateField()
-    end_date = forms.DateField(required=False)
+    date = forms.DateField(widget=forms.TextInput(attrs={'type': 'date'}))
+    end_date = forms.DateField(required=False, widget=forms.TextInput(attrs={'type': 'date'}))
 
     # Fields about sessions and rounds shot in them
     scoring_system = forms.ChoiceField(choices=SCORING_SYSTEMS, initial=SCORING_FULL)
     archers_per_target = forms.IntegerField(initial=4)
     arrows_entered_per_end = forms.IntegerField(initial=12, help_text='Number of arrow values included on each running slip')
-    session_1_time = forms.DateTimeField(label='Session time')
+    session_1_time = forms.DateTimeField(label='Session time', widget=forms.TextInput(attrs={'type': 'datetime-local'}))
     session_1_rounds = forms.ModelMultipleChoiceField(Round.objects, label='Rounds')
-    session_2_time = forms.DateTimeField(required=False, label='Session time')
+    session_2_time = forms.DateTimeField(required=False, label='Session time', widget=forms.TextInput(attrs={'type': 'datetime-local'}))
     session_2_rounds = forms.ModelMultipleChoiceField(Round.objects, required=False, label='Rounds')
-    session_3_time = forms.DateTimeField(required=False, label='Session time')
+    session_3_time = forms.DateTimeField(required=False, label='Session time', widget=forms.TextInput(attrs={'type': 'datetime-local'}))
     session_3_rounds = forms.ModelMultipleChoiceField(Round.objects, required=False, label='Rounds')
-    session_4_time = forms.DateTimeField(required=False, label='Session time')
+    session_4_time = forms.DateTimeField(required=False, label='Session time', widget=forms.TextInput(attrs={'type': 'datetime-local'}))
     session_4_rounds = forms.ModelMultipleChoiceField(Round.objects, required=False, label='Rounds')
-    session_5_time = forms.DateTimeField(required=False, label='Session time')
+    session_5_time = forms.DateTimeField(required=False, label='Session time', widget=forms.TextInput(attrs={'type': 'datetime-local'}))
     session_5_rounds = forms.ModelMultipleChoiceField(Round.objects, required=False, label='Rounds')
-    session_6_time = forms.DateTimeField(required=False, label='Session time')
+    session_6_time = forms.DateTimeField(required=False, label='Session time', widget=forms.TextInput(attrs={'type': 'datetime-local'}))
     session_6_rounds = forms.ModelMultipleChoiceField(Round.objects, required=False, label='Rounds')
 
     # Fields about result types
@@ -168,6 +168,7 @@ class CompetitionForm(forms.Form):
         tournament.save()
         self.instance.tournament = tournament
         self.instance.date = self.cleaned_data['date']
+        self.instance.end_date = self.cleaned_data['end_date']
         for field in self.CONFIG_FIELDS:
             setattr(self.instance, field, self.cleaned_data[field])
 

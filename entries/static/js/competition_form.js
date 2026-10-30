@@ -18,14 +18,6 @@ $(document).ready(function() {
 		$('#add_sessions').remove();
 	}
 
-	// Add date pickers to relevant fields
-	$('#id_session_1_time').datetimepicker({format: 'Y-m-d h:i:s'});
-	$('#id_session_2_time').datetimepicker({format: 'Y-m-d h:i:s'});
-	$('#id_session_3_time').datetimepicker({format: 'Y-m-d h:i:s'});
-	$('#id_session_4_time').datetimepicker({format: 'Y-m-d h:i:s'});
-	$('#id_session_5_time').datetimepicker({format: 'Y-m-d h:i:s'});
-	$('#id_session_6_time').datetimepicker({format: 'Y-m-d h:i:s'});
-
 	// Add more sessions on button click
 	$('#add_sessions').on('click', function(e) {
 		e.preventDefault();
