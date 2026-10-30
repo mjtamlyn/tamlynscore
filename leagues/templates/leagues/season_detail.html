@@ -47,6 +47,10 @@
             {% endfor %}
         </ul>
         {% endif %}
+        {% if not non_leg_competitions and not legs %}
+            <h2>Nothing here yet</h2>
+            <p class="p--centered">Move along...</p>
+        {% endif %}
     </div>
     <div class="col2">
         <h2>Other years</h2>
