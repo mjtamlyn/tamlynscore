@@ -8,7 +8,13 @@
 <div class="row row--flex">
     <div class="col4">
         {% for leg in legs %}
-            <h3>{{ leg }}</h3>
+            <h3>
+                {{ leg }}
+                {% if is_organiser %}
+                <a class="action-button edit" href="{% url 'leg-update' league_slug=league.slug season_slug=season.slug leg_slug=leg.slug %}"></a>
+                <a class="action-button delete"></a>
+                {% endif %}
+            </h3>
             <h4>Individual events</h4>
             <ul class="link-list">
                 {% for competition in leg.competitions.all %}

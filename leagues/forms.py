@@ -6,14 +6,17 @@ from scores.result_modes import ByRound, Team
 from .models import ConfigTemplate, Leg
 
 
-class LegCreateForm(forms.ModelForm):
+class LegFields(forms.ModelForm):
     name = forms.CharField(help_text='Human readable name, e.g. "MyLeague 1999-2000 Leg 1"')
     slug = forms.SlugField(label="URL segment", help_text='Used in urls. Historically just the leg number, e.g. "1". Must be unique by season.')
-    config_template = forms.ModelChoiceField(ConfigTemplate.objects, label="Competition configuration", help_text="Default configuration for the leg results, and events within the leg.")
 
     class Meta:
         model = Leg
         fields = ['name', 'slug']
+
+
+class LegCreateForm(LegFields):
+    config_template = forms.ModelChoiceField(ConfigTemplate.objects, label="Competition configuration", help_text="Default configuration for the leg results, and events within the leg.")
 
     def __init__(self, league, season, *args, **kwargs):
         self.league = league
@@ -43,3 +46,7 @@ class LegCreateForm(forms.ModelForm):
         instance.result_modes.create(mode=Team.slug)
 
         return instance
+
+
+class LegUpdateForm(LegFields):
+    pass

@@ -1,14 +1,14 @@
 from django.http import Http404, HttpResponseRedirect
 from django.shortcuts import get_object_or_404
 from django.urls import reverse
-from django.views.generic import CreateView, DetailView, ListView, TemplateView
+from django.views.generic import CreateView, DetailView, ListView, TemplateView, UpdateView
 
 from braces.views import MessageMixin
 
 from scores.models import Score
 from scores.result_modes import get_mode
 
-from .forms import LegCreateForm
+from .forms import LegCreateForm, LegUpdateForm
 from .models import League, Leg, ResultsMode, Season
 
 
@@ -193,3 +193,20 @@ class LegCreateView(LeagueMixin, CreateView):
 
     def get_success_url(self):
         return self.season.get_absolute_url()
+
+
+class LegUpdateView(LeagueMixin, UpdateView):
+    model = Leg
+    form_class = LegUpdateForm
+
+    def get_object(self):
+        # TODO: Move this to LeagueMixin? Also used in Results pages
+        return get_object_or_404(
+            Leg,
+            slug=self.kwargs['leg_slug'],
+            season__slug=self.kwargs['season_slug'],
+            season__league__slug=self.kwargs['league_slug'],
+        )
+
+    def get_success_url(self):
+        return self.object.season.get_absolute_url()
