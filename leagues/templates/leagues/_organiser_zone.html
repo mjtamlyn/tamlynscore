@@ -3,4 +3,5 @@
     <li><a href="{% url 'league-detail' league_slug=league.slug %}">{{ league }} home page</a></li>
     <li><a href="{% url 'managed-accounts' league_slug=league.slug %}">Managed accounts</a></li>
     <li><a href="{% url 'leg-create' league_slug=league.slug %}">Create new leg</a></li>
+    <li><a href="{% url 'event-create' league_slug=league.slug %}">Create new event</a></li>
 </ul>

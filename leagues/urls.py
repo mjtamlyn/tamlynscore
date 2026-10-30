@@ -4,6 +4,7 @@ from . import views
 
 urlpatterns = [
     path('organiser/<slug:league_slug>/leg-create/', views.LegCreateView.as_view(), name='leg-create'),
+    path('organiser/<slug:league_slug>/event-create/', views.EventCreateView.as_view(), name='event-create'),
     path('organiser/<slug:league_slug>/managed-accounts/', views.ManagedAccountList.as_view(), name='managed-accounts'),
     path('organiser/<slug:league_slug>/<slug:season_slug>/<slug:leg_slug>/edit/', views.LegUpdateView.as_view(), name='leg-update'),
     path('organiser/<slug:league_slug>/<slug:season_slug>/<slug:leg_slug>/delete/', views.LegDeleteView.as_view(), name='leg-delete'),

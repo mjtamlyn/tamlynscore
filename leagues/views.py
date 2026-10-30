@@ -10,7 +10,7 @@ from braces.views import MessageMixin
 from scores.models import Score
 from scores.result_modes import get_mode
 
-from .forms import LegCreateForm, LegUpdateForm
+from .forms import EventCompetitionForm, LegCreateForm, LegUpdateForm
 from .models import League, Leg, ResultsMode, Season
 
 
@@ -235,3 +235,18 @@ class LegDeleteView(LegMixin, DeleteView):
 
     def get_success_url(self):
         return self.leg.season.get_absolute_url()
+
+
+class EventCreateView(LeagueMixin, CreateView):
+    form_class = EventCompetitionForm
+    template_name = 'leagues/event_form.html'
+
+    def get_form_kwargs(self):
+        kwargs = super().get_form_kwargs()
+        kwargs['league'] = self.league
+        # TODO: SeasonQuerySet.filter_current()
+        self.season = kwargs['season'] = self.league.season_set.order_by('-start_date').first()
+        return kwargs
+
+    def get_success_url(self):
+        return self.season.get_absolute_url()
