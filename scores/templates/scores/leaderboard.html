@@ -7,7 +7,9 @@
 {% endblock %}
 
 {% block moduleclass %}leaderboard{% endblock %}
+{% block containerclass %}container--full{% endblock %}
 {% block title %}{{ title }} - {{ mode }}{% endblock %}
+
 
 {% block competition_content %}
 <div id="app" data-results-api="{% url url_name slug=competition.slug mode=mode.slug format='json' %}"></div>

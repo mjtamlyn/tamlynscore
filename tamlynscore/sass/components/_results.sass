@@ -9,7 +9,6 @@
   &__nav
     width: 300px
     border-right: 1px solid $borders
-    margin-right: 15px
     position: absolute
     top: 0
     height: 100vh
@@ -20,19 +19,18 @@
       position: relative
       width: 100%
       border-right: 0
-      margin-right: 0
 
   &__nav-toggle:after
     @include fa-icon()
     content: $fa-var-bars
     position: absolute
     top: 11px
-    left: 8px
+    left: 11px
     cursor: pointer
 
   &__main
     flex-grow: 1
-    margin-left: 315px
+    margin-left: 310px
 
     &--full-width
       margin: 0
@@ -41,7 +39,7 @@
 
   &__label
     background-color: $lightblue
-    padding: 10px 8px
+    padding: 10px
     font-weight: bold
     white-space: nowrap
     overflow: hidden
@@ -50,7 +48,7 @@
   &__category
     display: block
     cursor: pointer
-    padding: 10px 24px 10px 8px
+    padding: 10px 24px 10px 10px
     font-size: 16px
     position: relative
     white-space: nowrap
@@ -88,6 +86,7 @@
     font-size: 14px
     text-align: center
     overflow-x: scroll
+    padding: 0 5px
 
   &__heading,
   &__part
