@@ -20,14 +20,17 @@ const ResultsHeaders = ({ headers, team }) => {
     </>;
 };
 
-const Result = ({ details, team, scoresheetUrl, scoresheetApi, headers }) =>{
+const Result = ({ details, missedCut, team, scoresheetUrl, scoresheetApi, headers }) =>{
     const [showScoresheet, setShowScoresheet] = useState(false);
 
     const baseClassName = "results-list__part";
-
     const items = Iterator.zip([details, headers]).toArray();
     const bits = items.map(([detail, id]) => {
         var className = baseClassName;
+        if (missedCut) {
+            className += ` ${baseClassName}--missed-cut`;
+        }
+
         if (id === "Archer" || id === "Club" || id === "Country") {
             className += ` ${baseClassName}--left`;
             if (team) {
@@ -73,7 +76,7 @@ const Result = ({ details, team, scoresheetUrl, scoresheetApi, headers }) =>{
 
     return <>
         { bits }
-        { !team && <div className="results-list__part">
+        { !team && <div className={ missedCut ? `${baseClassName} ${baseClassName}--missed-cut` : baseClassName }>
             { scoresheetUrl && <a href={ scoresheetUrl } onClick={ toggleScoresheet } className="results-list__score-sheet" /> }
         </div> }
         { scoresheet }
@@ -86,6 +89,7 @@ const ResultList = ({ label, headers, scores }) => {
         return (
             <Result
                 details={ score.details }
+                missedCut={ score.missedCut }
                 scoresheetUrl={ score.scoresheetUrl }
                 scoresheetApi={ score.scoresheetApi }
                 team={ score.team }

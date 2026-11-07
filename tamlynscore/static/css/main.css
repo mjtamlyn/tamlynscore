@@ -4889,22 +4889,26 @@ ul.link-list li a:hover {
   text-overflow: ellipsis;
 }
 /* line 99, ../../sass/components/_results.sass */
+.results-list__heading--missed-cut, .results-list__part--missed-cut {
+  background-color: #eeeeee;
+}
+/* line 102, ../../sass/components/_results.sass */
 .results-list__heading--left, .results-list__part--left {
   text-align: left;
 }
-/* line 102, ../../sass/components/_results.sass */
+/* line 105, ../../sass/components/_results.sass */
 .results-list__heading--team-name, .results-list__part--team-name {
   font-weight: bold;
 }
-/* line 105, ../../sass/components/_results.sass */
+/* line 108, ../../sass/components/_results.sass */
 .results-list__heading--team-row, .results-list__part--team-row {
   border-bottom: 0;
 }
-/* line 108, ../../sass/components/_results.sass */
+/* line 111, ../../sass/components/_results.sass */
 .results-list__heading {
   font-weight: bold;
 }
-/* line 111, ../../sass/components/_results.sass */
+/* line 114, ../../sass/components/_results.sass */
 .results-list__score-sheet:after {
   display: inline-block;
   font: normal normal normal 14px/1 FontAwesome;
@@ -4914,7 +4918,7 @@ ul.link-list li a:hover {
   -moz-osx-font-smoothing: grayscale;
   content: "";
 }
-/* line 115, ../../sass/components/_results.sass */
+/* line 118, ../../sass/components/_results.sass */
 .results-list__score-sheet-row {
   grid-column: 1/-1;
   margin: 5px 0;

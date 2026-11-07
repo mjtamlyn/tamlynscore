@@ -413,6 +413,7 @@ class BaseResultMode(object):
                             'scoresheetUrl': scoresheet_url,
                             'scoresheetApi': scoresheet_api,
                         }
+                        json_score = self.serialize_score_extra(score, json_score)
                     json_category['scores'].append(json_score)
                 if not json_category['scores']:
                     continue
@@ -421,6 +422,9 @@ class BaseResultMode(object):
                 continue
             json_results.append(json_section)
         return json_results
+
+    def serialize_score_extra(self, score, json_score):
+        return json_score
 
     def get_categories_for_entry(self, competition, entry):
         kwargs = {
@@ -1148,6 +1152,10 @@ class H2HSeedings(ByRound, Team, BaseResultMode):
                         (not category.ages or entry.agb_age in category.ages)):
                     categories.append(category)
         return categories
+
+    def serialize_score_extra(self, score, json_score):
+        json_score['missedCut'] = getattr(score, 'missed_cut', False)
+        return json_score
 
 
 class Weekend(BaseResultMode):
