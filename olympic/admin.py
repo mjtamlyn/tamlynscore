@@ -35,6 +35,10 @@ class MatchArrowAdmin(admin.ModelAdmin):
     raw_id_fields = ('result',)
 
 
+@admin.register(Seeding)
+class SeedingAdmin(admin.ModelAdmin):
+    raw_id_fields = ('entry', 'entry_2', 'entry_3', 'session_round')
+
+
 admin.site.register(OlympicRound)
 admin.site.register(Category)
-admin.site.register(Seeding)

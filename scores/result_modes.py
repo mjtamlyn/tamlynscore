@@ -1054,12 +1054,8 @@ class H2HSeedings(ByRound, Team, BaseResultMode):
         rounds = self.get_rounds(competition)
         results = OrderedDict()
 
-        current_shot_round = None
-        section = None
         for round in rounds:
-            if round.shot_round != current_shot_round:
-                section = self.get_section_for_round(round, round.ranking_rounds.first().scoring_type, competition)
-                current_shot_round = round.shot_round
+            section = self.get_section_for_round(round, round.ranking_rounds.first().scoring_type, competition)
             section.seedings_confirmed = round.seeding_set.exists()
             section_scores = self.filter_scores(competition, scores, round)
             section_results = self.get_round_results(competition, round, section_scores, section.seedings_confirmed, leaderboard)
@@ -1071,12 +1067,6 @@ class H2HSeedings(ByRound, Team, BaseResultMode):
 
     def get_round_results(self, competition, round, scores, seedings_confirmed, leaderboard):
         if not round.shot_round.team_type:
-            results_category = ResultCategory(
-                bowstyle=round.category.bowstyles.all()[0] if round.category.bowstyles.all() else None,  # TODO: Fix this
-                gender=round.category.get_gender_display(),
-                novice=round.category.get_novice_display(),
-                junior=round.category.ages[0] if round.category.ages else None,  # TODO: Fix this
-            )
             if seedings_confirmed:
                 results = []
                 score_lookup = {score.target.session_entry.competition_entry: score for score in scores}
@@ -1100,8 +1090,8 @@ class H2HSeedings(ByRound, Team, BaseResultMode):
                         placing=seeding.seed,
                     )
                     results.append(score)
-                return {results_category: results}
-            results = ByRound.get_round_results(self, competition, [round.shot_round for round in round.ranking_rounds.all()], scores, category=results_category)
+                return {round.category: results}
+            results = ByRound.get_round_results(self, competition, [round.shot_round for round in round.ranking_rounds.all()], scores, category=round.category)
             if round.cut:
                 for category, provisional_seedings in results.items():
                     for seed in provisional_seedings:
