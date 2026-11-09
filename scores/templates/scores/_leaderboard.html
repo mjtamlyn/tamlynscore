@@ -14,7 +14,7 @@
             <tr><th colspan="100%">{{ category }}</th></tr>
             {% for score in scores %}
                 <tr class="{% if score.team %}no-border{% endif %} {% if score.missed_cut %}missed-cut{% endif %}">
-                    {% if include_confirmation_form and not section.seedings_confirmed %}
+                    {% if include_confirmation_form and not category.seedings_confirmed %}
                     <td>
                         {% if score.team %}
                             {# TODO add a bit of JS to make this a single checkbox #}
@@ -58,7 +58,7 @@
                 {% if score.team %}
                     {% for member in score.team %}
                     <tr {% if not forloop.last %}class="no-border"{% endif %}>
-                        {% if include_confirmation_form and not section.seedings_confirmed %}
+                        {% if include_confirmation_form and not category.seedings_confirmed %}
                         <td></td>
                         {% endif %}
                         <td></td>
@@ -74,8 +74,8 @@
                 <tr>
                     <td colspan="7">
                         {% csrf_token %}
-                        <input type="hidden" name="form-id" value="confirm-seedings-{{ section.round.pk }}">
-                        {% if section.seedings_confirmed %}
+                        <input type="hidden" name="form-id" value="confirm-seedings-{{ category.session_round.pk }}">
+                        {% if category.seedings_confirmed %}
                             <input class="btn delete" name="remove-all" type="submit" value="Delete seedings">
                         {% else %}
                             <input class="btn" type="submit" value="Confirm seedings">

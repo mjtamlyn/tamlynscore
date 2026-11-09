@@ -61,15 +61,13 @@ class OlympicIndex(OlympicMixin, ResultModeMixin, TemplateView):
             scores = Score.objects.filter(target_id__in=score_ids)
             mode = H2HSeedings(include_distance_breakdown=False, hide_golds=False)
             results = mode.get_results(self.competition, scores)
-            categories = list(results.values())
             seedings = []
             while not seedings:
-                for category in categories:
-                    if category:
-                        seedings = list(category.values())[0]
-                        if seedings:
+                for section in results:
+                    for scores in results[section].values():
+                        if scores:
+                            seedings = scores
                             break
-                break
             session_round.set_seedings(seedings)
         return redirect('olympic_index', slug=self.competition.slug)
 

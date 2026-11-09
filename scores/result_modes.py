@@ -1077,6 +1077,8 @@ class H2HSeedings(ByRound, Team, BaseResultMode):
                 novice=round.category.get_novice_display(),
                 junior=round.category.ages[0] if round.category.ages else None,  # TODO: Fix this
             )
+            results_category.seedings_confirmed = seedings_confirmed
+            results_category.session_round = round
             if seedings_confirmed:
                 results = []
                 score_lookup = {score.target.session_entry.competition_entry: score for score in scores}
@@ -1102,8 +1104,9 @@ class H2HSeedings(ByRound, Team, BaseResultMode):
                     results.append(score)
                 return {results_category: results}
             results = ByRound.get_round_results(self, competition, [round.shot_round for round in round.ranking_rounds.all()], scores, category=results_category)
-            if round.cut:
-                for category, provisional_seedings in results.items():
+            for category, provisional_seedings in results.items():
+                category.session_round = round
+                if round.cut:
                     for seed in provisional_seedings:
                         if (seed.placing and seed.placing > round.cut) or seed.placing is None:
                             seed.missed_cut = True
