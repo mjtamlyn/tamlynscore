@@ -1,0 +1,74 @@
+@use '../colors'
+@use '../typography'
+
+nav.header-nav
+  background: white
+  overflow: hidden
+  width: 100%
+  height: 44px
+  min-height: 44px
+  line-height: 44px
+
+  .nav-link
+    padding: 0 8px
+    margin: 5px 0
+    line-height: 34px
+    border-radius: 5px
+    display: block
+
+    &:hover
+      background-color: colors.$bg-dark
+
+    &--priority
+      padding: 0 10px
+      background-color: colors.$wared
+      color: white
+      font-weight: bold
+      &:hover
+        background-color: colors.$wared
+
+  .container
+    display: flex
+
+  .home
+    font-family: typography.$font-header
+    font-size: 22px
+    margin-right: 10px
+    .narrow
+      display: none
+    .wide
+      display: block
+
+    @media (max-width: 500px)
+      .narrow
+        display: block
+      .wide
+        display: none
+
+  .nav-links
+    flex-grow: 1
+    display: flex
+    margin-right: 10px
+
+  .user
+    font-size: 14px
+    flex-shrink: 1
+    min-width: 0
+    white-space: nowrap
+    display: flex
+
+    .logout
+      cursor: pointer
+
+    span.name
+      display: block
+      margin-right: 10px
+      overflow: hidden
+      text-overflow: ellipsis
+      min-width: 0
+
+      @media (max-width: 500px)
+        .narrow
+          display: block
+        .wide
+          display: none

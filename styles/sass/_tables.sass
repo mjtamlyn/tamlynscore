@@ -1,0 +1,66 @@
+@use 'fontawesome/fa'
+@use 'colors'
+
+// Faked tables
+div.table
+  display: table
+  .table-row
+    display: table-row
+    span
+      display: table-cell
+
+    &.header
+      font-weight: bold
+
+div.table
+  &.full-width
+    width: 100%
+
+// Real tables
+
+table.table
+  border-collapse: collapse
+  width: 100%
+
+  td, th
+    padding: 8px 3px
+    &.centered
+      text-align: center
+    &.oneline
+      white-space: nowrap
+
+  thead
+    tr
+      border-bottom: 2px solid colors.$dark
+
+  tbody
+    font-size: 14px
+
+    tr
+      border-bottom: 1px solid colors.$borders
+
+      &.no-border
+        border-bottom: none
+
+    tr.boss-start
+      border-top: 2px solid colors.$dark
+    tr.boss-end
+      border-bottom: 2px solid colors.$dark
+    tr.empty
+      background-color: colors.$bg
+
+    .bye
+      opacity: 0.6
+      font-style: italic
+
+  .score-sheet-link:after
+    @include fa.fa-icon()
+    content: fa.fa-content(fa.$var-table)
+
+// H2H
+table.h2h
+  max-width: 400px
+
+  td
+    width: 33%
+    text-align: center

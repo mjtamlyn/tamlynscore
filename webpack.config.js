@@ -13,6 +13,7 @@ const config = {
         'score_sheet': './js_src/scoreSheet.js',
         'target_input': './js_src/targetInput.js',
         'target_list': './js_src/targetList.js',
+        'styles': './styles/sass/main.sass',
     },
     mode: devMode ? 'development' : 'production',
     output: {
@@ -26,7 +27,11 @@ const config = {
                 test: /\.js$/,
                 use: 'babel-loader',
                 exclude: /node_modules/
-            }
+            }, {
+                test: /\.s[ac]ss$/i,
+                use: 'sass-loader',
+                type: 'css/auto',
+            },
         ]
     },
     plugins: [

@@ -1,0 +1,72 @@
+@use 'colors'
+
+.target-list
+  .detail
+    font-weight: bold
+    margin-right: 5px
+
+  .boss
+    margin: 10px 0
+    border-bottom: 1px solid colors.$lightblue
+
+    .archer-block
+      margin-bottom: 0
+      border-radius: 0
+      border-bottom: 0
+
+  &__btn
+    display: block
+    width: 100%
+    margin: 10px 0
+
+  .archer-block
+    position: relative
+    overflow: unset
+
+    .name
+      height: 28px
+
+    .bottom
+      min-height: 53px
+      overflow: auto
+
+  .select
+    cursor: pointer
+
+  .archer-selector
+    position: absolute
+    top: 28px
+    left: 10px
+    border: 1px solid colors.$borders
+    border-top: none
+    border-radius: 0 0 8px 8px
+    width: 300px
+    max-height: 350px
+    overflow-y: scroll
+    z-index: 1
+
+    &__input
+      width: 100%
+      border: none
+      border-radius: 0
+      border-bottom: 2px solid colors.$borders
+      outline: none
+
+    &__row
+      padding: 5px 8px
+      border-bottom: 1px solid colors.$borders
+      background-color: white
+      cursor: pointer
+
+      &:hover
+        background-color: colors.$oxford
+        color: white
+
+      &[aria-selected]
+        background-color: colors.$lightblue
+        &:hover
+          background-color: colors.$oxford
+          color: white
+
+      &:last-child
+        border-bottom: none

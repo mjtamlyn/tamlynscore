@@ -1,0 +1,41 @@
+@use '../colors'
+@use '../fontawesome/fa'
+
+ul.link-list
+  border-top: 1px solid colors.$bg-dark
+
+  li
+    border-bottom: 1px solid colors.$bg-dark
+    p
+      padding: 10px
+      margin: 0
+
+    a
+      padding: 10px
+      display: block
+      &::before
+        @include fa.fa-icon()
+        content: fa.fa-content(fa.$var-chevron-right)
+        font-size: 14px
+        color: colors.$borders
+      &:hover
+        background: colors.$bg
+        cursor: pointer
+
+.year-accordion
+  &__header
+    cursor: pointer
+    &::after
+      @include fa.fa-icon()
+      content: fa.fa-content(fa.$var-chevron-right)
+      color: colors.$borders
+      font-size: 14px
+
+  .link-list
+    display: none
+
+  &--active
+    .year-accordion__header::after
+      transform: rotate(90deg)
+    .link-list
+      display: block

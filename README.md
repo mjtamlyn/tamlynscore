@@ -10,9 +10,6 @@ The requirements for the project are as follows:
 * Node
 * PostgreSQL
 
-On top of these, if you want to modify/recompile the CSS you're going to need:
-* Compass
-
 ## Installation
 
 Assuming that the requirements have been fulfilled, the installation procedure is as follows:

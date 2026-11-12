@@ -1,4 +1,7 @@
 <!DOCTYPE html>
+
+{% load render_bundle from webpack_loader %}
+
 <html {% block htmlattrs %}{% endblock %}>
     <head>
         <meta name="viewport" content="{% block meta_viewport %}width=device-width, initial-scale=1{% endblock %}">
@@ -12,7 +15,7 @@
             {% endif %}
             {% endblock meta %}
             {% block styles %}
-                <link rel="stylesheet" href="{{ STATIC_URL }}css/main.css?cache=2023-12-11" />
+                {% render_bundle 'styles' 'css' %}
                 {% block extrastyles %}
                 {% endblock extrastyles %}
             {% endblock styles %}

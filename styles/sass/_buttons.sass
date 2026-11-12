@@ -1,0 +1,103 @@
+@use 'sass:color'
+@use 'colors'
+@use 'typography'
+@use 'fontawesome/fa' as fa;
+
+.btn
+  font-family: typography.$font-sans-serif
+  font-weight: normal
+  border-radius: 5px
+  background-color: colors.$blue
+  color: white
+  font-size: 16px
+  padding: 5px 10px
+  border: 0
+  cursor: pointer
+  text-align: center
+  -webkit-user-select: none
+  display: inline-block
+
+  &:hover
+    background-color: color.adjust(colors.$blue, $lightness: 10%)
+
+  &:before
+    margin-right: 5px
+
+  &.btn-subtle
+    background-color: colors.$gold
+
+  &.btn-small
+    font-size: 12px
+    padding: 3px 6px
+    margin: 0 1px
+    &:before
+      margin-right: 2px
+
+  &.btn-toggle
+    display: inline-flex
+    padding: 0
+
+    .btn-segment
+      padding: 5px 10px
+
+      &.selected
+        background: colors.$lightblue
+        box-shadow: 0 0 3px colors.$blue inset
+        border-radius: 5px
+
+    &.btn-small .btn-segment
+      padding: 3px 6px
+
+  &.delete
+    background-color: colors.$red
+
+    &:hover
+      background-color: color.adjust(colors.$red, $lightness: 10%)
+
+  &.score-sheet
+    background-color: colors.$wared
+
+    &:hover
+      background-color: colors.$wared
+
+  &.depressed
+    background-color: color.adjust(colors.$blue, $lightness: 10%)
+    box-shadow: 0 0 5px colors.$oxford inset
+
+button.action-button
+  font-size: inherit
+  background: none
+  padding: 0
+  border: 0
+  margin: 0
+
+.btn,
+.action-button
+  &.add:before
+    @include fa.fa-icon()
+    content: fa.fa-content(fa.$var-add)
+
+  &.edit:before
+    @include fa.fa-icon()
+    content: fa.fa-content(fa.$var-pencil)
+
+  &.delete:before
+    @include fa.fa-icon()
+    content: fa.fa-content(fa.$var-remove)
+
+  &.archive:before
+    @include fa.fa-icon()
+    content: fa.fa-content(fa.$var-archive)
+
+  &.insert:before
+    @include fa.fa-icon()
+    content: fa.fa-content(fa.$var-bars)
+
+  &.score-sheet:before
+    @include fa.fa-icon()
+    content: fa.fa-content(fa.$var-table)
+
+  &.reveal:after
+    @include fa.fa-icon()
+    content: fa.fa-content(fa.$var-chevron-down)
+    margin-left: 3px

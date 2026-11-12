@@ -1,0 +1,17 @@
+@use 'colors'
+
+table.field-plan
+  margin: 15px 0
+
+  tbody
+    font-size: 10px
+
+  td, th
+    padding: 5px 1px
+    border: 1px solid colors.$borders
+    &.empty
+      background-color: colors.$borders
+
+table.table
+  .missed-cut
+    background-color: #e3e3e3

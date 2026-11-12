@@ -1,0 +1,136 @@
+@use 'colors'
+
+$border: 1px solid colors.$dark
+
+.registration
+  .registration-board
+    display: block
+
+    .actions
+      margin: 10px 0
+
+    tr.present
+      background-color: colors.$bg
+
+      a.present
+        display: none
+    tr:not(.present)
+      a.not-present
+        display: none
+
+    .archer-details
+      opacity: 0.5
+      font-style: italic
+
+    tr.kit-inspected
+      background-color: colors.$bg
+
+      td
+        padding: 3px
+      .archer-name
+        font-style: italic
+      .archer-category
+        display: none
+
+.input-scores
+  .input-board
+    display: block
+    padding-bottom: 10px
+    border-bottom: 2px solid colors.$borders
+
+    .bosses
+      overflow: auto
+
+    $boss-size: 30px 
+    .boss
+      background-color: colors.$vlightblue
+      border: 1px solid colors.$lightblue
+      display: inline-block
+      height: $boss-size
+      margin: 5px
+      padding: 5px
+      border-radius: 5px
+      text-align: center
+      width: $boss-size
+      &.done
+        background-color: colors.$bluegrey
+        border-color: colors.$dark
+        color: white
+    .boss-link:focus
+      outline: none
+      .boss
+        border-color: colors.$lightblue
+        box-shadow: 0 0 5px colors.$lightblue
+
+  .input-tracker
+    display: grid
+    // Template will come from direct style setting as number of cols and rows varies
+    text-align: center
+    background-color: colors.$dark
+    padding: 1px
+    grid-gap: 1px
+
+    &__header,
+    &__item
+      padding: 3px 5px
+
+    &__header
+      background-color: white
+      font-weight: bold
+
+    &__item
+      background-color: colors.$lightblue
+      &--done
+        background-color: colors.$bluegrey
+
+    &__link
+      color: white
+
+.input-arrows
+  table
+    margin: 0 auto
+    tbody
+      font-size: 16px
+
+    tr.disabled,
+    tr.disabled input
+      color: #ccc
+
+    input
+      border: 1px solid colors.$lightblue
+      border-radius: 3px
+      outline: none
+      text-align: center
+      width: 35px
+      font-size: 16px
+      padding: 5px
+      &:focus
+        box-shadow: 0 0 5px colors.$gold
+
+  .save
+    text-align: center
+
+.input-dozens
+  input[type="number"]
+    width: 75px
+
+.leaderboard-big-screen
+  .container
+    width: 1800px
+    .col2
+      padding: 0 25px
+    h1
+      font-size: 50px
+    h2
+      margin-top: 0
+      font-size: 36px
+      overflow: hidden
+    h3
+      margin-top: 0
+      font-size: 36px
+    h4
+      font-size: 30px
+    table
+      border-top: 1px solid colors.$borders
+    td
+      font-size: 20px

@@ -8,6 +8,7 @@ references:
               environment:
                   PIPENV_VENV_IN_PROJECT: "true"
                   PIPENV_IGNORE_VIRTUALENVS: "true"
+                  NODE_PATH: .
 
     workspace_root: &workspace_root
         /tmp/workspace
@@ -36,7 +37,7 @@ references:
     pipenv_backup_cache_key: &pipenv_backup_cache_key
         v2-pipenv-cache
     node_modules_cache_key: &node_modules_cache_key
-        v1-node-modules-cache
+        v2-node-modules-cache
 
     restore_pipenv: &restore_pipenv
         restore_cache:
@@ -136,7 +137,7 @@ jobs:
             - run:
                 name: Run eslint
                 command: |
-                    ./node_modules/.bin/eslint
+                    ./node_modules/.bin/eslint js_src
             - *report_failure
 
     python_lint:
@@ -171,6 +172,7 @@ jobs:
         steps:
             - *attach_workspace
             - *restore_repo
+            - *restore_node_modules
             - *restore_pipenv
             - run:
                 name: Check migrations
@@ -182,6 +184,7 @@ jobs:
                 environment:
                     BUILD_DIR: /home/circleci/project
                 command: |
+                    ./node_modules/.bin/webpack build
                     source .venv/bin/activate
                     python manage.py test
             - *report_failure
