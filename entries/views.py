@@ -636,42 +636,9 @@ class TargetListApi(CsrfExemptMixin, TargetListBase, View):
         return JsonResponse({'status': 'ok', 'actions': actions})
 
 
-class Registration(TargetListBase):
+class Registration(CompetitionMixin, TemplateView):
     template_name = 'entries/registration.html'
     admin_required = True
-
-    def add_unallocated_entries(self, target_list):
-        pass
-
-    def get_target_list(self):
-        target_list = super(Registration, self).get_target_list()
-        for session, entries in target_list.items():
-            unregistered = 0
-            for target in target_list[session]['targets']:
-                if not target.session_entry.present:
-                    unregistered += 1
-                if session.device_scoring:
-                    try:
-                        entry_user = target.session_entry.competition_entry.entryuser
-                    except EntryUser.DoesNotExist:
-                        try:
-                            entry_user = EntryUser.objects.create(competition_entry=target.session_entry.competition_entry)
-                        except IntegrityError:
-                            pass  # I think this happens with double session entries
-                    target.login_url = self.request.build_absolute_uri(reverse('entry-authenticate', kwargs={
-                        'id': entry_user.uuid,
-                    }))
-            target_list[session]['unregistered'] = unregistered
-        return target_list
-
-    def post(self, request, slug):
-        present = request.POST['present'] == 'true'
-        updated = SessionEntry.objects.filter(pk=request.POST['pk']).update(present=present)
-        if not updated:
-            raise Http404
-        session_entry = SessionEntry.objects.get(pk=request.POST['pk'])
-        cache.delete('bosses_cache_%d' % session_entry.session_round.session_id)
-        return HttpResponse('ok')
 
 
 class RegistrationQR(CompetitionMixin, DetailView):

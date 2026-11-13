@@ -148,10 +148,6 @@ if not DEBUG and not os.environ.get('LOCAL'):
     SECURE_SSL_REDIRECT = True
     SECURE_PROXY_SSL_HEADER = ('HTTP_X_FORWARDED_PROTO', 'https')
 
-DEBUG_TOOLBAR_CONFIG = {
-    'JQUERY_URL': STATIC_URL + 'lib/jquery/jquery-2.1.3.min.js',
-}
-
 INTERNAL_IPS = [
     '127.0.0.1',
 ]
