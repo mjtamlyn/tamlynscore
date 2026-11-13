@@ -1,15 +1,24 @@
 {% extends 'entries/competition_detail.html' %}
 
+{% load render_bundle from webpack_loader %}
 {% load qr_code %}
 
 {% block scripts %}
+{% render_bundle 'registration' 'js' %}
+
 <script src="{{ STATIC_URL }}lib/jquery/jquery-2.1.3.min.js"></script>
 <script src="{{ STATIC_URL }}js/ajax-csrf.js"></script>
 <script src="{{ STATIC_URL }}js/registration.js"></script>
 {% endblock scripts %}
 
 {% block competition_content %}
+
 <div class="registration module">
+    <div
+        id="app"
+        data-target-list-api="{% url 'target_list_api' slug=competition.slug %}"
+    ></div>
+
     <h2>Registration</h2>
 
 <div class="row">
