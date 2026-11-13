@@ -7,7 +7,7 @@ const Toggle = ({ on, setOn }) => {
     } else {
         className += " toggle--off"
     }
-    return <div className={ className } onClick={ e => setOn(!on) } />;
+    return <div className={ className } onClick={ () => setOn(!on) } />;
 };
 
 export default Toggle;
