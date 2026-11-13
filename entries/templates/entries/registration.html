@@ -1,135 +1,18 @@
 {% extends 'entries/competition_detail.html' %}
 
+{% load render_bundle from webpack_loader %}
 {% load qr_code %}
 
 {% block scripts %}
-<script src="{{ STATIC_URL }}lib/jquery/jquery-2.1.3.min.js"></script>
-<script src="{{ STATIC_URL }}js/ajax-csrf.js"></script>
-<script src="{{ STATIC_URL }}js/registration.js"></script>
+{% render_bundle 'registration' 'js' %}
 {% endblock scripts %}
 
 {% block competition_content %}
-<div class="registration module">
-    <h2>Registration</h2>
 
-<div class="row">
-    <div class="col6">
-        <em>Sessions:</em>
-        <ul>
-            {% for session, details in target_list.items %}
-            <li><p>
-            <span>{{ session.start|date:"l, jS F - f a" }}</span>
-            <a class="btn btn-small" href="#session-{{ session.pk }}">Skip</a>
-            <small title="Unregistered entries">{{ details.unregistered }} unregistered</small>
-            </p></li>
-            {% endfor %}
-        </ul>
-    </div>
-</div>
-
-{% for session, details in target_list.items %}
-<div class="row">
-    <div class="col6">
-        <div class="registration-board" id="session-{{ session.pk }}" rel="{{ session.archers_per_target }}">
-            <div class="actions">
-                <select class="club-filter">
-                    <option data-club="--all--">--All--</option>
-                </select>
-            </div>
-            <table class="table">
-                <thead>
-                    <th>Target</th>
-                    <th>Name</th>
-                    <th>{% if competition.use_county_teams %}County{% else %}Club{% endif %}</th>
-                    <th>Bowstyle</th>
-                    <th>Gender</th>
-                    {% if competition.has_novices %}
-                    <th>Experience</th>
-                    {% endif %}
-                    {% if competition.has_juniors %}
-                    <th>Age</th>
-                    {% endif %}
-                    {% if competition.ifaa_rules %}
-                    <th>Division</th>
-                    {% endif %}
-                    <th>{% if competition.ifaa_rules %}ID{% else %}Archery GB Number{% endif %}</th>
-                    <th>Present</th>
-                </thead>
-                {% for boss, archers in details.target_list %}
-                {% for target, archer in archers %}
-                {% with archer.session_entry.competition_entry as entry %}
-                <tr class="archer {% if not archer or archer.session_entry.present %}present{% endif %}" data-club="{% if competition.use_county_teams %}{{ entry.county_id }}{% else %}{{ entry.club_id }}{% endif %}" data-clubname="{% if competition.use_county_teams %}{{ archer.session_entry.competition_entry.county }}{% else %}{{ archer.session_entry.competition_entry.club }}{% endif %}">
-                    <td>{{ boss }}{{ target }}</td>
-                    <td>{% if archer %}<a href="{% url 'archer_update' pk=entry.archer_id %}?next={{ request.path }}">{{ entry.archer }}</a>{% endif %}</td>
-                    <td>
-                        {{ entry.team_name }}
-                        {% if not competition.use_county_teams %}
-                            {% if not entry.club == entry.archer.club %}
-                            <span class="archer-details">({{ entry.archer.club.name }})</span>
-                            {% endif %}
-                        {% endif %}
-                    </td>
-                    <td>
-                        {% if archer %}
-                            <span class="pill {{ entry.bowstyle|slugify }}">{{ entry.bowstyle }}</span>
-                            {% if not entry.bowstyle == entry.archer.bowstyle %}
-                            <span class="archer-details">(
-                                <span class="pill {{ entry.archer.bowstyle|slugify }}">{{ entry.archer.bowstyle }}</span>
-                            )</span>
-                            {% endif %}
-                        {% endif %}
-                    </td>
-                    <td>
-                        {% if archer %}
-                            <span class="pill {{ entry.get_gender_display|slugify }}">
-                                {{ entry.get_gender_display }}
-                            </span>
-                        {% endif %}
-                    </td>
-                    {% if competition.has_novices %}
-                    <td>
-                        {% if archer and entry.novice == "N" or entry.archer.novice == "N" %}
-                        <span class="pill novice">{{ entry.get_novice_display }}</span>
-                        {% if not entry.get_novice_display == entry.archer.get_novice_display %}
-                        <span class="archer-details">(
-                            <span class="pill novice">{{ entry.archer.get_novice_display }}</span>
-                        )</span>
-                        {% endif %}
-                        {% endif %}
-                    </td>
-                    {% endif %}
-                    {% if competition.has_juniors %}
-                    <td>{{ entry.get_age_display }}</td>
-                    {% endif %}
-                    {% if competition.ifaa_rules %}
-                    <td>{{ entry.get_ifaa_division_display }}</td>
-                    {% endif %}
-                    <td>{{ entry.archer.agb_number }}</td>
-                    <td>
-                        {% if archer %}
-                        <a href="#present" class="present btn" data-pk="{{ archer.session_entry.pk }}">Register</a>
-                        <a href="#not-present" class="not-present btn" data-pk="{{ archer.session_entry.pk }}">Unregister</a>
-                        {% endif %}
-                    </td>
-                    {% if session.device_scoring %}
-                    <td>
-                        {% if archer %}
-                        <a href="{{ archer.login_url }}">
-                            {% qr_from_text archer.login_url size="S" %}
-                        </a>
-                        {% endif %}
-                    </td>
-                    {% endif %}
-                </tr>
-                {% endwith %}
-                {% endfor %}
-                {% endfor %}
-            </table>
-        </div>
-    </div>
-</div>
-{% endfor %}
-
-</div>
+<div
+    id="app"
+    class="registration"
+    data-target-list-api="{% url 'target_list_api' slug=competition.slug %}"
+></div>
 
 {% endblock %}
