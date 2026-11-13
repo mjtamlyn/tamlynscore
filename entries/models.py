@@ -440,6 +440,13 @@ class CompetitionEntry(models.Model):
             sections.append(self.get_agb_age_display())
         return ' '.join(sections)
 
+    def get_or_create_user(self):
+        try:
+            entry_user = self.entryuser
+        except EntryUser.DoesNotExist:
+            entry_user = EntryUser.objects.create(competition_entry=self)
+        return entry_user
+
 
 class EntryUser(models.Model):
     uuid = models.UUIDField(default=uuid.uuid4)

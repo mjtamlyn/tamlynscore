@@ -508,11 +508,17 @@ class TargetListBase(CompetitionMixin, ListView):
             'round': entry.session_round.shot_round.name,
             'present': entry.present,
             'kitInspected': entry.kit_inspected,
+            'loginLink': self.request.build_absolute_uri(reverse(
+                'entry-authenticate',
+                kwargs={
+                    'id': entry.competition_entry.get_or_create_user().uuid,
+                },
+            )),
             'qrApi': self.request.build_absolute_uri(reverse(
                 'registration_qr',
                 kwargs={
                     'slug': self.competition.slug,
-                    'entry_id': entry.pk,
+                    'uuid': entry.competition_entry.get_or_create_user().uuid,
                 },
             )),
         }
@@ -642,22 +648,13 @@ class Registration(CompetitionMixin, TemplateView):
 
 
 class RegistrationQR(CompetitionMixin, DetailView):
-    model = SessionEntry
-    pk_url_kwarg = 'entry_id'
+    model = EntryUser
+    slug_url_kwarg = 'uuid'
+    slug_field = 'uuid'
 
     def render_to_response(self, context, **kwargs):
-        session = context['object'].session_round.session
-        if not session.device_scoring:
-            raise Http404()
-        try:
-            entry_user = context['object'].competition_entry.entryuser
-        except EntryUser.DoesNotExist:
-            try:
-                entry_user = EntryUser.objects.create(competition_entry=context['object'].competition_entry)
-            except IntegrityError:
-                pass  # I think this happens with double session entries
         login_url = self.request.build_absolute_uri(reverse('entry-authenticate', kwargs={
-            'id': entry_user.uuid,
+            'id': context['object'].uuid,
         }))
         response = HttpResponse(content_type='image/svg+xml')
         qr_options = _options_from_args({'image_format': 'svg'})

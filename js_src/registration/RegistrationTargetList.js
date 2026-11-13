@@ -44,7 +44,9 @@ const SessionTargetList = ({ session, filtered, showQr }) => {
                             <PresentToggle archerId={ archer.id } present={ archer.present } />
                         </td>
                         { showQr && archer.qrApi && <td>
-                            <img className="qr-code" src={ archer.qrApi } />
+                            <a href={ archer.loginLink }>
+                                <img className="qr-code" src={ archer.qrApi } />
+                            </a>
                         </td> }
                     </tr>
                 );
