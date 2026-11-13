@@ -2,7 +2,7 @@ import React from 'react';
 
 import ArcherPills from '../utils/ArcherPills';
 
-const SessionTargetList = ({ session }) => {
+const SessionTargetList = ({ session, filtered }) => {
     const rows = [];
     const letters = ['A', 'B' , 'C', 'D', 'E', 'F', 'G'];
     const lettersUsed = letters.slice(0, session.archersPerBoss);
@@ -11,10 +11,14 @@ const SessionTargetList = ({ session }) => {
         lettersUsed.forEach((letter, i) => {
             const archer = boss.archers[letter];
             let bossEnd = false;
-            if ((i + 1) === session.archersPerBoss) {
+            if ((i + 1) === session.archersPerBoss && !filtered) {
+                // Don't bother with boss dividers when we are filtering
                 bossEnd = true;
             }
             if (archer) {
+                if (archer.filteredOut) {
+                    return null;
+                }
                 rows.push(
                     <tr
                             className={ "archer" + (archer.present ? " kit-inspected" : "") + (bossEnd ? " boss-end" : "") }
@@ -23,7 +27,7 @@ const SessionTargetList = ({ session }) => {
                         <td>{ boss.number }{ letter }</td>
                         <td>
                             <div className="archer-name">
-                                <strong>{ archer.name }</strong> <small>{ archer.agbNumber }</small>
+                                <strong>{ archer.name }</strong> · <small>{ archer.agbNumber } · { archer.round }</small>
                             </div>
                             <div className="archer-category">
                                 <ArcherPills categories={ archer.categories } />
@@ -39,6 +43,10 @@ const SessionTargetList = ({ session }) => {
                     </tr>
                 );
             } else {
+                if (filtered) {
+                    return null;
+                }
+
                 let blocked = false;
                 if (session.archersPerBoss === 4) {
                     const alternateLetters = {'A': 'C', 'C': 'A', 'B': 'D', 'D': 'B'};
@@ -78,10 +86,20 @@ const SessionTargetList = ({ session }) => {
     </>;
 };
 
-const RegistrationTargetList = ({ targetList }) => {
+const RegistrationTargetList = ({ targetList, filtered }) => {
+    var anythingToRender = false;
     const sessions = targetList.map((session) => {
-        return <SessionTargetList session={ session } key={ session.id } />;
+        if (filtered && !session.displayCount) {
+            return null;
+        }
+        anythingToRender = true;
+        return <SessionTargetList session={ session } key={ session.id } filtered={ filtered } />;
     });
+
+    if (!anythingToRender) {
+        return <p className="entries-filter__warning">No matches found</p>;
+    }
+
     return (
         <div className="registration-board">
             { sessions }

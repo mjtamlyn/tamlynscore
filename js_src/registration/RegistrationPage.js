@@ -8,8 +8,7 @@ import { CompetitionContext } from '../context/CompetitionContext';
 import ErrorState from '../utils/ErrorState';
 import Spinner from '../utils/Spinner';
 
-import RegistrationFilter from './RegistrationFilter';
-import RegistrationTargetList from './RegistrationTargetList';
+import RegistrationController from './RegistrationController';
 
 const RegistrationPage = ({ targetListApi }) => {
     const { isPending, isError, data, error } = useQuery({ 
@@ -40,8 +39,7 @@ const RegistrationPage = ({ targetListApi }) => {
         <ErrorBoundary FallbackComponent={ ErrorState }>
             <CompetitionContext.Provider value={ data.competition }>
                 <h2>Registration</h2>
-                <RegistrationFilter sessions={ data.targetList } />
-                <RegistrationTargetList targetList={ data.targetList } />
+                <RegistrationController targetList={ data.targetList } />
             </CompetitionContext.Provider>
         </ErrorBoundary>
     );
