@@ -5,9 +5,6 @@ import Toggle from '../utils/Toggle';
 
 const RegistrationFilter = ({ sessions, filterState, setFilter }) => {
     const items = sessions.map(session => {
-        var totalEntries = 0;
-        var presentCount = 0;
-
         return (
             <div className="entries-filter__session" key={ session.id }>
                 <div>{ session.sessionTime }</div>

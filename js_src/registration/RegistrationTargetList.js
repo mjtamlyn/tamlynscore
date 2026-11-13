@@ -2,6 +2,8 @@ import React from 'react';
 
 import ArcherPills from '../utils/ArcherPills';
 
+import PresentToggle from './PresentToggle';
+
 const SessionTargetList = ({ session, filtered }) => {
     const rows = [];
     const letters = ['A', 'B' , 'C', 'D', 'E', 'F', 'G'];
@@ -39,6 +41,7 @@ const SessionTargetList = ({ session, filtered }) => {
                         </td>
                         <td>
                             { archer.present ? "✅" : "❌" }
+                            <PresentToggle archerId={ archer.id } present={ archer.present } />
                         </td>
                     </tr>
                 );

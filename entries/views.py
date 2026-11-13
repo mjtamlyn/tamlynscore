@@ -599,6 +599,9 @@ class TargetListApi(CsrfExemptMixin, TargetListBase, View):
                 boss__gte=data['number'],
             ).update(boss=F('boss') - 1)
             return {'updated': updated}
+        elif data['action'] == 'PRESENT':
+            updated = SessionEntry.objects.filter(pk=data['id']).update(present=data['present'])
+            return {'updated': updated}
         elif data['action'] == 'KITINSPECTION':
             updated = SessionEntry.objects.filter(pk=data['id']).update(kit_inspected=data['kitInspected'])
             return {'updated': updated}

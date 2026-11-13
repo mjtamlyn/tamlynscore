@@ -4,6 +4,7 @@ import { ErrorBoundary } from 'react-error-boundary';
 
 import { useQuery } from '@tanstack/react-query';
 
+import { ApiContext } from '../context/ApiContext';
 import { CompetitionContext } from '../context/CompetitionContext';
 import ErrorState from '../utils/ErrorState';
 import Spinner from '../utils/Spinner';
@@ -20,7 +21,7 @@ const RegistrationPage = ({ targetListApi }) => {
             }
             return response.json();
         },
-        refetchInterval: 3 * 1000,  // 3 seconds
+        // refetchInterval: 3 * 1000,  // 3 seconds
     });
 
     if (isPending) {
@@ -37,10 +38,12 @@ const RegistrationPage = ({ targetListApi }) => {
 
     return (
         <ErrorBoundary FallbackComponent={ ErrorState }>
-            <CompetitionContext.Provider value={ data.competition }>
-                <h2>Registration</h2>
-                <RegistrationController targetList={ data.targetList } />
-            </CompetitionContext.Provider>
+            <ApiContext.Provider value={ { targetList: targetListApi } }>
+                <CompetitionContext.Provider value={ data.competition }>
+                    <h2>Registration</h2>
+                    <RegistrationController targetList={ data.targetList } />
+                </CompetitionContext.Provider>
+            </ApiContext.Provider>
         </ErrorBoundary>
     );
 };
