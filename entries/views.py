@@ -508,6 +508,13 @@ class TargetListBase(CompetitionMixin, ListView):
             'round': entry.session_round.shot_round.name,
             'present': entry.present,
             'kitInspected': entry.kit_inspected,
+            'qrApi': self.request.build_absolute_uri(reverse(
+                'registration_qr',
+                kwargs={
+                    'slug': self.competition.slug,
+                    'entry_id': entry.pk,
+                },
+            )),
         }
         if self.competition.has_novices and entry.competition_entry.novice == 'N':
             data['categories']['novice'] = entry.competition_entry.get_novice_display()
@@ -569,6 +576,7 @@ class TargetListApi(CsrfExemptMixin, TargetListBase, View):
                 'sessionTime': session.start.astimezone(zoneinfo.ZoneInfo(settings.TIME_ZONE)).strftime('%A, %-d %B - %-I:%M%p'),
                 'archersPerBoss': session.archers_per_target,
                 'targetList': allocations,
+                'deviceScoring': session.device_scoring,
                 'unallocatedEntries': session_context['entries_json'],
             })
         return JsonResponse({
@@ -664,6 +672,31 @@ class Registration(TargetListBase):
         session_entry = SessionEntry.objects.get(pk=request.POST['pk'])
         cache.delete('bosses_cache_%d' % session_entry.session_round.session_id)
         return HttpResponse('ok')
+
+
+class RegistrationQR(CompetitionMixin, DetailView):
+    model = SessionEntry
+    pk_url_kwarg = 'entry_id'
+
+    def render_to_response(self, context, **kwargs):
+        session = context['object'].session_round.session
+        if not session.device_scoring:
+            raise Http404()
+        try:
+            entry_user = context['object'].competition_entry.entryuser
+        except EntryUser.DoesNotExist:
+            try:
+                entry_user = EntryUser.objects.create(competition_entry=context['object'].competition_entry)
+            except IntegrityError:
+                pass  # I think this happens with double session entries
+        login_url = self.request.build_absolute_uri(reverse('entry-authenticate', kwargs={
+            'id': entry_user.uuid,
+        }))
+        response = HttpResponse(content_type='image/svg+xml')
+        qr_options = _options_from_args({'image_format': 'svg'})
+        qr_data = make_qr(login_url, qr_options)
+        qr_data.save(response, **qr_options.kw_save())
+        return response
 
 
 class ScoreSheets(CompetitionMixin, ListView):

@@ -18,9 +18,15 @@ const RegistrationController = ({ targetList }) => {
     };
 
     const filterSet = !filterState.showRegistered | filterState.filterText.length;
+    var hasQrs = false;
 
     // Annotate session with stats, and mark which archers should be hidden
     targetList.forEach(session => {
+        if (session.deviceScoring) {
+            // We show the toggle if any session has on-device scoring
+            hasQrs = true;
+        }
+
         const letters = ['A', 'B' , 'C', 'D', 'E', 'F', 'G'];
         const lettersUsed = letters.slice(0, session.archersPerBoss);
 
@@ -58,8 +64,8 @@ const RegistrationController = ({ targetList }) => {
     });
 
     return <>
-        <RegistrationFilter sessions={ targetList } filterState={ filterState } setFilter={ setFilter } />
-        <RegistrationTargetList targetList={ targetList } filtered={ filterSet } />
+        <RegistrationFilter sessions={ targetList } filterState={ filterState } setFilter={ setFilter } hasQrs={ hasQrs } />
+        <RegistrationTargetList targetList={ targetList } filtered={ filterSet } showQr={ filterState.showQr } />
     </>;
 };
 

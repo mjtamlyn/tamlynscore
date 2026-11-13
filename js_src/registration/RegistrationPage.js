@@ -21,7 +21,7 @@ const RegistrationPage = ({ targetListApi }) => {
             }
             return response.json();
         },
-        // refetchInterval: 3 * 1000,  // 3 seconds
+        refetchInterval: 3 * 1000,  // 3 seconds
     });
 
     if (isPending) {

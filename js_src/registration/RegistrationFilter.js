@@ -3,7 +3,7 @@ import React from 'react';
 import Toggle from '../utils/Toggle';
 
 
-const RegistrationFilter = ({ sessions, filterState, setFilter }) => {
+const RegistrationFilter = ({ sessions, filterState, setFilter, hasQrs }) => {
     const items = sessions.map(session => {
         return (
             <div className="entries-filter__session" key={ session.id }>
@@ -26,10 +26,10 @@ const RegistrationFilter = ({ sessions, filterState, setFilter }) => {
                 <span>Show registered?</span>
                 <Toggle on={ filterState.showRegistered } setOn={ (value) => setFilter('showRegistered', value) } />
             </div>
-            <div className="entries-filter__toggle">
+            { hasQrs && <div className="entries-filter__toggle">
                 <span>Show QR codes?</span>
                 <Toggle on={ filterState.showQr } setOn={ (value) => setFilter('showQr', value) } />
-            </div>
+            </div> }
             <div className="entries-filter__sessions">
                 { items }
             </div>

@@ -4,7 +4,7 @@ import ArcherPills from '../utils/ArcherPills';
 
 import PresentToggle from './PresentToggle';
 
-const SessionTargetList = ({ session, filtered }) => {
+const SessionTargetList = ({ session, filtered, showQr }) => {
     const rows = [];
     const letters = ['A', 'B' , 'C', 'D', 'E', 'F', 'G'];
     const lettersUsed = letters.slice(0, session.archersPerBoss);
@@ -43,6 +43,9 @@ const SessionTargetList = ({ session, filtered }) => {
                             { archer.present ? "✅" : "❌" }
                             <PresentToggle archerId={ archer.id } present={ archer.present } />
                         </td>
+                        { showQr && archer.qrApi && <td>
+                            <img className="qr-code" src={ archer.qrApi } />
+                        </td> }
                     </tr>
                 );
             } else {
@@ -64,6 +67,7 @@ const SessionTargetList = ({ session, filtered }) => {
                         <td></td>
                         <td></td>
                         <td></td>
+                        { showQr && <td></td> }
                     </tr>
                 );
             }
@@ -80,6 +84,7 @@ const SessionTargetList = ({ session, filtered }) => {
                     <th>Club</th>
                     <th>Kit</th>
                     <th>Here</th>
+                    { showQr && <th>QR code</th> }
                 </tr>
             </thead>
             <tbody>
@@ -89,14 +94,14 @@ const SessionTargetList = ({ session, filtered }) => {
     </>;
 };
 
-const RegistrationTargetList = ({ targetList, filtered }) => {
+const RegistrationTargetList = ({ targetList, filtered, showQr }) => {
     var anythingToRender = false;
     const sessions = targetList.map((session) => {
         if (filtered && !session.displayCount) {
             return null;
         }
         anythingToRender = true;
-        return <SessionTargetList session={ session } key={ session.id } filtered={ filtered } />;
+        return <SessionTargetList session={ session } key={ session.id } filtered={ filtered } showQr={ showQr } />;
     });
 
     if (!anythingToRender) {

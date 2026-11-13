@@ -23,4 +23,5 @@ urlpatterns = [
     path('<slug:slug>/running-slips/<int:round_id>/', views.RunningSlipsPdf.as_view(), name='running_slips_pdf'),
 
     path('<slug:slug>/registration/', views.Registration.as_view(), name='registration'),
+    path('<slug:slug>/registration/qr/<int:entry_id>.svg', views.RegistrationQR.as_view(), name='registration_qr'),
 ]
