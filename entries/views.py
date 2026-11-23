@@ -508,6 +508,19 @@ class TargetListBase(CompetitionMixin, ListView):
             'round': entry.session_round.shot_round.name,
             'present': entry.present,
             'kitInspected': entry.kit_inspected,
+            'entryEditLink': self.request.build_absolute_uri(reverse(
+                'entry_update',
+                kwargs={
+                    'slug': self.competition.slug,
+                    'entry_id': entry.competition_entry_id,
+                },
+            )),
+            'archerEditLink': self.request.build_absolute_uri(reverse(
+                'archer_update',
+                kwargs={
+                    'pk': entry.competition_entry.archer_id,
+                },
+            )) + '?next=' + reverse('registration', kwargs={'slug': self.competition.slug}),
             'loginLink': self.request.build_absolute_uri(reverse(
                 'entry-authenticate',
                 kwargs={

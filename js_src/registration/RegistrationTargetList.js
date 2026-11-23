@@ -1,8 +1,56 @@
-import React from 'react';
+import React, { useState } from 'react';
 
 import ArcherPills from '../utils/ArcherPills';
 
 import PresentToggle from './PresentToggle';
+
+const ArcherRow = ({ target, archer, bossEnd, showQr }) => {
+    const [menuOpen, setMenuOpen] = useState(false);
+
+    const menuToggle = (e) => {
+        e.stopPropagation();
+        setMenuOpen(!menuOpen);
+        if (!menuOpen) {
+            window.addEventListener('click', () => setMenuOpen(false), { once: true });
+        }
+    };
+
+    return (
+        <tr
+                className={ "archer" + (archer.present ? " kit-inspected" : "") + (bossEnd ? " boss-end" : "") }
+        >
+            <td>{ target }</td>
+            <td>
+                <div className="archer-name">
+                    <strong>{ archer.name }</strong> · <small>{ archer.agbNumber } · { archer.round }</small> ·&nbsp;
+                    <div className="archer-edit">
+                        <a className="btn edit btn-small" onClick={ menuToggle }>Edit</a>
+                        { menuOpen && <div className="edit-menu" id={ `edit-menu-${ archer.id }` }>
+                            <a className="edit-menu-item" href={ archer.entryEditLink }>Edit entry</a>
+                            <a className="edit-menu-item" href={ archer.entryEditLink }>Edit archer</a>
+                        </div> }
+                    </div>
+                </div>
+                <div className="archer-category">
+                    <ArcherPills categories={ archer.categories } />
+                </div>
+            </td>
+            <td>{ archer.club }</td>
+            <td className="oneline">
+                { archer.kitInspected ? "✅" : "❌" }
+            </td>
+            <td>
+                { archer.present ? "✅" : "❌" }
+                <PresentToggle archerId={ archer.id } present={ archer.present } />
+            </td>
+            { showQr && archer.qrApi && <td>
+                <a href={ archer.loginLink }>
+                    <img className="qr-code" src={ archer.qrApi } />
+                </a>
+            </td> }
+        </tr>
+    );
+};
 
 const SessionTargetList = ({ session, filtered, showQr }) => {
     const rows = [];
@@ -22,33 +70,13 @@ const SessionTargetList = ({ session, filtered, showQr }) => {
                     return null;
                 }
                 rows.push(
-                    <tr
-                            className={ "archer" + (archer.present ? " kit-inspected" : "") + (bossEnd ? " boss-end" : "") }
-                            key={ `${boss.number}${letter}` }
-                    >
-                        <td>{ boss.number }{ letter }</td>
-                        <td>
-                            <div className="archer-name">
-                                <strong>{ archer.name }</strong> · <small>{ archer.agbNumber } · { archer.round }</small>
-                            </div>
-                            <div className="archer-category">
-                                <ArcherPills categories={ archer.categories } />
-                            </div>
-                        </td>
-                        <td>{ archer.club }</td>
-                        <td className="oneline">
-                            { archer.kitInspected ? "✅" : "❌" }
-                        </td>
-                        <td>
-                            { archer.present ? "✅" : "❌" }
-                            <PresentToggle archerId={ archer.id } present={ archer.present } />
-                        </td>
-                        { showQr && archer.qrApi && <td>
-                            <a href={ archer.loginLink }>
-                                <img className="qr-code" src={ archer.qrApi } />
-                            </a>
-                        </td> }
-                    </tr>
+                    <ArcherRow
+                        target={ `${boss.number}${letter}` }
+                        archer={ archer }
+                        bossEnd={ bossEnd }
+                        showQr={ showQr }
+                        key={ `${boss.number}${letter}` }
+                    />
                 );
             } else {
                 if (filtered) {
