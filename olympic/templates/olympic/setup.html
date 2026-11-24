@@ -5,7 +5,7 @@
 
 <p>
 {% for round, category, entry_count in numbers %}
-    {{ round.round.shot_round.distance }}m {{ category.name }} - {{ entry_count }} archer(s)
+    {{ round.round.shot_round.distance }}m {{ category }} - {{ entry_count }} archer(s)
     <br />
 {% endfor %}
 </p>
