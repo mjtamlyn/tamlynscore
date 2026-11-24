@@ -294,6 +294,13 @@ class EntryCreateForm(forms.Form):
             )
             self.fields['club'].widget.attrs.update({'autofocus': ''})
             self.fields['update_club'] = forms.BooleanField(required=False)
+        if self.competition.home_county:
+            self.fields['county'] = forms.ModelChoiceField(
+                label='County (%s)' % current.club.county if current.club and current.club.county else 'County',
+                queryset=County.objects,
+                initial=current.county,
+                required=False,
+            )
         if self.competition.has_novices:
             self.fields['novice'] = forms.ChoiceField(
                 label='Experienced/Novice (%s)' % archer.get_novice_display(),
@@ -427,6 +434,8 @@ class EntryCreateForm(forms.Form):
             entry.custom_team_name = self.cleaned_data['custom_team_name']
         else:
             entry.club = self.cleaned_data['club'] or default.club
+        if self.competition.home_county:
+            entry.county = self.cleaned_data['county'] or (default.club.county if default.club else None)
         entry.bowstyle = self.cleaned_data['bowstyle'] or default.bowstyle
         if self.competition.has_novices:
             entry.novice = self.cleaned_data['novice'] or default.novice
