@@ -9,6 +9,7 @@ const devModeServer = 'http://localhost:8080';
 const config = {
     entry: {
         'judging': './js_src/judging.js',
+        'registration': './js_src/registration.js',
         'results': './js_src/results.js',
         'score_sheet': './js_src/scoreSheet.js',
         'target_input': './js_src/targetInput.js',

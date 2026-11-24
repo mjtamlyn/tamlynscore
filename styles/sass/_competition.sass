@@ -18,9 +18,45 @@ $border: 1px solid colors.$dark
       a.not-present
         display: none
 
+    .archer-edit
+      position: relative
+      display: inline-block
+      font-style: normal
+
+    .edit-menu
+      position: absolute
+      top: calc(100% + 6px)
+      display: flex
+      flex-direction: column
+      z-index: 1
+      white-space: nowrap
+      &:before
+        content: ""
+        width: 10px
+        height: 10px
+        position: absolute
+        background-color: colors.$bg-vdark
+        transform: rotate(45deg)
+        top: -4px
+        left: 6px
+
+    .edit-menu-item
+      padding: 3px 5px
+      z-index: 1
+      background-color: colors.$bg-vdark
+      &:hover
+        background-color: colors.$vlightblue
+      &:first-child
+        border-radius: 3px 3px 0 0
+      &:last-child
+        border-radius: 0 0 3px 3px
+
     .archer-details
       opacity: 0.5
       font-style: italic
+
+    .qr-code
+      height: 150px
 
     tr.kit-inspected
       background-color: colors.$bg

@@ -101,3 +101,29 @@ button.action-button
     @include fa.fa-icon()
     content: fa.fa-content(fa.$var-chevron-down)
     margin-left: 3px
+
+.toggle
+  border: 2px solid #bbb
+  border-radius: 18px
+  height: 36px
+  width: 65px;
+  margin: 3px 0
+  background-color: white
+  position: relative
+  cursor: pointer
+
+  &::after
+    content: ""
+    position: absolute
+    top: 1px
+    left: 1px
+    border: 2px solid #aaa
+    height: 26px
+    width: 26px
+    border-radius: 50%
+    background-color: colors.$vlightblue
+    transition: all 0.2s ease-in-out
+
+  &--on::after
+    left: 30px
+    background-color: colors.$orange

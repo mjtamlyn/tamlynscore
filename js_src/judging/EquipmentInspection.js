@@ -22,7 +22,8 @@ const EquipmentInspection = ({ targetList, targetListApi }) => {
             await context.client.cancelQueries({ queryKey: ['targetList'] })
             const previous = context.client.getQueryData(['targetList'])
             context.client.setQueryData(['targetList'], (old) => {
-                old.targetList.forEach(session => {
+                const newData = structuredClone(old);
+                newData.targetList.forEach(session => {
                     session.targetList.forEach(boss => {
                         Object.entries(boss.archers).forEach(([_, archer]) => {
                             if (archer?.id === id) {
@@ -31,7 +32,7 @@ const EquipmentInspection = ({ targetList, targetListApi }) => {
                         });
                     });
                 });
-                return old;
+                return newData;
             });
             return { previous };
         },
