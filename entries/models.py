@@ -52,6 +52,7 @@ class ResultsFormatFields(models.Model):
     novices_in_experienced_teams = models.BooleanField(default=False)
     exclude_later_shoots = models.BooleanField(default=False, help_text='Only the first session can count for results')
     ifaa_rules = models.BooleanField(default=False)
+    home_county = models.ForeignKey(County, blank=True, null=True, help_text='For county and visitor results', on_delete=models.SET_NULL)
     use_county_teams = models.BooleanField(default=False)
     strict_b_teams = models.BooleanField(default=False, help_text='e.g. BUTC')
     strict_c_teams = models.BooleanField(default=False, help_text='e.g. BUTC')

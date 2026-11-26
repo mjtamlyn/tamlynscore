@@ -46,11 +46,12 @@ class ResultSection(object):
 
 
 class ResultCategory(object):
-    def __init__(self, bowstyle, gender, junior=None, novice=None):
+    def __init__(self, bowstyle, gender, junior=None, novice=None, county=None):
         self.bowstyle = bowstyle
         self.gender = gender
         self.junior = junior
         self.novice = novice
+        self.county = county
 
     def __str__(self):
         parts = filter(None, [
@@ -59,6 +60,8 @@ class ResultCategory(object):
             self.junior,
             self.gender,
         ])
+        if self.county is not None:
+            parts = list(parts) + ['-', self.county]
         return ' '.join(parts)
 
     @property
@@ -72,6 +75,8 @@ class ResultCategory(object):
             parts.append(self.junior)
         if self.gender:
             parts.append(self.gender[0])
+        if self.county:
+            parts.append(self.county[0])
         return ''.join(parts)
 
     def __eq__(self, other):
@@ -80,11 +85,13 @@ class ResultCategory(object):
             self.gender,
             self.junior,
             self.novice,
+            self.county,
         ) == (
             other.bowstyle,
             other.gender,
             other.junior,
             other.novice,
+            other.county,
         )
 
     def __hash__(self):
@@ -93,7 +100,34 @@ class ResultCategory(object):
             self.gender,
             self.junior,
             self.novice,
+            self.county,
         ))
+
+    def _ordering(self):
+        junior_values = {
+            '': 0,
+            '50+': 1,
+            'U21': 2,
+            'U18': 3,
+            'U16': 4,
+            'U15': 3,
+            'U14': 4,
+            'U12': 5,
+            'U10': 6,
+        }
+        return (
+            self.county,
+            self.bowstyle.pk,
+            self.novice or '',
+            junior_values.get(self.junior or '', self.junior),
+            self.gender,
+        )
+
+    def __lt__(self, other):
+        return self._ordering() < other._ordering()
+
+    def __gt__(self, other):
+        return not self.__lt__(other)
 
 
 class TeamResultCategory(object):
@@ -547,7 +581,7 @@ class ByRound(BaseResultMode):
         return rounds
 
     def get_round_results(self, competition, rounds, scores, category=None):
-        results = OrderedDict()
+        results = {}
         for score in scores:
             session_entry = score.target.session_entry
             if session_entry.session_round.shot_round.id not in [round.id for round in rounds]:
@@ -576,7 +610,10 @@ class ByRound(BaseResultMode):
                         retired=False,
                         placing=None,
                     )
-        return results
+        ordered_results = OrderedDict()
+        for category in sorted(results):
+            ordered_results[category] = results[category]
+        return ordered_results
 
 
 class ByRoundAllShot(ByRound, BaseResultMode):
@@ -625,6 +662,22 @@ class ByRoundProgressional(ByRound, BaseResultMode):
             self.get_section_for_round(round, scoring_type, competition),
             self.get_round_results(competition, [round], scores)
         ) for (round, scoring_type) in rounds)
+
+
+class CountyAndVisitor(ByRound, BaseResultMode):
+    slug = 'county-and-visitor'
+    name = 'County and Visitor'
+
+    def get_categories_for_entry(self, competition, entry):
+        categories = super().get_categories_for_entry(competition, entry)
+        if competition.home_county:
+            if entry.county == competition.home_county:
+                for c in categories:
+                    c.county = 'County'
+            else:
+                for c in categories:
+                    c.county = 'Visitor'
+        return categories
 
 
 class DoubleRound(BaseResultMode):
