@@ -49,7 +49,7 @@
 {% for season in seasons %}
 <a href="{% firstof season.league.get_current_season.get_absolute_url league.get_absolute_url %}">
     <div class="leagues__block">
-        <img class="leagues__img" src="{% static 'leagues/logos/'|add:season.league.slug|add:'.png?v=2' %}">
+        <img class="leagues__img" src="{% static 'leagues/logos/'|add:season.league.slug|add:'.png' %}?v=2">
         <h3>{{ season.league }}</h3>
     </div>
 </a>
