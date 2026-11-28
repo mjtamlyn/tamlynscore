@@ -249,6 +249,10 @@ class InputDozens(CompetitionMixin, TemplateView):
         return render(request, self.template, locals())
 
 
+class InputVerify(CompetitionMixin, TemplateView):
+    template_name = 'scores/input_verify.html'
+
+
 class ScoreSheet(CompetitionMixin, TemplateView):
     template_name = 'scores/score_sheet.html'
     admin_required = False

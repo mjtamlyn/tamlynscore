@@ -1,0 +1,18 @@
+{% extends 'entries/competition_detail.html' %}
+
+{% load render_bundle from webpack_loader %}
+{% load qr_code %}
+
+{% block scripts %}
+{% render_bundle 'input_scores' 'js' %}
+{% endblock scripts %}
+
+{% block competition_content %}
+
+<div
+    id="app"
+    data-target-list-api="{% url 'target_list_api' slug=competition.slug %}"
+></div>
+
+{% endblock %}
+
