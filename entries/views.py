@@ -494,7 +494,7 @@ class TargetListBase(CompetitionMixin, ListView):
             data = [self.get_json_data(e) for e in details['entries']]
             details['entries_json'] = data
 
-    def get_json_data(self, entry):
+    def get_json_data(self, entry, target=None):
         data = {
             'id': entry.pk,
             'name': entry.competition_entry.archer.name,
@@ -585,7 +585,7 @@ class TargetListApi(CsrfExemptMixin, TargetListBase, View):
             for target, spaces in session_context['target_list']:
                 archers = {}
                 for detail, ta_obj in spaces:
-                    archers[detail] = self.get_json_data(ta_obj.session_entry) if ta_obj else None
+                    archers[detail] = self.get_json_data(ta_obj.session_entry, ta_obj) if ta_obj else None
                 allocations.append({
                     'number': target,
                     'archers': archers,

@@ -4,7 +4,7 @@ import { createRoot } from 'react-dom/client';
 import { QueryClient, QueryClientProvider } from '@tanstack/react-query';
 
 const app = document.getElementById('app');
-const targetListApi = app.dataset.targetListApi;
+const inputApi = app.dataset.inputApi;
 
 const queryClient = new QueryClient();
 
@@ -13,7 +13,7 @@ if (app) {
     root.render(
         <StrictMode>
             <QueryClientProvider client={ queryClient }>
-                { targetListApi }
+                { inputApi }
             </QueryClientProvider>
         </StrictMode>
     );

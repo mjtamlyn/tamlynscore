@@ -33,7 +33,7 @@ from entries.models import (
     CompetitionEntry, EntryUser, ResultsMode, Session, SessionEntry,
     SessionRound, TargetAllocation,
 )
-from entries.views import CompetitionMixin, TargetListBase
+from entries.views import CompetitionMixin, TargetListApi, TargetListBase
 from olympic.models import OlympicSessionRound
 
 from .forms import get_arrow_formset, get_dozen_formset
@@ -251,6 +251,25 @@ class InputDozens(CompetitionMixin, TemplateView):
 
 class InputVerify(CompetitionMixin, TemplateView):
     template_name = 'scores/input_verify.html'
+
+
+class InputApi(TargetListApi):
+
+    def get_queryset(self):
+        qs = super().get_queryset()
+        return qs.prefetch_related('score')
+
+    def get_json_data(self, entry, target):
+        data = super().get_json_data(entry)
+        data['arrows'] = serializers.score(
+            competition=self.competition,
+            entry=entry.competition_entry,
+            score=target.score,
+        )['arrows']
+        return data
+
+    def handle_action(self, data):
+        raise self.UnknownAction('No actions available yet')
 
 
 class ScoreSheet(CompetitionMixin, TemplateView):
